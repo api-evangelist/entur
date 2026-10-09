@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-transaction-import-request-schema.json",
+  "title": "TransactionImportRequest",
+  "description": "Request body for importing an already completed transaction.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-payment-partner-openapi.yml#/components/schemas/TransactionImportRequest",
+  "required": [
+    "transactionConfirmedAt"
+  ],
+  "type": "object",
+  "properties": {
+    "companyId": {
+      "pattern": "[\\d]{1,4}",
+      "type": "string",
+      "description": "Id of the issuing organisation. The id is equal to the internal id in Enturs Organisation Register. Required for ECARD."
+    },
+    "envNetworkId": {
+      "pattern": "[\\d]{6}",
+      "type": "string",
+      "description": "County code for issuer"
+    },
+    "mediaSerialNumberId": {
+      "pattern": "[\\d]{1,10}",
+      "type": "string",
+      "description": "Numerical e-Card identifier. Required for ECARD."
+    },
+    "paymentType": {
+      "type": "string",
+      "description": "Name of the specific payment type used. This further specifies the type of payment method used for this transaction. Often referred to as the name of the issuer for payment cards in the transaction data retrieved from payment terminals. Required for PAYMENTCARD."
+    },
+    "rrn": {
+      "maxLength": 12,
+      "minLength": 1,
+      "type": "string",
+      "description": "Reconciliation reference number used to track a transaction through different economy systems. Required for PAYMENTCARD."
+    },
+    "terminalId": {
+      "type": "string",
+      "description": "Unique identifier for a physical terminal. Makes a transaction unique together with rrn. Required for PAYMENTCARD."
+    },
+    "externalTransactionId": {
+      "type": "string",
+      "description": "Transaction ID from 3rd party payment provider."
+    },
+    "transactionConfirmedAt": {
+      "type": "string",
+      "description": "Time when payment transaction was completed by the client.",
+      "format": "date-time"
+    },
+    "transactionData": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Any extra transaction data which could be relevant can be specified as a key value map of strings."
+    }
+  }
+}

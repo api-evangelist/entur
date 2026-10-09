@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-reserve-specific-seats-request-schema.json",
+  "title": "ReserveSpecificSeatsRequest",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-seatingservices-openapi.yml#/components/schemas/ReserveSpecificSeatsRequest",
+  "type": "object",
+  "properties": {
+    "hasSeatBehaviors": {
+      "$ref": "#/$defs/SeqHasSeatBehavior"
+    }
+  },
+  "$defs": {
+    "SeqHasSeatBehavior": {
+      "type": "object",
+      "properties": {
+        "traversableAgain": {
+          "type": "boolean"
+        },
+        "empty": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

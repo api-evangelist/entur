@@ -1,0 +1,57 @@
+openapi: 3.2.0
+info:
+  version: 2.2.2
+  title: BoB.participantMetadata. Participant Metadata File API
+  description: The Participant Metadata API provides an interface for participants to manage metadata coordinated by an Administering Body (AB).
+servers:
+- url: /api/v2
+tags:
+- name: participantMetadataFile
+  description: Get all metadata for all registered participants.
+paths:
+  /participantMetadata:
+    get:
+      tags:
+      - participantMetadataFile
+      summary: Get latest participant metadata file
+      description: Get the latest participant metadata file, signed using JSON Web Signature (JWS) as defined in RFC 7515. Metadata validity is specified in the JWS header.
+      operationId: getParticipantMetadataFile
+      responses:
+        '200':
+          description: JWS JSON serialization (<a href="https://tools.ietf.org/html/rfc7515" target="_blank">RFC 7515</a>) of participant metadata. Payload is a Base64 for URL encoded string containing data of type participantMetadataFile.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/jws'
+        '409':
+          description: Server response unavailable due to numerous concurrent updates
+components:
+  schemas:
+    jws:
+      description: JSON Web Signature (JWS) Serialization as defined in <a href="https://tools.ietf.org/html/rfc7515" target="_blank">RFC 7515</a>, details in section <a href="https://tools.ietf.org/html/rfc7515#section-7.2.1" target="_blank">7.2.1</a>.
+      type: object
+      required:
+      - payload
+      - signature
+      properties:
+        payload:
+          type: string
+        signatures:
+          type: array
+          items:
+            type: object
+            required:
+            - signature
+            properties:
+              protected:
+                type: string
+              header:
+                type: string
+              signature:
+                type: string
+  securitySchemes:
+    Pop:
+      description: OAuth 2.0 Proof-of-possession (pop) Token
+      type: apiKey
+      name: Authorization
+      in: header

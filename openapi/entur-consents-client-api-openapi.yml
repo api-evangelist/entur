@@ -1,0 +1,1087 @@
+openapi: 3.2.0
+info:
+  title: Entur Consents client API
+  version: 2026.07.1
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Consents client across 2 of this provider''s published API definitions: entur-consents-openapi.json, entur-consents-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2/consents
+security:
+- jwt: []
+tags:
+- name: Consents client
+  description: Api for creating, fetching, modifying and deleting given consents by clients
+paths:
+  /client/given-consents/{givenConsentId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents client
+      summary: Find a given consent
+      description: Find a given consent defined by its id.
+      operationId: getGivenConsent
+      parameters:
+      - name: givenConsentId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:les
+          - consents-customer-data-global:les
+    put:
+      tags:
+      - Consents client
+      summary: Update a given consent
+      description: Update a given consent.
+      operationId: updateGivenConsent
+      parameters:
+      - name: givenConsentId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GivenConsentPutRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:endre
+          - consents-customer-data-global:endre
+    delete:
+      tags:
+      - Consents client
+      summary: Delete given consent
+      description: Delete a given consent
+      operationId: deleteGivenConsent
+      parameters:
+      - name: givenConsentId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:slett
+          - consents-customer-data-global:slett
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /client/given-consents/bulk:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Consents client
+      summary: Bulk update given consents
+      description: 'Bulk update given consents for a customer. Adds new given consents or replaces existing given consents for the specified consent IDs.
+
+        |Consents not included in the request remain unchanged.'
+      operationId: bulkUpdateGivenConsents
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/GivenConsentBulkUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:endre
+          - consents-customer-data-global:endre
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /client/given-consents:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents client
+      summary: Find given consents
+      description: Find given consents filtered by given query parameters.
+      operationId: findGivenConsents
+      parameters:
+      - name: originalDatedServiceJourneyIds
+        in: query
+        description: 'Search given consents by originalDatedServiceJourneyId (comma separated). Example: originalDatedServiceJourneyIds=ENT:DatedServiceJourney:XXXXX,ENT:DatedServiceJourney:YYYYY'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: lineRef
+        in: query
+        description: 'Search given consents by lineRef (comma separated). Example: lineRef=XXX:Line:YY,XXX:Line:ZZ'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: stopPlaces
+        in: query
+        description: 'Search given consents by stopPlaces (includes start and end stop) (comma separated). Example: stopPlaces=NSR:StopPlace:XXXXX,NSR:StopPlace:YYYY'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:les
+          - consents-customer-data-global:les
+    post:
+      tags:
+      - Consents client
+      summary: Create a given consent
+      description: Create a given consent.
+      operationId: addGivenConsent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GivenConsentRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:opprett
+          - consents-customer-data-global:opprett
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /client/given-consents/get-by/bulk:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Consents client
+      summary: Find given consents by customer references or customer numbers
+      description: 'Find given consents by the provided customer references or customer numbers, filtered by organisation.
+
+        If both customer number and customer references are provided Bad Request will be returned'
+      operationId: bulkFindGivenConsentsForCustomers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GivenConsentBulkGetRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:les
+          - consents-customer-data-global:les
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /client/given-consents/{customerRef}/by-customer-ref:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents client
+      summary: Find all by customer reference
+      description: Find all given consents associated with a customer reference.
+      operationId: findAllGivenConsentsByCustomerRef
+      parameters:
+      - name: customerRef
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:les
+          - consents-customer-data-global:les
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /client/given-consents/{customerNumber}/by-customer-number:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents client
+      summary: Find all by customer number
+      description: Find all given consents by a customer number.
+      operationId: findAllGivenConsentsByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GivenConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-customer-data:les
+          - consents-customer-data-global:les
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /client/consents:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents client
+      summary: Find all consents
+      operationId: findAllConsents
+      parameters:
+      - name: organisationIds
+        in: query
+        description: 'Filter consents by organisation ids (comma separated). If you''re a partner, this will be filled out from your authentication token. Example: organisationIds=1,20'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+      - name: consentCodes
+        in: query
+        description: 'Filter consents by consent base codes (comma separated). Example: consentCodes=ENT_INFO_SMS,ENT_INFO_EMAIL'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: versions
+        in: query
+        description: "Filter consents by consent base versions (comma separated). You can also use the keywords ALL or CURRENT.\n                |Example: versions=1,2 or versions=CURRENT\n              "
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+          default:
+          - CURRENT
+      - name: includeInactive
+        in: query
+        description: 'Whether or not to include inactive consents (Default: false)'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+        examples:
+          default:
+            value: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /client/consents/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents client
+      summary: Get a consent
+      description: Get a consent by its id.
+      operationId: getConsent
+      parameters:
+      - name: id
+        in: path
+        description: The id of the consent to retrieve
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 123
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+components:
+  schemas:
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: ErrorMessage
+    GivenConsentRequest:
+      required:
+      - consentChoice
+      - consentId
+      - customerNumber
+      - expirationDate
+      type: object
+      properties:
+        consentChoice:
+          type: boolean
+          description: Whether this consent has been approved or rejected.
+          examples:
+          - true
+        consentId:
+          type: integer
+          description: The id of the consent defining what and to whom the customer has consented.
+          format: int64
+          examples:
+          - 12
+        countryCode:
+          type: string
+          description: The telephone number country code provided with the consent
+          examples:
+          - '+47'
+        customerNumber:
+          type: integer
+          description: 'Customer number. '
+          format: int64
+          examples:
+          - 123456789
+        customerRef:
+          type: string
+          description: 'Customer reference. Note: If you do not provide a customer reference, the customer number will used as reference.'
+          examples:
+          - abcd-1234
+        email:
+          type: string
+          description: The contact email provided with the consent.
+          examples:
+          - example@mail.com
+        expirationDate:
+          type: string
+          description: When the consent expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        fromStopPlace:
+          type: string
+          description: The stop place where the customer’s journey started, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+        lineRef:
+          type: string
+          description: Reference to the customers journey line, in NeTEx format
+          examples:
+          - VYT:Line:L1
+        originalDatedServiceJourneyId:
+          type: string
+          description: Unique Id for a specific Service Journey, in NeTEx format with ENT as operator
+          examples:
+          - ENT:DatedServiceJourney:12345
+        telephoneNumber:
+          type: string
+          description: The telephone number provided with the consent
+          examples:
+          - '87654321'
+        toStopPlace:
+          type: string
+          description: The stop place where the customer’s journey ended, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+      description: Create a given consent for a customer
+    GivenConsentBulkGetRequest:
+      type: object
+      properties:
+        customerNumbers:
+          type: array
+          description: Customer numbers to look up.
+          items:
+            type: integer
+            description: Customer numbers to look up.
+            format: int64
+        customerRefs:
+          type: array
+          description: Customer references to look up.
+          items:
+            type: string
+            description: Customer references to look up.
+      description: Request to get given consents for multiple customers by customer numbers or customer references.
+    GivenConsentPutRequest:
+      required:
+      - consentChoice
+      - expirationDate
+      type: object
+      properties:
+        consentChoice:
+          type: boolean
+          description: Whether this consent has been approved or rejected.
+          examples:
+          - true
+        countryCode:
+          type: string
+          description: The telephone number country code provided with the consent
+          examples:
+          - '+47'
+        email:
+          type: string
+          description: The contact email provided with the consent.
+          examples:
+          - example@mail.com
+        expirationDate:
+          type: string
+          description: When the consent expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        fromStopPlace:
+          type: string
+          description: The stop place where the customer’s journey started, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+        lineRef:
+          type: string
+          description: Reference to the customers journey line, in NeTEx format
+          examples:
+          - VYT:Line:L1
+        originalDatedServiceJourneyId:
+          type: string
+          description: Unique Id for a specific Service Journey, in NeTEx format with ENT as operator
+          examples:
+          - ENT:DatedServiceJourney:12345
+        telephoneNumber:
+          type: string
+          description: The telephone number provided with the consent
+          examples:
+          - '87654321'
+        toStopPlace:
+          type: string
+          description: The stop place where the customer’s journey ended, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+      description: Update a given consent
+    GivenConsentBulkUpdateRequest:
+      required:
+      - consentChoice
+      - consentId
+      - customerNumber
+      - expirationDate
+      type: object
+      properties:
+        consentChoice:
+          type: boolean
+          description: Whether this consent has been approved or rejected.
+          examples:
+          - true
+        consentId:
+          type: integer
+          description: The id of the consent defining what and to whom the customer has consented.
+          format: int64
+          examples:
+          - 12
+        countryCode:
+          type: string
+          description: The telephone number country code provided with the consent
+          examples:
+          - '+47'
+        customerNumber:
+          type: integer
+          description: 'The customer number '
+          format: int64
+          examples:
+          - 123456789
+        customerRef:
+          type: string
+          description: 'Customer reference. Note: If you do not provide a customer ref, the customer number will used as reference.'
+          examples:
+          - abcd-1234
+        email:
+          type: string
+          description: The contact email provided with the consent.
+          examples:
+          - example@mail.com
+        expirationDate:
+          type: string
+          description: When the consent expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        fromStopPlace:
+          type: string
+          description: The stop place where the customer’s journey started, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+        lineRef:
+          type: string
+          description: Reference to the customers journey line, in NeTEx format
+          examples:
+          - VYT:Line:L1
+        originalDatedServiceJourneyId:
+          type: string
+          description: Unique Id for a specific Service Journey, in NeTEx format with ENT as operator
+          examples:
+          - ENT:DatedServiceJourney:12345
+        telephoneNumber:
+          type: string
+          description: The telephone number provided with the consent
+          examples:
+          - '87654321'
+        toStopPlace:
+          type: string
+          description: The stop place where the customer’s journey ended, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+      description: Request to bulk update given consents for a customer. Adds a new given consent or replaces any existing given consent identified by the consent ID.
+    InternalDescriptionResponse:
+      required:
+      - description
+      - languageCode
+      type: object
+      properties:
+        description:
+          type: string
+          description: A description for the partner administrating consents
+        languageCode:
+          type: string
+          description: ISO-639-3 language code. 3 characters
+          examples:
+          - ENG
+      description: Contains internal description for a consent. Will not be shown to customer
+    ConsentTermsResponse:
+      required:
+      - fullDescription
+      - languageCode
+      - shortDescription
+      type: object
+      properties:
+        fullDescription:
+          type: string
+          description: Text describing the terms in detail. The text can contain MarkDown
+        languageCode:
+          type: string
+          description: ISO-639-3 language code. 3 characters
+          examples:
+          - ENG
+        shortDescription:
+          type: string
+          description: Short text explaining the terms. The text can contain MarkDown
+      description: Text for terms in a specific language
+    ConsentResponse:
+      required:
+      - changedAt
+      - consentBase
+      - consentCode
+      - createdAt
+      - id
+      - isEmailSupported
+      - isSmsSupported
+      - organisationId
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the consent was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        consentBase:
+          $ref: '#/components/schemas/ConsentBaseResponse'
+        consentCode:
+          type: string
+          description: Code  of the consent base
+        createdAt:
+          type: string
+          description: When the consent was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Consent ID.
+          format: int64
+        isEmailSupported:
+          type: boolean
+          description: Whether the organisation supports email as a contact method
+        isSmsSupported:
+          type: boolean
+          description: Whether the organisation supports SMS as a contact method
+        organisationId:
+          type: integer
+          description: The organisation the consent is valid for.
+          format: int64
+        validFrom:
+          type: string
+          description: If set, the date the consent is valid from. Can only be set to a date after consent base validFrom. If not set, the consent base is in draft mode.
+          format: date-time
+        validTo:
+          type: string
+          description: If set, the date the consent is valid to. Set the date to deactivate the consent. Can only be set to a date before the consent base validTo. If not set the consent is active from validFrom and forever after.
+          format: date-time
+      description: Consent response, includes the consent base
+    ConsentBaseResponse:
+      required:
+      - changedAt
+      - consentCode
+      - createdAt
+      - terms
+      - version
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the consent base was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        consentCode:
+          type: string
+          description: Consent code used to identify the consent base
+          examples:
+          - ENT_INFO_SMS
+        consentOwnerOrgId:
+          type: integer
+          description: The organisation that owns the consent base. If not set, the consent base can be used by all organisations.
+          format: int64
+        createdAt:
+          type: string
+          description: When the consent base was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        internalDescription:
+          type: array
+          description: Internal description, describing the use cases for the consent base
+          items:
+            $ref: '#/components/schemas/InternalDescriptionResponse'
+        orgNameSubstitutionPattern:
+          type: string
+          description: The pattern on which to perform substitution within terms. Facilitates reusable consent basess across organisations
+          examples:
+          - '[ORG]'
+        terms:
+          type: array
+          description: Consent terms with long and short description in multiple languages. The descriptions can contain MarkDown
+          items:
+            $ref: '#/components/schemas/ConsentTermsResponse'
+        validFrom:
+          type: string
+          description: If set, the date the consent base is valid from. It is not possible to change the consent terms after this date without creating a new version. If not set, the consent base is in draft mode.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        validTo:
+          type: string
+          description: If set, the date the consent base is valid to. If this date is in the past, the consent base is deactivated. If not set, the consent is active from validFrom and onwards.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        version:
+          type: integer
+          description: The consent base version
+          format: int32
+      description: Consent base
+    GivenConsentResponse:
+      required:
+      - changedAt
+      - consent
+      - consentChoice
+      - consentId
+      - createdAt
+      - createdByOrgId
+      - customerNumber
+      - distributionChannel
+      - expirationDate
+      - id
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the consent was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        consent:
+          $ref: '#/components/schemas/ConsentResponse'
+        consentChoice:
+          type: boolean
+          description: Whether this consent has been approved or rejected.
+        consentId:
+          type: integer
+          description: The id of the consent defining what the customer has consented.
+          format: int64
+        countryCode:
+          type: string
+          description: The telephone number country code provided with the consent
+        createdAt:
+          type: string
+          description: When the consent was given. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdByOrgId:
+          type: integer
+          description: The organisation through which the consent was given
+          format: int64
+        customerNumber:
+          type: integer
+          description: Customer number. Entur number unique across organisations
+          format: int64
+        customerRef:
+          type: string
+          description: Customer reference. External reference, unique within an organisation
+        distributionChannel:
+          type: string
+          description: Distribution channel through which the consent was given.
+        email:
+          type: string
+          description: The contact email provided with the consent.
+        expirationDate:
+          type: string
+          description: When the consent expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        fromStopPlace:
+          type: string
+          description: The stop place where the customer’s journey started, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+        id:
+          type: integer
+          description: Unique id for the given consent.
+          format: int64
+        lineRef:
+          type: string
+          description: Reference to the customers journey line, in NeTEx format
+          examples:
+          - VYT:Line:L1
+        originalDatedServiceJourneyId:
+          type: string
+          description: Unique Id for a specific Service Journey, in NeTEx format
+          examples:
+          - ENT:DatedServiceJourney:12345
+        telephoneNumber:
+          type: string
+          description: The telephone number provided with the consent
+        toStopPlace:
+          type: string
+          description: The stop place where the customer’s journey ended, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+      description: A consent given for a customer
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-consents-openapi.json
+- entur-consents-openapi.yml

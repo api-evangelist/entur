@@ -1,0 +1,372 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-result-schema.json",
+  "title": "Result",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-geocoder-openapi.yml#/components/schemas/Result",
+  "required": [
+    "features",
+    "metadata",
+    "type"
+  ],
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "FeatureCollection"
+      ]
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Feature"
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "bbox": {
+      "maxItems": 4,
+      "minItems": 4,
+      "type": "array",
+      "description": "[minLon, minLat, maxLon, maxLat]",
+      "items": {
+        "type": "number"
+      }
+    }
+  },
+  "$defs": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "streetName": {
+          "type": "string"
+        },
+        "houseNumber": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        },
+        "locality": {
+          "type": "string"
+        },
+        "localityId": {
+          "type": "string"
+        },
+        "borough": {
+          "type": "string"
+        },
+        "boroughId": {
+          "type": "string"
+        },
+        "county": {
+          "type": "string"
+        },
+        "countyId": {
+          "type": "string"
+        },
+        "countryCode": {
+          "type": "string"
+        }
+      }
+    },
+    "Feature": {
+      "required": [
+        "geometry",
+        "properties",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Feature"
+          ]
+        },
+        "geometry": {
+          "$ref": "#/$defs/Geometry"
+        },
+        "properties": {
+          "$ref": "#/$defs/Place"
+        },
+        "bbox": {
+          "maxItems": 4,
+          "minItems": 4,
+          "type": "array",
+          "description": "GeoJSON bounding box `[minLon, minLat, maxLon, maxLat]`. Present for features with a real extent (streets, groups of stop places); omitted for point features.",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "Filters": {
+      "type": "object",
+      "properties": {
+        "layers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Layer"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "countries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "counties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "localities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fareZones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fareZoneAuthorities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stopPlaceTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "multimodal": {
+          "type": "string",
+          "enum": [
+            "parent",
+            "child",
+            "all"
+          ]
+        }
+      },
+      "description": "Echoes the request filters as sent, not the effective filter set."
+    },
+    "Geometry": {
+      "required": [
+        "coordinates",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Point"
+          ]
+        },
+        "coordinates": {
+          "maxItems": 2,
+          "minItems": 2,
+          "type": "array",
+          "description": "[longitude, latitude]",
+          "items": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "Layer": {
+      "type": "string",
+      "enum": [
+        "address",
+        "street",
+        "stopPlace",
+        "groupOfStopPlaces",
+        "poi",
+        "place"
+      ]
+    },
+    "Metadata": {
+      "required": [
+        "query",
+        "resultCount",
+        "timestamp"
+      ],
+      "type": "object",
+      "properties": {
+        "query": {
+          "$ref": "#/$defs/QueryInfo"
+        },
+        "resultCount": {
+          "type": "integer"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Response generation time as an ISO 8601 instant (UTC).",
+          "format": "date-time"
+        }
+      }
+    },
+    "Names": {
+      "required": [
+        "default",
+        "display"
+      ],
+      "type": "object",
+      "properties": {
+        "default": {
+          "type": "string",
+          "description": "Official name"
+        },
+        "label": {
+          "type": "string",
+          "description": "Common or colloquial name"
+        },
+        "display": {
+          "type": "string",
+          "description": "Formatted name with locality context, suitable for display"
+        }
+      }
+    },
+    "Place": {
+      "required": [
+        "id",
+        "layer",
+        "names",
+        "source"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "names": {
+          "$ref": "#/$defs/Names"
+        },
+        "layer": {
+          "$ref": "#/$defs/Layer"
+        },
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fareZones": {
+          "type": "array",
+          "description": "Zones the place is in; they overlap, so a stop can be in several. A multimodal parent lists its own plus its children's, so use `multimodal=child` for per-departure zones.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "transportModes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TransportMode"
+          }
+        },
+        "stopPlaceTypes": {
+          "type": "array",
+          "description": "NeTEx StopPlaceType values (same value set as the `stopPlaceTypes` filter parameter)",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stopPlaceRole": {
+          "type": "string",
+          "description": "A stop place's role in the parent-child hierarchy: `parent` (aggregates child stops), `child`, or `standalone`. Present on `stopPlace` features; absent on other layers and on stop places not yet reindexed. Treat an absent or unrecognised value as unknown, not `standalone`. (`parent`/`child` both mean multimodal.)",
+          "enum": [
+            "parent",
+            "child",
+            "standalone"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "description": "Data source identifier (same values as the sources filter)",
+          "enum": [
+            "openstreetmap",
+            "kartverket-matrikkelenadresse",
+            "kartverket-stedsnavn",
+            "nsr",
+            "custom-poi"
+          ]
+        },
+        "distance": {
+          "type": "number",
+          "description": "Distance from the reverse query point in kilometres (3-decimal precision). Present on `/v3/reverse` responses only; the field is omitted (not `null`) on autocomplete and place lookup.",
+          "format": "double"
+        },
+        "description": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Per-language description. Keys are ISO 639-2 alpha-3 language codes (`nor`, `eng`, etc.). The field is omitted (not `null`) when the underlying record has no description."
+        }
+      }
+    },
+    "QueryInfo": {
+      "required": [
+        "lang",
+        "limit"
+      ],
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double"
+        },
+        "lon": {
+          "type": "number",
+          "format": "double"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "lang": {
+          "type": "string"
+        },
+        "filters": {
+          "$ref": "#/$defs/Filters"
+        }
+      }
+    },
+    "TransportMode": {
+      "required": [
+        "mode"
+      ],
+      "type": "object",
+      "properties": {
+        "mode": {
+          "type": "string"
+        },
+        "subMode": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

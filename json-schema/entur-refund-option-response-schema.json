@@ -1,0 +1,231 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-refund-option-response-schema.json",
+  "title": "RefundOptionResponse",
+  "description": "A response detailing all refundable options for an order",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-refund-partner-openapi.yml#/components/schemas/RefundOptionResponse",
+  "type": "object",
+  "properties": {
+    "optionIdsThatCanBePerformedTogether": {
+      "type": "array",
+      "description": "A set of option ids that are possible to refund together. If only one option is returned, this will be empty. Ids are only valid inside the scope of a RefundOptionResponse",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "uniqueItems": true
+      },
+      "uniqueItems": true
+    },
+    "options": {
+      "type": "array",
+      "default": [],
+      "description": "All the refundable options for a given order, or options for requested order lines",
+      "items": {
+        "$ref": "#/$defs/RefundOption"
+      }
+    },
+    "orderRef": {
+      "$ref": "#/$defs/OrderReference"
+    }
+  },
+  "required": [
+    "optionIdsThatCanBePerformedTogether",
+    "options",
+    "orderRef"
+  ],
+  "$defs": {
+    "AffectedPaymentTransaction": {
+      "type": "object",
+      "description": "A composition of payment transaction data that is affected, including the amount that will be subtracted if used in a refund",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "The amount that will be subtracted from the transaction if used in a refund"
+        },
+        "generalType": {
+          "type": "string",
+          "description": "The general type of payment"
+        },
+        "import": {
+          "type": "boolean"
+        },
+        "paymentId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The id of a payment"
+        },
+        "rrn": {
+          "type": "string",
+          "description": "The Retrieval Reference Number for the affected transaction"
+        },
+        "specificType": {
+          "type": "string",
+          "description": "If available, a more specific payment type"
+        },
+        "transactionId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The id of the payment transaction"
+        }
+      },
+      "required": [
+        "amount",
+        "generalType",
+        "import",
+        "paymentId",
+        "transactionId"
+      ],
+      "title": "AffectedPaymentTransaction"
+    },
+    "OrderReference": {
+      "type": "object",
+      "description": "Wrapper detailing a OrderReference to an instance",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id of the instance"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The version of the instance"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "OrderReference"
+    },
+    "ProductElementIdentifier": {
+      "type": "object",
+      "description": "A type for depicting where an element resides in a sales package tree",
+      "properties": {
+        "fareStructureElementIndex": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The index of the element on the farestructure element level"
+        },
+        "fareproductIndex": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The index of the element on the fareproduct level"
+        },
+        "level": {
+          "$ref": "#/$defs/ProductLevel"
+        },
+        "validableElementIndex": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The index of the element on the validable element level"
+        }
+      },
+      "required": [
+        "level"
+      ],
+      "title": "ProductElementIdentifier"
+    },
+    "ProductLevel": {
+      "type": "string",
+      "description": "The level the element resides",
+      "enum": [
+        "SALE_PACKAGE",
+        "FARE_PRODUCT",
+        "VALIDABLE_ELEMENT",
+        "FARESTRUCTURE_ELEMENT"
+      ]
+    },
+    "ProductsElementWrapper": {
+      "type": "object",
+      "description": "A data-wrapper for a product type",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id of the product type"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the product type"
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the product type"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "ProductsElementWrapper"
+    },
+    "RefundOption": {
+      "type": "object",
+      "description": "A representation of a complete refundable option",
+      "properties": {
+        "additionalAffectedElementsOnLevel": {
+          "type": "array",
+          "default": [],
+          "description": "An optional list of additional elements on the same product level that this option also will consume",
+          "items": {
+            "$ref": "#/$defs/ProductElementIdentifier"
+          }
+        },
+        "affectedPaymentTransactions": {
+          "type": "array",
+          "description": "A summary list of which payment and its transactions that will be affected if this option is selected",
+          "items": {
+            "$ref": "#/$defs/AffectedPaymentTransaction"
+          }
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The datetime that this option will expire"
+        },
+        "fee": {
+          "type": "string",
+          "description": "The fee this option will entail. This needs to be subtracted from refundAmount to get the final amount that will be refunded"
+        },
+        "orderLineRef": {
+          "$ref": "#/$defs/OrderReference"
+        },
+        "product": {
+          "$ref": "#/$defs/ProductsElementWrapper"
+        },
+        "productElementIdentifier": {
+          "$ref": "#/$defs/ProductElementIdentifier"
+        },
+        "refundAmount": {
+          "type": "string",
+          "description": "The refundable amount that this option permits"
+        },
+        "refundRule": {
+          "$ref": "#/$defs/ProductsElementWrapper"
+        },
+        "transientId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "An id for an option that is unique only in the context of a RefundOptionResponse"
+        }
+      },
+      "required": [
+        "affectedPaymentTransactions",
+        "expiresAt",
+        "fee",
+        "orderLineRef",
+        "product",
+        "productElementIdentifier",
+        "refundAmount",
+        "refundRule",
+        "transientId"
+      ],
+      "title": "RefundOption"
+    }
+  }
+}

@@ -1,0 +1,327 @@
+openapi: 3.2.0
+info:
+  title: Entur Preferences admin API
+  version: 2026.10.0
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Preferences admin across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2
+security:
+- jwt: []
+tags:
+- name: Preferences admin
+  description: Api for creating, fetching, modifying and deleting preferences a customer can have
+paths:
+  /preferences/{preferenceId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Preferences admin
+      summary: Find Preference by id
+      description: Get a specific preference by Id.
+      operationId: findPreferenceById
+      parameters:
+      - name: preferenceId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferenceResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-preference:les
+    put:
+      tags:
+      - Preferences admin
+      summary: Update preference
+      description: Update the fields of an existing preference. All values are stored and overrides current values.
+      operationId: updatePreference
+      parameters:
+      - name: preferenceId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferenceRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferenceResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: customers-preference:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /preferences:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Preferences admin
+      summary: List all preferences
+      description: Get the list of all supported preferences. This list will include inactive preferences.
+      operationId: listAllPreferences
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-preference:les
+    post:
+      tags:
+      - Preferences admin
+      summary: Add preference
+      description: Add a preference to the database.
+      operationId: addPreference
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferenceRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferenceResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: customers-preference:opprett
+    servers:
+    - url: https://api.entur.io/customers/v2
+components:
+  schemas:
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: 'An Error message. '
+    PreferenceRequest:
+      required:
+      - isActive
+      - preferenceCode
+      - preferenceDescription
+      - preferenceType
+      type: object
+      properties:
+        isActive:
+          type: boolean
+          description: Whether the preference is active.
+        preferenceCode:
+          maxLength: 20
+          type: string
+          description: The preference code.
+        preferenceDescription:
+          maxLength: 255
+          type: string
+          description: A description of the preference.
+        preferenceType:
+          maxLength: 20
+          type: string
+          description: Type of preference.
+      description: Preference
+    PreferenceResponse:
+      required:
+      - changedAt
+      - createdAt
+      - id
+      - isActive
+      - preferenceCode
+      - preferenceDescription
+      - preferenceType
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the preference was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the preference was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Preference id.
+          format: int64
+        isActive:
+          type: boolean
+          description: Whether the preference is active.
+        preferenceCode:
+          maxLength: 20
+          type: string
+          description: The preference code.
+        preferenceDescription:
+          maxLength: 255
+          type: string
+          description: A description of the preference.
+        preferenceType:
+          maxLength: 20
+          type: string
+          description: Type of preference.
+      description: Preference
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-customers-openapi.json
+- entur-customers-openapi.yml

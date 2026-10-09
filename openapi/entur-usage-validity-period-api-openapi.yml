@@ -1,0 +1,507 @@
+openapi: 3.2.0
+info:
+  title: Products V3 Usage Validity Period API
+  description: '**This API specification is a draft and is not yet implemented. Endpoints, schemas, and
+
+    behavior are subject to change without notice.**
+
+
+    This API provides services to read and maintain products and fare data for public transport in Norway.'
+  contact:
+    name: Team Produkt
+    email: teamprodukt@entur.org
+  version: 2026.10.1
+  x-stability-level: draft
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: Usage Validity Period
+  description: 'Manage UsageValidityPeriod instances. Defines how long a product is valid after
+
+    purchase or activation (e.g., single trip, 60 minutes, 30 days).'
+paths:
+  /v3/parameters/limitations/usage-validity-period:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Usage Validity Period
+      summary: List usage validity period instances
+      description: Returns a paginated list of all UsageValidityPeriod instances.
+      operationId: listUsageValidityPeriods
+      parameters:
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Paginated list of UsageValidityPeriod instances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageValidityPeriodListResponse'
+              examples:
+                default:
+                  value:
+                    instances:
+                    - id: ENT:UsageValidityPeriod:DuringTravel
+                      name:
+                      - lang: nb-NO
+                        value: Under reise
+                      usageValidityType: SINGLE_TRIP
+                      validityPeriod: PT60M
+                      activationType: ON_CHECK_IN
+                    totalCount: 1
+                    page: 0
+                    size: 100
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - Usage Validity Period
+      summary: Create a usage validity period instance
+      description: Create a new UsageValidityPeriod instance.
+      operationId: createUsageValidityPeriod
+      requestBody:
+        description: The UsageValidityPeriod instance to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsageValidityPeriodRequest'
+            examples:
+              default:
+                value:
+                  name:
+                  - lang: nb-NO
+                    value: Under reise
+                  usageValidityType: SINGLE_TRIP
+                  validityPeriod: PT60M
+                  activationType: ON_CHECK_IN
+        required: true
+      responses:
+        '201':
+          description: UsageValidityPeriod instance created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageValidityPeriod'
+              examples:
+                default:
+                  value:
+                    id: ENT:UsageValidityPeriod:DuringTravel
+                    name:
+                    - lang: nb-NO
+                      value: Under reise
+                    usageValidityType: SINGLE_TRIP
+                    validityPeriod: PT60M
+                    activationType: ON_CHECK_IN
+        '400':
+          description: Bad request - Invalid data or schema violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match type schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'usageValidityType' is required for type 'usage-validity-period'.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/parameters/limitations/usage-validity-period/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Usage Validity Period
+      summary: Get a usage validity period instance
+      description: Retrieve the full detail of a single UsageValidityPeriod instance.
+      operationId: getUsageValidityPeriod
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: UsageValidityPeriod instance found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageValidityPeriod'
+              examples:
+                default:
+                  value:
+                    id: ENT:UsageValidityPeriod:DuringTravel
+                    name:
+                    - lang: nb-NO
+                      value: Under reise
+                    usageValidityType: SINGLE_TRIP
+                    validityPeriod: PT60M
+                    activationType: ON_CHECK_IN
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: UsageValidityPeriod instance not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Instance not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: UsageValidityPeriod instance ENT:UsageValidityPeriod:nonexistent not found.
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - Usage Validity Period
+      summary: Update a usage validity period instance
+      description: Update an existing UsageValidityPeriod instance.
+      operationId: updateUsageValidityPeriod
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: The updated UsageValidityPeriod data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsageValidityPeriodRequest'
+            examples:
+              default:
+                value:
+                  name:
+                  - lang: nb-NO
+                    value: Under reise
+                  usageValidityType: SINGLE_TRIP
+                  validityPeriod: PT60M
+                  activationType: ON_CHECK_IN
+        required: true
+      responses:
+        '200':
+          description: UsageValidityPeriod instance updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageValidityPeriod'
+              examples:
+                default:
+                  value:
+                    id: ENT:UsageValidityPeriod:DuringTravel
+                    name:
+                    - lang: nb-NO
+                      value: Under reise
+                    usageValidityType: SINGLE_TRIP
+                    validityPeriod: PT60M
+                    activationType: ON_CHECK_IN
+        '400':
+          description: Bad request - Invalid data or schema violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match type schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'usageValidityType' is required for type 'usage-validity-period'.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: UsageValidityPeriod instance not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Instance not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: UsageValidityPeriod instance ENT:UsageValidityPeriod:nonexistent not found.
+      x-entur-permissions:
+        value: product-api-access:endre
+components:
+  schemas:
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+    UsageValidityPeriodRequest:
+      required:
+      - name
+      - usageValidityType
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/LocalizedString'
+        usageValidityType:
+          type: string
+          description: The type of usage validity.
+          enum:
+          - SINGLE_TRIP
+          - RETURN_TRIP
+          - CARNET
+          - DAY_PASS
+          - WEEKLY_PASS
+          - MONTHLY_PASS
+          - ANNUAL_PASS
+          - CUSTOM_PERIOD
+        validityPeriod:
+          type: string
+          description: How long the product is valid after activation. ISO 8601 duration.
+          examples:
+          - PT60M
+        activationType:
+          type: string
+          description: What triggers the start of the validity period.
+          enum:
+          - ON_PURCHASE
+          - ON_FIRST_USE
+          - ON_CHECK_IN
+    UsageValidityPeriod:
+      required:
+      - id
+      - name
+      - usageValidityType
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):UsageValidityPeriod:([0-9A-Za-z_\-]*)$
+          type: string
+          description: The NeTEx ID of this UsageValidityPeriod.
+          examples:
+          - ENT:UsageValidityPeriod:DuringTravel
+        name:
+          $ref: '#/components/schemas/LocalizedString'
+        usageValidityType:
+          type: string
+          description: The type of usage validity.
+          enum:
+          - SINGLE_TRIP
+          - RETURN_TRIP
+          - CARNET
+          - DAY_PASS
+          - WEEKLY_PASS
+          - MONTHLY_PASS
+          - ANNUAL_PASS
+          - CUSTOM_PERIOD
+        validityPeriod:
+          type: string
+          description: How long the product is valid after activation. ISO 8601 duration.
+          examples:
+          - PT60M
+        activationType:
+          type: string
+          description: What triggers the start of the validity period.
+          enum:
+          - ON_PURCHASE
+          - ON_FIRST_USE
+          - ON_CHECK_IN
+    UsageValidityPeriodListResponse:
+      required:
+      - instances
+      - page
+      - size
+      - totalCount
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageValidityPeriod'
+        totalCount:
+          type: integer
+          description: Total number of UsageValidityPeriod instances.
+          examples:
+          - 8
+        page:
+          type: integer
+          description: Current zero-based page number.
+          examples:
+          - 0
+        size:
+          type: integer
+          description: Number of instances per page.
+          examples:
+          - 100
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+  responses:
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+  parameters:
+    page:
+      name: page
+      in: query
+      description: Zero-based page number. Defaults to 0.
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        default: 0
+      examples:
+        default:
+          value: 0
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    size:
+      name: size
+      in: query
+      description: Number of instances per page. Defaults to 100.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 1000
+        minimum: 1
+        type: integer
+        default: 100
+      examples:
+        default:
+          value: 100
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

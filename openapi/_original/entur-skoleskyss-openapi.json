@@ -1,0 +1,802 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Skoleskyss",
+    "description": "API for å opprette og slette skyssrettigheter for elever i Skoleskyss, Enturs løsning for skoleskyss for fylkeskommuner.",
+    "version": "2026.10.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.entur.io",
+      "description": "Production"
+    },
+    {
+      "url": "https://api.staging.entur.io",
+      "description": "Staging"
+    }
+  ],
+  "security": [
+    {
+      "jwt": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Skoleskyss",
+      "description": "Opprette og slette skyssrettigheter for elever."
+    }
+  ],
+  "paths": {
+    "/skoleskyss": {
+      "post": {
+        "tags": [
+          "Skoleskyss"
+        ],
+        "summary": "Opprett eller oppdater en skyssrettighet",
+        "description": "Oppretter en ny skyssrettighet for en elev, eller erstatter/oppdaterer en eksisterende dersom studentId+applicationId allerede har en aktiv skyssrettighet for organisasjonen.",
+        "operationId": "addSkoleskyss",
+        "requestBody": {
+          "description": "Skyssrettigheten som skal opprettes eller oppdateres.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostSkoleskyssRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Skyssrettigheten ble opprettet eller oppdatert.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostSkoleskyssResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ugyldig input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ValidationIssue"
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRequestError"
+                    }
+                  ]
+                },
+                "example": {
+                  "error": "InvalidCalendarError",
+                  "message": "calendar må inneholde enten id eller validDates, ikke begge"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Mangler eller ugyldig token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Manglende rettighet skoleskyss.full-access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Uventet feil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Dekker blant annet 412 Precondition Failed når organisationId mangler i token-payloaden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "skoleskyss.full-access:endre",
+          "description": "Gir full tilgang til å opprette skyssrettigheter og mottakere, samt slette en mottaker via API-et til Skoleskyss for organisasjonen definert i responsibilityType."
+        }
+      },
+      "delete": {
+        "tags": [
+          "Skoleskyss"
+        ],
+        "summary": "Slett en skyssrettighet",
+        "description": "Fjerner mottakeren fra skyssrettigheten.",
+        "operationId": "removeSkoleskyss",
+        "requestBody": {
+          "description": "Identifikatorene til skyssrettigheten som skal slettes.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteSkoleskyssRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Skyssrettigheten ble slettet.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSkoleskyssResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ugyldig input.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ValidationIssue"
+                      }
+                    },
+                    {
+                      "$ref": "#/components/schemas/InvalidRequestError"
+                    }
+                  ]
+                },
+                "example": {
+                  "error": "InvalidCalendarError",
+                  "message": "calendar må inneholde enten id eller validDates, ikke begge"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Mangler eller ugyldig token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Manglende rettighet skoleskyss.full-access.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Uventet feil.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Dekker blant annet 412 Precondition Failed når organisationId mangler i token-payloaden.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalError"
+                },
+                "example": {
+                  "error": "Internal"
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "skoleskyss.full-access:endre",
+          "description": "Gir full tilgang til å opprette skyssrettigheter og mottakere, samt slette en mottaker via API-et til Skoleskyss for organisasjonen definert i responsibilityType."
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "PostSkoleskyssRequest": {
+        "type": "object",
+        "example": {
+          "studentId": "12312311",
+          "applicationId": "6783",
+          "organisationId": 39,
+          "name": "Skolekort 2025 - 2026",
+          "validity": {
+            "startDate": "2025-08-16",
+            "endDate": "2026-08-31",
+            "calendar": {
+              "id": "INN:FareDayType:SchoolDayDefaultSchool20252026"
+            },
+            "tripDurationMinutes": 180,
+            "maxTripsPerDay": 2,
+            "travelWindow": {
+              "fromHour": 6,
+              "toHour": 9
+            },
+            "zones": [
+              {
+                "groupOfTariffZoneId": "INN:GroupOfTariffZones:1"
+              }
+            ]
+          },
+          "studentDetails": {
+            "firstName": "Kent",
+            "surname": "Andersen",
+            "school": {
+              "id": "123",
+              "name": "Gausdal Videregående"
+            },
+            "class": {
+              "id": "456",
+              "name": "1MK"
+            },
+            "phone": {
+              "number": "97722052",
+              "countryCode": "+47"
+            }
+          }
+        },
+        "properties": {
+          "organisationId": {
+            "type": "number"
+          },
+          "studentId": {
+            "$ref": "#/components/schemas/NumberOrString"
+          },
+          "applicationId": {
+            "$ref": "#/components/schemas/NumberOrString"
+          },
+          "name": {
+            "type": "string",
+            "description": "Navnet på skyssretten. For eksempel 'Skoleskort 2025-2026'."
+          },
+          "schoolName": {
+            "type": "string",
+            "description": "Navnet på skolen"
+          },
+          "validity": {
+            "$ref": "#/components/schemas/ValidityRequest"
+          },
+          "studentDetails": {
+            "$ref": "#/components/schemas/StudentDetailsRequest"
+          }
+        },
+        "required": [
+          "applicationId",
+          "studentId",
+          "validity"
+        ]
+      },
+      "NumberOrString": {
+        "anyOf": [
+          {
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "type": "number"
+          }
+        ]
+      },
+      "ValidityRequest": {
+        "type": "object",
+        "description": "endDate må være samme dag som eller etter startDate, og kan ikke ha passert.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Navn på gyldigheten. Brukes i billettvisningen."
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "calendar": {
+            "description": "Må inneholde enten id eller validDates, ikke begge.",
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "description": "Overstyrer standard-kalenderen fra config. Kan ikke kombineres med validDates.",
+                    "pattern": "^[A-Z]{3}:FareDayType:\\w+$"
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "validDates": {
+                    "type": "array",
+                    "description": "Liste over gyldige datoer for skyssretten (YYYY-MM-DD). Kan ikke kombineres med id.",
+                    "items": {
+                      "type": "string",
+                      "format": "date",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    },
+                    "minItems": 1
+                  }
+                },
+                "required": [
+                  "validDates"
+                ]
+              }
+            ]
+          },
+          "tripDurationMinutes": {
+            "type": "integer",
+            "description": "Antall minutter et enkelt klipp er gyldig etter aktivering. Standard er 180 minutter.",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "maxAvailableTrips": {
+            "type": "integer",
+            "description": "Maks antall turer totalt skyssretten gir rett til. Hvis utelatt er det ingen begrensning.",
+            "maximum": 9007199254740991,
+            "minimum": 0
+          },
+          "maxTripsPerDay": {
+            "type": "integer",
+            "description": "Maks antall turer per dag skyssretten gir rett til. Standard er 2.",
+            "maximum": 10,
+            "minimum": 1
+          },
+          "travelWindow": {
+            "type": "object",
+            "description": "Tidsvindu for når eleven kan gjennomføre turer. Overstyrer eventuell standard fra config. fromHour må være mindre enn eller lik toHour.",
+            "properties": {
+              "fromHour": {
+                "type": "integer",
+                "description": "Tidligste klokketime eleven kan starte en tur.",
+                "maximum": 23,
+                "minimum": 0
+              },
+              "toHour": {
+                "type": "integer",
+                "description": "Seneste klokketime eleven kan starte en tur.",
+                "maximum": 23,
+                "minimum": 0
+              }
+            },
+            "required": [
+              "fromHour",
+              "toHour"
+            ]
+          },
+          "zones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Zone"
+            }
+          }
+        },
+        "required": [
+          "endDate",
+          "startDate",
+          "zones"
+        ]
+      },
+      "Zone": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/PrivateCodeZone"
+          },
+          {
+            "$ref": "#/components/schemas/FareZoneIds"
+          },
+          {
+            "$ref": "#/components/schemas/GroupOfTariffZone"
+          }
+        ]
+      },
+      "PrivateCodeZone": {
+        "type": "object",
+        "properties": {
+          "fromPrivateCode": {
+            "$ref": "#/components/schemas/NumberOrString"
+          },
+          "toPrivateCode": {
+            "$ref": "#/components/schemas/NumberOrString"
+          }
+        },
+        "required": [
+          "fromPrivateCode",
+          "toPrivateCode"
+        ]
+      },
+      "FareZoneIds": {
+        "type": "object",
+        "properties": {
+          "fromZoneId": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}:FareZone:\\d+$"
+          },
+          "toZoneId": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}:FareZone:\\d+$"
+          }
+        },
+        "required": [
+          "fromZoneId",
+          "toZoneId"
+        ]
+      },
+      "GroupOfTariffZone": {
+        "type": "object",
+        "properties": {
+          "groupOfTariffZoneId": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}:GroupOfTariffZones:\\d+$"
+          }
+        },
+        "required": [
+          "groupOfTariffZoneId"
+        ]
+      },
+      "StudentDetailsRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "school": {
+            "$ref": "#/components/schemas/IdAndName"
+          },
+          "class": {
+            "$ref": "#/components/schemas/IdAndName"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?:[A-Za-z0-9_'+\\-]+\\.)*[A-Za-z0-9_'+\\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "phone": {
+            "type": "object",
+            "description": "Ved landskode +47 må number starte med 4 eller 9 og bestå av 8 siffer.",
+            "properties": {
+              "number": {
+                "type": "string",
+                "pattern": "\\d+"
+              },
+              "countryCode": {
+                "type": "string",
+                "default": "+47",
+                "pattern": "^\\+?\\d{1,3}$"
+              }
+            },
+            "required": [
+              "number"
+            ]
+          }
+        }
+      },
+      "IdAndName": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/NumberOrString"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "DeleteSkoleskyssRequest": {
+        "type": "object",
+        "example": {
+          "studentId": "12312312",
+          "applicationId": "6784",
+          "organisationId": 39
+        },
+        "properties": {
+          "organisationId": {
+            "type": "number"
+          },
+          "studentId": {
+            "$ref": "#/components/schemas/NumberOrString"
+          },
+          "applicationId": {
+            "$ref": "#/components/schemas/NumberOrString"
+          }
+        },
+        "required": [
+          "applicationId",
+          "studentId"
+        ]
+      },
+      "PostSkoleskyssResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "recipient": {
+            "externalRef": "12312311",
+            "customerAccountId": "CAI:CustomerAccount:1234567"
+          },
+          "fareContract": {
+            "externalRef": "6783",
+            "fareContractId": "FCI:FareContract:1234567",
+            "status": "created"
+          },
+          "transferDetails": {
+            "pickupCode": "123456",
+            "expiresAt": "2025-08-20T10:00:00Z"
+          }
+        },
+        "properties": {
+          "recipient": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "externalRef": {
+                "type": "string"
+              },
+              "customerAccountId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "customerAccountId",
+              "externalRef"
+            ]
+          },
+          "fareContract": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "externalRef": {
+                "type": "string"
+              },
+              "fareContractId": {
+                "type": "string"
+              },
+              "status": {
+                "$ref": "#/components/schemas/TravelRightOutcome"
+              }
+            },
+            "required": [
+              "externalRef",
+              "fareContractId",
+              "status"
+            ]
+          },
+          "transferDetails": {
+            "$ref": "#/components/schemas/TransferDetails"
+          }
+        },
+        "required": [
+          "fareContract",
+          "recipient"
+        ]
+      },
+      "TravelRightOutcome": {
+        "type": "string",
+        "description": "\"created\" = ny skyssrett. \"replaced\" = eksisterende skyssrett ble erstattet fordi noe var endret. \"unchanged\" = skyssretten var allerede lik forespørselen og ble beholdt; kun mottakeropplysninger ble oppdatert.",
+        "enum": [
+          "created",
+          "replaced",
+          "unchanged"
+        ]
+      },
+      "TransferDetails": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "pickupCode": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pickupCode"
+        ]
+      },
+      "ValidationIssue": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "path": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number"
+              ]
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "path"
+        ]
+      },
+      "InvalidRequestError": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "Kastes ved ugyldig kalender (InvalidCalendarError) eller ukjent sone (PrivateCodeNotFoundZoneError).",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error",
+          "message"
+        ]
+      },
+      "InternalError": {
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "error": "Internal"
+        },
+        "properties": {
+          "error": {
+            "type": "string",
+            "const": "Internal"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      },
+      "DeleteSkoleskyssResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "example": {
+          "customerAccountId": "CAI:CustomerAccount:1234567",
+          "fareContractIds": [
+            "FCI:FareContract:1234567"
+          ],
+          "fareContractId": "FCI:FareContract:1234567"
+        },
+        "properties": {
+          "customerAccountId": {
+            "type": "string"
+          },
+          "fareContractIds": {
+            "type": "array",
+            "deprecated": true,
+            "description": "Bruk fareContractId i stedet. Beholdes for bakoverkompatibilitet; inneholder 0 eller 1 element.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fareContractId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customerAccountId",
+          "fareContractIds"
+        ]
+      }
+    },
+    "parameters": {
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

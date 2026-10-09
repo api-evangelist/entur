@@ -1,0 +1,483 @@
+openapi: 3.2.0
+info:
+  title: Products V3 Entitlement Required API
+  description: '**This API specification is a draft and is not yet implemented. Endpoints, schemas, and
+
+    behavior are subject to change without notice.**
+
+
+    This API provides services to read and maintain products and fare data for public transport in Norway.'
+  contact:
+    name: Team Produkt
+    email: teamprodukt@entur.org
+  version: 2026.10.1
+  x-stability-level: draft
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: Entitlement Required
+  description: 'Manage EntitlementRequired instances. Defines what existing entitlement (e.g., a
+
+    valid ticket) is required to purchase a product.'
+paths:
+  /v3/parameters/limitations/entitlement-required:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Entitlement Required
+      summary: List entitlement required instances
+      description: Returns a paginated list of all EntitlementRequired instances.
+      operationId: listEntitlementRequireds
+      parameters:
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Paginated list of EntitlementRequired instances
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementRequiredListResponse'
+              examples:
+                default:
+                  value:
+                    instances:
+                    - id: ENT:EntitlementRequired:SingleTicket
+                      name:
+                      - lang: nb-NO
+                        value: Enkeltbillett påkrevd
+                      entitlementType: SINGLE_TRIP
+                      fareProductRef: ENT:PreassignedFareProduct:SingleTrip
+                    totalCount: 1
+                    page: 0
+                    size: 100
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - Entitlement Required
+      summary: Create an entitlement required instance
+      description: Create a new EntitlementRequired instance.
+      operationId: createEntitlementRequired
+      requestBody:
+        description: The EntitlementRequired instance to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntitlementRequiredRequest'
+            examples:
+              default:
+                value:
+                  name:
+                  - lang: nb-NO
+                    value: Enkeltbillett påkrevd
+                  entitlementType: SINGLE_TRIP
+                  fareProductRef: ENT:PreassignedFareProduct:SingleTrip
+        required: true
+      responses:
+        '201':
+          description: EntitlementRequired instance created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementRequired'
+              examples:
+                default:
+                  value:
+                    id: ENT:EntitlementRequired:SingleTicket
+                    name:
+                    - lang: nb-NO
+                      value: Enkeltbillett påkrevd
+                    entitlementType: SINGLE_TRIP
+                    fareProductRef: ENT:PreassignedFareProduct:SingleTrip
+        '400':
+          description: Bad request - Invalid data or schema violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match type schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'entitlementType' is required for type 'entitlement-required'.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/parameters/limitations/entitlement-required/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Entitlement Required
+      summary: Get an entitlement required instance
+      description: Retrieve the full detail of a single EntitlementRequired instance.
+      operationId: getEntitlementRequired
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: EntitlementRequired instance found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementRequired'
+              examples:
+                default:
+                  value:
+                    id: ENT:EntitlementRequired:SingleTicket
+                    name:
+                    - lang: nb-NO
+                      value: Enkeltbillett påkrevd
+                    entitlementType: SINGLE_TRIP
+                    fareProductRef: ENT:PreassignedFareProduct:SingleTrip
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: EntitlementRequired instance not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Instance not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: EntitlementRequired instance ENT:EntitlementRequired:nonexistent not found.
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - Entitlement Required
+      summary: Update an entitlement required instance
+      description: Update an existing EntitlementRequired instance.
+      operationId: updateEntitlementRequired
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: The updated EntitlementRequired data.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EntitlementRequiredRequest'
+            examples:
+              default:
+                value:
+                  name:
+                  - lang: nb-NO
+                    value: Enkeltbillett påkrevd
+                  entitlementType: SINGLE_TRIP
+                  fareProductRef: ENT:PreassignedFareProduct:SingleTrip
+        required: true
+      responses:
+        '200':
+          description: EntitlementRequired instance updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EntitlementRequired'
+              examples:
+                default:
+                  value:
+                    id: ENT:EntitlementRequired:SingleTicket
+                    name:
+                    - lang: nb-NO
+                      value: Enkeltbillett påkrevd
+                    entitlementType: SINGLE_TRIP
+                    fareProductRef: ENT:PreassignedFareProduct:SingleTrip
+        '400':
+          description: Bad request - Invalid data or schema violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match type schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'entitlementType' is required for type 'entitlement-required'.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: EntitlementRequired instance not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Instance not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: EntitlementRequired instance ENT:EntitlementRequired:nonexistent not found.
+      x-entur-permissions:
+        value: product-api-access:endre
+components:
+  schemas:
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+    EntitlementRequired:
+      required:
+      - entitlementType
+      - fareProductRef
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):EntitlementRequired:([0-9A-Za-z_\-]*)$
+          type: string
+          description: The NeTEx ID of this EntitlementRequired.
+          examples:
+          - ENT:EntitlementRequired:SingleTicket
+        name:
+          $ref: '#/components/schemas/LocalizedString'
+        entitlementType:
+          type: string
+          description: The type of entitlement that is required.
+          enum:
+          - SINGLE_TRIP
+          - PERIOD_PASS
+          - DAY_PASS
+          - CARNET
+        fareProductRef:
+          pattern: ^([A-Z]{3}):PreassignedFareProduct:([0-9A-Za-z_\-]*)$
+          type: string
+          description: Reference to the fare product that satisfies this entitlement.
+          examples:
+          - ENT:PreassignedFareProduct:SingleTrip
+    EntitlementRequiredListResponse:
+      required:
+      - instances
+      - page
+      - size
+      - totalCount
+      type: object
+      properties:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/EntitlementRequired'
+        totalCount:
+          type: integer
+          description: Total number of EntitlementRequired instances.
+          examples:
+          - 4
+        page:
+          type: integer
+          description: Current zero-based page number.
+          examples:
+          - 0
+        size:
+          type: integer
+          description: Number of instances per page.
+          examples:
+          - 100
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+    EntitlementRequiredRequest:
+      required:
+      - entitlementType
+      - fareProductRef
+      - name
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/LocalizedString'
+        entitlementType:
+          type: string
+          description: The type of entitlement that is required.
+          enum:
+          - SINGLE_TRIP
+          - PERIOD_PASS
+          - DAY_PASS
+          - CARNET
+        fareProductRef:
+          pattern: ^([A-Z]{3}):PreassignedFareProduct:([0-9A-Za-z_\-]*)$
+          type: string
+          description: Reference to the fare product that satisfies this entitlement.
+          examples:
+          - ENT:PreassignedFareProduct:SingleTrip
+  responses:
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+    size:
+      name: size
+      in: query
+      description: Number of instances per page. Defaults to 100.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 1000
+        minimum: 1
+        type: integer
+        default: 100
+      examples:
+        default:
+          value: 100
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    page:
+      name: page
+      in: query
+      description: Zero-based page number. Defaults to 0.
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        default: 0
+      examples:
+        default:
+          value: 0
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

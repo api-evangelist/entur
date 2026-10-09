@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-rebooked-reservation-response-v1-schema.json",
+  "title": "RebookedReservationResponseV1",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-seating-manager-openapi.yml#/components/schemas/RebookedReservationResponseV1",
+  "required": [
+    "createdAt",
+    "datedServiceJourneyId",
+    "destinationStopPlace",
+    "organisationId",
+    "originStopPlace",
+    "previousReservationLines",
+    "rebookingStatus",
+    "reference",
+    "reservationLines",
+    "reservationStatus",
+    "updatedAt",
+    "version",
+    "versionedAt"
+  ],
+  "type": "object",
+  "properties": {
+    "reference": {
+      "type": "string",
+      "description": "The reference for this reservation, this is a randomly generated UUID",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The `orderId` of the connected order where the creating client provided it. There are reservations without a connected order."
+    },
+    "version": {
+      "type": "integer",
+      "description": "The highest/newest `version` of this reservation. The initial version number is `1`.",
+      "format": "int32"
+    },
+    "originStopPlace": {
+      "$ref": "#/$defs/StopPlaceResponseV1"
+    },
+    "previousOriginStopPlace": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StopPlaceResponseV1"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "destinationStopPlace": {
+      "$ref": "#/$defs/StopPlaceResponseV1"
+    },
+    "previousDestinationStopPlace": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/StopPlaceResponseV1"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "datedServiceJourneyId": {
+      "type": "string",
+      "description": "Id of the dated service journey"
+    },
+    "previousDatedServiceJourneyId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Id of the previous dated service journey if the dated service journey has been changed"
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "The organisation id of the order which the `reservation` belongs to.This id is determined by the authentication used by the client.",
+      "format": "int64"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "When this reservation was initially created",
+      "format": "YYYY-MM-DDThh:mm:ssZ"
+    },
+    "versionedAt": {
+      "type": "string",
+      "description": "When this version of this reservation was created",
+      "format": "YYYY-MM-DDThh:mm:ssZ"
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "When this was previously updated. This includes status changes, reservation line changes and so on.",
+      "format": "YYYY-MM-DDThh:mm:ssZ"
+    },
+    "reservationStatus": {
+      "type": "string",
+      "description": "Describes the `reservation` status.",
+      "enum": [
+        "DRAFT",
+        "CONFIRMED",
+        "CANCELLED",
+        "DEPRECATED"
+      ]
+    },
+    "rebookingStatus": {
+      "type": "string",
+      "description": "Describes the `rebooking` status of the reservation.",
+      "enum": [
+        "ACCEPTED",
+        "MANUAL",
+        "SUGGESTED",
+        "REBOOKED_DRAFT",
+        "REJECTED"
+      ]
+    },
+    "reservationLines": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RebookedReservationLineResponseV1"
+      }
+    },
+    "previousReservationLines": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RebookedReservationLineResponseV1"
+      }
+    },
+    "info": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Additional free text information about the reservation."
+    }
+  },
+  "$defs": {
+    "RebookedReservationLineResponseV1": {
+      "required": [
+        "reference",
+        "reservationLineType",
+        "reservedProperties"
+      ],
+      "type": "object",
+      "properties": {
+        "reference": {
+          "type": "string",
+          "description": "Reference for this reservation line`",
+          "format": "uuid"
+        },
+        "orderLineId": {
+          "type": "string",
+          "description": "OrderLine ID for this reservation line`"
+        },
+        "reservationLineType": {
+          "type": "string",
+          "description": "The type of reservation line."
+        },
+        "reservedProperties": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "The properties required by the traveller."
+          }
+        }
+      }
+    },
+    "StopPlaceResponseV1": {
+      "required": [
+        "nsrCode",
+        "sequenceNr"
+      ],
+      "type": "object",
+      "properties": {
+        "nsrCode": {
+          "type": "string",
+          "description": "Stop Place id defined by National StopPlace registry."
+        },
+        "sequenceNr": {
+          "type": "integer",
+          "description": "The ordering of the station in the journey.",
+          "format": "int32"
+        }
+      },
+      "description": "Destination `StopPlace` of the `reservation`"
+    }
+  }
+}

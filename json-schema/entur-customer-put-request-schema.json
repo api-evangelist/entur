@@ -1,0 +1,195 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-customer-put-request-schema.json",
+  "title": "CustomerPutRequest",
+  "description": "A registered customer put request. Required fields are firstName, surname, password, organizationId, changedBy and changedByChannel.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-customers-openapi.yml#/components/schemas/CustomerPutRequest",
+  "required": [
+    "changedBy",
+    "changedByChannel",
+    "firstName",
+    "surname"
+  ],
+  "type": "object",
+  "properties": {
+    "changedBy": {
+      "maxLength": 100,
+      "type": "string",
+      "description": "Who last changed the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR"
+    },
+    "changedByChannel": {
+      "maxLength": 100,
+      "type": "string",
+      "description": "Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR"
+    },
+    "countryCode": {
+      "maxLength": 4,
+      "type": "string",
+      "description": "Telephone number country code, starting with +."
+    },
+    "customerAccountId": {
+      "maxLength": 60,
+      "type": "string",
+      "description": "Deprecated. The field is no longer stored. Use /profiles/{customerNumber}/customer-accounts. Customer account id used for account based ticketing.",
+      "deprecated": true
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "description": "Date of birth. ISO 8601 date format",
+      "format": "date"
+    },
+    "email": {
+      "maxLength": 80,
+      "type": "string",
+      "description": "Email used for contact and potentially also for login"
+    },
+    "emailVerifiedAt": {
+      "type": "string",
+      "description": "When the email was verified. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "expirationDate": {
+      "type": "string",
+      "description": "The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "firstName": {
+      "maxLength": 50,
+      "type": "string",
+      "description": "First and middle name."
+    },
+    "landlineNumber": {
+      "maxLength": 80,
+      "type": "string",
+      "description": "Landline telephone number."
+    },
+    "languagePreference": {
+      "type": "string",
+      "description": "Deprecated, please use languagePreferenceISO6393. Which language the customer wants information in. Default is 'NO'.",
+      "deprecated": true,
+      "enum": [
+        "NO",
+        "EN"
+      ]
+    },
+    "languagePreferenceISO6393": {
+      "type": "string",
+      "description": "Which language the customer wants information in. ISO 639-3 format. Default is 'NOB'.",
+      "enum": [
+        "NOB",
+        "NNO",
+        "ENG"
+      ]
+    },
+    "nationality": {
+      "maxLength": 3,
+      "minLength": 3,
+      "type": "string",
+      "description": "The customers nationality. ISO 3166-1 alpha-3 format"
+    },
+    "postalAddresses": {
+      "type": "array",
+      "description": "The postal addresses connected to the customer.",
+      "items": {
+        "$ref": "#/$defs/PostalAddressRequest"
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "Customer status. Statuses supported: 'A' = Active, 'P' = Passive, 'D' = Deleted. Default is 'A'.",
+      "default": "A",
+      "enum": [
+        "A",
+        "P",
+        "D"
+      ]
+    },
+    "surname": {
+      "maxLength": 50,
+      "type": "string",
+      "description": "Surname."
+    },
+    "telephoneNumber": {
+      "maxLength": 80,
+      "type": "string",
+      "description": "Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number."
+    },
+    "telephoneNumberNoCountryCode": {
+      "maxLength": 12,
+      "type": "string",
+      "description": "Telephone number without country code or punctuation."
+    },
+    "telephoneNumberVerifiedAt": {
+      "type": "string",
+      "description": "When the telephone number was verified. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "vippsId": {
+      "type": "string",
+      "description": "Deprecated. The field is no longer stored and is ignored. Vipps unique user identifier.",
+      "format": "uuid",
+      "deprecated": true
+    }
+  },
+  "$defs": {
+    "PostalAddressRequest": {
+      "required": [
+        "countryCode",
+        "postCode",
+        "town",
+        "typeOfAddress"
+      ],
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "maxLength": 80,
+          "type": "string",
+          "description": "Address line 1."
+        },
+        "addressLine2": {
+          "maxLength": 80,
+          "type": "string",
+          "description": "Address line 2, often used for c/o information."
+        },
+        "countryCode": {
+          "maxLength": 3,
+          "minLength": 3,
+          "type": "string",
+          "description": "The address country code. ISO 3166-1 alpha-3 format"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Unique id for postal address. This value is exclusively used when updating a full customer, to identify which of the addresses to update. Otherwise it is ignored.",
+          "format": "int64"
+        },
+        "postCode": {
+          "maxLength": 10,
+          "type": "string",
+          "description": "The address post code. Only 4 digits for Norwegian addresses."
+        },
+        "town": {
+          "type": "string",
+          "description": "The address post town. Will be required"
+        },
+        "typeOfAddress": {
+          "type": "string",
+          "description": "The type of address. Types supported: 'P' = Private, 'I' = Invoice, 'S' = Shadow.",
+          "enum": [
+            "P",
+            "I",
+            "S"
+          ]
+        },
+        "verifiedAt": {
+          "type": "string",
+          "description": "When the address was verified. ISO 8601 date format",
+          "format": "date-time"
+        }
+      },
+      "description": "Postal address connected to a customer"
+    }
+  }
+}

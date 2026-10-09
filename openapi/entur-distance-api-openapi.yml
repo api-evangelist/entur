@@ -1,0 +1,1016 @@
+openapi: 3.2.0
+info:
+  title: Entur Distance API
+  version: 2026.08.0
+  contact:
+    name: Team Avstand og Nettverk
+  description: 'Operations tagged Distance across 2 of this provider''s published API definitions: entur-prdudisapi-openapi.json, entur-prdudisapi-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/distance
+security:
+- enturOpen: []
+tags:
+- name: Distance
+paths:
+  /stop-place-distances/{fromStopPlaceId}/{toStopPlaceId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Distance
+      summary: Shortest distance
+      description: Returns the distance between two stops as JSON, it includes metadata on the two stops
+      operationId: calculateStopPlaceDistanceFromToPlainText
+      parameters:
+      - name: fromStopPlaceId
+        in: path
+        description: The start point of the Stop Place in NeTEx format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: toStopPlaceId
+        in: path
+        description: The end point of the Stop Place in NeTEx format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: time
+        in: query
+        description: The time at which the distance is active. This defaults to now
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: organisationId
+        in: query
+        description: The organisation owning the distance. This is defaulted to 1 if not supplied
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+          default: 1
+      - name: withPath
+        in: query
+        description: RFU
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: 1
+            '*/*':
+              examples:
+                default:
+                  value: 1
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistanceCalculationResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  errors:
+                  - Detail on first error
+                  - Detail on second error
+                  detail: Human readable error
+        '401':
+          description: Not Authorized
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '404':
+          description: Resource Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '500':
+          description: Internal Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+      security:
+      - enturOpen: []
+    servers:
+    - url: https://api.entur.io/distance
+  /stop-place-distances/travel-path/{fromStopPlaceId}/{toStopPlaceId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Distance
+      summary: Distance in travel path only
+      description: Returns the distance between two stops, it includes metadata on the two stops including the path, but the path will exclude any paths that aren't based on real travels
+      operationId: calculateStopPlaceDistanceFromToRealOnly
+      parameters:
+      - name: fromStopPlaceId
+        in: path
+        description: The start point of the Stop Place in Netex format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: toStopPlaceId
+        in: path
+        description: The end point of the Stop Place in Netex format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: time
+        in: query
+        description: The time at which the distance is active. This defaults to now
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: organisationId
+        in: query
+        description: The organisation owning the distance
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistanceCalculationResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  errors:
+                  - Detail on first error
+                  - Detail on second error
+                  detail: Human readable error
+        '401':
+          description: Not Authorized
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '404':
+          description: Resource Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '500':
+          description: Internal Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+      security:
+      - enturOpen: []
+    servers:
+    - url: https://api.entur.io/distance
+  /stop-place-distances/reachable/{fromStopPlaceId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Distance
+      summary: All reachable stops
+      description: Returns all stops that are reachable from a given stop and the distance to the stop
+      operationId: reachableStops
+      parameters:
+      - name: fromStopPlaceId
+        in: path
+        description: The start point of the Stop Place in Netex format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: time
+        in: query
+        description: The time at which the distance is active. This defaults to now
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: organisationId
+        in: query
+        description: The organisation owning the distance
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                default:
+                  value: 1
+        '400':
+          description: Validation Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  errors:
+                  - Detail on first error
+                  - Detail on second error
+                  detail: Human readable error
+        '401':
+          description: Not Authorized
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '404':
+          description: Resource Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '500':
+          description: Internal Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+      security:
+      - enturOpen: []
+    servers:
+    - url: https://api.entur.io/distance
+  /stop-place-distances/pricing-path/{fromStopPlaceId}/{toStopPlaceId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Distance
+      summary: Shortest distance
+      description: Returns the distance between two stops, it includes metadata on the two stops including the path
+      operationId: calculateStopPlaceDistanceFromTo
+      parameters:
+      - name: fromStopPlaceId
+        in: path
+        description: The start point of the Stop Place in Netex format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: toStopPlaceId
+        in: path
+        description: The end point of the Stop Place in Netex format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: time
+        in: query
+        description: The time at which the distance is active. This defaults to now
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: organisationId
+        in: query
+        description: The organisation owning the distance
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistanceCalculationResponse'
+        '400':
+          description: Validation Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  errors:
+                  - Detail on first error
+                  - Detail on second error
+                  detail: Human readable error
+        '401':
+          description: Not Authorized
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '404':
+          description: Resource Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '500':
+          description: Internal Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+      security:
+      - enturOpen: []
+    servers:
+    - url: https://api.entur.io/distance
+  /stop-place-distances/connected/{fromStopPlaceId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Distance
+      summary: All directly connected stops
+      description: Returns all stops connected in 1 jump from this stop and the distance to the stop
+      operationId: directlyConnectedStops
+      parameters:
+      - name: fromStopPlaceId
+        in: path
+        description: The start point of the Stop Place in Netex format
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: time
+        in: query
+        description: The time at which the distance is active. This defaults to now
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: travelPathOnly
+        in: query
+        description: If the result should also include stop that are connected through pricing path and not travel paths
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: organisationId
+        in: query
+        description: The organisation owning the distance
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              examples:
+                default:
+                  value: 1
+        '400':
+          description: Validation Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  errors:
+                  - Detail on first error
+                  - Detail on second error
+                  detail: Human readable error
+        '401':
+          description: Not Authorized
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '404':
+          description: Resource Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+        '500':
+          description: Internal Error
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  instance:
+                    type: string
+                    format: uri
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    format: int32
+                  detail:
+                    type:
+                    - string
+                    - 'null'
+                examples:
+                - instance: https://api.entur.io/distance/request/path
+                  title: Reason for error
+                  status: 400
+                  detail: Human readable error
+      security:
+      - enturOpen: []
+    servers:
+    - url: https://api.entur.io/distance
+components:
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    DistancePath:
+      type: object
+      properties:
+        id:
+          type: string
+        distance:
+          type: integer
+          format: int32
+      examples:
+      - id: NSR:StopPlace:20
+        distance: 10
+    DistanceCalculationResponse:
+      type: object
+      properties:
+        organisationId:
+          type: integer
+          format: int64
+        fromStopPlaceId:
+          type: string
+        toStopPlaceId:
+          type: string
+        distance:
+          type: integer
+          format: int32
+        paths:
+          type:
+          - array
+          - 'null'
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/DistancePath'
+      examples:
+      - organisationId: 1
+        fromStopPlaceId: NSR:StopPlace:337
+        toStopPlaceId: NSR:StopPlace:94
+        distance: 10
+        paths:
+        - - id: NSR:StopPlace:20
+            distance: 10
+  securitySchemes:
+    enturOpen:
+      type: apiKey
+      name: ET-Client-Name
+      in: header
+x-refined-from:
+- entur-prdudisapi-openapi.json
+- entur-prdudisapi-openapi.yml

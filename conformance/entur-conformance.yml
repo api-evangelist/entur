@@ -1,0 +1,60 @@
+name: Entur Conformance
+generated: '2026-10-09'
+method: searched
+source: https://developer.entur.no/llms-full.txt
+standards:
+- id: oauth2
+  conforms: true
+  evidence: Partner APIs require [OAuth2](https://oauth.net/) client credentials. (https://developer.entur.no/docs/authentication)
+- id: osdm
+  conforms: partial
+  domain_standard: true
+  evidence: Entur offers a subset of the [OSDM](https://osdm.io/) specification, version 3.7.1. As of now, only seat reservation for travellers
+    with a travel pass is supported. (https://developer.entur.no/docs/partner-services/osdm)
+- id: omsa
+  conforms: true
+  domain_standard: true
+  evidence: Sales v2 — Entur's sales API, based on the Open Mobility Sales API (OMSA) standard (https://developer.entur.no/apis/api-specs ; contract
+    openapi/entur-omsa-openapi.yml)
+- id: netex
+  conforms: true
+  domain_standard: true
+  evidence: All data dumps have permanent URL's and come as NeTEx or GTFS datasets. NeTEx is the official format for public transport data in
+    Norway (https://developer.entur.no/open-data/timetable)
+- id: gtfs
+  conforms: true
+  domain_standard: true
+  evidence: All data dumps have permanent URL's and come as NeTEx or GTFS datasets. (https://developer.entur.no/open-data/timetable)
+- id: siri
+  conforms: true
+  domain_standard: true
+  evidence: real-time feeds in Norway on SIRI 2.0. It is available as SIRI XML, SIRI Lite (REST) and GTFS-RT. (Real-Time Data page, llms-full.txt)
+- id: gtfs-rt
+  conforms: true
+  domain_standard: true
+  evidence: It is available as SIRI XML, SIRI Lite (REST) and GTFS-RT. (Real-Time Data page, llms-full.txt)
+- id: gbfs
+  conforms: true
+  domain_standard: true
+  evidence: GBFS Feeds - Standardized feeds following the General Bikeshare Feed Specification (Mobility page, llms-full.txt)
+- id: openapi-3.1
+  conforms: true
+  evidence: the document declares 3.1.0
+- id: openapi-3.1
+  conforms: true
+  evidence: the document declares 3.1.1
+- id: openapi-3.1
+  conforms: true
+  evidence: the document declares 3.1.2
+- id: rfc9457
+  conforms: true
+  evidence: application/problem+json on 2321 response(s), e.g. POST /v1/settlement-import/generic 400
+- id: idempotency
+  conforms: false
+  evidence: no idempotency key parameter on mutating operations
+- id: pagination
+  conforms: true
+  evidence: list operations take limit, offset, page
+- id: ratelimit-headers
+  conforms: true
+  evidence: responses declare Retry-After

@@ -1,0 +1,560 @@
+openapi: 3.2.0
+info:
+  title: Products V3 Sales package assignment API
+  description: '**This API specification is a draft and is not yet implemented. Endpoints, schemas, and
+
+    behavior are subject to change without notice.**
+
+
+    This API provides services to read and maintain products and fare data for public transport in Norway.'
+  contact:
+    name: Team Produkt
+    email: teamprodukt@entur.org
+  version: 2026.10.1
+  x-stability-level: draft
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: Sales package assignment
+  description: Assign the supplement products to sales packages without knowledge of the full sales package structure.
+paths:
+  /v3/supplement-products/{id}/sales-offer-package-assignments:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Sales package assignment
+      summary: List sales package assignments for a supplement product
+      description: 'List all sales packages that a supplement product is currently assigned to,
+
+        including the version reference for each assignment.'
+      operationId: listSalesOfferPackageAssignments
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: List of sales package assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesOfferPackageAssignmentListItem'
+              examples:
+                assignmentList:
+                  $ref: '#/components/examples/assignmentList'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Supplement product not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Supplement product not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: SupplementProduct 'BNR:SupplementProduct:e006fb5c' not found.
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - Sales package assignment
+      summary: Assign supplement product to sales packages
+      description: 'Assign a supplement product to one or more sales packages. Each assignment creates a new
+
+        version of the target sales package containing the supplement product reference.
+
+
+        This is a best-effort batch operation — failure on one sales package does not prevent
+
+        processing of the others. The response body conveys per-item results; callers must
+
+        inspect each item''s status rather than relying solely on the HTTP status code.
+
+
+        If the supplement product is already assigned to a sales package but with a different version,
+
+        the version reference is updated (upsert semantics).
+
+
+        The caller must have an agreement with the sales package owner (verified against the agreement
+
+        register). The caller must also own the supplement product.'
+      operationId: createSalesOfferPackageAssignments
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Supplement product version and target sales packages.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOfferPackageAssignmentRequest'
+            examples:
+              assignParking:
+                $ref: '#/components/examples/assignParking'
+              assignParkingAsDraft:
+                $ref: '#/components/examples/assignParkingAsDraft'
+        required: true
+      responses:
+        '200':
+          description: 'Per-sales-offer-package results. Each item indicates SUCCESS or FAILED with details;
+
+            inspect individual results rather than relying solely on the HTTP status.
+
+            '
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOfferPackageAssignmentResponse'
+              examples:
+                multiStatus:
+                  $ref: '#/components/examples/multiStatus'
+                allSuccess:
+                  $ref: '#/components/examples/allSuccess'
+                draftCreated:
+                  $ref: '#/components/examples/draftCreated'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Supplement product not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Supplement product not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: SupplementProduct 'BNR:SupplementProduct:e006fb5c' not found.
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/supplement-products/{id}/sales-offer-package-assignments/{salesOfferPackageId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    delete:
+      tags:
+      - Sales package assignment
+      summary: Remove supplement product from a sales package
+      description: 'Remove the assignment of a supplement product from a sales package. This creates a new
+
+        version of the sales package without the supplement product reference.
+
+
+        Only the supplement product owner or the sales package owner can remove the assignment.'
+      operationId: deleteSalesOfferPackageAssignment
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - name: salesOfferPackageId
+        in: path
+        description: NeTEx ID of the sales package to remove the assignment from.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
+          type: string
+        examples:
+          default:
+            value: VYG:SalesOfferPackage:07c4332c
+      responses:
+        '204':
+          description: Assignment removed successfully
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Supplement product or sales package not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Assignment not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: Assignment of 'BNR:SupplementProduct:e006fb5c' to 'VYG:SalesOfferPackage:07c4332c' not found.
+      x-entur-permissions:
+        value: product-api-access:endre
+components:
+  schemas:
+    SalesOfferPackageAssignmentResponse:
+      required:
+      - results
+      type: object
+      properties:
+        results:
+          type: array
+          description: Per-sales-offer-package result. Best-effort — failure on one sales package does not stop others.
+          items:
+            $ref: '#/components/schemas/SalesOfferPackageAssignmentResultItem'
+    SalesOfferPackageAssignmentListItem:
+      required:
+      - fareProductId
+      - fareProductVersionId
+      - salesOfferPackageId
+      type: object
+      properties:
+        salesOfferPackageId:
+          pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx ID of the sales package.
+          examples:
+          - VYG:SalesOfferPackage:07c4332c
+        salesOfferPackageName:
+          $ref: '#/components/schemas/LocalizedString'
+        fareProductId:
+          type: string
+          description: NeTEx ID of the fare product.
+          examples:
+          - EXA:SupplementProduct:e006fb5c
+        fareProductVersionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID of the assigned fare product version.
+          examples:
+          - EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef
+    AssignmentError:
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          enum:
+          - NO_AGREEMENT
+          - NOT_FOUND
+          - ACCESS_DENIED
+          - VALIDITY_CONFLICT
+          - DRAFT_IN_PROGRESS
+          examples:
+          - NO_AGREEMENT
+        message:
+          type: string
+          description: Human-readable error message.
+          examples:
+          - Ingen avtale med SJN for denne salgspakka
+      description: Error details for a failed assignment.
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+    SalesOfferPackageAssignmentRequest:
+      required:
+      - fareProductVersionId
+      - salesOfferPackageIds
+      type: object
+      properties:
+        fareProductVersionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID of the fare product version to assign.
+          examples:
+          - EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef
+        salesOfferPackageIds:
+          minItems: 1
+          type: array
+          description: List of sales package NeTEx IDs to assign the fare product to.
+          items:
+            pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
+            type: string
+            description: NeTEx ID of a sales package.
+            examples:
+            - VYG:SalesOfferPackage:07c4332c
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Status of the created sales package version. Defaults to VERSIONED (auto-publish).
+
+
+              - **DRAFT** - Creates a draft version that must be manually published via PUT /sales-offer-packages/{id}/publication.
+
+              - **PROPOSED** - Creates a proposed version pending review.
+
+              - **VERSIONED** - Auto-publishes the new version immediately (default).
+
+              '
+            examples:
+            - VERSIONED
+    SalesOfferPackageAssignmentResultItem:
+      required:
+      - salesOfferPackageId
+      - status
+      type: object
+      properties:
+        salesOfferPackageId:
+          pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx ID of the sales package.
+          examples:
+          - VYG:SalesOfferPackage:07c4332c
+        status:
+          type: string
+          description: Whether the assignment succeeded or failed for this sales package.
+          enum:
+          - SUCCESS
+          - FAILED
+          examples:
+          - SUCCESS
+        versionStatus:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: The status of the created sales package version. Only present on success.
+            examples:
+            - VERSIONED
+        createdVersionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID of the newly created sales package version. Only present on success.
+          examples:
+          - VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef
+        versionNumber:
+          type: integer
+          description: Version number of the created version. Only present when versionStatus is VERSIONED.
+          examples:
+          - 14
+        error:
+          $ref: '#/components/schemas/AssignmentError'
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
+  responses:
+    BadRequestError:
+      description: Bad request - Invalid data or schema violation
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            schemaViolation:
+              summary: Request does not match schema
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: Field 'name' is required.
+            purchaseWindowNotFound:
+              summary: Referenced purchase window not found
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+  examples:
+    assignmentList:
+      summary: List of sales package assignments for a fare product
+      value:
+      - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+        salesOfferPackageName:
+        - lang: nb-NO
+          value: Salgspakke tog + parkering
+        fareProductId: FJO:SupplementProduct:f9e8d7c6
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+      - salesOfferPackageId: KYS:SalesOfferPackage:t4u5v6
+        salesOfferPackageName:
+        - lang: nb-NO
+          value: Salgspakke buss + parkering
+        fareProductId: FJO:SupplementProduct:f9e8d7c6
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+    draftCreated:
+      summary: Draft version created (no version number)
+      value:
+        results:
+        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+          status: SUCCESS
+          versionStatus: DRAFT
+          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+    allSuccess:
+      summary: All assignments succeeded
+      value:
+        results:
+        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+          status: SUCCESS
+          versionStatus: VERSIONED
+          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+          versionNumber: 14
+    assignParkingAsDraft:
+      summary: Assign parking supplement as draft (requires manual publication)
+      value:
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+        salesOfferPackageIds:
+        - TOG:SalesOfferPackage:a1b2c3d4
+        status: DRAFT
+    assignParking:
+      summary: Assign parking supplement to two sales packages
+      value:
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+        salesOfferPackageIds:
+        - TOG:SalesOfferPackage:a1b2c3d4
+        - KYS:SalesOfferPackage:q7r8s9
+    multiStatus:
+      summary: Mixed success and failure response
+      value:
+        results:
+        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+          status: SUCCESS
+          versionStatus: VERSIONED
+          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+          versionNumber: 14
+        - salesOfferPackageId: KYS:SalesOfferPackage:q7r8s9
+          status: FAILED
+          error:
+            code: NO_AGREEMENT
+            message: Ingen avtale med KYS for denne salgspakka
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

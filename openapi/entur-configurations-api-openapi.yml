@@ -1,0 +1,483 @@
+openapi: 3.2.0
+info:
+  title: Entur Configurations API
+  version: 2026.10.2
+  contact:
+    name: Entur
+    url: https://developer.entur.org
+  description: 'Operations tagged Configurations across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: Entur's Production environment
+- url: https://api.staging.entur.io/sales
+  description: Entur's Staging environment
+- url: https://api.dev.entur.io/sales
+  description: Entur's Development environment
+security:
+- jwt: []
+tags:
+- name: Configurations
+  description: Configurations directly configurable by partners. E.g. Webhooks.
+paths:
+  /v1/webhooks:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Configurations
+      summary: Get all webhook configurations
+      description: Partners can call this endpoint to get all the webhook configurations they have registered.
+      operationId: getWebhooks
+      parameters:
+      - $ref: '#/components/parameters/paginationPageParam'
+      - $ref: '#/components/parameters/paginationPerPageParam'
+      responses:
+        '200':
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageOfWebhookConfiguration'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+      - Configurations
+      summary: Register one or more webhook events
+      description: Partners can call this endpoint to register where they want to receive webhook events. They register a base url, and a list of events and what path the partner want to receive webhooks for that particular event.
+      operationId: registerWebhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookConfigurationRequest'
+        required: true
+      responses:
+        '201':
+          description: Webhook created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookConfigurationResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/webhooks/{webhookConfigurationId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Configurations
+      summary: Get webhook by ID
+      description: Get a webhook by the ID of the webhook.
+      operationId: getWebhook
+      parameters:
+      - $ref: '#/components/parameters/webhookConfigurationId'
+      responses:
+        '200':
+          description: Webhook found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookConfigurationResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    put:
+      tags:
+      - Configurations
+      summary: Update a webhook
+      description: Partners can update a webhook configuration by using this endpoint. All the same values the partner input when creating a webhook can be changed using this endpoint
+      operationId: updateWebhook
+      parameters:
+      - $ref: '#/components/parameters/webhookConfigurationId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookConfigurationRequest'
+        required: true
+      responses:
+        '200':
+          description: Webhook updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookConfigurationResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    delete:
+      tags:
+      - Configurations
+      summary: Delete a webhook
+      description: Delete a specific webhook configuration by id.
+      operationId: deleteWebhook
+      parameters:
+      - $ref: '#/components/parameters/webhookConfigurationId'
+      responses:
+        '204':
+          description: Webhook deleted
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/webhooks/{webhookConfigurationId}/rotate-secret:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Configurations
+      summary: Rotate the webhook secret
+      description: If the current secret has been compromised, this endpoint offers a simple way to rotate the secret.
+      operationId: rotateWebhookSecret
+      parameters:
+      - $ref: '#/components/parameters/webhookConfigurationId'
+      responses:
+        '200':
+          description: Secret rotated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookConfigurationResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+components:
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+  schemas:
+    PageOfWebhookConfiguration:
+      title: PageOfWebhookConfiguration
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items on a specific page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/WebhookConfigurationResponse'
+          examples:
+          - - baseUrl: https://entur-partner.no/webhooks
+              secret: xgr*hyw8bru4DWZ1wqc
+              eventPaths:
+              - event: CREDIT
+                path: /credit
+              - event: CAPTURE
+                path: /capture
+              organisationId: 1
+        totalItems:
+          type: integer
+          description: Total number of items
+          format: int64
+          readOnly: true
+          examples:
+          - 72
+        totalPages:
+          type: integer
+          description: Total number of pages available to browse
+          format: int64
+          readOnly: true
+          examples:
+          - 9
+      description: Page displays a subset of a list of entities
+      examples:
+      - items:
+        - baseUrl: https://entur-partner.no/webhooks
+          secret: xgr*hyw8bru4DWZ1wqc
+          eventPaths:
+          - event: CREDIT
+            path: /credit
+          - event: CAPTURE
+            path: /capture
+          organisationId: 1
+        totalItems: 1
+        totalPages: 1
+    WebhookConfigurationRequest:
+      title: WebhookConfigurationRequest
+      required:
+      - baseUrl
+      - eventPaths
+      type: object
+      properties:
+        baseUrl:
+          type: string
+          description: The client specified base url where they want to use for all event paths.
+          examples:
+          - https://entur-partner.no/webhooks
+        eventPaths:
+          minItems: 1
+          type: array
+          description: A collection of which webhooks events and the paths they should be sent to. The path is combined with the base url to form a complete url
+          items:
+            $ref: '#/components/schemas/WebhookConfigurationEventPaths'
+          examples:
+          - - event: CREDIT
+              path: /credit
+            - event: CAPTURE
+              path: /capture
+      description: The request body a client will send when registering a webhook configuration.
+      examples:
+      - baseUrl: https://entur-partner.no/webhooks
+        eventPaths:
+        - event: CREDIT
+          path: /credit
+        - event: CAPTURE
+          path: /capture
+    WebhookConfigurationResponse:
+      title: WebhookConfigurationResponse
+      required:
+      - baseUrl
+      - eventPaths
+      - organisationId
+      - secret
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the webhook configuration
+          format: int64
+          examples:
+          - 1
+        baseUrl:
+          type: string
+          description: The client specified base url where they want to use for all event paths.
+          examples:
+          - https://entur-partner.no/webhooks
+        secret:
+          type: string
+          description: The secret that should be used to validate the signature of receive webhooks. This is generated by Entur.
+          examples:
+          - xgr*hyw8bru4DWZ1wqc
+        eventPaths:
+          type: array
+          description: A collection of which webhooks events and the paths they should be sent to. The path is combined with the base url to form a complete url
+          items:
+            $ref: '#/components/schemas/WebhookConfigurationEventPaths'
+          examples:
+          - - event: CREDIT
+              path: /credit
+            - event: CAPTURE
+              path: /capture
+        organisationId:
+          type: integer
+          description: The organisation that own this webhook configuration
+          format: int64
+          examples:
+          - 1
+      description: The response returned when registering or updating a webhook configuration
+      examples:
+      - baseUrl: https://entur-partner.no/webhooks
+        secret: xgr*hyw8bru4DWZ1wqc
+        eventPaths:
+        - event: CREDIT
+          path: /credit
+        - event: CAPTURE
+          path: /capture
+        organisationId: 1
+    PaymentError:
+      title: PaymentError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error that occurred.
+          examples:
+          - Internal Server Error
+        exception:
+          type: string
+          description: What exception caused the error.
+          examples:
+          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message:
+          type: string
+          description: A message detailing the error.
+          examples:
+          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path:
+          type: string
+          description: The url path that was accessed when the error happenened.
+          examples:
+          - /v1/payments/1/transactions/1/capture
+        status:
+          type: integer
+          description: The http status of the response.
+          format: int32
+          examples:
+          - 500
+        timestamp:
+          type: string
+          description: When the error occurred
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        errorReason:
+          type: string
+          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
+          examples:
+          - SOFT_DECLINE
+      x-examples: {}
+      examples:
+      - error: Internal Server Error
+        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path: /v1/payments/1/transactions/1/capture
+        status: 500
+        timestamp: '2025-08-24T14:15:22Z'
+    WebhookConfigurationEventPaths:
+      title: WebhookConfigurationEventPaths
+      required:
+      - event
+      - path
+      type: object
+      properties:
+        event:
+          type: string
+          description: 'A webhook event. Possible values are: CREDIT.'
+          examples:
+          - CREDIT
+        path:
+          pattern: ^/.*$
+          type: string
+          description: The path a webhook event should be sent to. Must start with '/'. The full callback url is the base url with this path appended verbatim.
+          examples:
+          - /credit
+      description: The response returned when registering or updating a webhook configuration
+      examples:
+      - event: CREDIT
+        path: /credit
+  parameters:
+    paginationPageParam:
+      name: page
+      in: query
+      description: Selects a specific page in the collection
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    webhookConfigurationId:
+      name: webhookConfigurationId
+      in: path
+      description: The id of a webhook
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    paginationPerPageParam:
+      name: perPage
+      in: query
+      description: Selects the number of elements per page
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 30
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-payment-partner-openapi.json
+- entur-payment-partner-openapi.yml

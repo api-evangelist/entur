@@ -1,0 +1,123 @@
+generated: '2026-10-09'
+method: searched
+source:
+- https://om.entur.no/personvern
+- https://developer.entur.no/terms-of-service
+- https://uustatus.no/nb/erklaringer/publisert/5aa4d523-635f-41a3-9a9e-f794e8404777
+notes: >-
+  Entur AS (Norway's national public transport data platform). The privacy policy (Personvern) is in Norwegian
+  Bokmål and quoted verbatim in that language; the developer Terms of service are in English. The developer
+  terms (last modified 2026-09-28) are the API-specific privacy surface; the consumer privacy policy was last
+  updated 21.02.25. No trust center, sub-processor list page, transparency report or SBOM was found on these pages.
+signals:
+  data_subject_request:
+    url: https://developer.entur.no/terms-of-service
+    section: Privacy and personal data
+    channel: personvernombud[at]entur.org (DPO); tilbakemelding@entur.org; customer centre 61 27 90 88
+    rights_named: [access, rectification, erasure, restriction, objection, portability, complaint to Datatilsynet]
+    evidence:
+    - source: https://developer.entur.no/terms-of-service
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "All data subjects can exercise their rights under Articles 15–21 GDPR by contacting Entur's data protection officer at personvernombud[at]entur.org."
+    - source: https://om.entur.no/personvern
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Du har dessuten rett til å motta personopplysninger om deg selv i et strukturert, alminnelig anvendt og maskinlesbart format og til å overføre disse opplysningene til en annen behandlingsansvarlig."
+    - source: https://om.entur.no/personvern
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Du har rett til å klage til Datatilsynet på vår behandling av personopplysninger."
+    note: >-
+      GDPR Articles 15-21 rights are offered to all data subjects via the DPO; the consumer policy separately
+      names access, rectification/erasure, restriction, objection, and data portability (machine-readable
+      export and transfer to another controller), plus the right to complain to the Norwegian DPA. No response
+      deadline is stated.
+  data_retention:
+    url: https://developer.entur.no/terms-of-service
+    section: Privacy and personal data
+    evidence:
+    - source: https://developer.entur.no/terms-of-service
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "The logs are retained for 14 months. Longer retention only occurs in the case of security or incident investigations."
+    - source: https://om.entur.no/personvern
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Din profil hos Entur og tilhørende personopplysninger vil bli slettet senest 2 år etter siste registrerte aktivitet (pålogging eller henvendelse til kundesenteret)."
+    - source: https://om.entur.no/personvern
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Opplysninger som er nødvendige for faktureringsformål må Entur iht. regnskapslovgivningen oppbevare i 5 år."
+    note: >-
+      Concrete retention periods: API request logs (IP, path, ET-Client-Name) 14 months; consumer profiles
+      deleted at most 2 years after last activity; billing records kept 5 years under accounting law.
+  subprocessors:
+    url: https://om.entur.no/personvern
+    section: Våre databehandlere
+    named_in_policy: [Nets (payments), Sentry, PostHog, Splitbee]
+    evidence:
+    - source: https://om.entur.no/personvern
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Dersom du ønsker informasjon om hvilke databehandlere vi benytter, kan du be om innsyn til tilbakemelding@entur.org ."
+    - source: https://developer.entur.no/terms-of-service
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Entur does not act as your data processor, unless a separate data processor agreement is in place."
+    note: >-
+      No published sub-processor list: the processor list is available on request by email. Some processors
+      are named in passing (Nets for card data, Sentry, PostHog, Splitbee). For API consumers, Entur states it
+      is not their processor; each API user is an independent controller unless a DPA is signed.
+  ai_transparency:
+    url: https://om.entur.no/personvern
+    section: Grunnlaget for, formålet med og hva slags personopplysninger vi behandler
+    evidence:
+    - source: https://om.entur.no/personvern
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Dette inkluderer kategorisering av henvendelser og delvis automatisering av behandlingen, herunder bruk av maskinlæring. Vi bruker ikke opplysninger som kan identifisere deg til å trene maskinlæringsmodeller."
+    note: >-
+      Discloses machine learning use in categorising and partly automating customer enquiries, and commits
+      not to train ML models on personally identifying data. Covers customer service, not the APIs.
+  data_residency:
+    url: https://om.entur.no/personvern
+    section: Analyseverktøy og feilsøking
+    evidence:
+    - source: https://om.entur.no/personvern
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Ved hjelp av PostHog og Splitbee kan vi samle inn data og analysere hvordan entur.no og Entur-appen blir brukt. PostHog og Splitbee behandler data i Europa."
+    note: >-
+      Narrow: the only residency statement covers the two analytics tools (processed in Europe). No general
+      residency commitment is made for API or customer data.
+  support_lifetime:
+    url: https://developer.entur.no/terms-of-service
+    section: API versioning, deprecation, and beta
+    evidence:
+    - source: https://developer.entur.no/terms-of-service
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Maintain the previous version in parallel for a minimum of 12 months."
+    - source: https://developer.entur.no/terms-of-service
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "They may change or be withdrawn without the full deprecation notice period that applies to stable APIs."
+    note: >-
+      When breaking changes can't be avoided, Entur promises written advance notice and runs the previous API
+      version in parallel for at least 12 months. Beta APIs are excluded from this.
+  accessibility_conformance:
+    url: https://uustatus.no/nb/erklaringer/publisert/5aa4d523-635f-41a3-9a9e-f794e8404777
+    section: I hvilken grad er nettstedet i samsvar med kravene til universell utforming?
+    standard: WCAG 2.1 (Norwegian universal design of ICT regulations)
+    conformance: partial
+    evidence:
+    - source: https://uustatus.no/nb/erklaringer/publisert/5aa4d523-635f-41a3-9a9e-f794e8404777
+      http_status: 200
+      fetched: '2026-10-09'
+      quote: "Nettstedet er delvis i samsvar med kravene til universell utforming av ikt. Det er brudd på 29 av 48 krav i regelverket."
+    note: >-
+      Public accessibility statement for entur.no on the Norwegian government uustatus register, linked
+      from the entur.no footer: partially conformant, with 29 of 48 requirements breached. It covers
+      the consumer website, not developer.entur.no (whose footer links its own Accessibility statement,
+      not read here).

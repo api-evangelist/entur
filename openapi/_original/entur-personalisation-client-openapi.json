@@ -1,0 +1,3196 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Personalisation Client Integration",
+    "description": "Integrate personalisation in clients, for example show a customers status in programs.",
+    "contact": {
+      "name": "Team Personalisering",
+      "email": "team.personalisering@entur.org"
+    },
+    "version": "2026.09.0"
+  },
+  "externalDocs": {
+    "description": "Entur Developer Documentation",
+    "url": "https://developer.entur.org/pages-personalisation-docs-personalisation-client-integration-guide"
+  },
+  "servers": [
+    {
+      "url": "https://api.entur.io/personalisation"
+    }
+  ],
+  "security": [
+    {
+      "jwt": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Programs",
+      "description": "\nGet information about a program.\n"
+    },
+    {
+      "name": "Members",
+      "description": "\nInformation and management of members in a program.\n"
+    },
+    {
+      "name": "Customers",
+      "description": "\nFind information about memberships and status a customer might have in programs.\n"
+    },
+    {
+      "name": "Orders",
+      "description": "Information and management of orders that are or should be processed by a program."
+    }
+  ],
+  "paths": {
+    "/v1/programs/{programId}/reward-ladder": {
+      "post": {
+        "tags": [
+          "Programs"
+        ],
+        "summary": "Get reward ladder for a potential member",
+        "description": "\nReward ladder for a potential member shows the levels available, what is required to achieve each level \nand what rewards are given in each level with the specified member specification. For reis and skyss reiserabatt, no request body is required.\nFor other programs, the member specification should be provided in the body, and it should be a JSON object with keys and values matching the member metadata definitions configured for the program.\nIn these cases, request access to the programs custom generated spec.\nThe member specification is used to determine which levels are relevant for the potential member and what rewards they would get in each level.\n        ",
+        "operationId": "getRewardLadder",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberRewardLadder"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "personalisation.programs.program:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/deferred-registration": {
+      "post": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Deferred registration",
+        "description": "\nReplays the events for a given order ID and order line ID to manually register potential points for a given customer ID.\nReturns `422 Unprocessable Entity` if no points could be given to the customer.\nReturns `200 OK` with details about the points given if successful.\n",
+        "operationId": "deferredRegistrationForProgram",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeferredRegistration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsGivenResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "422": {
+            "description": "Unprocessable Content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoPointsGivenResult"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "personalisation-customerdata-global:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/customer-memberships": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Query program memberships of a customer",
+        "description": "\nQuery the memberships of a customer using customer ID. Returns list of program memberships,\nwith the member ID and any member data that is stored in each program.\n",
+        "operationId": "queryCustomerMemberships",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerMembershipsQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CustomerMembership"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/current-level-summaries": {
+      "post": {
+        "tags": [
+          "Customers"
+        ],
+        "summary": "Current status of a customer",
+        "description": "\nCurrent Level Summary contains information about the current status of a customer in a program, with information about\nhow many points the customer has, what level on the reward ladder they're at, the rewards they have achieved and any suspensions\nthey might have.\n\nBy default, the endpoint will return the customers status at the time the request was made. However, you can specify \nthe request parameter statusAt to set which time to query the status for.\n\nReturns a list of summaries, one for each program the customer is a member of. You can choose to filter on programs, using the program reference.\nWill return empty list if customer is not a member of any programs.\n",
+        "operationId": "queryCurrentLevelSummaries",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrentLevelSummaryQuery"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CurrentLevelSummary"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/transactions": {
+      "get": {
+        "tags": [
+          "Orders"
+        ],
+        "summary": "Get all transactions for orderId",
+        "description": "Get all transactions created by an order ID in all available programs.",
+        "operationId": "findTransactionsByOrderId",
+        "parameters": [
+          {
+            "name": "orderId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransactionByOrder"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}": {
+      "get": {
+        "tags": [
+          "Programs"
+        ],
+        "summary": "Get program",
+        "description": "Get information about a program",
+        "operationId": "getActiveProgram",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Program"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation.programs.program:les",
+              "personalisation.admin.programs:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get members",
+        "description": "Returns a paged list of all members in a program.  Default page size is 20, maximum page size is 100.",
+        "operationId": "getMembers",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "customerId",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageMember"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members/{memberId}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get member",
+        "description": "Get a member by member ID in a program.",
+        "operationId": "getMember",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Member"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members/{memberId}/transactions": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get all transactions for a member",
+        "description": "Paged list of all transactions for a member, sorted by `validFrom` descending. Default page size is 20, maximum page size is 100.",
+        "operationId": "getTransactions",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "query",
+            "description": "The order id to filter transactions by",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "description": "The order id to filter transactions by"
+            }
+          },
+          {
+            "name": "pointDefinitionReference",
+            "in": "query",
+            "description": "The point definition reference to filter transactions by",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "description": "The point definition reference to filter transactions by"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageTransaction"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members/{memberId}/suspension-periods": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get suspension periods",
+        "description": "Paged list of all suspension periods for a member, sorted by `startAt` descending. Default page size is 20, maximum page size is 100.",
+        "operationId": "getSuspensionPeriods",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageSuspensionPeriod"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members/{memberId}/reward-ladder": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get reward ladder for a member",
+        "description": "\nReward ladder for a member shows the levels available for a member, what is required to achieve each level \nand what rewards are given in each level. \n        ",
+        "operationId": "getMemberRewardLadder",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberRewardLadder"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members/{memberId}/points-history": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get points history for a member",
+        "description": "Returns a paged list of points earned and consumed by a member in a program, ordered by created at descending.  Default page size is 20, maximum page size is 100.",
+        "operationId": "getMemberPointsHistory",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "pointDefinitionReference",
+            "in": "query",
+            "description": "The point definition reference to filter by.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "description": "The point definition reference to filter by.",
+              "examples": [
+                "points"
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "points"
+              }
+            }
+          },
+          {
+            "name": "pointEventType",
+            "in": "query",
+            "description": "The point type to filter by. Returns both types if not specified",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "description": "The point type to filter by. Returns both types if not specified",
+              "enum": [
+                "EARNED",
+                "CONSUMED"
+              ],
+              "examples": [
+                "EARNED"
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "EARNED"
+              }
+            }
+          },
+          {
+            "name": "createdAfter",
+            "in": "query",
+            "description": "The start of the period to filter by. Defaults to one year ago.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "description": "The start of the period to filter by. Defaults to one year ago.",
+              "format": "date-time",
+              "examples": [
+                "2023-01-01T00:00:00Z"
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "2023-01-01T00:00:00Z"
+              }
+            }
+          },
+          {
+            "name": "createdBefore",
+            "in": "query",
+            "description": "The end of the period to filter by. Defaults to current time.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "description": "The end of the period to filter by. Defaults to current time.",
+              "format": "date-time",
+              "examples": [
+                "2024-01-01T00:00:00Z"
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "2024-01-01T00:00:00Z"
+              }
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageMemberPoints"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members/{memberId}/point-periods": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Point periods for member",
+        "description": "\nPaged list of all point periods for a member in a program. It's ordered by the `startAt` field of the period, with the \nmost recent first. Default page size is 20, maximum page size is 100.\n",
+        "operationId": "findPointPeriodsForMember",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePointPeriod"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/programs/{programId}/members/{memberId}/point-periods/{pointPeriodId}": {
+      "get": {
+        "tags": [
+          "Members"
+        ],
+        "summary": "Get point period",
+        "description": "Get a point period for a member in a program by the point period ID.",
+        "operationId": "findPointPeriodForMemberById",
+        "parameters": [
+          {
+            "name": "programId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "memberId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "pointPeriodId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointPeriod"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "personalisation-customerdata:les",
+              "personalisation-customerdata-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "CurrentReward": {
+        "required": [
+          "@type",
+          "description",
+          "rewardId"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "rewardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "@type": {
+            "type": "string"
+          }
+        },
+        "description": "The current rewards the member has achieved in the program",
+        "discriminator": {
+          "propertyName": "@type",
+          "mapping": {
+            "CurrentPercentDiscountedProductReward": "#/components/schemas/CurrentPercentDiscountedProductReward",
+            "CurrentFeatureReward": "#/components/schemas/CurrentFeatureReward"
+          }
+        }
+      },
+      "LevelStatusReward": {
+        "required": [
+          "@type",
+          "description",
+          "rewardId"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "rewardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "@type": {
+            "type": "string"
+          }
+        },
+        "description": "Rewards for this level",
+        "discriminator": {
+          "propertyName": "@type",
+          "mapping": {
+            "LevelStatusPercentDiscountedProductReward": "#/components/schemas/LevelStatusPercentDiscountedProductReward",
+            "LevelStatusFeatureReward": "#/components/schemas/LevelStatusFeatureReward"
+          }
+        }
+      },
+      "MemberPoints": {
+        "required": [
+          "amount",
+          "createdAt",
+          "id",
+          "memberId",
+          "pointDefinitionReference",
+          "programId",
+          "sourceId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "programId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "memberId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "pointDefinitionReference": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "discriminator": {
+          "propertyName": "@type",
+          "mapping": {
+            "EARNED": "#/components/schemas/MemberPointsEarnedResponse",
+            "CONSUMED": "#/components/schemas/MemberPointsConsumedResponse"
+          }
+        }
+      },
+      "MemberReward": {
+        "required": [
+          "@type",
+          "description",
+          "rewardId"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "rewardId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "@type": {
+            "type": "string"
+          }
+        },
+        "description": "Rewards when the level is reached",
+        "discriminator": {
+          "propertyName": "@type",
+          "mapping": {
+            "MemberPercentDiscountedProductReward": "#/components/schemas/MemberPercentDiscountedProductReward",
+            "MemberFeatureReward": "#/components/schemas/MemberFeatureReward"
+          }
+        }
+      },
+      "SuspensionPeriod": {
+        "required": [
+          "@type",
+          "createdAt",
+          "endAt",
+          "id",
+          "referenceId",
+          "startAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Generated identifier",
+            "format": "int64"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Metadata for the suspension period"
+          },
+          "endAt": {
+            "type": "string",
+            "description": "When the suspension period ends",
+            "format": "date-time"
+          },
+          "startAt": {
+            "type": "string",
+            "description": "When the suspension period starts",
+            "format": "date-time"
+          },
+          "cancelledAt": {
+            "type": "string",
+            "description": "When the suspension period was cancelled from.",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time when the period was created",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "The date and time when the period was last updated",
+            "format": "date-time"
+          },
+          "referenceId": {
+            "type": "string",
+            "description": "\n        Id to match multiple suspension periods.\n        Can for example be the id of the ticket, so that all periods for that ticket gets the same suspensionId.\n        Used for cancelling suspensions. See the CancelSuspensions effect.\n    "
+          },
+          "@type": {
+            "type": "string"
+          }
+        },
+        "description": "\nA SuspensionPeriod is a mechanism for temporarily blocking/pausing various features in personalisation for a member.\nA SuspensionPeriod has several subtypes that determines which feature is being suspended.\n    ",
+        "discriminator": {
+          "propertyName": "@type",
+          "mapping": {
+            "EffectSuspensionPeriod": "#/components/schemas/EffectSuspensionPeriod",
+            "RewardsSuspensionPeriod": "#/components/schemas/RewardsSuspensionPeriod"
+          }
+        }
+      },
+      "CappingStatus": {
+        "required": [
+          "cappingAmount",
+          "isReached"
+        ],
+        "type": "object",
+        "properties": {
+          "cappingAmount": {
+            "type": "number",
+            "description": "The amount that this point definition is capped at",
+            "examples": [
+              100
+            ]
+          },
+          "isReached": {
+            "type": "boolean",
+            "description": "Whether the capping amount has been reached by the member",
+            "examples": [
+              true
+            ]
+          }
+        },
+        "description": "The capping status for this point definition, if capping is enabled"
+      },
+      "CurrentFeatureReward": {
+        "required": [
+          "description",
+          "rewardId"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CurrentReward"
+          }
+        ]
+      },
+      "CurrentLevelSummary": {
+        "required": [
+          "currentRewards",
+          "memberId",
+          "pointDefinitionStatuses",
+          "programId",
+          "suspensionStatuses"
+        ],
+        "type": "object",
+        "properties": {
+          "programId": {
+            "type": "integer",
+            "description": "\nId of the program.\nWARNING: Don't use this for matching with a specific program, since it may vary across environments. \nUse \"programReference\" instead.\n    ",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "programReference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "\nReference to the program.\nThis is a unique reference that is the same in all environments, and can be used to identify the program.\nNullable for backwards compatibility reasons. Should be filled out in most cases.\n    ",
+            "examples": [
+              "flexiticket"
+            ]
+          },
+          "memberId": {
+            "type": "integer",
+            "description": "\nId of the member within the program. Can be used to look up more information about the member.\n    ",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "currentLevel": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LevelStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currentRewards": {
+            "type": "array",
+            "description": "The current rewards the member has achieved in the program",
+            "items": {
+              "$ref": "#/components/schemas/CurrentReward"
+            }
+          },
+          "suspensionStatuses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuspensionStatus"
+            }
+          },
+          "pointDefinitionStatuses": {
+            "type": "array",
+            "description": "The current status of each point definition in the program",
+            "items": {
+              "$ref": "#/components/schemas/PointDefinitionStatus"
+            }
+          }
+        },
+        "description": "Summary of the current level of a member",
+        "readOnly": true
+      },
+      "CurrentLevelSummaryQuery": {
+        "required": [
+          "customerId"
+        ],
+        "type": "object",
+        "properties": {
+          "programId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Id of the program to query. If null, will return summary of all programs the customer is enrolled in.",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "programReference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Reference to the program to query. Better to use than programId, since programId might vary in different environments.",
+            "examples": [
+              "flexiticket"
+            ]
+          },
+          "customerId": {
+            "type": "string",
+            "description": "Customer id of the member",
+            "examples": [
+              "29582738"
+            ]
+          },
+          "programReferences": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "description": "List of reference to the programs to query. If given then it overrides the programReference parameter.",
+            "items": {
+              "type": "string",
+              "description": "List of reference to the programs to query. If given then it overrides the programReference parameter.",
+              "examples": [
+                "[\"flexiticket\",\"reis\"]"
+              ]
+            },
+            "examples": [
+              [
+                "flexiticket",
+                "reis"
+              ]
+            ]
+          },
+          "statusAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Get current level summary at a given date and time. Defaults to now if not set.",
+            "format": "date-time",
+            "examples": [
+              "2023-10-01T12:00:00.567Z"
+            ]
+          }
+        },
+        "description": "Status query for a member",
+        "writeOnly": true
+      },
+      "CurrentPercentDiscountedProductReward": {
+        "required": [
+          "description",
+          "percentDiscount",
+          "rewardId"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CurrentReward"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "percentDiscount": {
+                "type": "number",
+                "description": "The percentage discount this reward gives",
+                "examples": [
+                  5
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CurrentPointsPeriod": {
+        "required": [
+          "startOfPeriod"
+        ],
+        "type": "object",
+        "properties": {
+          "startOfPeriod": {
+            "type": "string",
+            "description": "The start of the period for which the current points are valid",
+            "format": "date-time"
+          },
+          "endOfPeriod": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The end of the period for which the current points are valid",
+            "format": "date-time"
+          }
+        },
+        "description": "\nThe period for which the current points are valid. Only filled out if the point definition is periodic.\nCan return the first active period after the queried time if there is no period active at that point.\n"
+      },
+      "CustomerMembership": {
+        "required": [
+          "memberId",
+          "programId"
+        ],
+        "type": "object",
+        "properties": {
+          "programId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "programReference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "\nUnique reference for the program.\n",
+            "examples": [
+              "reis"
+            ]
+          },
+          "memberId": {
+            "type": "integer",
+            "description": "The ID for the customer's membership in the program",
+            "format": "int64"
+          },
+          "memberMetadata": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "object",
+              "description": "Metadata about the member"
+            },
+            "description": "Metadata about the member"
+          }
+        },
+        "description": "Information about a customers membership in a program"
+      },
+      "CustomerMembershipsQuery": {
+        "required": [
+          "customerId"
+        ],
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "Customer id of the member",
+            "examples": [
+              "29582738"
+            ]
+          },
+          "programReferences": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "description": "List of reference to the programs to query.",
+            "items": {
+              "type": "string",
+              "description": "List of reference to the programs to query.",
+              "examples": [
+                "[\"flexiticket\",\"reis\"]"
+              ]
+            },
+            "examples": [
+              [
+                "flexiticket",
+                "reis"
+              ]
+            ]
+          }
+        },
+        "description": "Program memberships for a customer",
+        "writeOnly": true
+      },
+      "DeferredRegistration": {
+        "required": [
+          "customerId",
+          "orderId",
+          "orderLineId"
+        ],
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "The customer ID for which to register the order"
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The order ID for which to register"
+          },
+          "orderLineId": {
+            "type": "string",
+            "description": "The order line ID for which to register"
+          }
+        },
+        "description": "Request deferred registration for a customer ID and order ID"
+      },
+      "EffectSuspensionPeriod": {
+        "required": [
+          "@type",
+          "createdAt",
+          "effectType",
+          "endAt",
+          "id",
+          "referenceId",
+          "startAt"
+        ],
+        "type": "object",
+        "description": "\nA type of suspension period that prevents any effects to be executed on the member within the period.\nFor example, this can prevent the member for receiving any points, by blocking the GivePoint effect.\n",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuspensionPeriod"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "cancelledAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "When the suspension period was cancelled from.",
+                "format": "date-time"
+              },
+              "metadata": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "description": "Metadata for the suspension period"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The date and time when the period was last updated",
+                "format": "date-time"
+              },
+              "effectType": {
+                "type": "string",
+                "description": "The type of effect that this period suspends",
+                "enum": [
+                  "AddMember",
+                  "UpdateMemberMetadata",
+                  "GivePoint",
+                  "RefundPoints",
+                  "ConsumePoints",
+                  "SuspendRewards",
+                  "SuspendEffect",
+                  "CancelSuspensions",
+                  "RevokePoint",
+                  "ResetPoints",
+                  "ResetSuspensions",
+                  "AddIntent",
+                  "CancelIntent",
+                  "RemoveMember"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Error": {
+        "required": [
+          "correlationId",
+          "message",
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "description": "The http status code.",
+            "format": "int32",
+            "examples": [
+              400
+            ]
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "An error occurred"
+            ]
+          },
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The main error message.",
+            "examples": [
+              "An error occurred"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "The main error message.",
+            "examples": [
+              "An error occurred"
+            ]
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "The unique correlation id for the request.",
+            "examples": [
+              "b5d4960d-7ab2-43d6-a8f3-113da042a288"
+            ]
+          },
+          "errors": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "description": "Validation error on a specific field.",
+            "items": {
+              "$ref": "#/components/schemas/FieldError"
+            }
+          }
+        }
+      },
+      "FieldError": {
+        "required": [
+          "field",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "description": "Validation error on a specific field."
+      },
+      "LevelStatus": {
+        "required": [
+          "levelId",
+          "rewards"
+        ],
+        "type": "object",
+        "properties": {
+          "levelId": {
+            "type": "integer",
+            "description": "Id of the level in the reward ladder",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "rewards": {
+            "type": "array",
+            "description": "Rewards for this level",
+            "items": {
+              "$ref": "#/components/schemas/LevelStatusReward"
+            }
+          }
+        },
+        "description": "The current level in the reward ladder the member has achieved"
+      },
+      "LevelStatusFeatureReward": {
+        "required": [
+          "description",
+          "rewardId"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LevelStatusReward"
+          }
+        ]
+      },
+      "LevelStatusPercentDiscountedProductReward": {
+        "required": [
+          "description",
+          "percentDiscount",
+          "rewardId"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LevelStatusReward"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "percentDiscount": {
+                "type": "number",
+                "description": "The percentage discount this reward gives",
+                "examples": [
+                  5
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Member": {
+        "required": [
+          "createdAt",
+          "customerId",
+          "id",
+          "organisationId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "customerId": {
+            "type": "string",
+            "description": "Customer id"
+          },
+          "organisationId": {
+            "type": "integer",
+            "description": "The organisation this member belongs to",
+            "format": "int64"
+          },
+          "metadata": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "description": "Metadata needed for the processing of events"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "description": "A member"
+      },
+      "MemberFeatureReward": {
+        "required": [
+          "description",
+          "rewardId"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MemberReward"
+          }
+        ]
+      },
+      "MemberLevelSummary": {
+        "required": [
+          "name",
+          "requirementsNeeded",
+          "rewardRequirements",
+          "rewards"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Level name"
+          },
+          "rewardRequirements": {
+            "type": "array",
+            "description": "Requirements for reaching the level",
+            "items": {
+              "$ref": "#/components/schemas/RewardRequirement"
+            }
+          },
+          "requirementsNeeded": {
+            "type": "string",
+            "description": "Whether any or all requirements need to be fulfilled",
+            "enum": [
+              "ALL",
+              "ANY"
+            ],
+            "examples": [
+              "ALL"
+            ]
+          },
+          "rewards": {
+            "type": "array",
+            "description": "Rewards when the level is reached",
+            "items": {
+              "$ref": "#/components/schemas/MemberReward"
+            }
+          }
+        },
+        "description": "Requirements and rewards for each membership level of a specific program"
+      },
+      "MemberPercentDiscountedProductReward": {
+        "required": [
+          "description",
+          "percentDiscount",
+          "rewardId"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MemberReward"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "percentDiscount": {
+                "type": "number",
+                "description": "The percentage discount this reward gives",
+                "examples": [
+                  5
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "MemberPointsConsumedResponse": {
+        "required": [
+          "amount",
+          "consumedAt",
+          "createdAt",
+          "id",
+          "memberId",
+          "pointDefinitionReference",
+          "programId",
+          "sourceId"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MemberPoints"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "consumedAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "refundedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "metadata": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": {
+                  "type": "object"
+                }
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "MemberPointsEarnedResponse": {
+        "required": [
+          "amount",
+          "createdAt",
+          "id",
+          "memberId",
+          "pointDefinitionReference",
+          "programId",
+          "sourceId",
+          "validFrom"
+        ],
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MemberPoints"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "validFrom": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "expireAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "cancelledAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "metadata": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": {
+                  "type": "object"
+                }
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "MemberRewardLadder": {
+        "required": [
+          "rewardLadder"
+        ],
+        "type": "object",
+        "properties": {
+          "rewardLadder": {
+            "type": "array",
+            "description": "Program level details, including the specific requirements and rewards for each level in the program",
+            "items": {
+              "$ref": "#/components/schemas/MemberLevelSummary"
+            }
+          }
+        },
+        "description": "Information about the current reward ladder for a program member",
+        "readOnly": true
+      },
+      "NoPointsGivenResult": {
+        "required": [
+          "reason",
+          "status",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Reason why no points were given",
+            "enum": [
+              "ORDER_DOES_NOT_BELONG_TO_CUSTOMER",
+              "CONDITIONS_NOT_SATISFIED",
+              "CUSTOMER_NOT_MEMBER",
+              "CUSTOMER_ID_NOT_FOUND_IN_EVENT",
+              "MEMBER_SUSPENDED",
+              "TICKET_CANCELLED",
+              "AMOUNT_EVALUATED_TO_ZERO",
+              "ORDER_ALREADY_REGISTERED"
+            ],
+            "examples": [
+              "ORDER_DOES_NOT_BELONG_TO_CUSTOMER"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "description": "The http status code.",
+            "format": "int32",
+            "examples": [
+              400
+            ]
+          },
+          "title": {
+            "type": "string",
+            "examples": [
+              "An error occurred"
+            ]
+          }
+        },
+        "description": "Result of deferred registration where no points were given"
+      },
+      "PageMember": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageMemberPoints": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/MemberPoints"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PagePointPeriod": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/PointPeriod"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageSuspensionPeriod": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/SuspensionPeriod"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageTransaction": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int32",
+            "readOnly": true,
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PointDefinitionStatus": {
+        "required": [
+          "currentPoints",
+          "pendingPoints",
+          "pointDefinitionId",
+          "pointDefinitionPluralName",
+          "pointDefinitionReference",
+          "pointDefinitionSingularName"
+        ],
+        "type": "object",
+        "properties": {
+          "pointDefinitionId": {
+            "type": "integer",
+            "description": "Id of the point definition",
+            "format": "int64"
+          },
+          "pointDefinitionReference": {
+            "type": "string",
+            "description": "\nUnique reference for the point. Meant to be used to identify what kind of point this is, across different environments\nwhere the id might be different. This enables clients of the api to enrich the presentation of the point definition,\nbeyond what this api delivers (for example giving the point definition an icon, or more descriptive text).\n",
+            "examples": [
+              "trips_done"
+            ]
+          },
+          "pointDefinitionSingularName": {
+            "type": "string",
+            "description": "Singular name of the point definition",
+            "examples": [
+              "reise"
+            ]
+          },
+          "pointDefinitionPluralName": {
+            "type": "string",
+            "description": "Plural name of the point definition",
+            "examples": [
+              "reiser"
+            ]
+          },
+          "currentPoints": {
+            "type": "number",
+            "description": "The amount of points the member currently has of this point definition",
+            "examples": [
+              15
+            ]
+          },
+          "pendingPoints": {
+            "type": "number",
+            "description": "\nThe amount of points the member has received, but are not valid yet.\nIf the point definition is periodic, this field will only contain the pending points in the current point period.\n",
+            "examples": [
+              15
+            ]
+          },
+          "cappingStatus": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CappingStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "currentPointsPeriod": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CurrentPointsPeriod"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "description": "The current status of a point definition in a program for a member"
+      },
+      "PointPeriod": {
+        "required": [
+          "endAt",
+          "id",
+          "startAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The ID of the point period",
+            "format": "int64"
+          },
+          "startAt": {
+            "type": "string",
+            "description": "The start time of the point period",
+            "format": "date-time"
+          },
+          "endAt": {
+            "type": "string",
+            "description": "The end time of the point period",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": {
+              "type": "object",
+              "description": "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+            },
+            "description": "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+          }
+        },
+        "description": "The core information about a point period",
+        "readOnly": true
+      },
+      "PointsGiven": {
+        "required": [
+          "amount",
+          "pointDefinitionReference"
+        ],
+        "type": "object",
+        "properties": {
+          "transactionId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The ID of the transaction for the given points. Null if the points given amount is 0.",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "number",
+            "description": "The amount of points given"
+          },
+          "pointDefinitionReference": {
+            "type": "string",
+            "description": "Reference to the point definition given point for"
+          },
+          "pointPeriodId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The ID of the point period the points were given in, if applicable",
+            "format": "int64"
+          }
+        },
+        "description": "List of points given per point definition"
+      },
+      "PointsGivenResult": {
+        "required": [
+          "pointsGiven"
+        ],
+        "type": "object",
+        "properties": {
+          "pointsGiven": {
+            "type": "array",
+            "description": "List of points given per point definition",
+            "items": {
+              "$ref": "#/components/schemas/PointsGiven"
+            }
+          }
+        },
+        "description": "Points given to a customer as a result of deferred registration"
+      },
+      "Program": {
+        "required": [
+          "active",
+          "administratorOrganisations",
+          "createdAt",
+          "id",
+          "name",
+          "organisationId",
+          "organisationsWithAccess",
+          "preset",
+          "programVersionId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "organisationId": {
+            "type": "integer",
+            "description": "Id of organisation owning the program",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "preset": {
+            "type": "string",
+            "enum": [
+              "CAMPAIGN_CODE_PROGRAM",
+              "CUSTOM"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the program",
+            "examples": [
+              "Entur+"
+            ]
+          },
+          "reference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "\nUnique reference for the program. Meant to be used to identify which program this is, across different environments\nwhere the id might be different. This enables clients of the api to more easily identify the program, for example to\nenrich the presentation, beyond what this api delivers (for example with an icon, or more descriptive text).\n",
+            "examples": [
+              "reis"
+            ]
+          },
+          "infoLink": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "A link to information about the program",
+            "examples": [
+              "https://selskap.test/theprogram/"
+            ]
+          },
+          "organisationsWithAccess": {
+            "type": "array",
+            "description": "A list of organisations that can consume the program",
+            "items": {
+              "type": "integer",
+              "description": "A list of organisations that can consume the program",
+              "format": "int64"
+            },
+            "examples": [
+              [
+                1,
+                2
+              ]
+            ]
+          },
+          "administratorOrganisations": {
+            "type": "array",
+            "description": "A list of organisations that can administrate the program",
+            "items": {
+              "type": "integer",
+              "description": "A list of organisations that can administrate the program",
+              "format": "int64"
+            },
+            "examples": [
+              [
+                1,
+                2,
+                3
+              ]
+            ]
+          },
+          "active": {
+            "type": "boolean",
+            "description": "\nIf program is active. Inactive programs are excluded from triggering effects.\n",
+            "examples": [
+              true
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "programVersionId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "description": "Information about a program"
+      },
+      "RewardRequirement": {
+        "required": [
+          "pointDefinitionId",
+          "requiredAmount"
+        ],
+        "type": "object",
+        "properties": {
+          "requiredAmount": {
+            "type": "number",
+            "description": "Required amount to reach a program level"
+          },
+          "pointDefinitionId": {
+            "type": "integer",
+            "description": "Id of the point definition",
+            "format": "int64"
+          },
+          "pointDefinitionReference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Point definition reference"
+          }
+        },
+        "description": "Requirements for reaching the level"
+      },
+      "RewardsSuspensionPeriod": {
+        "required": [
+          "@type",
+          "createdAt",
+          "endAt",
+          "id",
+          "referenceId",
+          "startAt"
+        ],
+        "type": "object",
+        "description": "A type of suspension period used to prevent the member from receiving any rewards in the period.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuspensionPeriod"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "cancelledAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "When the suspension period was cancelled from.",
+                "format": "date-time"
+              },
+              "metadata": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": true,
+                "description": "Metadata for the suspension period"
+              },
+              "updatedAt": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "The date and time when the period was last updated",
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "SuspensionStatus": {
+        "required": [
+          "endAt",
+          "referenceId",
+          "startAt",
+          "suspensionType"
+        ],
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "type": "string",
+            "description": "The reference id of the suspension"
+          },
+          "suspensionType": {
+            "$ref": "#/components/schemas/SuspensionStatusType"
+          },
+          "startAt": {
+            "type": "string",
+            "description": "When the suspension started",
+            "format": "date-time"
+          },
+          "endAt": {
+            "type": "string",
+            "description": "When the suspension will end",
+            "format": "date-time"
+          }
+        },
+        "description": "Status of a suspension"
+      },
+      "SuspensionStatusType": {
+        "type": "string",
+        "description": "\n        The type of suspension:\n        - Rewards: Member is suspended from receiving rewards\n        - GivePointsEffect: Member is suspended from being given points\n        - ConsumePointsEffect: Member is suspended from using points\n        - UpdateMemberMetadata: Member is suspended from updating their metadata. \n        - SuspendRewardsEffect: Member is suspended from being put into reward suspension\n        - SuspendEffectEffect: Member is suspended from being put into effect suspension\n    ",
+        "enum": [
+          "Rewards",
+          "GivePointsEffect",
+          "SuspendRewardsEffect",
+          "SuspendEffectEffect",
+          "ConsumePointsEffect"
+        ]
+      },
+      "Transaction": {
+        "required": [
+          "amount",
+          "createdAt",
+          "id",
+          "pointDefinitionId",
+          "programId",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Generated identifier",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "programId": {
+            "type": "integer",
+            "description": "The id of the program this transaction belongs to",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "number",
+            "description": "The number of points of the definition this transaction gives"
+          },
+          "pointDefinitionId": {
+            "type": "integer",
+            "description": "The id of the point definition this transaction gives points of",
+            "format": "int64"
+          },
+          "pointDefinitionReference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The reference of the point definition this transaction gives points of"
+          },
+          "referenceId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Unique reference for this transaction. Populated from the event that created the transaction, based on the effect configuration."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time when the transaction was created",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The date and time when the transaction was last updated",
+            "format": "date-time"
+          },
+          "expireAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The date and time when the transaction expires. If null, the transaction never expires.",
+            "format": "date-time"
+          },
+          "cancelledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The date and time when the transaction was cancelled. If not null, the transaction is valid until this time.",
+            "format": "date-time"
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "The date and time the transaction is valid from.",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "description": "Metadata for the transaction"
+          }
+        },
+        "description": "A transaction"
+      },
+      "TransactionByOrder": {
+        "required": [
+          "amount",
+          "createdAt",
+          "id",
+          "memberId",
+          "pointDefinitionId",
+          "programId",
+          "validFrom"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Generated identifier",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "programId": {
+            "type": "integer",
+            "description": "The id of the program this transaction belongs to",
+            "format": "int64"
+          },
+          "memberId": {
+            "type": "integer",
+            "description": "The ID of the member in the program this transaction belongs to",
+            "format": "int64"
+          },
+          "amount": {
+            "type": "number",
+            "description": "The number of points of the definition this transaction gives"
+          },
+          "pointDefinitionId": {
+            "type": "integer",
+            "description": "The id of the point definition this transaction gives points of",
+            "format": "int64"
+          },
+          "pointDefinitionReference": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The reference of the point definition this transaction gives points of"
+          },
+          "pointPeriodId": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "The id of the point period this transaction belongs to, if applicable",
+            "format": "int64"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date and time when the transaction was created",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The date and time when the transaction was last updated",
+            "format": "date-time"
+          },
+          "expireAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The date and time when the transaction expires. If null, the transaction never expires.",
+            "format": "date-time"
+          },
+          "cancelledAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The date and time when the transaction was cancelled. If not null, the transaction is valid until this time.",
+            "format": "date-time"
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "The date and time the transaction is valid from.",
+            "format": "date-time"
+          },
+          "metadata": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "additionalProperties": true,
+            "description": "Metadata for the transaction"
+          }
+        },
+        "description": "A transaction"
+      }
+    },
+    "responses": {
+      "Error400": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error404": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Error500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-transaction-request-schema.json",
+  "title": "TransactionRequest",
+  "description": "Information used to create a transaction.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-payment-partner-openapi.yml#/components/schemas/TransactionRequest",
+  "required": [
+    "amount"
+  ],
+  "type": "object",
+  "properties": {
+    "amount": {
+      "type": "string",
+      "description": "Amount to pay, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  "
+    },
+    "currency": {
+      "pattern": "[A-Z]{3}",
+      "type": "string",
+      "description": "3-letter ISO 4217 currency code. Default is NOK.",
+      "default": "NOK"
+    },
+    "isImport": {
+      "type": "boolean",
+      "description": "Import flag. Selects a special payment method for imports.",
+      "default": false
+    },
+    "paymentType": {
+      "$ref": "#/$defs/PaymentType"
+    },
+    "paymentTypeGroup": {
+      "$ref": "#/$defs/PaymentTypeGroup"
+    },
+    "recurringPaymentId": {
+      "type": "integer",
+      "description": "ID of the saved payment method to use for this transaction.",
+      "format": "int64"
+    },
+    "paymentAgreementId": {
+      "type": "integer",
+      "description": "ID of the payment agreement to charge against. Used for Vipps recurring agreement payments. Mutually exclusive with recurringPaymentId.",
+      "format": "int64"
+    },
+    "with3DSecure": {
+      "type": "boolean",
+      "description": "Flag to choose payment methods with or without 3D Secure. This option is only accessible to privileged clients.",
+      "default": true
+    },
+    "scaExemption": {
+      "$ref": "#/$defs/ScaExemption"
+    },
+    "createAgreement": {
+      "type": "boolean",
+      "description": "If true, a new FLEXIBLE Vipps agreement is created and the transaction amount becomes the initial charge. The user must approve the agreement before the charge is processed. Use with paymentType VIPPS / paymentTypeGroup MOBILE. Mutually exclusive with paymentAgreementId and recurringPaymentId.",
+      "default": false
+    }
+  },
+  "$defs": {
+    "PaymentType": {
+      "type": "string",
+      "description": "The actual type of payment.",
+      "enum": [
+        "AMEX",
+        "BANKAXEPT",
+        "COLLECTOR",
+        "GIFTCARD",
+        "MASTERCARD",
+        "PAYPAL",
+        "VIPPS",
+        "VISA",
+        "XLEDGER",
+        "COLLECTOR_B2B",
+        "TWO_B2B"
+      ]
+    },
+    "PaymentTypeGroup": {
+      "type": "string",
+      "description": "A PaymentTypeGroup used to override which kind of method to use for reimbursement, instead of using same as used for the payment transaction.This will only take effect if the payment method on the payment transaction allows for overriding.",
+      "enum": [
+        "AGENT",
+        "CASH",
+        "ECARD",
+        "GIFTCARD",
+        "INVOICE",
+        "MOBILE",
+        "PAYMENTCARD",
+        "PAYPAL",
+        "REMITTED",
+        "REQUISITION"
+      ]
+    },
+    "ScaExemption": {
+      "title": "ScaExemption",
+      "type": "string",
+      "description": "The type of SCA (secure customer authentication) Exemption for a transaction. Defaults to NO_EXEMPTION. Other available values are: LOW_VALUE."
+    }
+  }
+}

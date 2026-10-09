@@ -1,0 +1,184 @@
+openapi: 3.2.0
+info:
+  title: Entur Privacy API
+  version: 2026.09.0
+  contact:
+    name: Team Personalisering
+    email: team.personalisering@entur.org
+  description: 'Operations tagged Privacy across 2 of this provider''s published API definitions: entur-personalisation-privacy-openapi.json, entur-personalisation-privacy-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/personalisation
+security:
+- jwt: []
+tags:
+- name: Privacy
+  description: Get all personal information stored about a customer.
+paths:
+  /v1/privacy:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Privacy
+      summary: Get all personal information stored about a customer
+      description: 'Get all personal information stored about a customer, including which program memberships,
+
+        points earned and suspension periods.'
+      operationId: getPrivacy
+      parameters:
+      - name: customerId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+components:
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    Error:
+      required:
+      - correlationId
+      - message
+      - status
+      - title
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        title:
+          type: string
+          examples:
+          - An error occurred
+        detail:
+          type:
+          - string
+          - 'null'
+          description: The main error message.
+          examples:
+          - An error occurred
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - An error occurred
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type:
+          - array
+          - 'null'
+          description: Validation error on a specific field.
+          items:
+            $ref: '#/components/schemas/FieldError'
+    FieldError:
+      required:
+      - field
+      - message
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+      description: Validation error on a specific field.
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+externalDocs:
+  description: Entur Developer Documentation
+  url: https://developer.entur.org/pages-personalisation-docs-personalisation-privacy-api
+x-refined-from:
+- entur-personalisation-privacy-openapi.json
+- entur-personalisation-privacy-openapi.yml

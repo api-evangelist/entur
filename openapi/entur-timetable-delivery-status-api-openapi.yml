@@ -1,0 +1,110 @@
+openapi: 3.2.0
+info:
+  title: Entur Timetable Delivery Status API
+  version: 2026.09.0
+  contact:
+    name: Entur
+    url: https://developer.entur.org
+  description: 'Operations tagged timetable-delivery-status across 2 of this provider''s published API definitions: entur-timetable-delivery-status-openapi.json, entur-timetable-delivery-status-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.dev.entur.io/timetable/v1/timetable-events
+  description: Development
+- url: https://api.staging.entur.io/timetable/v1/timetable-events
+  description: Staging
+- url: https://api.entur.io/timetable/v1/timetable-events
+  description: Production
+tags:
+- name: timetable-delivery-status
+  description: Status of a timetable data delivery
+paths:
+  /status/{codespace}/{correlationId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - timetable-delivery-status
+      summary: Get the status of a timetable data delivery
+      description: Return the status of the delivery identified by its correlation id
+      operationId: getDataDeliveryStatus
+      parameters:
+      - name: codespace
+        in: path
+        description: Codespace identifying the data provider (e.g. 'RUT').
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: correlationId
+        in: path
+        description: Correlation id assigned to the delivery when it was submitted.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delivery status for the requested correlation id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataDeliveryStatus'
+              examples:
+                default:
+                  value:
+                    state: OK
+                    date: '2026-04-17T10:30:00Z'
+                    fileName: rut-netex_202604171030.zip
+    servers:
+    - url: https://api.dev.entur.io/timetable/v1/timetable-events
+      description: Development
+    - url: https://api.staging.entur.io/timetable/v1/timetable-events
+      description: Staging
+    - url: https://api.entur.io/timetable/v1/timetable-events
+      description: Production
+components:
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    DataDeliveryStatus:
+      type: object
+      properties:
+        state:
+          type: string
+          enum:
+          - IN_PROGRESS
+          - FAILED
+          - OK
+        date:
+          type: string
+          format: date-time
+        fileName:
+          type: string
+x-refined-from:
+- entur-timetable-delivery-status-openapi.json
+- entur-timetable-delivery-status-openapi.yml

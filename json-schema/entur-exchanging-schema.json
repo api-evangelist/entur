@@ -1,0 +1,618 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-exchanging-schema.json",
+  "title": "Exchanging",
+  "description": "Exchanging",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-products-openapi.yml#/components/schemas/Exchanging",
+  "required": [
+    "changed",
+    "created",
+    "fareFrameRef",
+    "id",
+    "modification",
+    "nameOfClass",
+    "status"
+  ],
+  "type": "object",
+  "properties": {
+    "allowed": {
+      "type": "string",
+      "description": "Allowed.",
+      "enum": [
+        "NONE",
+        "PARTIAL",
+        "FULL"
+      ]
+    },
+    "canChangeClass": {
+      "type": "boolean",
+      "description": "Whether user can change class."
+    },
+    "changed": {
+      "type": "string",
+      "description": "Changed datetime."
+    },
+    "compatibleWithVersionRef": {
+      "type": "string",
+      "description": "Compatible with version."
+    },
+    "created": {
+      "type": "string",
+      "description": "Created datetime."
+    },
+    "derivedFromVersionRef": {
+      "type": "string",
+      "description": "Derived from version."
+    },
+    "description": {
+      "type": "array",
+      "description": "Description represented in different languages. Language codes are ISO-639.",
+      "items": {
+        "$ref": "#/$defs/TextInLanguage"
+      }
+    },
+    "exchangeableFromAnyTime": {
+      "type": "boolean",
+      "description": "Can be exchanged or refunded from any point after purchase."
+    },
+    "exchangeableFromDuration": {
+      "type": "string",
+      "description": "Duration to start of period before (negative) or after (positive) the trigger point resellWhen (i.e. either BEFORE_START_OF_VALIDITY_PERIOD or BEFORE_FIRST_USE) or that ticket may be exchanged or refunded."
+    },
+    "exchangeableTo": {
+      "type": "string",
+      "description": "Type of exchange allowed.",
+      "enum": [
+        "ANY_PRODUCT",
+        "SAME_PRODUCT_SAME_DAY",
+        "SAME_PRODUCT_ANY_DAY",
+        "UPGRADE_TO_STANDARD_FARE",
+        "SPECIFIED_PRODUCTS"
+      ]
+    },
+    "exchangeableUntilAnyTime": {
+      "type": "boolean",
+      "description": "Can be exchanged or refunded until any point after purchase."
+    },
+    "exchangeableUntilDuration": {
+      "type": "string",
+      "description": "Duration to end of period before (negative) or after ( positive) the trigger point (i.e. either BEFORE_START_OF_VALIDITY_PERIOD or BEFORE_FIRST_USE) that ticket may be exchanged or refunded."
+    },
+    "fareFrameRef": {
+      "$ref": "#/$defs/VersionOfObjectRef"
+    },
+    "fareTableRefs": {
+      "type": "array",
+      "description": "References for associated fare tables.",
+      "items": {
+        "$ref": "#/$defs/VersionOfObjectRef"
+      }
+    },
+    "hasFee": {
+      "type": "boolean",
+      "description": "Has fee."
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "Id."
+    },
+    "limitingRule": {
+      "$ref": "#/$defs/LimitingRule"
+    },
+    "limitingRuleRef": {
+      "$ref": "#/$defs/VersionOfObjectRef"
+    },
+    "modification": {
+      "type": "string",
+      "description": "Modification status.",
+      "enum": [
+        "NEW",
+        "REVISE",
+        "DELETE"
+      ]
+    },
+    "name": {
+      "type": "array",
+      "description": "Name represented in different languages. Language codes are ISO-639.",
+      "items": {
+        "$ref": "#/$defs/TextInLanguage"
+      }
+    },
+    "nameOfClass": {
+      "type": "string",
+      "description": "Name of class."
+    },
+    "numberOfExchangesAllowed": {
+      "type": "integer",
+      "description": "Number of times a ticket may be exchanged.",
+      "format": "int32"
+    },
+    "onlyAtCertainDistributionPoints": {
+      "type": "boolean",
+      "description": "Whether distribution is restricted to certain points."
+    },
+    "prices": {
+      "type": "array",
+      "description": "Prices in different currencies for the exchanging rule.",
+      "items": {
+        "$ref": "#/$defs/FarePrice"
+      }
+    },
+    "refundBasis": {
+      "type": "string",
+      "description": "Basis on which refund is made. See allowed values below.",
+      "enum": [
+        "PER_OFFER",
+        "PER_PERSON"
+      ]
+    },
+    "resellWhen": {
+      "type": "string",
+      "description": "Event marking when the exchangeable status of the ticket changes.",
+      "enum": [
+        "NEVER",
+        "BEFORE_START_OF_VALIDITY_PERIOD",
+        "AFTER_START_OF_VALIDITY_PERIOD",
+        "AFTER_END_OF_VALIDITY_PERIOD",
+        "BEFORE_FIRST_USE",
+        "AFTER_FIRST_USE",
+        "BEFORE_VALIDATION",
+        "AFTER_VALIDATION",
+        "AFTER_PURCHASE"
+      ]
+    },
+    "specifiedProducts": {
+      "type": "array",
+      "description": "Reference to the product IDs where exchanging to is allowed. Only use this in combination with 'exchangeableTo.SPECIFIED_PRODUCTS'",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "description": "Exchanging status.",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    },
+    "toFareClass": {
+      "type": "string",
+      "description": "Fare class to which can be exchanged.",
+      "enum": [
+        "FIRST_CLASS",
+        "SECOND_CLASS",
+        "THIRD_CLASS",
+        "ECONOMY_CLASS",
+        "BUSINESS_CLASS",
+        "TURISTA",
+        "PREFERENTE",
+        "STANDARD_CLASS",
+        "PREMIUM_CLASS",
+        "ANY",
+        "UNKNOWN"
+      ]
+    },
+    "unusedTicketsOnly": {
+      "type": "boolean",
+      "description": "Unused tickets only."
+    },
+    "version": {
+      "minLength": 1,
+      "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "Exchanging version."
+    }
+  },
+  "$defs": {
+    "FarePrice": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount"
+        },
+        "canBeCumulative": {
+          "type": "boolean",
+          "description": "canBeCumulative."
+        },
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency."
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "discountPercentageUsed": {
+          "maximum": 100,
+          "minimum": -100,
+          "type": "integer",
+          "description": "discountPercentageUsed.",
+          "format": "int32"
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Id."
+        },
+        "isAllowed": {
+          "type": "boolean",
+          "description": "isAllowed."
+        },
+        "limitingRule": {
+          "$ref": "#/$defs/LimitingRule"
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "ranking": {
+          "type": "integer",
+          "description": "Ranking.",
+          "format": "int32"
+        },
+        "rounding": {
+          "$ref": "#/$defs/Rounding"
+        },
+        "roundingRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "vatRegisterGroup": {
+          "type": "string",
+          "description": "vatRegisterGroup.",
+          "enum": [
+            "EXCEPTION_FROM_VAT",
+            "GENERAL_VAT",
+            "FOOD_VAT",
+            "TRANSPORT_AND_TICKETS_VAT"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "description": "Version.",
+          "readOnly": true
+        }
+      },
+      "description": "A description of the price and factor for a set fare"
+    },
+    "LimitingRule": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status"
+      ],
+      "type": "object",
+      "properties": {
+        "canBeCumulative": {
+          "type": "boolean",
+          "description": "CanBeCumulative."
+        },
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "discountAsPercentage": {
+          "type": "number",
+          "description": "DiscountAsPercentage.",
+          "format": "float"
+        },
+        "discountAsValue": {
+          "type": "number",
+          "description": "DiscountAsValue.",
+          "format": "float"
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "maximumPrice": {
+          "type": "string",
+          "description": "MaximumPrice."
+        },
+        "maximumPriceAsPercentage": {
+          "type": "number",
+          "description": "MaximumPriceAsPercentage.",
+          "format": "double"
+        },
+        "minimumLimitPrice": {
+          "type": "string",
+          "description": "MinimumLimitPrice."
+        },
+        "minimumPrice": {
+          "type": "string",
+          "description": "MinimumPrice."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version."
+        }
+      },
+      "description": "A LimitingRule"
+    },
+    "Rounding": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "roundingMethod",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "roundingMethod": {
+          "type": "string",
+          "description": "Type of rounding.",
+          "enum": [
+            "NONE",
+            "DOWN",
+            "UP",
+            "SPLIT",
+            "STEP_TABLE",
+            "FIVE",
+            "NINE",
+            "TEN",
+            "FORTY_NINE"
+          ]
+        },
+        "roundingModulus": {
+          "type": "number",
+          "description": "Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.",
+          "format": "double"
+        },
+        "status": {
+          "type": "string",
+          "description": "Rounding status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Rounding version."
+        }
+      },
+      "description": "A description of how prices are rounded post calculation",
+      "deprecated": true
+    },
+    "TextInLanguage": {
+      "required": [
+        "lang",
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "lang": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Language code."
+        },
+        "value": {
+          "minLength": 1,
+          "type": "string",
+          "description": "The text."
+        }
+      },
+      "description": "Text in a specific language."
+    },
+    "VersionOfObjectRef": {
+      "required": [
+        "nameOfClass",
+        "ref",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "nameOfClass": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Name of class."
+        },
+        "ref": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "The netex id reference to the object."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version."
+        }
+      },
+      "description": "Fare frame ref."
+    }
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-refund-request-schema.json",
+  "title": "RefundRequest",
+  "description": "A request for performing a refund",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-refund-partner-openapi.yml#/components/schemas/RefundRequest",
+  "type": "object",
+  "properties": {
+    "refundOperations": {
+      "type": "array",
+      "description": "A list of refund operations which will specify order line, optionally where in the product tree the change occurs, and how much money should be refunded with this change",
+      "items": {
+        "$ref": "#/$defs/PerformRefundEntry"
+      }
+    },
+    "additionalTerminalData": {
+      "$ref": "#/$defs/TerminalRefundingData"
+    },
+    "includesCancelledOrderLines": {
+      "type": "boolean",
+      "description": "Lets refund know that the request will include already cancelled order lines, and to handle them accordingly"
+    }
+  },
+  "required": [
+    "refundOperations"
+  ],
+  "$defs": {
+    "OrderReference": {
+      "type": "object",
+      "description": "Wrapper detailing a OrderReference to an instance",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id of the instance"
+        },
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The version of the instance"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "OrderReference"
+    },
+    "PerformRefundEntry": {
+      "type": "object",
+      "description": "A refund 'operation' that describes which order line, and which elements in that order line product tree that is to be refunded",
+      "properties": {
+        "orderLineRef": {
+          "$ref": "#/$defs/OrderReference"
+        },
+        "refundOperations": {
+          "type": "array",
+          "description": "A list of identifiers for which element(s) in the order lines product tree that is to be refunded",
+          "items": {
+            "$ref": "#/$defs/ProductElementIdentifier"
+          }
+        },
+        "refundRule": {
+          "$ref": "#/$defs/ProductsElementWrapper",
+          "description": "The refund rule that is to be used with this entry."
+        }
+      },
+      "required": [
+        "orderLineRef",
+        "refundOperations"
+      ],
+      "title": "PerformRefundEntry"
+    },
+    "ProductElementIdentifier": {
+      "type": "object",
+      "description": "A type for depicting where an element resides in a sales package tree",
+      "properties": {
+        "fareStructureElementIndex": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The index of the element on the farestructure element level"
+        },
+        "fareproductIndex": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The index of the element on the fareproduct level"
+        },
+        "level": {
+          "$ref": "#/$defs/ProductLevel"
+        },
+        "validableElementIndex": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The index of the element on the validable element level"
+        }
+      },
+      "required": [
+        "level"
+      ],
+      "title": "ProductElementIdentifier"
+    },
+    "ProductLevel": {
+      "type": "string",
+      "description": "The level the element resides",
+      "enum": [
+        "SALE_PACKAGE",
+        "FARE_PRODUCT",
+        "VALIDABLE_ELEMENT",
+        "FARESTRUCTURE_ELEMENT"
+      ]
+    },
+    "ProductsElementWrapper": {
+      "type": "object",
+      "description": "A data-wrapper for a product type",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id of the product type"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the product type"
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the product type"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "ProductsElementWrapper"
+    },
+    "TerminalRefundingData": {
+      "type": "object",
+      "description": "Holder for data that needs to be provided when performing a refund on an external terminal",
+      "properties": {
+        "additionalData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Any extra transaction data which could be relevant can be specified as a key value map of strings. If there exists keys here that clash with specific types in this request, the fields in the request are prioritized"
+        },
+        "baxNumber": {
+          "type": "string",
+          "description": "When performing an offline refund to card terminal, the BAX-number is mandatory info"
+        },
+        "obfuscatedCardNumber": {
+          "type": "string",
+          "description": "The obfuscated value of the card number the refund was performed against"
+        },
+        "paymentType": {
+          "type": "string",
+          "description": "The type of payment method that is provided to the terminal for refunding"
+        },
+        "rrn": {
+          "type": "string",
+          "description": "Reconciliation reference number used to track an order (transaction) through different economy systems. Generated by a terminal"
+        },
+        "terminalId": {
+          "type": "string",
+          "description": "When performing an offline refund to card terminal, the terminal id is mandatory info"
+        },
+        "transactionConfirmedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Datetime when credit transaction was completed externally by the client."
+        }
+      },
+      "required": [
+        "baxNumber",
+        "obfuscatedCardNumber",
+        "paymentType",
+        "rrn",
+        "terminalId",
+        "transactionConfirmedAt"
+      ],
+      "title": "TerminalRefundingData"
+    }
+  }
+}

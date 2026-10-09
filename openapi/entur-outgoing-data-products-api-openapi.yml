@@ -1,0 +1,541 @@
+openapi: 3.2.0
+info:
+  title: Entur Outgoing Data Products API
+  version: 2026.09.1
+  contact:
+    name: Team Salgsdata
+    email: regnskapservice@entur.org
+  description: 'Operations tagged Outgoing Data Products across 2 of this provider''s published API definitions: entur-clearing-reports-openapi.json, entur-clearing-reports-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/cleos-reporting
+  description: Entur's Production environment
+- url: https://api.staging.entur.io/cleos-reporting
+  description: Entur's Staging environment
+- url: https://api.dev.entur.io/cleos-reporting
+  description: Entur's Development environment
+security:
+- bearerToken: []
+tags:
+- name: Outgoing Data Products
+  description: Discover, inspect and download generated data products
+paths:
+  /api/v2/partner-data/dataset/{datasetId}/report:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Outgoing Data Products
+      summary: Create download job for report
+      description: Creates an asynchronous download job that will format the dataset and make it available as a report via a signed bucket URL. Note that targetFormat CSV and CSV2 will both produce the same CSV2 format.
+      operationId: createDatasetDownloadJob
+      parameters:
+      - name: datasetId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: targetFormat
+        in: query
+        description: 'Optional conversion format for Parquet datasets (PARQUET, XLSX, CSV2) '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - UNKNOWN
+          - PDF
+          - CSV
+          - CSV2
+          - XLSX
+          - SAFT_GL
+          - PROFF1
+          - PROFF2
+          - ZIP
+          - TXT
+          - BINARY
+          - BCC
+          - FICHE
+          - FICHE_A
+          - FICHE_B
+          - CSV3
+          - EXTERNAL
+          - ACCOUNTED
+          - PARQUET
+          - BIGQUERY
+      responses:
+        '201':
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '400':
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '403':
+          description: Forbidden. Client Organisation not on the copy list
+        '404':
+          description: Dataset unavailable
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+      x-entur-permissions:
+        value: cleos-reports:les
+    servers:
+    - url: https://api.entur.io/cleos-reporting
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/cleos-reporting
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/cleos-reporting
+      description: Entur's Development environment
+  /api/v2/partner-data/report/{jobId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Outgoing Data Products
+      summary: Fetch formatted report metadata
+      description: Wait for asynchronous job and and return formatted report metadata. The report itself can be downloaded by the client using the provided signed bucket URL.
+      operationId: getReportContents
+      parameters:
+      - name: jobId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: waitFor
+        in: query
+        description: Wait in seconds, max 40
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      responses:
+        '200':
+          description: OK. The report is available for download.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '202':
+          description: Accepted. Returned if the optional waitFor has passed but the content is not yet available
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '204':
+          description: No report content. No signed URL will be provided.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '400':
+          description: Bad request. The Job failed.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '403':
+          description: Forbidden. The job was not created for the authenticated user's organisation.
+        '404':
+          description: No job exists.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '409':
+          description: Conflict. The job has failed. Consult Entur.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '410':
+          description: Gone. The job has expired and should not be used to download content
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetDownloadJobDto'
+      x-entur-permissions:
+        value: cleos-reports:les
+    servers:
+    - url: https://api.entur.io/cleos-reporting
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/cleos-reporting
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/cleos-reporting
+      description: Entur's Development environment
+  /api/v2/partner-data/dataset/{datasetId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Outgoing Data Products
+      summary: Get dataset metadata
+      description: Get dataset metadata. This does not include a download URL, create a download job for that.
+      operationId: getPartnerDatasetMetadata
+      parameters:
+      - name: datasetId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Ok
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetRpt'
+        '400':
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetRpt'
+        '403':
+          description: Forbidden. Client Organisation not on the copy list
+        '404':
+          description: Not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetRpt'
+        '409':
+          description: Conflict
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetRpt'
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PartnerDatasetRpt'
+      x-entur-permissions:
+        value: cleos-reports:les
+    servers:
+    - url: https://api.entur.io/cleos-reporting
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/cleos-reporting
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/cleos-reporting
+      description: Entur's Development environment
+  /api/v2/partner-data/dataproduct/{dataProductVersion}/next:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Outgoing Data Products
+      summary: Find next dataset id
+      description: Find next dataset in the dataproduct identified by the dataProductVersion. The dataset must have the clients authenticated Organisation on the copy list. A dataset is defined as newer by having a greater ID than the provided (typically the previous successfully downloaded ID). The ID sequence may have holes but is always increasing. When synchronizing a new dataproduct with a backlog of datasets, the initial idAfter can be identified via the self service portal. Alternatively use idAfter=0 in combination with a fromDate to limit backlogged downloads.
+      operationId: getNextDataset
+      parameters:
+      - name: dataProductVersion
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: idAfter
+        in: query
+        description: Return the first dataset ID from DataProduct with ID larger than this
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: fromDate
+        in: query
+        description: Limit to datasets ordered on or after this date
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Ok
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        '204':
+          description: No new dataset available
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        '400':
+          description: Bad request
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        '404':
+          description: Data product version does not exist
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        '409':
+          description: Conflict. The next dataset has failed. Consult Entur before proceeding.
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        '410':
+          description: Data product version permanently disabled, no more datasets will be produced
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        '500':
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+      x-entur-permissions:
+        value: cleos-reports:les
+    servers:
+    - url: https://api.entur.io/cleos-reporting
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/cleos-reporting
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/cleos-reporting
+      description: Entur's Development environment
+components:
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    PartnerDatasetRpt:
+      type: object
+      description: Metadata for a Dataset. A Dataset is a batch of data that contributes to a Data Product. The Dataset may be downloaded as a formatted Report via this API, or via BigQuery depending on Dataset Type.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: ID of this dataset.
+          example: 7232958
+        dataProductVersion:
+          type: integer
+          format: int64
+          description: Id of the specific version of the data product template used.
+          example: 1108
+        dataProductCode:
+          type: string
+          description: The data product code, this may be contributed to by several template versions over time.
+          example: SD-GL-1
+        orderDate:
+          type: string
+          format: date
+          description: The System Date for the dataset creation.
+          example: '2024-12-03'
+        orderBy:
+          type: string
+          description: Created by user or system.
+          example: CLEOS
+        datasetType:
+          type: string
+          description: Classification of the dataset. PARQUET sets can be formatted and downloaded on demand. BIGQUERY can not be downloaded, only accessed via BigQuery. LEGACY reports (CSV, XLSX) are preformatted.
+          example: PARQUET
+        datasetName:
+          type: string
+          description: Userfriendly name of the dataset, typically used as the filename when downloaded.
+          example: SD-GL-1_ATB_AS_-_2024100772511_v1.1.1.parquet
+        status:
+          type: integer
+          format: int32
+          description: 'Current status of the dataset: 0=Ordered, 1=COMPLETED, 2=Failed, 4=On Demand (DEPRECATED), 3=Cancelled, 9=Processing.'
+        rows:
+          type: integer
+          format: int32
+          description: Number of rows in the dataset when COMPLETED. Not available for legacy reports.
+          example: 1340
+        bqProject:
+          type: string
+          description: Destination BigQuery project when dataset is of type BIGQUERY.
+          example: ent-data-vyg-ext-tst
+        chartOfAccountsRef:
+          type: string
+          description: The Chart of Accounts this dataset is derived from, if defined.
+          example: EOS:ChartOfAccounts:210
+        ownerOrgRef:
+          type: string
+          description: Organisation owning the dataset with self-service access.
+          example: '4'
+        copyOrgRefs:
+          type: array
+          description: Recipients of the dataset with self-service and M2M access.
+          example:
+          - 5
+          - 6
+          items:
+            type: string
+        acctMonthId:
+          type: integer
+          format: int64
+          description: Clearing system Accounting Month ID used by this dataset.
+          example: 3201
+        glBatchId:
+          type: integer
+          format: int64
+          description: GL Batch ID potentially used by this dataset.
+          example: 2024120172588
+        apBatchId:
+          type: integer
+          format: int64
+          description: AP Batch ID potentially used by this dataset.
+          example: 161004032
+        arBatchId:
+          type: integer
+          format: int64
+          description: AR Batch ID potentially used by this dataset.
+          example: 840007997
+        inBatchId:
+          type: integer
+          format: int64
+          description: IN Batch ID potentially used by this dataset.
+          example: 790
+        agreementId:
+          type: integer
+          format: int64
+          description: Clearing system Agreement ID potentially used by this dataset.
+          example: 3752
+    PartnerDatasetDownloadJobDto:
+      type: object
+      description: DTO for an asynchronous dataset download job. The formatted report itself can be downloaded by the client using the provided signed bucket URL. A formatted report is considered transient, and is identified by the download job that formats it. Note that a signed bucket URL will expire after a fixed period of time, typically 24 hours.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: UUID of this download job. The job will automatically expire after a fixed period of time after completion.
+          example: 1170fca5-b0d6-4661-a002-112a21bde824
+        status:
+          type: integer
+          format: int32
+          description: 'Current status of the job: 0=Ordered, 1=COMPLETED, 2=Failed, 3=Expired, 5=Processing.'
+          example: 0
+        description:
+          type: string
+          description: Best effort explanation for the status.
+          example: '0'
+        reportName:
+          type: string
+          description: Suggested report filename for the formatted dataset.
+          example: SD-GL-1_ATB_AS_-_2024100772511_v1.1.1.csv
+        contentType:
+          type: string
+          description: MIME Type of the formatted dataset.
+          example: text/csv
+        datasetIDs:
+          type: array
+          description: List of Dataset IDs that will be included in the download job. The API will always return a single ID since it does not support merging datasets.
+          example:
+          - 7315613
+          items:
+            type: integer
+            format: int64
+        jobCreatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the download job was created.
+          example: '2024-12-06T09:09:47.713993'
+        rows:
+          type: integer
+          format: int64
+          description: The number of rows in the formatted dataset when COMPLETED.
+          example: 1340
+        signedBucketUrl:
+          type: string
+          description: The signed URL to download the formatted dataset when COMPLETED.
+          example: https://storage.googleapis.com/cleos-rep-test-bucket/060852c8-5fc8-4c55-a5ce-ee3ef3849ec3?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=cleos-rep-bucket-sa%40ent-clerep-dev.iam.gserviceaccount.com%2F20241204%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20241204T144627Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=68a825a7dd51cde....
+        crc32c:
+          type: string
+          description: Checksum of a formatted dataset when COMPLETED, this can be used by the client to verify the download. Not available for legacy reports.
+          example: +1nWcg==
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+externalDocs:
+  description: Clearing Reports Developer Guide
+  url: https://developer.entur.no/guides/clearing/reports
+x-refined-from:
+- entur-clearing-reports-openapi.json
+- entur-clearing-reports-openapi.yml

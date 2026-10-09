@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-one-stop-booking-schema.json",
+  "title": "OneStopBooking",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-shared-mobility-openapi.yml#/components/schemas/OneStopBooking",
+  "type": "object",
+  "properties": {
+    "customerNumber": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "recurringPaymentId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "coordinates": {
+      "$ref": "#/$defs/Coordinates"
+    },
+    "assetId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "stationId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "vehicleTypeId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "autoStart": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "priceAdjustments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/PriceAdjustmentDto"
+      }
+    },
+    "pricingPlan": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "coordinates",
+    "customerNumber",
+    "priceAdjustments",
+    "recurringPaymentId"
+  ],
+  "$defs": {
+    "Coordinates": {
+      "type": "object",
+      "properties": {
+        "longitude": {
+          "type": "number",
+          "format": "float"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "float"
+        },
+        "altitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ]
+    },
+    "PriceAdjustmentDto": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "description"
+      ],
+      "title": "PriceAdjustment"
+    }
+  }
+}

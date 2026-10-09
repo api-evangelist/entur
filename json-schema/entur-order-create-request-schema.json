@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-order-create-request-schema.json",
+  "title": "OrderCreateRequest",
+  "description": "Optional configuration to use when creating an Order",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-order-partner-openapi.yml#/components/schemas/OrderCreateRequest",
+  "type": "object",
+  "properties": {
+    "contactInfo": {
+      "$ref": "#/$defs/ContactInfo"
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency for this Order.",
+      "default": "NOK"
+    },
+    "externalReference": {
+      "type": "string",
+      "description": "External reference for Orders"
+    },
+    "expireAt": {
+      "type": "string",
+      "description": "Any changes not confirmed before this point in time will be discarded. Default is 20 minutes from the last operation. Cannot be in the past, or further into the future than six months.",
+      "format": "date-time"
+    },
+    "organisationOverride": {
+      "type": "string",
+      "description": "Deprecated. Use header Entur-On-Behalf-Of instead. If present, the Order will be created on behalf of the given organisation ID, rather than the organisation associated with the token. Requires special agreements before use is allowed.",
+      "deprecated": true
+    }
+  },
+  "$defs": {
+    "ContactInfo": {
+      "title": "ContactInfo",
+      "type": "object",
+      "properties": {
+        "createdBy": {
+          "$ref": "#/$defs/CustomerRef"
+        },
+        "contact": {
+          "$ref": "#/$defs/CustomerRef"
+        }
+      },
+      "description": "Contact information related to different aspects in the lifecycle of an Order."
+    },
+    "CustomerRef": {
+      "title": "CustomerRef",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID for Customer"
+        }
+      },
+      "description": "Customer reference."
+    }
+  }
+}

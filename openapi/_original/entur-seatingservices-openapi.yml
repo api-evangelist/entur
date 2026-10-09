@@ -1,0 +1,1519 @@
+# x-archived-from: entur-seatingservices-openapi.yml
+# x-archived-on: 2026-10-09
+openapi: 3.1.0
+info:
+  title: Seating Services
+  description: API exposing services to handle seat reservations
+  version: 2026.09.0
+servers:
+- url: https://api.entur.io/seatingservices
+paths:
+  /v1/seat-types/{id}:
+    put:
+      tags:
+      - seat-type-controller
+      operationId: updateSeatType
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatTypeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatTypeResponse'
+    delete:
+      tags:
+      - seat-type-controller
+      operationId: deleteSeatType
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: No Content
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/{reservationId}:
+    get:
+      tags:
+      - reservation-controller
+      operationId: getReservation
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+    put:
+      tags:
+      - reservation-controller
+      operationId: updateSeatsReservation
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservationRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/{reservationId}/products:
+    put:
+      tags:
+      - reservation-controller
+      operationId: checkProductCombination
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqProductToCheckForSeatsRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationWithOrderLineIdAndSeatsMapping'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/product-attributes/{attribute-id}:
+    put:
+      tags:
+      - product-attribute-controller
+      operationId: updateProductAttributes
+      parameters:
+      - name: attribute-id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductAttributeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductAttributeResponse'
+    delete:
+      tags:
+      - product-attribute-controller
+      operationId: deleteProductAttributes
+      parameters:
+      - name: attribute-id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: No Content
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/companion-for-seats/{companionMappingId}:
+    put:
+      tags:
+      - companion-for-seat-controller
+      operationId: updateCompanionMapping
+      parameters:
+      - name: companionMappingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanionForSeatRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanionForSeatResponse'
+    delete:
+      tags:
+      - companion-for-seat-controller
+      operationId: deleteCompanionMapping
+      parameters:
+      - name: companionMappingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/reservations/{reservationId}:
+    get:
+      tags:
+      - reservation-controller-beta
+      operationId: getReservation_1
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+    put:
+      tags:
+      - reservation-controller-beta
+      operationId: updateSeatsReservation_1
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservationRequestBeta'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/seat-types:
+    get:
+      tags:
+      - seat-type-controller
+      operationId: getSeatTypes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqSeatTypeResponse'
+    post:
+      tags:
+      - seat-type-controller
+      operationId: createSeatType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatTypeRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatTypeResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/specific-seats:
+    post:
+      tags:
+      - reservation-controller
+      operationId: reserveSpecificSeats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSpecificSeatsRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/by-seat-types:
+    post:
+      tags:
+      - reservation-controller
+      operationId: reserveSeatsByType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatTypeRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/by-products:
+    post:
+      tags:
+      - reservation-controller
+      operationId: reserveSeatsByProductWithOrderLineId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatsByProductRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationWithOrderLineIdAndSeatsMapping'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/product-attributes:
+    get:
+      tags:
+      - product-attribute-controller
+      operationId: getProductAttributes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqProductAttributeResponse'
+    post:
+      tags:
+      - product-attribute-controller
+      operationId: createProductAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqProductAttributeRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqProductAttributeResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/seat-capacities:
+    post:
+      tags:
+      - seat-capacity-controller
+      operationId: getCapacityWithProductInfoPerDeparture
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqJourneyQuery'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqSeatCapacityWithProducts'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/companion-for-seats:
+    get:
+      tags:
+      - companion-for-seat-controller
+      operationId: getCompanionForProducts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqCompanionForSeatResponse'
+    post:
+      tags:
+      - companion-for-seat-controller
+      operationId: createCompanionMapping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanionForSeatRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanionForSeatResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/reservations:
+    get:
+      tags:
+      - reservation-controller-beta
+      operationId: getAllReservationsBetaWithCriteria
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: reservationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqReservationResponseBeta'
+      deprecated: true
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: seatsReservation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatReservationRequestBeta'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/reservations/specific-seats:
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: reserveSpecificSeats_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSpecificSeatsRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/reservations/by-seat-types:
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: reserveSeatsByType_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatTypeRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/reservations/by-products:
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: reserveSeatsByProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatsByProductRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/dated-service-journeys/seat-capacities:
+    post:
+      tags:
+      - seat-capacity-controller-beta
+      operationId: getCapacityWithProductInfoPerDeparture_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqJourneyQuery'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqSeatCapacityWithProducts'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/seats/{seatId}:
+    patch:
+      tags:
+      - reservation-controller
+      operationId: updateSeatStatus
+      parameters:
+      - name: seatId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{datedServiceJourneyId}:
+    patch:
+      tags:
+      - dated-service-journey-controller-v-1
+      operationId: setDatedServiceJourneyStatus
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDatedServiceJourneyRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatedServiceJourneyResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/reservations/seats/{seatId}:
+    patch:
+      tags:
+      - reservation-controller-beta
+      operationId: updateSeat
+      parameters:
+      - name: seatId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/MapStringString'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v2/api-docs:
+    get:
+      tags:
+      - swagger-controller
+      operationId: swagger
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations:
+    get:
+      tags:
+      - reservation-controller
+      operationId: getAllReservationsWithCriteria
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createdAfter
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: changedAfter
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: reservationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: excludeInactiveReservations
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqReservationResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{datedServiceJourneyId}/total-seat-capacities:
+    get:
+      tags:
+      - seat-capacity-controller
+      operationId: getTotalCapacity
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalCapacity'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{datedServiceJourneyId}/seats:
+    get:
+      tags:
+      - dated-service-journey-controller-v-1
+      operationId: getAvailableSeatsInATrain
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{datedServiceJourneyId}/railcars:
+    get:
+      tags:
+      - dated-service-journey-controller-v-1
+      operationId: getRailcars
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarTypeResponseV1'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{datedServiceJourneyId}/railcars/{railcarNumber}/seats:
+    get:
+      tags:
+      - dated-service-journey-controller-v-1
+      operationId: getAvailableSeatsInARailcar
+      parameters:
+      - name: railcarNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RailcarResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{datedServiceJourneyId}/railcars/seats:
+    get:
+      tags:
+      - dated-service-journey-controller-v-1
+      operationId: getAvailableSeatsInRailcarBySeatTypeId
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: travellers
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: seatTypeId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RailcarResponseV1'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{datedServiceJourneyId}/railcars/configs:
+    get:
+      tags:
+      - dated-service-journey-controller-v-1
+      operationId: getRailcarGroupInfo
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarTypeInfoResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/clear-cache/{datedServiceJourneyId}:
+    get:
+      tags:
+      - seat-capacity-controller
+      operationId: clearCacheForDatedServiceJourney
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/dated-service-journeys/{datedServiceJourneyId}/total-seat-capacities:
+    get:
+      tags:
+      - seat-capacity-controller-beta
+      operationId: getTotalCapacity_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TotalCapacity'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/dated-service-journeys/{datedServiceJourneyId}/seats:
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getAvailableSeatsInATrain_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars:
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getRailcars_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarTypeResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars/{railcarNumber}/seats:
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getAvailableSeatsInARailcar_1
+      parameters:
+      - name: railcarNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RailcarResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars/seats:
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getAvailableSeatsInRailcarBySeatTypeId_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: travellers
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: seatTypeId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RailcarResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars/configs:
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getRailcarGroupInfo_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarTypeInfoResponseBeta'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/seats:
+    delete:
+      tags:
+      - reservation-controller
+      operationId: cancelSeats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqCancelSeatRequest'
+        required: true
+      responses:
+        '204':
+          description: No Content
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /beta/reservations/seats:
+    delete:
+      tags:
+      - reservation-controller-beta
+      operationId: cancelSeats_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqCancelSeatRequest'
+        required: true
+      responses:
+        '204':
+          description: No Content
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+components:
+  schemas:
+    SeatTypeRequest: {}
+    SeatTypeResponse: {}
+    UpdateReservationRequest: {}
+    ReservationResponse: {}
+    SeqProductToCheckForSeatsRequest:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    ReservationWithOrderLineIdAndSeatsMapping: {}
+    UpdateProductAttributeRequest: {}
+    ProductAttributeResponse: {}
+    CompanionForSeatRequest: {}
+    CompanionForSeatResponse: {}
+    UpdateReservationRequestBeta: {}
+    ReservationResponseBeta: {}
+    ReserveSpecificSeatsRequest:
+      type: object
+      properties:
+        hasSeatBehaviors:
+          $ref: '#/components/schemas/SeqHasSeatBehavior'
+    SeqHasSeatBehavior:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    ReserveSeatTypeRequest: {}
+    ReserveSeatsByProductRequest: {}
+    SeqProductAttributeRequest:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqProductAttributeResponse:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqJourneyQuery:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqSeatCapacityWithProducts:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeatReservationRequestBeta: {}
+    SeatResponse: {}
+    UpdateDatedServiceJourneyRequest:
+      type: object
+      properties:
+        closed:
+          type: boolean
+    DatedServiceJourneyResponse:
+      type: object
+      properties:
+        closed:
+          type: boolean
+    MapStringString:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeatResponseBeta: {}
+    SeqSeatTypeResponse:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqReservationResponse:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    TotalCapacity: {}
+    SeqRailcarResponseV1:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqRailcarTypeResponseV1:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    RailcarResponseV1: {}
+    SeqRailcarTypeInfoResponseV1:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqCompanionForSeatResponse:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqReservationResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqRailcarResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqRailcarTypeResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    RailcarResponseBeta: {}
+    SeqRailcarTypeInfoResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqCancelSeatRequest:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt

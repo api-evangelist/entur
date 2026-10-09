@@ -1,0 +1,254 @@
+openapi: 3.2.0
+info:
+  version: 2.2.2
+  title: BoB.participantMetadata. Interface Endpoint API
+  description: The Participant Metadata API provides an interface for participants to manage metadata coordinated by an Administering Body (AB).
+servers:
+- url: /api/v2
+tags:
+- name: interfaceEndpoint
+  description: 'A participant API implementation is made accessible to other participants through interface endpoints. A general description of each type of endpoint can be found in the BoB documentation: How does it work → BoB-API and API endpoints.'
+paths:
+  /participantMetadata/{pid}/interfaceEndpoint:
+    get:
+      tags:
+      - interfaceEndpoint
+      summary: Get interface endpoints by participant identifier
+      operationId: getInterfaceEndpoints
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/endpoint'
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+    post:
+      tags:
+      - interfaceEndpoint
+      summary: Add interface endpoint to participants object
+      operationId: addInterfaceEndpoint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '201':
+          description: successful operation
+          headers:
+            Location:
+              description: URL of created endpoint
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint'
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+        '422':
+          description: unprocessable entity
+          content:
+            application/json:
+              schema:
+                description: Description of why the request entity could not be processed
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/endpointCall'
+        description: interfaceEndpoint object
+        required: true
+  /participantMetadata/{pid}/interfaceEndpoint/{endpointId}:
+    get:
+      tags:
+      - interfaceEndpoint
+      summary: Get interface endpoint by endpoint identifier
+      operationId: getInterfaceEndpoint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: endpointId
+        in: path
+        description: Endpoint identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/endpoint'
+        '401':
+          description: unauthorised
+        '404':
+          description: pid/endpointId not found
+    put:
+      tags:
+      - interfaceEndpoint
+      summary: Update interface endpoint by endpoint identifier
+      operationId: updateInterfaceEndpoint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: endpointId
+        in: path
+        description: Endpoint identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '204':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid/endpointId not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/endpoint'
+        description: interfaceEndpoint object
+        required: true
+    delete:
+      tags:
+      - interfaceEndpoint
+      summary: Delete interface endpoint by endpoint identifier
+      operationId: deleteInterfaceEndpoint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: endpointId
+        in: path
+        description: Endpoint identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '204':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid/endpointId not found
+components:
+  schemas:
+    endpoint:
+      allOf:
+      - required:
+        - endpointId
+      - properties:
+          endpointId:
+            type: integer
+            format: int64
+            example: 1
+      - $ref: '#/components/schemas/endpointCall'
+    endpointCall:
+      type: object
+      required:
+      - version
+      - type
+      - uri
+      properties:
+        version:
+          type: integer
+          format: int32
+          description: A positive integer
+          example: 1
+        type:
+          type: string
+          enum:
+          - account
+          - authentication
+          - booking
+          - device
+          - inspection
+          - product
+          - resource
+          - ticket
+          - token
+          - traveller
+          - validation
+          example: ticket
+        uri:
+          type: string
+          example: https://bob.linkon.se/sj/api/v1
+        tlsa:
+          description: TLSA (<a href="https://tools.ietf.org/html/rfc6698" target="_blank">RFC 6698</a>) parameters for endpoint. More information about TLSA can be found in the <a href="https://samtrafiken.atlassian.net/wiki/spaces/BOB/pages/879067159/Network+Infrastructure+and+Gateways" target="_blank">BoB Manual&#58; Implementer considerations &rarr; Network Infrastructure and Gateways</a>.
+          type: object
+          properties:
+            usage:
+              type: integer
+              format: int32
+              minimum: 0
+              maximum: 255
+            selector:
+              type: integer
+              format: int32
+              minimum: 0
+              maximum: 255
+            type:
+              type: integer
+              format: int32
+              minimum: 0
+              maximum: 255
+            data:
+              type: string
+              pattern: ^(([0-9A-Fa-f]){2})+$
+  securitySchemes:
+    Pop:
+      description: OAuth 2.0 Proof-of-possession (pop) Token
+      type: apiKey
+      name: Authorization
+      in: header

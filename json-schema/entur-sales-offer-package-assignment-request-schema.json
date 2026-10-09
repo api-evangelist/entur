@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-sales-offer-package-assignment-request-schema.json",
+  "title": "SalesOfferPackageAssignmentRequest",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-products-api-openapi.yml#/components/schemas/SalesOfferPackageAssignmentRequest",
+  "required": [
+    "fareProductVersionId",
+    "salesOfferPackageIds"
+  ],
+  "type": "object",
+  "properties": {
+    "fareProductVersionId": {
+      "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "NeTEx version ID of the fare product version to assign."
+    },
+    "salesOfferPackageIds": {
+      "minItems": 1,
+      "type": "array",
+      "description": "List of sales package NeTEx IDs to assign the fare product to.",
+      "items": {
+        "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+        "type": "string",
+        "description": "NeTEx ID of a sales package."
+      }
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/VersionStatus"
+        },
+        {
+          "description": "Status of the created sales package version. Defaults to VERSIONED (auto-publish).\n\n- **DRAFT** - Creates a draft version that must be manually published via PUT /sales-offer-packages/{id}/publication.\n- **PROPOSED** - Creates a proposed version pending review.\n- **VERSIONED** - Auto-publishes the new version immediately (default).\n"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    }
+  }
+}

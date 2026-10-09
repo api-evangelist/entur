@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-program-schema.json",
+  "title": "Program",
+  "description": "Information about a program",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personalisation-client-openapi.yml#/components/schemas/Program",
+  "required": [
+    "active",
+    "administratorOrganisations",
+    "createdAt",
+    "id",
+    "name",
+    "organisationId",
+    "organisationsWithAccess",
+    "preset",
+    "programVersionId"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "Id of organisation owning the program",
+      "format": "int64"
+    },
+    "preset": {
+      "type": "string",
+      "enum": [
+        "CAMPAIGN_CODE_PROGRAM",
+        "CUSTOM"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "The name of the program"
+    },
+    "reference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "\nUnique reference for the program. Meant to be used to identify which program this is, across different environments\nwhere the id might be different. This enables clients of the api to more easily identify the program, for example to\nenrich the presentation, beyond what this api delivers (for example with an icon, or more descriptive text).\n"
+    },
+    "infoLink": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "A link to information about the program"
+    },
+    "organisationsWithAccess": {
+      "type": "array",
+      "description": "A list of organisations that can consume the program",
+      "items": {
+        "type": "integer",
+        "description": "A list of organisations that can consume the program",
+        "format": "int64"
+      }
+    },
+    "administratorOrganisations": {
+      "type": "array",
+      "description": "A list of organisations that can administrate the program",
+      "items": {
+        "type": "integer",
+        "description": "A list of organisations that can administrate the program",
+        "format": "int64"
+      }
+    },
+    "active": {
+      "type": "boolean",
+      "description": "\nIf program is active. Inactive programs are excluded from triggering effects.\n"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "programVersionId": {
+      "type": "integer",
+      "format": "int64"
+    }
+  }
+}

@@ -1,0 +1,240 @@
+openapi: 3.2.0
+info:
+  title: Entur API Documentation API
+  version: 2026.10.2
+  contact:
+    name: Entur
+    url: https://developer.entur.org
+  description: 'Operations tagged API Documentation across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: Entur's Production environment
+- url: https://api.staging.entur.io/sales
+  description: Entur's Staging environment
+- url: https://api.dev.entur.io/sales
+  description: Entur's Development environment
+security:
+- jwt: []
+tags:
+- name: API Documentation
+  description: OpenAPI specification endpoints.
+paths:
+  /v3/api-docs:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - API Documentation
+      summary: Api spec OAS3
+      description: Return the OpenApi Specification for the Payment API.
+      operationId: getOpenApiAsJson
+      parameters:
+      - name: group
+        in: query
+        description: The API documentation group to return the specification for.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Payments
+          - Credits
+          - Recurring Payments
+        examples:
+          default:
+            value: Payments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                default:
+                  value:
+                    openapi: 3.0.1
+                    info:
+                      title: Payment API
+                      version: 1.0.0
+                    paths: {}
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v3/api-docs-internal:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - API Documentation
+      summary: Api spec OAS3
+      description: Return the OpenApi Specification for the Payment Internal API.
+      operationId: getInternalOpenApiAsJson
+      parameters:
+      - name: group
+        in: query
+        description: The API documentation group to return the specification for.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Payment Mending
+          - Cache
+          - Payment Configuration
+          - Kafka
+        examples:
+          default:
+            value: Payment Mending
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                default:
+                  value:
+                    openapi: 3.0.1
+                    info:
+                      title: Payment API
+                      version: 1.0.0
+                    paths: {}
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+components:
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    PaymentError:
+      title: PaymentError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error that occurred.
+          examples:
+          - Internal Server Error
+        exception:
+          type: string
+          description: What exception caused the error.
+          examples:
+          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message:
+          type: string
+          description: A message detailing the error.
+          examples:
+          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path:
+          type: string
+          description: The url path that was accessed when the error happenened.
+          examples:
+          - /v1/payments/1/transactions/1/capture
+        status:
+          type: integer
+          description: The http status of the response.
+          format: int32
+          examples:
+          - 500
+        timestamp:
+          type: string
+          description: When the error occurred
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        errorReason:
+          type: string
+          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
+          examples:
+          - SOFT_DECLINE
+      x-examples: {}
+      examples:
+      - error: Internal Server Error
+        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path: /v1/payments/1/transactions/1/capture
+        status: 500
+        timestamp: '2025-08-24T14:15:22Z'
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-payment-partner-openapi.json
+- entur-payment-partner-openapi.yml

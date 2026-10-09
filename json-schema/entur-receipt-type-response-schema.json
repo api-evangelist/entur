@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-receipt-type-response-schema.json",
+  "title": "ReceiptTypeResponse",
+  "description": "Response from a successful type query.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-receipt-partner-openapi.yml#/components/schemas/ReceiptTypeResponse",
+  "type": "object",
+  "properties": {
+    "receiptType": {
+      "$ref": "#/$defs/ReceiptType"
+    }
+  },
+  "$defs": {
+    "ReceiptType": {
+      "type": "string",
+      "description": "Type of receipt",
+      "enum": [
+        "SALE",
+        "REFUND",
+        "CANCEL",
+        "CHANGE",
+        "DAY_SUMMARY"
+      ]
+    }
+  }
+}

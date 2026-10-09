@@ -1,0 +1,19 @@
+name: Entur Lifecycle
+generated: '2026-10-09'
+method: searched
+source: https://developer.entur.no/terms-of-service
+versioning:
+  scheme: major version in the URL path (e.g. /geocoder/v3, /v1/orders, /v3/parameters, /v1-beta/reservations)
+  policy: Entur is committed to backward-compatible API development wherever possible.
+  migration_guides:
+  - https://developer.entur.no/docs/open-services/geocoder/migration-v2-v3
+  - https://developer.entur.no/docs/partner-services/sales-platform/offers/migration-v2-v3
+deprecation:
+  policy: 'When breaking changes are unavoidable, Entur will: Provide written advance notice to affected consumers. Maintain the previous version in parallel for a minimum of 12 months. Make significant changes available in test environments before production rollout.'
+  minimum_parallel_support: Maintain the previous version in parallel for a minimum of 12 months.
+  beta: APIs or features marked as beta are provided for early access and testing purposes. They may change or be withdrawn without the full deprecation notice period that applies to stable APIs.
+  sunset_headers: none documented
+  examples:
+  - As of May 1st, 2025, Tariffzones references (e.g. AKT:TariffZone:450) are no longer updated as they are deprecated.
+status_page: null
+note: The docs name no status page and no SLA.

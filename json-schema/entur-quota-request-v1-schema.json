@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-quota-request-v1-schema.json",
+  "title": "QuotaRequestV1",
+  "description": "One or more quotas for the service journey",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-inventory-openapi.yml#/components/schemas/QuotaRequestV1",
+  "type": "object",
+  "properties": {
+    "quota": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "products": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ods": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OdRequestV1"
+      }
+    },
+    "quotaConfigurationId": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "datedServiceJourneyId": {
+      "type": "string"
+    },
+    "purchaseWindowStart": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "purchaseWindowStop": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "useStoplist": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "datedServiceJourneyId",
+    "ods",
+    "products",
+    "quota",
+    "useStoplist"
+  ],
+  "$defs": {
+    "OdRequestV1": {
+      "type": "object",
+      "properties": {
+        "origin": {
+          "type": "string"
+        },
+        "destination": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "destination",
+        "origin"
+      ]
+    }
+  }
+}

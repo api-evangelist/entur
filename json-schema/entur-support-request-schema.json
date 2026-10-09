@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-support-request-schema.json",
+  "title": "SupportRequest",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-shared-mobility-openapi.yml#/components/schemas/SupportRequest",
+  "type": "object",
+  "properties": {
+    "bookingId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "assetId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "supportType": {
+      "type": "string",
+      "enum": [
+        "BROKEN_DOWN",
+        "NOT_AT_LOCATION",
+        "MISSING_AFTER_PAUSE",
+        "NOT_CLEAN",
+        "NOT_AVAILABLE",
+        "UNABLE_TO_OPEN",
+        "UNABLE_TO_CLOSE",
+        "API_TECHNICAL",
+        "API_FUNCTIONAL",
+        "ACCIDENT",
+        "OTHER"
+      ]
+    },
+    "contactInformationEndUser": {
+      "$ref": "#/$defs/ContactInformation"
+    },
+    "comment": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "place": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Place"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "stationId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "contactInformationEndUser",
+    "supportType"
+  ],
+  "$defs": {
+    "ContactInformation": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "phone": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Coordinates": {
+      "type": "object",
+      "properties": {
+        "longitude": {
+          "type": "number",
+          "format": "float"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "float"
+        },
+        "altitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ]
+    },
+    "Place": {
+      "type": "object",
+      "properties": {
+        "coordinates": {
+          "$ref": "#/$defs/Coordinates"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "coordinates"
+      ]
+    }
+  }
+}

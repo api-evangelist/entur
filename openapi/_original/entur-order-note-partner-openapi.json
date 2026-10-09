@@ -1,0 +1,697 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Order Notes",
+    "description": "Repository for data that is connectable to `orderId` and can be represented in String form. Note that only one note per `type` is able to be used per `orderId` for DEADLINE, VENDOR_CONTACT_INFO_OVERRIDE, ZERO_TICKET and PENALTY_FARE. If there is any need for nested data structures, consumers are invited to simply store small JSON objects in the `text` field.",
+    "contact": {
+      "name": "Team Salg",
+      "email": "team.salg@entur.org"
+    },
+    "version": "2026.07.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.staging.entur.io/sales",
+      "description": "Staging test environment"
+    },
+    {
+      "url": "https://api.dev.entur.io/sales",
+      "description": "Development test environment"
+    },
+    {
+      "url": "https://api.entur.io/sales",
+      "description": "Production environment"
+    }
+  ],
+  "security": [
+    {
+      "jwt": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Order Notes",
+      "description": "Services for creating, updating, retrieving and deleting order notes."
+    }
+  ],
+  "paths": {
+    "/v1/order-notes": {
+      "get": {
+        "tags": [
+          "Order Notes"
+        ],
+        "summary": "Search order notes",
+        "description": "Search all OrderNotes by the following query params: id, orderId, type, createdAt and updatedAt.",
+        "operationId": "searchOrderNotes",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Filter based on the id of the order note",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "default": {
+                "value": [
+                  "eq:1234"
+                ]
+              }
+            }
+          },
+          {
+            "name": "orderId",
+            "in": "query",
+            "description": "Filter based on order id",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "default": {
+                "value": [
+                  "eq:ABCD1234"
+                ]
+              }
+            }
+          },
+          {
+            "name": "orderLineIds",
+            "in": "query",
+            "description": "Filter based on order line IDs. Supports `in:` and `nin:` for multi-value queries (comma-separated).",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "default": {
+                "value": [
+                  "in:a0d85027-ccda-4d6f-bb3d-b55508d6b45d,d4f85027-ccda-4d6f-bb3d-b55508d6b45e"
+                ]
+              }
+            }
+          },
+          {
+            "name": "orderLineIdsInOrEmpty",
+            "in": "query",
+            "description": "Filter based on order line IDs, and also return Order Notes with no order line IDs. Supports only plain comma-separated values.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "default": {
+                "value": [
+                  "a0d85027-ccda-4d6f-bb3d-b55508d6b45d,d4f85027-ccda-4d6f-bb3d-b55508d6b45e"
+                ]
+              }
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter based on type of order note",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "default": {
+                "value": [
+                  "eq:PENALTY_FARE"
+                ]
+              }
+            }
+          },
+          {
+            "name": "createdAt",
+            "in": "query",
+            "description": "Filter based on when the order note was created",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "default": {
+                "value": [
+                  "gt:2019-10-10T11:00:59Z"
+                ]
+              }
+            }
+          },
+          {
+            "name": "updatedAt",
+            "in": "query",
+            "description": "Filter based on when the order note last was updated",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "examples": {
+              "default": {
+                "value": [
+                  "lt:2019-10-10T11:00:59Z"
+                ]
+              }
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Select a specific page in the collection",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1
+            },
+            "examples": {
+              "default": {
+                "value": 1
+              }
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Select the number of elements per page",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "default": 30
+            },
+            "examples": {
+              "default": {
+                "value": 10
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageOfOrderNoteResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Order Notes"
+        ],
+        "summary": "Create order note",
+        "description": "Create a new OrderNote. Returns OrderNoteResponse with added timestamps.",
+        "operationId": "createOrderNote",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderNoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/order-notes/{id}": {
+      "get": {
+        "tags": [
+          "Order Notes"
+        ],
+        "summary": "Get an order note based on its id.",
+        "description": "Get an OrderNote based on its Id.",
+        "operationId": "getOrderNoteById",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderNoteResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Order Notes"
+        ],
+        "summary": "Update order note",
+        "description": "Make changes to an existing OrderNote. If an OrderNote does not exist, this will return 404. Please check if it exists first, and use POST to create a new OrderNote.",
+        "operationId": "updateOrderNoteById",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderNoteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrderNoteResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Order Notes"
+        ],
+        "summary": "Delete order note",
+        "description": "Delete OrderNote with specified id.",
+        "operationId": "deleteOrderNoteById",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/orderNoteIdPathParam"
+        },
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "title": "ApiError",
+        "required": [
+          "error",
+          "exception",
+          "message",
+          "path",
+          "status",
+          "timestamp"
+        ],
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": "string",
+            "description": "Short, human-readable summary of the problem"
+          },
+          "error": {
+            "type": "string"
+          },
+          "exception": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "examples": [
+          {
+            "timestamp": "2024-01-10T11:00:59Z",
+            "status": 404,
+            "title": "Not Found",
+            "error": "Not Found",
+            "exception": "NotFoundException",
+            "message": "Order note with id 1234 not found",
+            "path": "/v1/order-notes/1234"
+          }
+        ]
+      },
+      "OrderNoteRequest": {
+        "title": "OrderNoteRequest",
+        "required": [
+          "orderId",
+          "text",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "maxLength": 8,
+            "minLength": 8,
+            "type": "string",
+            "description": "Id of order the note refers to. Unique in combination with `type`."
+          },
+          "orderLineIds": {
+            "type": "array",
+            "description": "Specify if the order note should only be part of specific order lines. If left empty, the note will belong to the whole order.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "text": {
+            "type": "string",
+            "description": "Contents of order-note. Usage is specific to `type`"
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrderNoteType"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Identifying information about who created the note. Should adhere to the pattern 'system:identifer'. Due to this standard, the character ':' is not available for use in either system or identifier. See examples.",
+            "examples": [
+              "Sørvis:OlaNordmann"
+            ]
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "Identifying information about who most recently updated the note. Should adhere to the pattern 'system:identifer'. Due to this standard, the character ':' is not available for use in either system or identifier. See examples.",
+            "examples": [
+              "SJ:22211"
+            ]
+          }
+        },
+        "examples": [
+          {
+            "orderId": "ABCD1234",
+            "text": "Customer called and wanted to change the delivery address for the tickets to work address.",
+            "type": "CUSTOMER_COMMUNICATION",
+            "createdBy": "1234",
+            "updatedBy": "1234"
+          }
+        ]
+      },
+      "OrderNoteResponse": {
+        "title": "OrderNoteResponse",
+        "required": [
+          "createdAt",
+          "id",
+          "orderId",
+          "orderLineIds",
+          "text",
+          "type",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id of the note",
+            "format": "int64"
+          },
+          "orderId": {
+            "maxLength": 8,
+            "minLength": 8,
+            "type": "string",
+            "description": "Id of order the note refers to. Unique in combination with `type`."
+          },
+          "orderLineIds": {
+            "type": "array",
+            "description": "Specific order lines the order note is part of. If empty, the note belongs to the whole order.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp for when the order-note was created.",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp for when the order-note was last updated.",
+            "format": "date-time"
+          },
+          "text": {
+            "type": "string",
+            "description": "Contents of order-note. Usage is specific to `type`"
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrderNoteType"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Identifying information about who created the note. Should adhere to the pattern 'system:identifer'. Due to this standard, the character ':' is not available for use in either system or identifier. See examples.",
+            "examples": [
+              "Email:no-reply@entur.org"
+            ]
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "Identifying information about who most recently updated the note. Should adhere to the pattern 'system:identifer'. Due to this standard, the character ':' is not available for use in either system or identifier. See examples.",
+            "examples": [
+              "Sørvis:OlaNordmann"
+            ]
+          }
+        },
+        "examples": [
+          {
+            "orderId": "ABCD1234",
+            "orderLineIds": [],
+            "text": "Customer called and wanted to change the delivery address for the tickets to work address.",
+            "type": "CUSTOMER_COMMUNICATION",
+            "createdBy": "1234",
+            "updatedBy": "1234",
+            "id": 5678,
+            "createdAt": "2025-12-10T11:00:59Z",
+            "updatedAt": "2025-12-10T11:00:59Z"
+          }
+        ]
+      },
+      "PageOfOrderNoteResponse": {
+        "title": "PageOfOrderNoteResponse",
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderNoteResponse"
+            }
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalItems": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "examples": [
+          {
+            "items": [
+              {
+                "orderId": "ABCD1234",
+                "orderLineIds": [],
+                "text": "Customer called and wanted to change the delivery address for the tickets to work address.",
+                "type": "CUSTOMER_COMMUNICATION",
+                "createdBy": "1234",
+                "updatedBy": "1234",
+                "id": 5678,
+                "createdAt": "2025-12-10T11:00:59Z",
+                "updatedAt": "2025-12-10T11:00:59Z"
+              }
+            ],
+            "totalPages": 1,
+            "totalItems": 1
+          }
+        ]
+      },
+      "OrderNoteType": {
+        "type": "string",
+        "description": "Type of Order Note. \n\nPENALTY_FARE - info used to generate penalty fare invoice \n\nZERO_TICKET - info regarding why zero ticket issued \n\nVENDOR_CONTACT_INFO_OVERRIDE - updated contact info for vendor eg. for group travel offer\n\nDEADLINE - deadline for changes to order eg. for group travel offer\n\nCUSTOMER_COMMUNICATION - note sent to customer, either manually or automated \n\nTERMS_AND_CONDITIONS - note relating to terms and conditions\n\nREFUND - note created as a part of refund process, either manually or automated \n\nGENERIC - note with additional order info \n\nUNKNOWN - untagged info ",
+        "default": "UNKNOWN",
+        "enum": [
+          "PENALTY_FARE",
+          "ZERO_TICKET",
+          "VENDOR_CONTACT_INFO_OVERRIDE",
+          "DEADLINE",
+          "CUSTOMER_COMMUNICATION",
+          "TERMS_AND_CONDITIONS",
+          "REFUND",
+          "GENERIC",
+          "UNKNOWN"
+        ]
+      }
+    },
+    "responses": {
+      "badRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "notFound": {
+        "description": "Order note not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      },
+      "conflict": {
+        "description": "OrderNote already exists with that orderId and type",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "orderNoteIdPathParam": {
+        "name": "id",
+        "in": "path",
+        "description": "Id of the Order Note",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,35 @@
+generated: '2026-10-09'
+method: derived
+generator: derive-webhooks.py
+source:
+- openapi/entur-omsa-openapi.yml
+- openapi/entur-shared-mobility-openapi.yml
+description: 'Event surface derived from the provider''s own OpenAPI: callbacks, enum event. No AsyncAPI document is published by the provider;
+  this catalog lists the events the contract names.'
+management_operations:
+- getWebhooks
+- registerWebhook
+- getWebhook
+- updateWebhook
+- deleteWebhook
+- rotateWebhookSecret
+- triggerRebookingMessage
+- sendNotification
+events:
+- event: jobCompleted
+  description: callback declared on searchOfferHandler
+  declared_in: callbacks
+- event: PREPARE
+  declared_in: components/schemas/OneStopBookingEvent/properties/event
+- event: START
+  declared_in: components/schemas/OneStopBookingEvent/properties/event
+- event: PAUSE
+  declared_in: components/schemas/OneStopBookingEvent/properties/event
+- event: RESUME
+  declared_in: components/schemas/OneStopBookingEvent/properties/event
+- event: START_FINISHING
+  declared_in: components/schemas/OneStopBookingEvent/properties/event
+- event: FINISH
+  declared_in: components/schemas/OneStopBookingEvent/properties/event
+- event: CANCEL
+  declared_in: components/schemas/OneStopBookingEvent/properties/event

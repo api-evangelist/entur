@@ -1,0 +1,1213 @@
+openapi: 3.2.0
+info:
+  title: Entur Members API
+  version: 2026.09.0
+  contact:
+    name: Team Personalisering
+    email: team.personalisering@entur.org
+  description: 'Operations tagged Members across 4 of this provider''s published API definitions: entur-personalisation-client-openapi.json, entur-personalisation-privacy-openapi.json, entur-personalisation-client-openapi.yml, entur-personalisation-privacy-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/personalisation
+security:
+- jwt: []
+tags:
+- name: Members
+  description: Information and management of members in a program.
+paths:
+  /v1/programs/{programId}/members:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Get members
+      description: Returns a paged list of all members in a program. Default page size is 20, maximum page size is 100.
+      operationId: getMembers
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: customerId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 1
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 200
+          minimum: 1
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMember'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}/members/{memberId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Get member
+      description: Get a member by member ID in a program.
+      operationId: getMember
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Member'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    delete:
+      tags:
+      - Members
+      summary: Delete member
+      description: Marks a member for deletion. The member will be permanently deleted after 72 hours
+      operationId: deleteMember
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:slett
+          - personalisation-customerdata-global:slett
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}/members/{memberId}/transactions:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Get all transactions for a member
+      description: Paged list of all transactions for a member, sorted by `validFrom` descending. Default page size is 20, maximum page size is 100.
+      operationId: getTransactions
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: orderId
+        in: query
+        description: The order id to filter transactions by
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The order id to filter transactions by
+      - name: pointDefinitionReference
+        in: query
+        description: The point definition reference to filter transactions by
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The point definition reference to filter transactions by
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 1
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 200
+          minimum: 1
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTransaction'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}/members/{memberId}/suspension-periods:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Get suspension periods
+      description: Paged list of all suspension periods for a member, sorted by `startAt` descending. Default page size is 20, maximum page size is 100.
+      operationId: getSuspensionPeriods
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 1
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 200
+          minimum: 1
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageSuspensionPeriod'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}/members/{memberId}/reward-ladder:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Get reward ladder for a member
+      description: 'Reward ladder for a member shows the levels available for a member, what is required to achieve each level
+
+        and what rewards are given in each level.'
+      operationId: getMemberRewardLadder
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberRewardLadder'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}/members/{memberId}/points-history:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Get points history for a member
+      description: Returns a paged list of points earned and consumed by a member in a program, ordered by created at descending. Default page size is 20, maximum page size is 100.
+      operationId: getMemberPointsHistory
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: pointDefinitionReference
+        in: query
+        description: The point definition reference to filter by.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The point definition reference to filter by.
+          examples:
+          - points
+        examples:
+          default:
+            value: points
+      - name: pointEventType
+        in: query
+        description: The point type to filter by. Returns both types if not specified
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The point type to filter by. Returns both types if not specified
+          enum:
+          - EARNED
+          - CONSUMED
+          examples:
+          - EARNED
+        examples:
+          default:
+            value: EARNED
+      - name: createdAfter
+        in: query
+        description: The start of the period to filter by. Defaults to one year ago.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The start of the period to filter by. Defaults to one year ago.
+          format: date-time
+          examples:
+          - '2023-01-01T00:00:00Z'
+        examples:
+          default:
+            value: '2023-01-01T00:00:00Z'
+      - name: createdBefore
+        in: query
+        description: The end of the period to filter by. Defaults to current time.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The end of the period to filter by. Defaults to current time.
+          format: date-time
+          examples:
+          - '2024-01-01T00:00:00Z'
+        examples:
+          default:
+            value: '2024-01-01T00:00:00Z'
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 1
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 200
+          minimum: 1
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageMemberPoints'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}/members/{memberId}/point-periods:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Point periods for member
+      description: 'Paged list of all point periods for a member in a program. It''s ordered by the `startAt` field of the period, with the
+
+        most recent first. Default page size is 20, maximum page size is 100.'
+      operationId: findPointPeriodsForMember
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+          default: 1
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 200
+          minimum: 1
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePointPeriod'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}/members/{memberId}/point-periods/{pointPeriodId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Members
+      summary: Get point period
+      description: Get a point period for a member in a program by the point period ID.
+      operationId: findPointPeriodForMemberById
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: pointPeriodId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PointPeriod'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    servers:
+    - url: https://api.entur.io/personalisation
+components:
+  schemas:
+    PagePointPeriod:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/PointPeriod'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
+    SuspensionPeriod:
+      required:
+      - '@type'
+      - createdAt
+      - endAt
+      - id
+      - referenceId
+      - startAt
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Generated identifier
+          format: int64
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Metadata for the suspension period
+        endAt:
+          type: string
+          description: When the suspension period ends
+          format: date-time
+        startAt:
+          type: string
+          description: When the suspension period starts
+          format: date-time
+        cancelledAt:
+          type: string
+          description: When the suspension period was cancelled from.
+          format: date-time
+        createdAt:
+          type: string
+          description: The date and time when the period was created
+          format: date-time
+        updatedAt:
+          type: string
+          description: The date and time when the period was last updated
+          format: date-time
+        referenceId:
+          type: string
+          description: "\n        Id to match multiple suspension periods.\n        Can for example be the id of the ticket, so that all periods for that ticket gets the same suspensionId.\n        Used for cancelling suspensions. See the CancelSuspensions effect.\n    "
+        '@type':
+          type: string
+      description: "\nA SuspensionPeriod is a mechanism for temporarily blocking/pausing various features in personalisation for a member.\nA SuspensionPeriod has several subtypes that determines which feature is being suspended.\n    "
+      discriminator:
+        propertyName: '@type'
+        mapping:
+          EffectSuspensionPeriod: '#/components/schemas/EffectSuspensionPeriod'
+          RewardsSuspensionPeriod: '#/components/schemas/RewardsSuspensionPeriod'
+    PageMember:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Member'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
+    RewardRequirement:
+      required:
+      - pointDefinitionId
+      - requiredAmount
+      type: object
+      properties:
+        requiredAmount:
+          type: number
+          description: Required amount to reach a program level
+        pointDefinitionId:
+          type: integer
+          description: Id of the point definition
+          format: int64
+        pointDefinitionReference:
+          type:
+          - string
+          - 'null'
+          description: Point definition reference
+      description: Requirements for reaching the level
+    PointPeriod:
+      required:
+      - endAt
+      - id
+      - startAt
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the point period
+          format: int64
+        startAt:
+          type: string
+          description: The start time of the point period
+          format: date-time
+        endAt:
+          type: string
+          description: The end time of the point period
+          format: date-time
+        metadata:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: object
+            description: "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+          description: "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+      description: The core information about a point period
+      readOnly: true
+    Error:
+      required:
+      - correlationId
+      - message
+      - status
+      - title
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        title:
+          type: string
+          examples:
+          - An error occurred
+        detail:
+          type:
+          - string
+          - 'null'
+          description: The main error message.
+          examples:
+          - An error occurred
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - An error occurred
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type:
+          - array
+          - 'null'
+          description: Validation error on a specific field.
+          items:
+            $ref: '#/components/schemas/FieldError'
+    MemberLevelSummary:
+      required:
+      - name
+      - requirementsNeeded
+      - rewardRequirements
+      - rewards
+      type: object
+      properties:
+        name:
+          type: string
+          description: Level name
+        rewardRequirements:
+          type: array
+          description: Requirements for reaching the level
+          items:
+            $ref: '#/components/schemas/RewardRequirement'
+        requirementsNeeded:
+          type: string
+          description: Whether any or all requirements need to be fulfilled
+          enum:
+          - ALL
+          - ANY
+          examples:
+          - ALL
+        rewards:
+          type: array
+          description: Rewards when the level is reached
+          items:
+            $ref: '#/components/schemas/MemberReward'
+      description: Requirements and rewards for each membership level of a specific program
+    MemberReward:
+      required:
+      - '@type'
+      - description
+      - rewardId
+      type: object
+      properties:
+        description:
+          type: string
+        rewardId:
+          type: integer
+          format: int64
+        '@type':
+          type: string
+      description: Rewards when the level is reached
+      discriminator:
+        propertyName: '@type'
+        mapping:
+          MemberPercentDiscountedProductReward: '#/components/schemas/MemberPercentDiscountedProductReward'
+          MemberFeatureReward: '#/components/schemas/MemberFeatureReward'
+    MemberRewardLadder:
+      required:
+      - rewardLadder
+      type: object
+      properties:
+        rewardLadder:
+          type: array
+          description: Program level details, including the specific requirements and rewards for each level in the program
+          items:
+            $ref: '#/components/schemas/MemberLevelSummary'
+      description: Information about the current reward ladder for a program member
+      readOnly: true
+    MemberPoints:
+      required:
+      - amount
+      - createdAt
+      - id
+      - memberId
+      - pointDefinitionReference
+      - programId
+      - sourceId
+      type: object
+      properties:
+        id:
+          type: string
+        sourceId:
+          type: string
+        programId:
+          type: integer
+          format: int64
+        memberId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+        pointDefinitionReference:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      discriminator:
+        propertyName: '@type'
+        mapping:
+          EARNED: '#/components/schemas/MemberPointsEarnedResponse'
+          CONSUMED: '#/components/schemas/MemberPointsConsumedResponse'
+    PageTransaction:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Transaction'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
+    FieldError:
+      required:
+      - field
+      - message
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+      description: Validation error on a specific field.
+    PageSuspensionPeriod:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/SuspensionPeriod'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
+    PageMemberPoints:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MemberPoints'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
+    Member:
+      required:
+      - createdAt
+      - customerId
+      - id
+      - organisationId
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerId:
+          type: string
+          description: Customer id
+        organisationId:
+          type: integer
+          description: The organisation this member belongs to
+          format: int64
+        metadata:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          description: Metadata needed for the processing of events
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      description: A member
+    Transaction:
+      required:
+      - amount
+      - createdAt
+      - id
+      - pointDefinitionId
+      - programId
+      - validFrom
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Generated identifier
+          format: int64
+          examples:
+          - 1
+        programId:
+          type: integer
+          description: The id of the program this transaction belongs to
+          format: int64
+        amount:
+          type: number
+          description: The number of points of the definition this transaction gives
+        pointDefinitionId:
+          type: integer
+          description: The id of the point definition this transaction gives points of
+          format: int64
+        pointDefinitionReference:
+          type:
+          - string
+          - 'null'
+          description: The reference of the point definition this transaction gives points of
+        referenceId:
+          type:
+          - string
+          - 'null'
+          description: Unique reference for this transaction. Populated from the event that created the transaction, based on the effect configuration.
+        createdAt:
+          type: string
+          description: The date and time when the transaction was created
+          format: date-time
+        updatedAt:
+          type:
+          - string
+          - 'null'
+          description: The date and time when the transaction was last updated
+          format: date-time
+        expireAt:
+          type:
+          - string
+          - 'null'
+          description: The date and time when the transaction expires. If null, the transaction never expires.
+          format: date-time
+        cancelledAt:
+          type:
+          - string
+          - 'null'
+          description: The date and time when the transaction was cancelled. If not null, the transaction is valid until this time.
+          format: date-time
+        validFrom:
+          type: string
+          description: The date and time the transaction is valid from.
+          format: date-time
+        metadata:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          description: Metadata for the transaction
+      description: A transaction
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-personalisation-client-openapi.json
+- entur-personalisation-privacy-openapi.json
+- entur-personalisation-client-openapi.yml
+- entur-personalisation-privacy-openapi.yml

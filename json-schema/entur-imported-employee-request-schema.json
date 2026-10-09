@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-imported-employee-request-schema.json",
+  "title": "ImportedEmployeeRequest",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personnel-tickets-openapi.yml#/components/schemas/ImportedEmployeeRequest",
+  "required": [
+    "addressLine",
+    "companyId",
+    "dateOfBirth",
+    "employeeNo",
+    "employmentPercentage",
+    "employmentTypeId",
+    "firstName",
+    "hireStartDate",
+    "isDeleted",
+    "postalCode",
+    "ssn",
+    "surname"
+  ],
+  "type": "object",
+  "properties": {
+    "employeeNo": {
+      "minLength": 1,
+      "type": "string",
+      "description": "Employee number"
+    },
+    "companyId": {
+      "type": "integer",
+      "description": "The company the employee is employed by",
+      "format": "int64"
+    },
+    "workPlaceId": {
+      "type": "integer",
+      "description": "Workplace id",
+      "format": "int64",
+      "deprecated": true
+    },
+    "employmentTypeId": {
+      "minLength": 1,
+      "type": "string",
+      "description": "The type of employment"
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "description": "When the employee was born",
+      "format": "date"
+    },
+    "ssn": {
+      "maxLength": 5,
+      "minLength": 5,
+      "type": "string",
+      "description": "The employee's social security number. 5 digits."
+    },
+    "firstName": {
+      "minLength": 1,
+      "type": "string",
+      "description": "The employee's first name"
+    },
+    "surname": {
+      "minLength": 1,
+      "type": "string",
+      "description": "The employee's surname"
+    },
+    "addressLine": {
+      "minLength": 1,
+      "type": "string",
+      "description": "The employee's postal address"
+    },
+    "postalCode": {
+      "minLength": 1,
+      "type": "string",
+      "description": "The postal code for the employee's address"
+    },
+    "preferredProductId": {
+      "type": "integer",
+      "description": "Deprecated. Use separate endpoint categories.",
+      "format": "int64",
+      "deprecated": true
+    },
+    "abstainFromTicket": {
+      "type": "boolean",
+      "description": "Whether a ticket should be created. Default false"
+    },
+    "sendTicketToPrivateAddress": {
+      "type": "boolean",
+      "description": "Not used. Won't be saved.",
+      "deprecated": true
+    },
+    "jobDescription": {
+      "type": "string",
+      "description": "Not used. Won't be saved.",
+      "deprecated": true
+    },
+    "hireStartDate": {
+      "type": "string",
+      "description": "When the employee was hired",
+      "format": "date"
+    },
+    "payType": {
+      "type": "string",
+      "description": "Pay type - see the codes in the API documentation"
+    },
+    "hireEndDate": {
+      "type": "string",
+      "description": "When the employee left the company",
+      "format": "date"
+    },
+    "hireEndCause": {
+      "type": "string",
+      "description": "Why the employee left the company"
+    },
+    "disabilityGrade": {
+      "type": "integer",
+      "description": "The employee's degree of disability. Default 0.",
+      "format": "int32"
+    },
+    "disabilityFromDate": {
+      "type": "string",
+      "description": "When the employee's disability was granted",
+      "format": "date"
+    },
+    "disabilityProofRegistered": {
+      "type": "boolean",
+      "description": "Deprecated. Use separate endpoint for disability proofs.",
+      "deprecated": true
+    },
+    "disabilityProofRegisteredDate": {
+      "type": "string",
+      "description": "Use separate endpoint for disability proofs",
+      "format": "date",
+      "deprecated": true
+    },
+    "employmentPercentage": {
+      "type": "integer",
+      "description": "Employment percentage",
+      "format": "int32"
+    },
+    "employmentPercentageDate": {
+      "type": "string",
+      "description": "Date for registered employment percentage",
+      "format": "date"
+    },
+    "paidPercentage": {
+      "type": "integer",
+      "description": "The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply",
+      "format": "int32"
+    },
+    "paidPercentageDate": {
+      "type": "string",
+      "description": "Not used. Won't be saved.",
+      "format": "date",
+      "deprecated": true
+    },
+    "leaveFromDate": {
+      "type": "string",
+      "description": "When the employee starts a leave",
+      "format": "date"
+    },
+    "isOnWaitPay": {
+      "type": "boolean",
+      "description": "Not used. Won't be saved.",
+      "deprecated": true
+    },
+    "waitPayDate": {
+      "type": "string",
+      "description": "Not used. Won't be saved.",
+      "format": "date",
+      "deprecated": true
+    },
+    "isFeePaid": {
+      "type": "boolean",
+      "description": "Deprecated. Use separate endpoint for yearlyFees.",
+      "deprecated": true
+    },
+    "note": {
+      "type": "string",
+      "description": "Deprecated. Not used.",
+      "deprecated": true
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Whether the employee has been marked for deletion. Default false"
+    },
+    "id": {
+      "type": "integer",
+      "description": "If present, this will perform an update of the employee",
+      "format": "int64"
+    }
+  }
+}

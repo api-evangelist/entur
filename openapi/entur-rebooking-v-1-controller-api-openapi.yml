@@ -1,0 +1,436 @@
+openapi: 3.2.0
+info:
+  title: Entur Rebooking V 1 Controller API
+  version: 2026.09.0
+  description: 'Operations tagged rebooking-v-1-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seating-manager
+security:
+- bearer-key: []
+tags:
+- name: rebooking-v-1-controller
+paths:
+  /v1/rebookings:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - rebooking-v-1-controller
+      summary: Fetch unhandled rebooked reservations for a dated service journey
+      description: Fetch all unhandled rebooked reservations for a dated service journey. A unhandled rebooked reservation is a reservations that has `status=DRAFT` and rebooking status SUGGESTED, MANUAL or ACCEPTED.
+      operationId: getRebookedReservationsV1
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        description: Dated service journey id to fetch rebooked reservations for.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: VYG:DatedServiceJourney:64_BRG-OSL_22-06-03
+      - name: reservationStatus
+        in: query
+        description: The status of the reservations considered, defaults to DRAFT
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: DRAFT
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+        examples:
+          default:
+            value: CONFIRMED
+      - name: rebookingStatuses
+        in: query
+        description: The `rebooking statuses` of the reservation that will be fetched. Defaults to SUGGESTED, MANUAL or ACCEPTED.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ACCEPTED
+            - MANUAL
+            - SUGGESTED
+            - REBOOKED_DRAFT
+            - REJECTED
+            - NONE
+        examples:
+          default:
+            value: NONE
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RebookedReservationResponseV1'
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1/rebookings/dated-service-journeys:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - rebooking-v-1-controller
+      summary: Fetch rebooking statistics grouped by original dated service journey
+      description: Fetch statistics for original departures from today onward in Norwegian local time. Supply exactly one of organisationId or lineId; supplying both or neither returns 400. The caller must have reservation read access to the organisations owning the selected original and replacement departures. Statistics count travel intentions, not individual reservation legs, under the original departure. Departures whose five rebooking counters are all zero are omitted. The reservation status defaults to DRAFT; rebooking statuses are MANUAL, SUGGESTED and ACCEPTED, in that priority order. Snoozed travel intentions are counted separately and excluded from active counts. No-journey travel intentions are counted separately for DRAFT only.
+      operationId: getDatedServiceJourneysWithRebookingsStatsV1
+      parameters:
+      - name: organisationId
+        in: query
+        description: Owner organisation of the original departures. Required when lineId is omitted; cannot be combined with lineId.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 1
+      - name: lineId
+        in: query
+        description: Line of the original departures. Required when organisationId is omitted; cannot be combined with organisationId.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: VYG:Line:70
+      - name: reservationStatus
+        in: query
+        description: The status of the reservations considered, defaults to DRAFT
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: DRAFT
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+        examples:
+          default:
+            value: DRAFT
+      responses:
+        '200':
+          description: Rebooking statistics for the original departures.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RebookingOverviewResponseV1'
+        '400':
+          description: Supply exactly one of organisationId or a non-blank lineId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonError'
+        '403':
+          description: The caller lacks read access to the requested data.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommonError'
+    servers:
+    - url: https://api.entur.io/seating-manager
+components:
+  schemas:
+    RebookedReservationLineResponseV1:
+      required:
+      - reference
+      - reservationLineType
+      - reservedProperties
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference for this reservation line`
+          format: uuid
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line`
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        reservationLineType:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+        reservedProperties:
+          type: array
+          items:
+            type: string
+            description: The properties required by the traveller.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+      discriminator:
+        propertyName: reservationLineType
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/RebookedSingleSeatReservationLineResponseV1'
+          COMPARTMENT: '#/components/schemas/RebookedCompartmentReservationLineResponseV1'
+          FREE_SEATING: '#/components/schemas/RebookedFreeSeatingReservationLineResponseV1'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingDataResponseV1'
+    CommonError:
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    RebookedReservationResponseV1:
+      required:
+      - createdAt
+      - datedServiceJourneyId
+      - destinationStopPlace
+      - organisationId
+      - originStopPlace
+      - previousReservationLines
+      - rebookingStatus
+      - reference
+      - reservationLines
+      - reservationStatus
+      - updatedAt
+      - version
+      - versionedAt
+      type: object
+      properties:
+        reference:
+          type: string
+          description: The reference for this reservation, this is a randomly generated UUID
+          format: uuid
+          examples:
+          - 123e4567-e89b-12d3-a456-426614174000
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: The `orderId` of the connected order where the creating client provided it. There are reservations without a connected order.
+          examples:
+          - ZGMCDSVS
+        version:
+          type: integer
+          description: The highest/newest `version` of this reservation. The initial version number is `1`.
+          format: int32
+          examples:
+          - 1
+        originStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        previousOriginStopPlace:
+          anyOf:
+          - $ref: '#/components/schemas/StopPlaceResponseV1'
+          - type: 'null'
+        destinationStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        previousDestinationStopPlace:
+          anyOf:
+          - $ref: '#/components/schemas/StopPlaceResponseV1'
+          - type: 'null'
+        datedServiceJourneyId:
+          type: string
+          description: Id of the dated service journey
+        previousDatedServiceJourneyId:
+          type:
+          - string
+          - 'null'
+          description: Id of the previous dated service journey if the dated service journey has been changed
+        organisationId:
+          type: integer
+          description: The organisation id of the order which the `reservation` belongs to.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        createdAt:
+          type: string
+          description: When this reservation was initially created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        versionedAt:
+          type: string
+          description: When this version of this reservation was created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        updatedAt:
+          type: string
+          description: When this was previously updated. This includes status changes, reservation line changes and so on.
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        reservationStatus:
+          type: string
+          description: Describes the `reservation` status.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        rebookingStatus:
+          type: string
+          description: Describes the `rebooking` status of the reservation.
+          enum:
+          - ACCEPTED
+          - MANUAL
+          - SUGGESTED
+          - REBOOKED_DRAFT
+          - REJECTED
+          examples:
+          - ACCEPTED
+        reservationLines:
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/RebookedReservationLineResponseV1'
+        previousReservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/RebookedReservationLineResponseV1'
+        info:
+          type:
+          - string
+          - 'null'
+          description: Additional free text information about the reservation.
+          examples:
+          - Unable to rebook this reservation due to no available seats.
+    RebookingOverviewResponseV1:
+      required:
+      - amountOfAcceptedRebookings
+      - amountOfManualRebookings
+      - amountOfNoJourneyRebookings
+      - amountOfSnoozedRebookings
+      - amountOfSuggestedRebookings
+      - originalDatedServiceJourneyId
+      - replacements
+      type: object
+      properties:
+        originalDatedServiceJourneyId:
+          minLength: 1
+          type: string
+          description: Id of the original dated service journey
+        replacements:
+          type: array
+          description: All replacement dated service journeys
+          items:
+            type: string
+            description: All replacement dated service journeys
+        amountOfSuggestedRebookings:
+          type: integer
+          description: Number of rebookings suggested
+          format: int32
+          examples:
+          - 1
+        amountOfManualRebookings:
+          type: integer
+          description: Number of rebookings ready for manual handling
+          format: int32
+          examples:
+          - 2
+        amountOfAcceptedRebookings:
+          type: integer
+          description: Number of rebookings accepted
+          format: int32
+          examples:
+          - 0
+        amountOfNoJourneyRebookings:
+          type: integer
+          description: Number of no-journey rebookings
+          format: int32
+          examples:
+          - 0
+        amountOfSnoozedRebookings:
+          type: integer
+          description: Number of rebookings snoozed
+          format: int32
+          examples:
+          - 0
+    StopPlaceResponseV1:
+      required:
+      - nsrCode
+      - sequenceNr
+      type: object
+      properties:
+        nsrCode:
+          type: string
+          description: Stop Place id defined by National StopPlace registry.
+          examples:
+          - NSR:StopPlace:337
+        sequenceNr:
+          type: integer
+          description: The ordering of the station in the journey.
+          format: int32
+          examples:
+          - 0
+      description: Destination `StopPlace` of the `reservation`
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seating-manager-openapi.json
+- entur-seating-manager-openapi.yml

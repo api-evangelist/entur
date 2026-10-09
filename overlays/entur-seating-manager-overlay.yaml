@@ -1,0 +1,52 @@
+overlay: 1.0.0
+info:
+  title: Entur Seating manager overlay
+  version: 1.0.0
+extends: ../openapi/_original/entur-seating-manager-openapi.yml
+x-generated: '2026-10-09'
+x-method: generated
+actions:
+- target: $.info
+  description: API Evangelist provider metadata.
+  update:
+    x-provider: entur
+    x-provider-name: Entur
+    x-apievangelist-operation-count: 49
+    x-apievangelist-generated: '2026-10-09'
+    x-apievangelist-source: openapi/entur-seating-manager-openapi.yml
+- target: $.paths['/v1-beta/reservations/{reference}'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get reservation
+- target: $.paths['/v1-beta/reservations/{reference}'].patch
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update reservation
+- target: $.paths['/v1-beta/reservations'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get reservations on seating offer
+- target: $.paths['/v1/capacities/{datedServiceJourneyId}/total'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get total capacity
+- target: $.paths['/v1-beta/reservations/reservation-line/{reservationLineReference}'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get reservation by reservation line reference
+- target: $.paths['/v1-beta/reservations/by-statuses'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get reservations on seating offer by statuses
+- target: $.paths['/v1-beta/rebookings/dated-service-journeys'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get dated service journeys with rebookings stats
+- target: $.paths['/v1-beta/rebookings/dated-service-journeys/history'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get service journey with rebooking history
+- target: $.paths['/ready'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Ready

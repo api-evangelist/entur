@@ -1,0 +1,971 @@
+openapi: 3.2.0
+info:
+  title: Entur Employee import API
+  version: 2026.08.0
+  contact:
+    name: Entur Team Personalisering
+    email: team.personalisering@entur.org
+  termsOfService: http://entur.org
+  description: 'Operations tagged Employee import across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io
+security:
+- jwt: []
+tags:
+- name: Employee import
+  description: Import employees from an external system to be added to the personnel ticket system
+paths:
+  /personnelticket/v2/imports/employees:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Employee import
+      summary: Import a new employee
+      operationId: importNewEmployee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportedEmployeeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedEmployeeResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rettighetshaver-Sensitiv.companyId:opprett
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/imports/employees/{employeeId}/years/{year}/yearly-fees:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Employee import
+      summary: Set the status of the yearly fee
+      description: Set the status of the yearly fee for the given employee for the given year. This endpoint will trigger generation of ticket rights.
+      operationId: setYearlyFee
+      parameters:
+      - name: employeeId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: year
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maximum: 2100
+          minimum: 1980
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeYearlyFeeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeYearlyFeeResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rettighetshaver.employeeId:endre
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/imports/employees/{employeeId}/years/{year}/disability-proofs:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Employee import
+      summary: Set registration status of the disability proof
+      description: Set registration status of the disability proof for the given employee for the given year
+      operationId: setDisabilityProof
+      parameters:
+      - name: employeeId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: year
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          maximum: 2100
+          minimum: 1980
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeDisabilityProofRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeDisabilityProofResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rettighetshaver-Sensitiv.employeeId:endre
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/imports/employees/csv:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Employee import
+      summary: Import multiple employees via csv
+      description: Import multiple employees via csv. Will return a list of the actually changed elements. This list may be empty if all uploaded values were already in the database.If any birth date or ssn is invalid, nothing will be imported, and an error message listing invalid dates and ssn will be returned
+      operationId: importMultipleEmployeesCsv
+      parameters:
+      - name: importForCompany
+        in: query
+        description: If provided, will parse the csv file based on the format provided by the company. Use employeeNoPrefix from the relevant company. The the company has no specific format registered, the standard format will be used.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - standard
+          - BaneS
+          - BNOR
+          - SPOR
+          - entur
+        examples:
+          default:
+            value: standard
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                importFile:
+                  contentMediaType: application/octet-stream
+                  description: 'A csv formatted file with employees to import. Use the properties as described by the relevant format. Default is $ref: #/definitions/ImportedEmployeeRequest.'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ImportedEmployeeResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rettighetshaver-Sensitiv:opprett
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/imports/employees/{importedEmployeeId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Employee import
+      summary: Get imported employee
+      operationId: getImportedEmployee
+      parameters:
+      - name: importedEmployeeId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedEmployeeResponse'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          all:
+          - Personalbillett-Rettighetshaver.employeeId:les
+          - Personalbillett-Rettighetshaver-Sensitiv.employeeId:les
+    patch:
+      tags:
+      - Employee import
+      summary: Patch a previously imported employee
+      operationId: patchImportedEmployee
+      parameters:
+      - name: importedEmployeeId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportedEmployeeMergePatchRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedEmployeeResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rettighetshaver-Sensitiv.employeeId:endre
+    servers:
+    - url: https://api.entur.io
+components:
+  schemas:
+    EmployeeDisabilityProofRequest:
+      required:
+      - isRegistered
+      type: object
+      properties:
+        isRegistered:
+          type: boolean
+          description: Whether proof of disability has been registered
+          examples:
+          - true
+      description: Yearly disability proof information
+    ImportedEmployeeResponse:
+      required:
+      - companyId
+      - employeeNo
+      - firstName
+      - id
+      - surname
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The id of the imported employee
+          format: int64
+        employeeNo:
+          type: string
+          description: Employee number
+        companyId:
+          type: integer
+          description: The company the employee is employed by
+          format: int64
+        workPlaceId:
+          type: integer
+          description: Unused
+          format: int64
+          deprecated: true
+        employmentTypeId:
+          type: string
+          description: The type of employment
+        dateOfBirth:
+          type: string
+          description: When the employee was born
+          format: date
+          examples:
+          - '2023-01-01'
+        ssn:
+          type: string
+          description: The employee's social security number
+        firstName:
+          type: string
+          description: The employee's first name
+        surname:
+          type: string
+          description: The employee's surname
+        addressLine:
+          type: string
+          description: The employee's postal address
+        postalData:
+          $ref: '#/components/schemas/PostalPlaceResponse'
+        preferredProductId:
+          type: integer
+          description: Deprecated. Use separate endpoint categories.
+          format: int64
+          deprecated: true
+        abstainFromTicket:
+          type: boolean
+          description: Whether a ticket should be created
+        sendTicketToPrivateAddress:
+          type: boolean
+          description: Unused
+          deprecated: true
+        jobDescription:
+          type: string
+          description: Unused
+          deprecated: true
+        hireStartDate:
+          type: string
+          description: When the employee was hired
+          format: date
+          examples:
+          - '2019-04-12'
+        payType:
+          type: string
+          description: Pay type - see the codes in the API documentation
+          examples:
+          - A
+        hireEndDate:
+          type: string
+          description: When the employee left the company
+          format: date
+          examples:
+          - '2019-04-17'
+        hireEndCause:
+          type: string
+          description: Why the employee left the company
+        disabilityGrade:
+          type: integer
+          description: The employee's degree of disability. Default 0.
+          format: int32
+          examples:
+          - 20
+        disabilityFromDate:
+          type: string
+          description: When the employee's disability was granted
+          format: date
+          examples:
+          - '2017-12-31'
+        disabilityProofRegistered:
+          type: boolean
+          description: Deprecated. Use separate endpoint for disability proofs.
+          deprecated: true
+        disabilityProofRegisteredDate:
+          type: string
+          description: Unused
+          format: date
+          deprecated: true
+          examples:
+          - '2023-01-01'
+        employmentPercentage:
+          type: integer
+          description: Employment percentage
+          format: int32
+          examples:
+          - 80
+        employmentPercentageDate:
+          type: string
+          description: Date for registered employment percentage
+          format: date
+          examples:
+          - '2019-07-13'
+        paidPercentage:
+          type: integer
+          description: The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply
+          format: int32
+        paidPercentageDate:
+          type: string
+          description: Unused
+          format: date
+          deprecated: true
+          examples:
+          - '2023-01-01'
+        leaveFromDate:
+          type: string
+          description: When the employee starts a leave
+          format: date
+          examples:
+          - '2019-05-12'
+        isOnWaitPay:
+          type: boolean
+          description: Unused
+          deprecated: true
+        waitPayDate:
+          type: string
+          description: Unused
+          format: date
+          deprecated: true
+          examples:
+          - '2019-04-13'
+        isFeePaid:
+          type: boolean
+          description: Deprecated. Use separate endpoint for yearlyFees. Whether the ticket fee has been paid, if applicable
+          deprecated: true
+        note:
+          type: string
+          description: Any additional information
+        isDeleted:
+          type: boolean
+          description: Whether the employee has been marked for deletion
+        lastUpdate:
+          type: string
+          description: When the imported employee was last updated
+          format: date-time
+        sourceLastUpdate:
+          type: string
+          description: The source for the last update
+        createdAt:
+          type: string
+          description: The date of creation.
+          format: date-time
+        createdBy:
+          type: string
+          description: The source for the first creation
+    EmployeeYearlyFeeRequest:
+      required:
+      - isPaid
+      type: object
+      properties:
+        isPaid:
+          type: boolean
+          description: Whether this yearly fee has been paid
+          examples:
+          - true
+      description: Yearly fee information
+    ImportedEmployeeRequest:
+      required:
+      - addressLine
+      - companyId
+      - dateOfBirth
+      - employeeNo
+      - employmentPercentage
+      - employmentTypeId
+      - firstName
+      - hireStartDate
+      - isDeleted
+      - postalCode
+      - ssn
+      - surname
+      type: object
+      properties:
+        employeeNo:
+          minLength: 1
+          type: string
+          description: Employee number
+        companyId:
+          type: integer
+          description: The company the employee is employed by
+          format: int64
+        workPlaceId:
+          type: integer
+          description: Workplace id
+          format: int64
+          deprecated: true
+        employmentTypeId:
+          minLength: 1
+          type: string
+          description: The type of employment
+        dateOfBirth:
+          type: string
+          description: When the employee was born
+          format: date
+          examples:
+          - '2023-01-01'
+        ssn:
+          maxLength: 5
+          minLength: 5
+          type: string
+          description: The employee's social security number. 5 digits.
+          examples:
+          - '44554'
+        firstName:
+          minLength: 1
+          type: string
+          description: The employee's first name
+        surname:
+          minLength: 1
+          type: string
+          description: The employee's surname
+        addressLine:
+          minLength: 1
+          type: string
+          description: The employee's postal address
+        postalCode:
+          minLength: 1
+          type: string
+          description: The postal code for the employee's address
+        preferredProductId:
+          type: integer
+          description: Deprecated. Use separate endpoint categories.
+          format: int64
+          deprecated: true
+        abstainFromTicket:
+          type: boolean
+          description: Whether a ticket should be created. Default false
+        sendTicketToPrivateAddress:
+          type: boolean
+          description: Not used. Won't be saved.
+          deprecated: true
+        jobDescription:
+          type: string
+          description: Not used. Won't be saved.
+          deprecated: true
+        hireStartDate:
+          type: string
+          description: When the employee was hired
+          format: date
+          examples:
+          - '2019-04-12'
+        payType:
+          type: string
+          description: Pay type - see the codes in the API documentation
+          examples:
+          - A
+        hireEndDate:
+          type: string
+          description: When the employee left the company
+          format: date
+          examples:
+          - '2019-04-17'
+        hireEndCause:
+          type: string
+          description: Why the employee left the company
+        disabilityGrade:
+          type: integer
+          description: The employee's degree of disability. Default 0.
+          format: int32
+          examples:
+          - 20
+        disabilityFromDate:
+          type: string
+          description: When the employee's disability was granted
+          format: date
+          examples:
+          - '2017-12-31'
+        disabilityProofRegistered:
+          type: boolean
+          description: Deprecated. Use separate endpoint for disability proofs.
+          deprecated: true
+        disabilityProofRegisteredDate:
+          type: string
+          description: Use separate endpoint for disability proofs
+          format: date
+          deprecated: true
+          examples:
+          - '2023-01-01'
+        employmentPercentage:
+          type: integer
+          description: Employment percentage
+          format: int32
+          examples:
+          - 80
+        employmentPercentageDate:
+          type: string
+          description: Date for registered employment percentage
+          format: date
+          examples:
+          - '2019-07-13'
+        paidPercentage:
+          type: integer
+          description: The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply
+          format: int32
+        paidPercentageDate:
+          type: string
+          description: Not used. Won't be saved.
+          format: date
+          deprecated: true
+          examples:
+          - '2023-01-01'
+        leaveFromDate:
+          type: string
+          description: When the employee starts a leave
+          format: date
+          examples:
+          - '2019-05-12'
+        isOnWaitPay:
+          type: boolean
+          description: Not used. Won't be saved.
+          deprecated: true
+        waitPayDate:
+          type: string
+          description: Not used. Won't be saved.
+          format: date
+          deprecated: true
+          examples:
+          - '2023-01-01'
+        isFeePaid:
+          type: boolean
+          description: Deprecated. Use separate endpoint for yearlyFees.
+          deprecated: true
+        note:
+          type: string
+          description: Deprecated. Not used.
+          deprecated: true
+        isDeleted:
+          type: boolean
+          description: Whether the employee has been marked for deletion. Default false
+        id:
+          type: integer
+          description: If present, this will perform an update of the employee
+          format: int64
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    EmployeeDisabilityProofResponse:
+      required:
+      - isRegistered
+      - year
+      type: object
+      properties:
+        year:
+          type: integer
+          description: The year this information is valid for
+          format: int32
+          examples:
+          - 2020
+        isRegistered:
+          type: boolean
+          description: Whether a disability proof has been registered this year
+          examples:
+          - true
+      description: Yearly disability proof information
+    PostalPlaceResponse:
+      required:
+      - code
+      - country
+      - isDeleted
+      - place
+      type: object
+      properties:
+        code:
+          type: string
+          description: Postal code
+          examples:
+          - 0238
+        place:
+          type: string
+          description: Postal place
+          examples:
+          - OSLO
+        country:
+          type: string
+          description: Country, format ISO 3166-1 alpha-3
+          examples:
+          - NOR
+        isDeleted:
+          type: boolean
+          description: If the postal place has been deleted
+      description: The postal data for the employee's address
+    ImportedEmployeeMergePatchRequest:
+      required:
+      - companyId
+      - employeeNo
+      - employmentPercentage
+      - employmentTypeId
+      - isDeleted
+      type: object
+      properties:
+        employeeNo:
+          type: string
+          description: Employee number
+        companyId:
+          type: string
+          description: Company Id
+        employmentTypeId:
+          type: string
+          description: Type of employment
+          examples:
+          - full-time (F), part-time (M), extra (T), unknown (U)
+        dateOfBirth:
+          type: string
+          description: When the employee was born
+          format: date
+          examples:
+          - '2023-01-01'
+        ssn:
+          type: string
+          description: Birthdate-number og D-number, 5 digits
+        firstName:
+          type: string
+          description: The employee's first name
+        surname:
+          type: string
+          description: The employee's surname
+        addressLine:
+          type: string
+          description: The employee's address line
+        postalCode:
+          type: string
+          description: The postal code for the employee's address
+        preferredProductId:
+          type: integer
+          description: The employee's product
+          format: int64
+        abstainFromTicket:
+          type: boolean
+          description: Whether a ticket should be created
+        hireStartDate:
+          type: string
+          description: When the employee was hired
+          format: date
+          examples:
+          - '2019-04-12'
+        payType:
+          type: string
+          description: Pay type - see the codes in the API documentation
+          examples:
+          - A
+        hireEndDate:
+          type: string
+          description: When the employee left the company
+          format: date
+          examples:
+          - '2019-04-17'
+        hireEndCause:
+          type: string
+          description: Why the employee left the company
+          examples:
+          - pensioner (A), quitting (E), ...
+        disabilityGrade:
+          type: integer
+          description: The employee's degree of disability. Default 0.
+          format: int32
+          examples:
+          - 20
+        disabilityFromDate:
+          type: string
+          description: When the employee's disability was granted
+          format: date
+          examples:
+          - '2017-12-31'
+        employmentPercentage:
+          type: integer
+          description: Employment percentage
+          format: int32
+          examples:
+          - 80
+        employmentPercentageDate:
+          type: string
+          description: Date for registered employment percentage
+          format: date
+          examples:
+          - '2019-07-13'
+        paidPercentage:
+          type: integer
+          description: The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply
+          format: int32
+        leaveFromDate:
+          type: string
+          description: When the employee starts a leave
+          format: date
+          examples:
+          - '2019-05-12'
+        isDeleted:
+          type: boolean
+          description: Whether the employee has been marked for deletion. Default false
+      description: Merge patch request for an Employee
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
+    EmployeeYearlyFeeResponse:
+      required:
+      - isPaid
+      - year
+      type: object
+      properties:
+        year:
+          type: integer
+          description: The year this fee is valid
+          format: int32
+          examples:
+          - 2020
+        isPaid:
+          type: boolean
+          description: Whether this yearly fee has been paid
+          examples:
+          - true
+      description: Yearly fee information
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-personnel-tickets-openapi.json
+- entur-personnel-tickets-openapi.yml

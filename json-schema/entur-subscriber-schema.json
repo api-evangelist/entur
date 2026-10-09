@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-subscriber-schema.json",
+  "title": "subscriber",
+  "description": "Optional URIs for callbacks for this job.\n\nSupport for this parameter is not required and the parameter may be\nremoved from the API definition, if conformance class **'callback'**\nis not listed in the conformance declaration under `/conformance`.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-omsa-openapi.yml#/components/schemas/subscriber",
+  "required": [
+    "successUrl"
+  ],
+  "type": "object",
+  "properties": {
+    "successUri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "inProgressUri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "failedUri": {
+      "type": "string",
+      "format": "uri"
+    }
+  }
+}

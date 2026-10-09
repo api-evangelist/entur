@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-distance-calculation-response-schema.json",
+  "title": "DistanceCalculationResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-prdudisapi-openapi.yml#/components/schemas/DistanceCalculationResponse",
+  "type": "object",
+  "properties": {
+    "organisationId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "fromStopPlaceId": {
+      "type": "string"
+    },
+    "toStopPlaceId": {
+      "type": "string"
+    },
+    "distance": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "paths": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/DistancePath"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "DistancePath": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "distance": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+generated: '2026-10-09'
+method: derived
+source: openapi/entur-omsa-openapi.yml
+schemes:
+- name: OAuth
+  source: openapi/entur-omsa-openapi.yml
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: /
+    tokenUrl: /oauth/token
+  description: This flow facilitates to get access tokens based on username/password. These
+    can be obtained by the owner of the service, look at the landing page to find out how to
+    contact it.
+- name: OAuthPKI
+  source: openapi/entur-omsa-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: /oauth/token
+  description: OAuth 2.0 with PKI and mutual TLS for client authentication The client sends
+    its X.509 during the handshake. The server validates and accepts the certificate. The call
+    to the /oauth/token can use the provided credentials (O or CN) to provide a access_token
+    (JWT).
+scopes:
+- scope: processes
+  description: Access to /processes/
+  flows:
+  - authorizationCode
+  - clientCredentials
+  sources:
+  - openapi/entur-omsa-openapi.yml

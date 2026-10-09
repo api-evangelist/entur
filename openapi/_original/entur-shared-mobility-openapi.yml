@@ -1,0 +1,1219 @@
+# x-archived-from: entur-shared-mobility-openapi.yml
+# x-archived-on: 2026-10-09
+openapi: 3.1.0
+info:
+  title: Entur shared mobility API
+  description: This is the API for Entur shared mobility. It is used to communicate with the Entur shared mobility platform. The API is based on the TOMP-API standard and is used to manage bookings, payments, and other operations related to shared mobility. The API is designed to be easy to use and understand, with clear documentation and examples. The API is also designed to be secure, with support for OAuth2 authentication and authorization.
+  contact:
+    name: Team Delingsmobilitet
+  version: 2026.09.2
+servers:
+- url: https://api.entur.io/shared-mobility/v1
+  description: Generated server url
+security:
+- Authorization: []
+tags:
+- name: Booking
+- name: Operator
+- name: QR Code
+- name: Support
+- name: TransportOperator
+paths:
+  /bookings/{bookingId}/retry-failed-payment/{recurringPaymentId}:
+    put:
+      tags:
+      - Booking
+      description: Retry failed payment
+      operationId: retryFailedPayment
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: bookingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      - name: recurringPaymentId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '402':
+          description: Payment Required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /support:
+    post:
+      tags:
+      - Support
+      summary: Create a support case
+      description: Create a support case base on the given supportRequest. The operatorId is used to identify the correct receiving operator.
+      operationId: createSupportCase
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Entur-Distribution-Channel
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Operator-Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportRequest'
+        required: true
+      responses:
+        '200':
+          description: SupportStatus
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SupportStatus'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /bookings/{transportOperatorBookingId}/notification:
+    post:
+      tags:
+      - SharedMobilityInternal
+      - Booking
+      description: Send a message to the end user
+      operationId: sendNotification
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: transportOperatorBookingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+        required: true
+      responses:
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /bookings/{bookingId}/one-stop/event:
+    post:
+      tags:
+      - Booking
+      description: Change the leg event for a one-stop booking
+      operationId: oneStopEvent
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: bookingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OneStopBookingEvent'
+        required: true
+      responses:
+        '200':
+          description: BookingResponse
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '402':
+          description: Payment Required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /bookings/one-stop:
+    post:
+      tags:
+      - Booking
+      description: Create a one-stop booking
+      operationId: createOneStopBooking
+      parameters:
+      - name: Entur-Distribution-Channel
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Operator-Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OneStopBooking'
+        required: true
+      responses:
+        '200':
+          description: BookingResponse
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '402':
+          description: Payment Required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /bookings/leg/{transportOperatorLegId}/event:
+    post:
+      tags:
+      - SharedMobilityInternal
+      - Booking
+      description: Change the leg event for a one-stop booking
+      operationId: updateBookingWithLegsIdEventsPost
+      parameters:
+      - name: Operator-Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: transportOperatorLegId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: oneStopState
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - PREPARE
+          - START
+          - PAUSE
+          - RESUME
+          - START_FINISHING
+          - FINISH
+          - CANCEL
+      responses:
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /qr-code:
+    get:
+      tags:
+      - QR Code
+      description: Get information based on QR code URL
+      operationId: getQrCodeInfo
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: qrCodeUrl
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: longitude
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: number
+          format: float
+      - name: latitude
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: number
+          format: float
+      responses:
+        '200':
+          description: Asset
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /operators/availability:
+    get:
+      tags:
+      - Operator
+      summary: Get all available operator IDs
+      description: Get a list of all operator IDs the client has access to sell mobility on behalf of.
+      operationId: getAvailability
+      responses:
+        '200':
+          description: OperatorAvailabilityResponse
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/OperatorAvailabilityResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /bookings:
+    get:
+      tags:
+      - Booking
+      description: Get a list of all bookings given customer ID
+      operationId: getBookings
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: customerId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: customerNumber
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: active
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: paymentStatus
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - UNPAID
+          - PAID
+          - PAYMENT_FAILED
+      responses:
+        '200':
+          description: List<BookingResponse>
+          content:
+            application/problem+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+      deprecated: true
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /bookings/{customerNumber}/active:
+    get:
+      tags:
+      - Booking
+      description: Get active bookings for a given customer number
+      operationId: getActiveBookings
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: List<BookingResponse>
+          content:
+            application/problem+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /bookings/{bookingId}:
+    get:
+      tags:
+      - Booking
+      description: Get a booking given booking ID
+      operationId: getBooking
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: bookingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: BookingResponse
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+components:
+  schemas:
+    ApiError:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: integer
+          format: int32
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        exception:
+          type: string
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      required:
+      - detail
+      - error
+      - exception
+      - instance
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      - type
+    ContactInformation:
+      type: object
+      properties:
+        email:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
+    Coordinates:
+      type: object
+      properties:
+        longitude:
+          type: number
+          format: float
+        latitude:
+          type: number
+          format: float
+        altitude:
+          type:
+          - number
+          - 'null'
+          format: float
+      required:
+      - latitude
+      - longitude
+    Place:
+      type: object
+      properties:
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        name:
+          type:
+          - string
+          - 'null'
+      required:
+      - coordinates
+    SupportRequest:
+      type: object
+      properties:
+        bookingId:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        assetId:
+          type:
+          - string
+          - 'null'
+        supportType:
+          type: string
+          enum:
+          - BROKEN_DOWN
+          - NOT_AT_LOCATION
+          - MISSING_AFTER_PAUSE
+          - NOT_CLEAN
+          - NOT_AVAILABLE
+          - UNABLE_TO_OPEN
+          - UNABLE_TO_CLOSE
+          - API_TECHNICAL
+          - API_FUNCTIONAL
+          - ACCIDENT
+          - OTHER
+        contactInformationEndUser:
+          $ref: '#/components/schemas/ContactInformation'
+        comment:
+          type:
+          - string
+          - 'null'
+        place:
+          oneOf:
+          - $ref: '#/components/schemas/Place'
+          - type: 'null'
+        stationId:
+          type:
+          - string
+          - 'null'
+      required:
+      - contactInformationEndUser
+      - supportType
+    SupportStatus:
+      type: object
+      properties:
+        status:
+          type:
+          - string
+          - 'null'
+        timeToResolution:
+          type:
+          - integer
+          - 'null'
+          format: int32
+    Notification:
+      type: object
+      properties:
+        originOperator:
+          type: string
+        message:
+          type:
+          - string
+          - 'null'
+      required:
+      - originOperator
+    OneStopBookingEvent:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+          - PREPARE
+          - START
+          - PAUSE
+          - RESUME
+          - START_FINISHING
+          - FINISH
+          - CANCEL
+        fileName:
+          type:
+          - string
+          - 'null'
+        fileType:
+          type:
+          - string
+          - 'null'
+        fileData:
+          type:
+          - string
+          - 'null'
+          format: byte
+      required:
+      - event
+    Asset:
+      type: object
+      properties:
+        operator:
+          $ref: '#/components/schemas/Operator'
+        id:
+          type:
+          - string
+          - 'null'
+        systemId:
+          type:
+          - string
+          - 'null'
+        stationId:
+          type:
+          - string
+          - 'null'
+        formFactor:
+          type:
+          - string
+          - 'null'
+          enum:
+          - BICYCLE
+          - CARGO_BICYCLE
+          - CAR
+          - MOPED
+          - SCOOTER
+          - SCOOTER_STANDING
+          - SCOOTER_SEATED
+          - OTHER
+        licensePlate:
+          type:
+          - string
+          - 'null'
+        stateOfCharge:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        currentRangeKm:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        vehicleMaxRangeInMeters:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        vehicleCode:
+          type:
+          - string
+          - 'null'
+        vehicleTypeId:
+          type:
+          - string
+          - 'null'
+        coordinates:
+          oneOf:
+          - $ref: '#/components/schemas/Coordinates'
+          - type: 'null'
+        propulsionType:
+          type:
+          - string
+          - 'null'
+          enum:
+          - HUMAN
+          - ELECTRIC_ASSIST
+          - ELECTRIC
+          - COMBUSTION
+          - COMBUSTION_DIESEL
+          - HYBRID
+          - PLUG_IN_HYBRID
+          - HYDROGEN_FUEL_CELL
+        stationSlotName:
+          type:
+          - string
+          - 'null'
+      required:
+      - operator
+    BookingResponse:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          format: uuid
+        transportOperatorBookingId:
+          type: string
+        transportOperatorLegId:
+          type: string
+        state:
+          type: string
+          enum:
+          - NOT_STARTED
+          - IN_USE
+          - PAUSED
+          - FINISHING
+          - FINISHED
+          - CANCELLED
+          - PREPARING
+        orderId:
+          type: string
+        pricingPlan:
+          $ref: '#/components/schemas/PricingPlanDto'
+        departureTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        arrivalTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        distanceTravelled:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        pricing:
+          $ref: '#/components/schemas/PricingDto'
+        asset:
+          $ref: '#/components/schemas/Asset'
+        comment:
+          type:
+          - string
+          - 'null'
+      required:
+      - asset
+      - bookingId
+      - orderId
+      - pricing
+      - pricingPlan
+      - state
+      - transportOperatorBookingId
+      - transportOperatorLegId
+      title: Booking
+    Operator:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PriceAdjustmentDto:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+        description:
+          type: string
+      required:
+      - amount
+      - description
+      title: PriceAdjustment
+    PricingDto:
+      type: object
+      properties:
+        currentAmount:
+          type: number
+          format: double
+        originalAmount:
+          type: number
+          format: double
+        finalAmount:
+          type:
+          - number
+          - 'null'
+          format: double
+        priceAdjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceAdjustmentDto'
+        paymentStatus:
+          type: string
+          enum:
+          - UNPAID
+          - PAID
+          - PAYMENT_FAILED
+        surcharge:
+          type:
+          - string
+          - 'null'
+      required:
+      - currentAmount
+      - originalAmount
+      - paymentStatus
+      - priceAdjustments
+      title: Pricing
+    PricingPlanDto:
+      type: object
+      properties:
+        currency:
+          type: string
+        price:
+          type: number
+          format: double
+        perMinPricing:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/PricingSegmentDto'
+      required:
+      - currency
+      - price
+      title: PricingPlan
+    PricingSegmentDto:
+      type: object
+      properties:
+        start:
+          type: integer
+          format: int32
+        end:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        interval:
+          type: integer
+          format: int32
+        rate:
+          type: number
+          format: double
+      required:
+      - interval
+      - rate
+      - start
+      title: PricingSegment
+    OneStopBooking:
+      type: object
+      properties:
+        customerNumber:
+          type: integer
+          format: int64
+        recurringPaymentId:
+          type: integer
+          format: int64
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        assetId:
+          type:
+          - string
+          - 'null'
+        stationId:
+          type:
+          - string
+          - 'null'
+        vehicleTypeId:
+          type:
+          - string
+          - 'null'
+        autoStart:
+          type:
+          - boolean
+          - 'null'
+        priceAdjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceAdjustmentDto'
+        pricingPlan:
+          type:
+          - string
+          - 'null'
+      required:
+      - coordinates
+      - customerNumber
+      - priceAdjustments
+      - recurringPaymentId
+    OperatorAvailabilityResponse:
+      type: object
+      properties:
+        operatorIds:
+          type: array
+          items:
+            type: string
+      required:
+      - operatorIds
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    Authorization:
+      type: http
+      description: Authorization header
+      scheme: bearer
+      bearerFormat: Bearer eyJhbGciOiJIUzI1NiIsInR5cCIf36POk6yJV_adQssw5c

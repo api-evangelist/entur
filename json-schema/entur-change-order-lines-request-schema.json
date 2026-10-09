@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-change-order-lines-request-schema.json",
+  "title": "ChangeOrderLinesRequest",
+  "description": "The holder for a change offer configuration.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-reserve-offers-partner-openapi.yml#/components/schemas/ChangeOrderLinesRequest",
+  "required": [
+    "offerConfigurations",
+    "orderId",
+    "refundPriceDifference"
+  ],
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "The order to add the offer(s) to"
+    },
+    "offerConfigurations": {
+      "type": "array",
+      "description": "A list of change offer configurations selected for purchase",
+      "items": {
+        "$ref": "#/$defs/ChangeOrderLinesConfiguration"
+      }
+    },
+    "refundPriceDifference": {
+      "type": "boolean",
+      "description": "Experimental value that is used to refund the price difference between the original purchase and the change, if the change is cheaper than the original product.",
+      "default": false
+    }
+  },
+  "$defs": {
+    "ChangeOrderLinesConfiguration": {
+      "title": "ChangeOrderLinesConfiguration",
+      "required": [
+        "offerId",
+        "orderLineId"
+      ],
+      "type": "object",
+      "properties": {
+        "customers": {
+          "type": "array",
+          "description": "Customers with optional entitlement data; used to link travellers to order line and when offers are created with entitlements",
+          "items": {
+            "$ref": "#/$defs/Customer"
+          },
+          "default": []
+        },
+        "distributionDetails": {
+          "$ref": "#/$defs/DistributionDetails"
+        },
+        "externalReference": {
+          "type": "string",
+          "description": "External reference to an order line. Only used by external operators to identify order lines created by OfferConfigurations"
+        },
+        "offerId": {
+          "type": "string",
+          "description": "The id of the offer that is used",
+          "format": "uuid"
+        },
+        "orderLineId": {
+          "type": "string",
+          "description": "The id of the OrderLine to replace. Multiple offer configurations may contain the same orderLineId if replacing the OrderLine with multiple offer configurations. In that case, selectedOrderLineIds must also be equal."
+        },
+        "selectableProductIds": {
+          "type": "array",
+          "description": "A list of ids for selected products. Duplicates are only supported for SupplementProducts which does not modify seating assignments for the PreassignedFareProduct",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "selectedTravellerIds": {
+          "type": "array",
+          "description": "This field is used to specify which travellers will be included in the use of this offer. It is validated against the travellers identified in the travellerMappings property of the selected Offer, as well as the legal number of UserProfiles per compartment when reserving a group product. When reserving a group product, validation is performed against the valid number of UserProfiles per compartment. When reserving regular products, a number of order lines will be made, corresponding to the number of selectedTravellerIds. Each order line will have one of the selectedTravellerIds.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "selectedOrderLineIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "description": "The configuration-holder for an offer configuration"
+    },
+    "Customer": {
+      "title": "Customer",
+      "required": [
+        "customerId",
+        "entitlements"
+      ],
+      "type": "object",
+      "properties": {
+        "customerId": {
+          "type": "string",
+          "description": "Customer id that will be linked to the order line created from the offer specified"
+        },
+        "entitlements": {
+          "type": "array",
+          "description": "The entitlement data for a customer; used if the the offer is created with entitlements",
+          "items": {
+            "$ref": "#/$defs/CustomerEntitlement"
+          },
+          "default": []
+        }
+      },
+      "description": "A holder for a customer and entitlements used by the customer for the offer"
+    },
+    "CustomerEntitlement": {
+      "title": "CustomerEntitlement",
+      "required": [
+        "entitlementProductRef"
+      ],
+      "type": "object",
+      "properties": {
+        "contractId": {
+          "type": "string",
+          "description": "The id of a benefit-contract that gives a customer an entitlement",
+          "format": "uuid"
+        },
+        "entitlementProductRef": {
+          "$ref": "#/$defs/IdAndVersionRef"
+        },
+        "externalEntitlementRef": {
+          "$ref": "#/$defs/IdAndVersionRef"
+        }
+      },
+      "description": "A holder for a customers entitlements"
+    },
+    "DistributionDetails": {
+      "title": "DistributionDetails",
+      "type": "object",
+      "properties": {
+        "fulfillmentMethodRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "typeOfTravelDocumentToIssueRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "customerAccountRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "distributionHolderCustomerId": {
+          "type": "string",
+          "description": "The Entur customer id that will be linked to the distribution of the order line created"
+        }
+      },
+      "description": "Wrapper for references connected to distribution of travel rights and/or tickets"
+    },
+    "IdAndVersionRef": {
+      "title": "IdAndVersionRef",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id reference to an external entity"
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional version reference to an external entity"
+        }
+      },
+      "description": "A holder for an id and version combination"
+    },
+    "RefType": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Value to identify a given resource"
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional version for a given resource"
+        }
+      },
+      "description": "Versioned Reference to a resource"
+    }
+  }
+}

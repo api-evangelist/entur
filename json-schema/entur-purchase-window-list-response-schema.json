@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-purchase-window-list-response-schema.json",
+  "title": "PurchaseWindowListResponse",
+  "description": "A page of purchase windows, each with the versions relevant today.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-product-parameters-api-openapi.yml#/components/schemas/PurchaseWindowListResponse",
+  "allOf": [
+    {
+      "$ref": "#/$defs/PageInfo"
+    },
+    {
+      "required": [
+        "purchaseWindows"
+      ],
+      "type": "object",
+      "properties": {
+        "purchaseWindows": {
+          "type": "array",
+          "description": "The purchase windows on this page, ordered by id.",
+          "items": {
+            "$ref": "#/$defs/VersionedElementSummary"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "LocalizedString": {
+      "type": "array",
+      "items": {
+        "required": [
+          "lang",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "lang": {
+            "pattern": "^[a-z]{2}-[A-Z]{2}$",
+            "type": "string",
+            "description": "BCP-47 language tag (e.g., 'nb-NO', 'en-GB')."
+          },
+          "value": {
+            "type": "string",
+            "description": "The localized string value for the specified lang."
+          }
+        }
+      }
+    },
+    "PageInfo": {
+      "required": [
+        "page",
+        "size",
+        "totalCount"
+      ],
+      "type": "object",
+      "properties": {
+        "totalCount": {
+          "type": "integer",
+          "description": "Total number of elements matching the query."
+        },
+        "page": {
+          "type": "integer",
+          "description": "Current zero-based page number."
+        },
+        "size": {
+          "type": "integer",
+          "description": "Requested page size."
+        }
+      },
+      "description": "Paging information shared by all paginated list responses."
+    },
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    },
+    "VersionSummary": {
+      "required": [
+        "names",
+        "startDate",
+        "status",
+        "versionId"
+      ],
+      "type": "object",
+      "properties": {
+        "versionId": {
+          "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "NeTEx id of the version."
+        },
+        "versionNumber": {
+          "type": "integer",
+          "description": "Sequence number of the version, when assigned.",
+          "format": "int64"
+        },
+        "names": {
+          "$ref": "#/$defs/LocalizedString"
+        },
+        "startDate": {
+          "type": "string",
+          "description": "First day the version is valid.",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "First day the version is no longer valid (optional).",
+          "format": "date"
+        },
+        "status": {
+          "$ref": "#/$defs/VersionStatus"
+        }
+      },
+      "description": "A light summary of one version of a versioned element, as shown in lists. Shared by the list\nendpoints of all element types.\n"
+    },
+    "VersionedElementSummary": {
+      "required": [
+        "id",
+        "ownerOrganisationId",
+        "versions"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "pattern": "^([A-Z]{3}):([A-Za-z]+):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "NeTEx id of the element."
+        },
+        "ownerOrganisationId": {
+          "type": "integer",
+          "description": "Internal organisation id owning the element.",
+          "format": "int64"
+        },
+        "versions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/VersionSummary"
+          }
+        }
+      },
+      "description": "A versioned element with the versions relevant today, as shown in lists. Shared by the list\nendpoints of all element types. The versions are:\n\n- VERSIONED versions valid today or in the future (no end date, or an end date after today)\n- DRAFT and PROPOSED versions, regardless of date\n- when deprecated versions are requested, the most recent DEPRECATED version (latest start date)\n\nordered by status (DRAFT, PROPOSED, VERSIONED, DEPRECATED) and then by start date, newest first.\n"
+    }
+  }
+}

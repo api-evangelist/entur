@@ -1,0 +1,344 @@
+openapi: 3.2.0
+info:
+  title: Entur Product Tree Explanations API
+  version: 2026.10.0
+  description: 'Operations tagged product-tree-explanations across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: product-tree-explanations
+paths:
+  /product-tree-explanations:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - product-tree-explanations
+      summary: Retrieves all explanations
+      operationId: product-tree-explanations_get
+      parameters:
+      - name: nameOfClass
+        in: query
+        description: The nameOfClass to identify a ProductTreeExplained, i.e 'SalesPackage'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from BCP-47, e.g. 'nb' or 'en'
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductTreeExplained'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /product-tree-explanations/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - product-tree-explanations
+      summary: Retrieves explanation for netexId and version
+      operationId: product-tree-explanations_get_1
+      parameters:
+      - name: id
+        in: path
+        description: The netexId to identify a ProductTreeExplained
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: version
+        in: path
+        description: The version to identify a ProductTreeExplained
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from BCP-47, e.g. 'nb' or 'en'
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductTreeExplained'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    SeqExplainedMessageResponse:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+      description: Translated messages explaining the failure
+      readOnly: true
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    ProductTreeExplained:
+      required:
+      - description
+      - explainedElementDescription
+      - explainedElementName
+      - id
+      - name
+      - severity
+      - version
+      type: object
+      properties:
+        description:
+          type: array
+          description: Description of the root element represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        explainedElementDescription:
+          type: array
+          description: Description of the explained element represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        explainedElementId:
+          type: string
+          description: The netexId of the explained element
+          readOnly: true
+        explainedElementName:
+          type: array
+          description: Name of the explained element represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        explainedElementNameOfClass:
+          type: string
+          description: The nameOfClass of the explained element
+          readOnly: true
+        explainedElementVersion:
+          type: string
+          description: The version of the explained element
+          readOnly: true
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id for root component/element
+          readOnly: true
+          examples:
+          - NSB:SalesPackage:SomeSalesPackage
+        messages:
+          $ref: '#/components/schemas/SeqExplainedMessageResponse'
+        name:
+          type: array
+          description: Name of the root element represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: nameOfClass
+          readOnly: true
+          examples:
+          - SalesPackage
+        originalErrorMessage:
+          type: string
+          description: The original error message thrown
+          readOnly: true
+        reason:
+          type: string
+          description: Reason for failed tree
+          readOnly: true
+          examples:
+          - invalidProductData
+        severity:
+          type: string
+          description: Severity of the explained event. 'error' drops the tree; 'warning' is published alongside the tree
+          readOnly: true
+          enum:
+          - error
+          - warning
+          examples:
+          - error
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version for root component/element
+          readOnly: true
+          examples:
+          - NSB:Version:V1
+      description: Schema for presenting explained messages for failed product trees
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

@@ -1,0 +1,429 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-reservation-response-schema.json",
+  "title": "ReservationResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-seating-manager-openapi.yml#/components/schemas/ReservationResponse",
+  "required": [
+    "createdAt",
+    "createdBy",
+    "datedServiceJourneyId",
+    "destinationStopPlace",
+    "organisationId",
+    "originStopPlace",
+    "reference",
+    "reservationLines",
+    "status",
+    "updatedAt",
+    "version",
+    "versionedAt"
+  ],
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "integer",
+      "description": "The `version` of the reservation. Starts with `1`.",
+      "format": "int32"
+    },
+    "originStopPlace": {
+      "$ref": "#/$defs/StopPlaceResponseV1"
+    },
+    "destinationStopPlace": {
+      "$ref": "#/$defs/StopPlaceResponseV1"
+    },
+    "datedServiceJourneyId": {
+      "minLength": 1,
+      "type": "string",
+      "description": "Id of the dated service journey"
+    },
+    "status": {
+      "minLength": 1,
+      "type": "string",
+      "description": "Describes the `reservation` status.",
+      "enum": [
+        "DRAFT",
+        "CONFIRMED",
+        "CANCELLED",
+        "DEPRECATED"
+      ]
+    },
+    "reference": {
+      "minLength": 1,
+      "type": "string",
+      "description": "The reference for this reservation",
+      "format": "uuid"
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "The organisation id of the order which the `reservation` belongs to.",
+      "format": "int64"
+    },
+    "createdAt": {
+      "minLength": 1,
+      "type": "string",
+      "description": "When this reservation was initially created",
+      "format": "YYYY-MM-DDThh:mm:ssZ"
+    },
+    "rebookingStatus": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Describes the `rebooking` status of the reservation.",
+      "enum": [
+        "ACCEPTED",
+        "MANUAL",
+        "SUGGESTED",
+        "REBOOKED_DRAFT",
+        "REJECTED"
+      ]
+    },
+    "versionedAt": {
+      "minLength": 1,
+      "type": "string",
+      "description": "When this version of this reservation was created",
+      "format": "YYYY-MM-DDThh:mm:ssZ"
+    },
+    "updatedAt": {
+      "minLength": 1,
+      "type": "string",
+      "description": "When this was previously updated. This includes status changes, reservation line changes and so on.",
+      "format": "YYYY-MM-DDThh:mm:ssZ"
+    },
+    "reservationLines": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ReservationLineResponse"
+      }
+    },
+    "orderId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The 'id' of the order the reservation belongs to"
+    },
+    "createdBy": {
+      "type": "integer",
+      "description": "The organisation id this version of the `reservation` was created by.This id is determined by the authentication used by the client.",
+      "format": "int64"
+    },
+    "updatedBy": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "The organisation id of the organisation that last updated this `reservation`.This id is determined by the authentication used by the client.",
+      "format": "int64"
+    },
+    "info": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Additional free text information about the reservation."
+    }
+  },
+  "$defs": {
+    "ReservationLineResponse": {
+      "required": [
+        "reference",
+        "requestedProperties",
+        "requestedSeatingProperties",
+        "reservedProperties",
+        "reservedSeatingProperties",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "reference": {
+          "type": "string",
+          "description": "Reference for this reservation line`",
+          "format": "uuid"
+        },
+        "reservedProperties": {
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The properties reserved by the reservation line."
+          }
+        },
+        "reservedSeatingProperties": {
+          "$ref": "#/$defs/SeatingPropertiesResponseV1"
+        },
+        "requestedProperties": {
+          "type": "array",
+          "items": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The properties required by the traveller."
+          }
+        },
+        "requestedSeatingProperties": {
+          "$ref": "#/$defs/SeatingPropertiesResponseV1"
+        },
+        "orderLineId": {
+          "type": "string",
+          "description": "OrderLine ID for this reservation line."
+        },
+        "numberOfTravellers": {
+          "type": "integer",
+          "description": "Number of travellers on the reservation line.",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of reservation line."
+        }
+      }
+    },
+    "SeatingPropertiesResponseV1": {
+      "type": "object",
+      "properties": {
+        "fareClass": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Fare class of the seat. Netex enumeration.",
+          "enum": [
+            "UNKNOWN",
+            "FIRST_CLASS",
+            "SECOND_CLASS",
+            "THIRD_CLASS",
+            "PREFERENTE",
+            "PREMIUM_CLASS",
+            "BUSINESS_CLASS",
+            "STANDARD_CLASS",
+            "TURISTA",
+            "ECONOMY_CLASS",
+            "ANY"
+          ]
+        },
+        "groupBooking": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Group booking permission of the seat. Netex enumeration.",
+          "enum": [
+            "GROUPS_ALLOWED",
+            "GROUPS_NOT_ALLOWED",
+            "GROUPS_ALLOWED_WITH_RESERVATION",
+            "GROUP_BOOKINGS_RESTRICTED",
+            "UNKNOWN"
+          ]
+        },
+        "accommodationFacility": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Accommodation property of the seat. Netex enumeration.",
+          "enum": [
+            "UNKNOWN",
+            "SEATING",
+            "FOLDING_SEAT",
+            "SLEEPER",
+            "SINGLE_SLEEPER",
+            "DOUBLE_SLEEPER",
+            "SPECIAL_SLEEPER",
+            "COUCHETTE",
+            "SINGLE_COUCHETTE",
+            "DOUBLE_COUCHETTE",
+            "SPECIAL_SEATING",
+            "RECLINING_SEATS",
+            "BABY_COMPARTMENT",
+            "FAMILY_CARRIAGE",
+            "RECREATION_AREA",
+            "PANORAMA_COACH",
+            "PULLMAN_COACH",
+            "PUSHCHAIR",
+            "WHEELCHAIR",
+            "STANDING"
+          ]
+        },
+        "seatAttachment": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Attachment of the seat. Netex enumeration.",
+          "enum": [
+            "REVERSIBLE",
+            "FIXED",
+            "FOLDING",
+            "REMOVABLE",
+            "OTHER"
+          ]
+        },
+        "seatPosition": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Position of the seat. Netex enumeration.",
+          "enum": [
+            "WINDOW",
+            "AISLE",
+            "MIDDLE",
+            "UPPER_BERTH",
+            "MIDDLE_BERTH",
+            "LOWER_BERTH",
+            "OTHER"
+          ]
+        },
+        "relativeDirection": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Relative direction of the seat. Netex enumeration.",
+          "enum": [
+            "BOTH",
+            "FORWARDS",
+            "BACKWARDS"
+          ]
+        },
+        "nuisanceFacilities": {
+          "uniqueItems": true,
+          "type": "array",
+          "description": "Set of possible nuisance factors of the seat. Netex enumerations.",
+          "items": {
+            "type": "string",
+            "description": "Set of possible nuisance factors of the seat. Netex enumerations.",
+            "enum": [
+              "UNKNOWN",
+              "SMOKING",
+              "NO_SMOKING",
+              "FAMILY_AREA",
+              "CHILDFREE_AREA",
+              "ANIMALS_ALLOWED",
+              "NO_ANIMALS",
+              "BREASTFEEDING_FRIENDLY",
+              "MOBILE_PHONE_USE_ZONE",
+              "MOBILE_PHONE_FREE_ZONE"
+            ]
+          }
+        },
+        "passengerCommsFacilities": {
+          "uniqueItems": true,
+          "type": "array",
+          "description": "Set of possible communication facilities available for passenger in the seat. Netex enumerations.",
+          "items": {
+            "type": "string",
+            "description": "Set of possible communication facilities available for passenger in the seat. Netex enumerations.",
+            "enum": [
+              "UNKNOWN",
+              "FREE_WIFI",
+              "PUBLIC_WIFI",
+              "POWER_SUPPLY_SOCKETS",
+              "TELEPHONE",
+              "AUDIO_ENTERTAINMENT",
+              "VIDEO_ENTERTAINMENT",
+              "BUSINESS_SERVICES",
+              "INTERNET",
+              "POST_OFFICE",
+              "POST_BOX"
+            ]
+          }
+        },
+        "sanitaryFacilities": {
+          "uniqueItems": true,
+          "type": "array",
+          "description": "Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.",
+          "items": {
+            "type": "string",
+            "description": "Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.",
+            "enum": [
+              "NONE",
+              "TOILET",
+              "WHEELCHAIR_ACCESS_TOILET",
+              "SHOWER",
+              "WASHING_AND_CHANGE_FACILITIES",
+              "BABY_CHANGE",
+              "WHEELCHAIR_BABY_CHANGE",
+              "SHOE_SHINER",
+              "OTHER"
+            ]
+          }
+        },
+        "mobilityFacilities": {
+          "uniqueItems": true,
+          "type": "array",
+          "description": "Set of possible mobility facilities available for passenger in the seat. Netex enumerations.",
+          "items": {
+            "type": "string",
+            "description": "Set of possible mobility facilities available for passenger in the seat. Netex enumerations.",
+            "enum": [
+              "UNKNOWN",
+              "LOW_FLOOR",
+              "STEP_FREE_ACCESS",
+              "SUITABLE_FOR_PUSHCHAIRS",
+              "SUITABLE_FOR_WHEELCHAIRS",
+              "SUITABLE_FOR_HEAVILIY_DISABLED",
+              "BOARDING_ASSISTANCE",
+              "ONBOARD_ASSISTANCE",
+              "UNACCOMPANIED_MINOR_ASSISTANCE",
+              "TACTILE_PLATFORM_EDGES",
+              "TACTILE_GUIDING_STRIPS"
+            ]
+          }
+        },
+        "baggageType": {
+          "uniqueItems": true,
+          "type": "array",
+          "description": "Set of possible baggage types possible for passenger in the seat. Netex enumerations.",
+          "items": {
+            "type": "string",
+            "description": "Set of possible baggage types possible for passenger in the seat. Netex enumerations.",
+            "enum": [
+              "HANDBAG",
+              "HAND_LUGGAGE",
+              "SMALL_SUITCASE",
+              "SUITCASE",
+              "TRUNK",
+              "OVERSIZE_ITEM",
+              "BICYCLE",
+              "MOTORCYCLE",
+              "SPORTING_EQUIPMENT",
+              "SKIS",
+              "MUSICAL_INSTRUMENT",
+              "PUSH_CHAIR",
+              "WHEELCHAIR",
+              "MOTORIZED_WHEELCHAIR",
+              "LARGE_MOTORIZED_WHEELCHAIR",
+              "SMALL_ANIMAL",
+              "ANIMAL",
+              "GAME",
+              "OTHER"
+            ]
+          }
+        }
+      },
+      "description": "Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class."
+    },
+    "StopPlaceResponseV1": {
+      "required": [
+        "nsrCode",
+        "sequenceNr"
+      ],
+      "type": "object",
+      "properties": {
+        "nsrCode": {
+          "type": "string",
+          "description": "Stop Place id defined by National StopPlace registry."
+        },
+        "sequenceNr": {
+          "type": "integer",
+          "description": "The ordering of the station in the journey.",
+          "format": "int32"
+        }
+      },
+      "description": "Destination `StopPlace` of the `reservation`"
+    }
+  }
+}

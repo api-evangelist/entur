@@ -1,0 +1,492 @@
+openapi: 3.2.0
+info:
+  title: Entur Codes API
+  version: 2026.08.0
+  contact:
+    name: Entur Team Personalisering
+    email: team.personalisering@entur.org
+  termsOfService: http://entur.org
+  description: 'Operations tagged Codes across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io
+security:
+- jwt: []
+tags:
+- name: Codes
+  description: Updated lists of valid codes to use for different properties
+paths:
+  /personnelticket/v2/code-pages/ticket-types:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Codes
+      summary: Get available ticket types
+      description: Get available ticket types. The ticket type informs of which country it is valid in and what train class it covers.
+      operationId: getTicketTypes
+      parameters:
+      - name: includeDeleted
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: generatesTicketRights
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTicketTypeResponse'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/code-pages/products:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Codes
+      summary: Get available personnel ticket products
+      operationId: getProducts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/code-pages/pay-types:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Codes
+      summary: Get types of pay an employee can have
+      operationId: getPayType
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PayType'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/code-pages/family-relations:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Codes
+      summary: Get family relations available
+      description: Get family relations available. A family relation is between an employee and their family member(s)
+      operationId: getFamilyRelation
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamilyRelation'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/code-pages/employment-types:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Codes
+      summary: Get types of employment
+      operationId: getEmploymentType
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmploymentType'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/code-pages/employment-end-causes:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Codes
+      summary: Get causes for end of employment
+      operationId: getEmploymentEndCauses
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmploymentEndCause'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+    servers:
+    - url: https://api.entur.io
+components:
+  schemas:
+    PayType:
+      required:
+      - code
+      - description
+      type: object
+      properties:
+        code:
+          type: string
+          description: The code used for input
+          readOnly: true
+        description:
+          type: string
+          description: A description of the particular code's meaning
+          readOnly: true
+      description: Pay type - see the codes in the API documentation
+    TicketTypeResponse:
+      required:
+      - canHaveStationPairs
+      - code
+      - countryCode
+      - description
+      - generatesTicketRights
+      - id
+      - isDeleted
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Ticket type id
+          format: int64
+        code:
+          type: string
+          description: Ticket type
+        description:
+          type: string
+          description: Ticket type description
+        countryCode:
+          type: string
+          description: Country code
+        generatesTicketRights:
+          type: boolean
+          description: Whether or not this this ticket type is relevant for sending as input to a Manual order. If this = false (the default), it will not generate new tickets rights by manual order.
+        canHaveStationPairs:
+          type: boolean
+          description: 'Whether or not this ticket type is compatible with station pairs when placing a manual order. The default = false. '
+        isDeleted:
+          type: boolean
+          description: Whether the ticket type is deleted.
+      description: The Ticket type informs of which country it is valid in and what train class it covers.
+    Product:
+      required:
+      - id
+      - name
+      - validFrom
+      - validUntil
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The product id
+          format: int64
+        name:
+          type: string
+          description: Human readable product name
+        validFrom:
+          type: string
+          description: When the product is valid from
+          format: date
+          examples:
+          - '2023-01-01'
+        validUntil:
+          type: string
+          description: When the product is valid to
+          format: date
+          examples:
+          - '2023-01-01'
+      description: A personnel ticket product
+    EmploymentEndCause:
+      required:
+      - code
+      - description
+      type: object
+      properties:
+        code:
+          type: string
+          description: The code used for input
+          readOnly: true
+        description:
+          type: string
+          description: A description of the particular code's meaning
+          readOnly: true
+      description: The reason for an employment to end
+    FamilyRelation:
+      required:
+      - code
+      - description
+      type: object
+      properties:
+        code:
+          type: string
+          description: The code used for input
+          readOnly: true
+        description:
+          type: string
+          description: A description of the particular code's meaning
+          readOnly: true
+      description: The relation a family member has to an employee
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    EmploymentType:
+      required:
+      - code
+      - description
+      type: object
+      properties:
+        code:
+          type: string
+          description: The code used for input
+          readOnly: true
+        description:
+          type: string
+          description: A description of the particular code's meaning
+          readOnly: true
+      description: Employment type. Examples include Employee, Part time, Temp
+    PageTicketTypeResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          items:
+            $ref: '#/components/schemas/TicketTypeResponse'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int64
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int64
+          examples:
+          - 1
+      description: Paged content
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-personnel-tickets-openapi.json
+- entur-personnel-tickets-openapi.yml

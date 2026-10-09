@@ -1,0 +1,141 @@
+openapi: 3.2.0
+info:
+  title: Entur Flexible Transport API
+  version: 2026.09.0
+  description: 'Operations tagged Flexible Transport across 2 of this provider''s published API definitions: entur-timetable-management-openapi.json, entur-timetable-management-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/timetable/v1/timetable-management
+  description: Production
+- url: https://api.staging.entur.io/timetable/v1/timetable-management
+  description: Staging
+- url: https://api.dev.entur.io/timetable/v1/timetable-management
+  description: Development
+security:
+- jwt: []
+tags:
+- name: Flexible Transport
+  description: Flexible transport dataset operations
+paths:
+  /flex-datasets/{codespace}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Flexible Transport
+      summary: Upload flexible transport dataset
+      description: Upload a NeTEx dataset containing flexible transport data
+      operationId: uploadFlexDataset
+      parameters:
+      - name: codespace
+        in: path
+        description: Provider Codespace
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  contentMediaType: application/octet-stream
+                  description: NeTEx flex dataset file (ZIP archive)
+            examples:
+              flex-dataset-upload:
+                summary: Upload flexible transport dataset
+                description: Example of uploading a NeTEx flexible transport dataset ZIP file for provider FLX
+                value:
+                  file: netex-flex-dataset-flx-2024-01-15.zip
+        required: true
+      responses:
+        '200':
+          description: OK - the dataset has been received successfully (this is only a technical acknowledgement, before applying any validation rule. The dataset may be rejected further down in the validation pipeline)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResult'
+              examples:
+                flex-upload-success:
+                  summary: Successful flex upload
+                  description: Flexible transport dataset upload initiated successfully, correlationId can be used to track progress
+                  value:
+                    correlationId: 660f9511-f30c-52e5-b827-557766551111
+        '401':
+          description: Unauthorized - the authorization token is missing or has expired.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: User is not authenticated
+        '403':
+          description: Forbidden - the authorization token is present, but it does not provide sufficient privileges to perform the operation.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Access denied
+        '404':
+          description: Not Found - most likely a typo in the request URL.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Not found
+        '500':
+          description: Internal Server Error - a processing error on Entur's side.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Internal server error
+    servers:
+    - url: https://api.entur.io/timetable/v1/timetable-management
+      description: Production
+    - url: https://api.staging.entur.io/timetable/v1/timetable-management
+      description: Staging
+    - url: https://api.dev.entur.io/timetable/v1/timetable-management
+      description: Development
+components:
+  schemas:
+    UploadResult:
+      type: object
+      properties:
+        correlationId:
+          type: string
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-timetable-management-openapi.json
+- entur-timetable-management-openapi.yml

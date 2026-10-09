@@ -1,0 +1,795 @@
+openapi: 3.2.0
+info:
+  title: Entur Service Facility Sets API
+  version: 2026.10.0
+  description: 'Operations tagged service-facility-sets across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: service-facility-sets
+paths:
+  /service-facility-sets:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - service-facility-sets
+      summary: Retrieves all service facility sets
+      operationId: service-facility-sets_getAll
+      parameters:
+      - name: orgId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: validOnDate
+        in: query
+        description: Return only the versions valid on the given date (ISO-8601).
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ServiceFacilitySet'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - service-facility-sets
+      summary: Create a ServiceFacilitySet
+      operationId: service-facility-sets_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceFacilitySet'
+        required: true
+      responses:
+        '204':
+          description: Entity created successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /service-facility-sets/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - service-facility-sets
+      summary: Retrieves the service facility set valid on a given date
+      description: Optional validOnDate query parameter (defaults to now). In prod returns the VERSIONED element; in staging/dev PROPOSED is preferred over VERSIONED.
+      operationId: service-facility-sets_getByIdAndValidOnDate
+      parameters:
+      - name: id
+        in: path
+        description: The id to identify a ServiceFacilitySet
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: validOnDate
+        in: query
+        description: Return the version valid on the given date (ISO-8601).
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFacilitySet'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /service-facility-sets/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - service-facility-sets
+      summary: Retrieves service facility set for id and version
+      operationId: service-facility-sets_getById
+      parameters:
+      - name: id
+        in: path
+        description: The id to identify a ServiceFacilitySet
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the ServiceFacilitySet
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceFacilitySet'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - service-facility-sets
+      summary: Updates an existing ServiceFacilitySet
+      operationId: service-facility-sets_update
+      parameters:
+      - name: id
+        in: path
+        description: The id to identify a ServiceFacilitySet
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the ServiceFacilitySet
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceFacilitySet'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    delete:
+      tags:
+      - service-facility-sets
+      summary: Deletes a ServiceFacilitySet by id and version
+      operationId: service-facility-sets_deleteById
+      parameters:
+      - name: id
+        in: path
+        description: The id to identify a ServiceFacilitySet
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the ServiceFacilitySet
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      responses:
+        '200':
+          description: The resource was deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoxedUnit'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    OnboardStay:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime
+          readOnly: true
+        duration:
+          type: string
+          description: Duration.
+          examples:
+          - PT24H
+        fareClass:
+          type: string
+          description: Fareclass.
+          enum:
+          - FIRST_CLASS
+          - SECOND_CLASS
+          - THIRD_CLASS
+          - ECONOMY_CLASS
+          - BUSINESS_CLASS
+          - TURISTA
+          - PREFERENTE
+          - STANDARD_CLASS
+          - PREMIUM_CLASS
+          - ANY
+          - UNKNOWN
+          examples:
+          - FIRST_CLASS
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:OnboardStay:Sleeper
+        modification:
+          type: string
+          description: Modification status
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - OnboardStay
+        permission:
+          type: string
+          description: BoardingPermissionEnum.
+          enum:
+          - EARLYBOARDINGPOSSIBLEBEFOREDEPARTURE
+          - DELAYEDALIGHTINGPOSSIBLEAFTERARRIVAL
+          - OVERNIGHTSTAYONBOARDALLOWED
+          examples:
+          - EARLYBOARDINGPOSSIBLEBEFOREDEPARTURE
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: An OnboardStay
+    Accommodation:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        accommodationFacility:
+          type: string
+          description: Accommodation facility.
+          enum:
+          - SLEEPER
+          - SEATING
+          - DOUBLE_SLEEPER
+          - SINGLE_SLEEPER
+          - SPECIAL_SLEEPER
+          - COUCHETTE
+          - SINGLE_COUCHETTE
+          - DOUBLE_COUCHETTE
+          - RECLINING_SEAT
+          - BABY_COMPARTMENT
+          - FAMILY_COMPARTMENT
+          - PANORAMA_COACH
+          - PULLMAN_COACH
+          - STANDING
+          examples:
+          - SLEEPER
+        changed:
+          type: string
+          description: Changed datetime
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime
+          readOnly: true
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Accommodation:Sleeper
+        modification:
+          type: string
+          description: Modification status
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Accommodation
+        nuisanceFacilities:
+          type: array
+          description: List of nuisance facilities
+          items:
+            type: string
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: An Accommodation
+    ServiceFacilitySet:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        accommodation:
+          $ref: '#/components/schemas/Accommodation'
+        changed:
+          type: string
+          description: Changed datetime
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime
+          readOnly: true
+        description:
+          type: array
+          description: Description
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id
+          examples:
+          - NSB:ServiceFacilitySet:Ordinary
+        modification:
+          type: string
+          description: Modification status
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class
+          readOnly: true
+          examples:
+          - ServiceFacilitySet
+        onboardStay:
+          $ref: '#/components/schemas/OnboardStay'
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A ServiceFacilitySet
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    BoxedUnit:
+      type: object
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

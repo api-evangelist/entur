@@ -1,0 +1,102 @@
+generated: '2026-10-09'
+method: searched
+source: https://developer.entur.no/docs/authentication
+summary:
+  types:
+  - apiKey
+  - http
+  - oauth2
+  api_key_in:
+  - header
+  oauth2_flows:
+  - authorizationCode
+  - clientCredentials
+schemes:
+- name: bearerToken
+  type: http
+  scheme: bearer
+  bearerFormat: JWT
+  sources:
+  - openapi/entur-clearing-openapi.yml
+  - openapi/entur-clearing-reports-openapi.yml
+  - openapi/entur-consents-openapi.yml
+  - openapi/entur-customers-openapi.yml
+  - openapi/entur-offers-partner-openapi.yml
+  - openapi/entur-omsa-openapi.yml
+  - openapi/entur-order-note-partner-openapi.yml
+  - openapi/entur-payment-partner-openapi.yml
+  - openapi/entur-personalisation-client-openapi.yml
+  - openapi/entur-personalisation-privacy-openapi.yml
+  - openapi/entur-personnel-tickets-openapi.yml
+  - openapi/entur-pricing-api-openapi.yml
+  - openapi/entur-product-parameters-api-openapi.yml
+  - openapi/entur-products-api-openapi.yml
+  - openapi/entur-products-openapi.yml
+  - openapi/entur-raw-timetable-data-openapi.yml
+  - openapi/entur-receipt-partner-openapi.yml
+  - openapi/entur-shared-mobility-openapi.yml
+  - openapi/entur-skoleskyss-openapi.yml
+  - openapi/entur-third-party-product-partner-openapi.yml
+  - openapi/entur-timetable-management-openapi.yml
+- name: bearer-key
+  type: http
+  scheme: Bearer
+  bearerFormat: jwt
+  sources:
+  - openapi/entur-inventory-openapi.yml
+  - openapi/entur-seating-manager-openapi.yml
+  - openapi/entur-seatingservices-openapi.yml
+- name: OpenData
+  type: http
+  scheme: none
+  description: this data set is open. If it is one of the options, it is up to the implementing party whether it
+    is open or not.
+  sources:
+  - openapi/entur-omsa-openapi.yml
+- name: OAuth
+  type: oauth2
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: /
+    tokenUrl: /oauth/token
+    scopes: 1
+  description: This flow facilitates to get access tokens based on username/password. These can be obtained by the
+    owner of the service, look at the landing page to find out how to contact it.
+  sources:
+  - openapi/entur-omsa-openapi.yml
+- name: OAuthPKI
+  type: oauth2
+  flows:
+  - flow: clientCredentials
+    tokenUrl: /oauth/token
+    scopes: 1
+  description: OAuth 2.0 with PKI and mutual TLS for client authentication The client sends its X.509 during the
+    handshake. The server validates and accepts the certificate. The call to the /oauth/token can use the provided
+    credentials (O or CN) to provide a access_token (JWT).
+  sources:
+  - openapi/entur-omsa-openapi.yml
+- name: enturOpen
+  type: apiKey
+  in: header
+  parameter: ET-Client-Name
+  sources:
+  - openapi/entur-prdudisapi-openapi.yml
+docs: https://developer.entur.no/docs/authentication
+derived_from: openapi/entur-clearing-openapi.yml, openapi/entur-clearing-reports-openapi.yml, openapi/entur-consents-openapi.yml,
+  openapi/entur-customers-openapi.yml, openapi/entur-inventory-openapi.yml, openapi/entur-offers-partner-openapi.yml,
+  openapi/entur-omsa-openapi.yml, openapi/entur-order-note-partner-openapi.yml, openapi/entur-payment-partner-openapi.yml,
+  openapi/entur-personalisation-client-openapi.yml, openapi/entur-personalisation-privacy-openapi.yml, openapi/entur-personnel-tickets-openapi.yml
+  ...
+documented:
+  partner_apis: 'OAuth2 client_credentials. Exchange a Client ID and Secret for a JWT and send it as Authorization:
+    Bearer <ACCESS_TOKEN>'
+  token_endpoint: https://partner.entur.org/oauth/token
+  audience: https://api.entur.io
+  environments:
+    production: https://partner.entur.org
+    staging: https://partner.staging.entur.org
+    dev: https://partner.dev.entur.org
+  token_lifetime: Tokens from Entur's authentication service are valid for **24 hours**.
+  client_creation: https://entur-partner.entur.org/permission-admin/clients/create (role Brukeradministrator required)
+  client_identification: All Entur APIs, open and partner, also require the `ET-Client-Name` header on every request.
+  open_services: No credentials; ET-Client-Name header only

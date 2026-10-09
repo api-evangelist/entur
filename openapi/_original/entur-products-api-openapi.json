@@ -1,0 +1,4518 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Products V3",
+    "description": "**This API specification is a draft and is not yet implemented. Endpoints, schemas, and\nbehavior are subject to change without notice.**\n\nThis API provides services to read and maintain products and fare data for public transport in Norway.\n",
+    "contact": {
+      "name": "Team Produkt",
+      "email": "teamprodukt@entur.org"
+    },
+    "version": "2026.10.1",
+    "x-stability-level": "draft"
+  },
+  "servers": [
+    {
+      "url": "https://api.entur.io/products",
+      "description": "Production environment"
+    },
+    {
+      "url": "https://api.staging.entur.io/products",
+      "description": "Staging environment"
+    },
+    {
+      "url": "https://api.dev.entur.io/products",
+      "description": "Development environment"
+    }
+  ],
+  "security": [
+    {
+      "jwt": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Entitlement Required",
+      "description": "Manage EntitlementRequired instances. Defines what existing entitlement (e.g., a\nvalid ticket) is required to purchase a product.\n"
+    },
+    {
+      "name": "Supplement product",
+      "description": "A supplement product can be purchased in addition to a preassigned fare product. Examples of supplement product types include:\n  - Seat reservation\n  - Bicycle\n  - Animal\n  - Meal\n  - Wi-fi\n  - Luggage\n  - Parking\n"
+    },
+    {
+      "name": "Sales package assignment",
+      "description": "Assign the supplement products to sales packages without knowledge of the full sales package structure.\n"
+    },
+    {
+      "name": "Sales package",
+      "description": "Fine-grained modification of sales packages. The client sends a full request body and\nhas full control over the sales package content.\n"
+    },
+    {
+      "name": "Usage Validity Period",
+      "description": "Manage UsageValidityPeriod instances. Defines how long a product is valid after\npurchase or activation (e.g., single trip, 60 minutes, 30 days).\n"
+    },
+    {
+      "name": "Version",
+      "description": "Version management endpoints"
+    }
+  ],
+  "paths": {
+    "/v3/parameters/limitations/entitlement-required": {
+      "get": {
+        "tags": [
+          "Entitlement Required"
+        ],
+        "summary": "List entitlement required instances",
+        "description": "Returns a paginated list of all EntitlementRequired instances.",
+        "operationId": "listEntitlementRequireds",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of EntitlementRequired instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitlementRequiredListResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "instances": [
+                        {
+                          "id": "ENT:EntitlementRequired:SingleTicket",
+                          "name": [
+                            {
+                              "lang": "nb-NO",
+                              "value": "Enkeltbillett påkrevd"
+                            }
+                          ],
+                          "entitlementType": "SINGLE_TRIP",
+                          "fareProductRef": "ENT:PreassignedFareProduct:SingleTrip"
+                        }
+                      ],
+                      "totalCount": 1,
+                      "page": 0,
+                      "size": 100
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "post": {
+        "tags": [
+          "Entitlement Required"
+        ],
+        "summary": "Create an entitlement required instance",
+        "description": "Create a new EntitlementRequired instance.",
+        "operationId": "createEntitlementRequired",
+        "requestBody": {
+          "description": "The EntitlementRequired instance to create.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitlementRequiredRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "name": [
+                      {
+                        "lang": "nb-NO",
+                        "value": "Enkeltbillett påkrevd"
+                      }
+                    ],
+                    "entitlementType": "SINGLE_TRIP",
+                    "fareProductRef": "ENT:PreassignedFareProduct:SingleTrip"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "EntitlementRequired instance created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitlementRequired"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "id": "ENT:EntitlementRequired:SingleTicket",
+                      "name": [
+                        {
+                          "lang": "nb-NO",
+                          "value": "Enkeltbillett påkrevd"
+                        }
+                      ],
+                      "entitlementType": "SINGLE_TRIP",
+                      "fareProductRef": "ENT:PreassignedFareProduct:SingleTrip"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid data or schema violation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "schemaViolation": {
+                    "summary": "Request does not match type schema",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/bad-request",
+                      "title": "Bad Request",
+                      "status": 400,
+                      "detail": "Field 'entitlementType' is required for type 'entitlement-required'."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/parameters/limitations/entitlement-required/{id}": {
+      "get": {
+        "tags": [
+          "Entitlement Required"
+        ],
+        "summary": "Get an entitlement required instance",
+        "description": "Retrieve the full detail of a single EntitlementRequired instance.",
+        "operationId": "getEntitlementRequired",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "EntitlementRequired instance found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitlementRequired"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "id": "ENT:EntitlementRequired:SingleTicket",
+                      "name": [
+                        {
+                          "lang": "nb-NO",
+                          "value": "Enkeltbillett påkrevd"
+                        }
+                      ],
+                      "entitlementType": "SINGLE_TRIP",
+                      "fareProductRef": "ENT:PreassignedFareProduct:SingleTrip"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "EntitlementRequired instance not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Instance not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "EntitlementRequired instance ENT:EntitlementRequired:nonexistent not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "put": {
+        "tags": [
+          "Entitlement Required"
+        ],
+        "summary": "Update an entitlement required instance",
+        "description": "Update an existing EntitlementRequired instance.",
+        "operationId": "updateEntitlementRequired",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The updated EntitlementRequired data.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitlementRequiredRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "name": [
+                      {
+                        "lang": "nb-NO",
+                        "value": "Enkeltbillett påkrevd"
+                      }
+                    ],
+                    "entitlementType": "SINGLE_TRIP",
+                    "fareProductRef": "ENT:PreassignedFareProduct:SingleTrip"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "EntitlementRequired instance updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitlementRequired"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "id": "ENT:EntitlementRequired:SingleTicket",
+                      "name": [
+                        {
+                          "lang": "nb-NO",
+                          "value": "Enkeltbillett påkrevd"
+                        }
+                      ],
+                      "entitlementType": "SINGLE_TRIP",
+                      "fareProductRef": "ENT:PreassignedFareProduct:SingleTrip"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid data or schema violation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "schemaViolation": {
+                    "summary": "Request does not match type schema",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/bad-request",
+                      "title": "Bad Request",
+                      "status": 400,
+                      "detail": "Field 'entitlementType' is required for type 'entitlement-required'."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "EntitlementRequired instance not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Instance not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "EntitlementRequired instance ENT:EntitlementRequired:nonexistent not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/supplement-products": {
+      "post": {
+        "tags": [
+          "Supplement product"
+        ],
+        "summary": "Create a new supplement product",
+        "description": "Create a new supplement product. A new version will be created with version number 1.\n",
+        "operationId": "createSupplementProduct",
+        "requestBody": {
+          "description": "Supplement product to be created.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplementProductRequest"
+              },
+              "examples": {
+                "bicycle": {
+                  "$ref": "#/components/examples/bicycle"
+                },
+                "seatReservation": {
+                  "$ref": "#/components/examples/seatReservation"
+                },
+                "dog": {
+                  "$ref": "#/components/examples/dog"
+                },
+                "luggage": {
+                  "$ref": "#/components/examples/luggage"
+                },
+                "parking": {
+                  "$ref": "#/components/examples/parking"
+                },
+                "upgrade": {
+                  "$ref": "#/components/examples/upgrade"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Supplement product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementProductResponse"
+                },
+                "examples": {
+                  "parking": {
+                    "$ref": "#/components/examples/parking-2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "description": "Conflict - Supplement product already exists",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "conflict": {
+                    "summary": "Supplement product already exists",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/conflict",
+                      "title": "Conflict",
+                      "status": 409,
+                      "detail": "Supplement product with privateCode '123' already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/supplement-products/{id}": {
+      "get": {
+        "tags": [
+          "Supplement product"
+        ],
+        "summary": "Get the active version of a supplement product",
+        "description": "Retrieve the version of the supplement product that is active on the given date.\n",
+        "operationId": "getSupplementProduct",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/validOnDate"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The supplement product version active on the given date.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementProductResponse"
+                },
+                "examples": {
+                  "parking": {
+                    "$ref": "#/components/examples/parking-2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Supplement product not found, or no version is active on the given travel date",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Supplement product not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "SupplementProduct 'EXA:SupplementProduct:456' not found."
+                    }
+                  },
+                  "noActiveVersion": {
+                    "summary": "No version active on the travel date",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "No version of SupplementProduct 'EXA:SupplementProduct:456' is active on 2026-12-01."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "post": {
+        "tags": [
+          "Supplement product"
+        ],
+        "summary": "Create a new version of a supplement product",
+        "description": "Create a new version of existing supplement product. The added version will be in DRAFT status, and will be created with version number n+1. The version will not be active until a start date is set and the version is published.\n",
+        "operationId": "createSupplementProductVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The updated version of supplement product. The existing data in supplement product will be replaced by this one.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplementProductRequest"
+              },
+              "examples": {
+                "bicycle": {
+                  "$ref": "#/components/examples/bicycle"
+                },
+                "seatReservation": {
+                  "$ref": "#/components/examples/seatReservation"
+                },
+                "dog": {
+                  "$ref": "#/components/examples/dog"
+                },
+                "luggage": {
+                  "$ref": "#/components/examples/luggage"
+                },
+                "parking": {
+                  "$ref": "#/components/examples/parking"
+                },
+                "upgrade": {
+                  "$ref": "#/components/examples/upgrade"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Supplement product created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementProductResponse"
+                },
+                "examples": {
+                  "parking": {
+                    "$ref": "#/components/examples/parking-2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "description": "Conflict - Supplement product already exists",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "conflict": {
+                    "summary": "Supplement product already exists",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/conflict",
+                      "title": "Conflict",
+                      "status": 409,
+                      "detail": "Supplement product with privateCode '123' already exists."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/supplement-products/{id}/versions": {
+      "get": {
+        "tags": [
+          "Supplement product"
+        ],
+        "summary": "List versions of a supplement product",
+        "description": "Retrieve all versions of a supplement product by its NeTEx ID, including drafts and\nproposals.\n",
+        "operationId": "getSupplementProductVersions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of supplement product versions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VersionResponse"
+                  }
+                },
+                "examples": {
+                  "versionHistory": {
+                    "$ref": "#/components/examples/versionHistory"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Supplement product not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Supplement product not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "SupplementProduct 'EXA:SupplementProduct:456' not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/supplement-products/{id}/{version}": {
+      "get": {
+        "tags": [
+          "Supplement product"
+        ],
+        "summary": "Get a supplement product version",
+        "description": "Retrieve the complete supplement product for a specific version,\nidentified by NeTEx version ID or version number.\n",
+        "operationId": "getSupplementProductVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Supplement product version found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementProductResponse"
+                },
+                "examples": {
+                  "parking": {
+                    "$ref": "#/components/examples/parking-2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Supplement product or version not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Supplement product version not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "Version 'EXA:Version:SP-abc123-v1' not found for SupplementProduct 'EXA:SupplementProduct:456'."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "put": {
+        "tags": [
+          "Supplement product"
+        ],
+        "summary": "Update a version of a supplement product",
+        "description": "Update the version of a supplement product. The version will not be active until a start date is set and the version is published.\n",
+        "operationId": "updateSupplementProductVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "$ref": "#/components/parameters/version"
+          }
+        ],
+        "requestBody": {
+          "description": "The updated version of supplement product. The existing data in supplement product will be replaced by this one.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplementProductRequest"
+              },
+              "examples": {
+                "bicycle": {
+                  "$ref": "#/components/examples/bicycle"
+                },
+                "seatReservation": {
+                  "$ref": "#/components/examples/seatReservation"
+                },
+                "dog": {
+                  "$ref": "#/components/examples/dog"
+                },
+                "luggage": {
+                  "$ref": "#/components/examples/luggage"
+                },
+                "parking": {
+                  "$ref": "#/components/examples/parking"
+                },
+                "upgrade": {
+                  "$ref": "#/components/examples/upgrade"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Supplement product updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplementProductResponse"
+                },
+                "examples": {
+                  "parking": {
+                    "$ref": "#/components/examples/parking-2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Supplement product not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "conflict": {
+                    "summary": "Supplement product not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/conflict",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "Supplement product not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/supplement-products/{id}/sales-offer-package-assignments": {
+      "get": {
+        "tags": [
+          "Sales package assignment"
+        ],
+        "summary": "List sales package assignments for a supplement product",
+        "description": "List all sales packages that a supplement product is currently assigned to,\nincluding the version reference for each assignment.\n",
+        "operationId": "listSalesOfferPackageAssignments",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of sales package assignments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SalesOfferPackageAssignmentListItem"
+                  }
+                },
+                "examples": {
+                  "assignmentList": {
+                    "$ref": "#/components/examples/assignmentList"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Supplement product not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Supplement product not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "SupplementProduct 'BNR:SupplementProduct:e006fb5c' not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "post": {
+        "tags": [
+          "Sales package assignment"
+        ],
+        "summary": "Assign supplement product to sales packages",
+        "description": "Assign a supplement product to one or more sales packages. Each assignment creates a new\nversion of the target sales package containing the supplement product reference.\n\nThis is a best-effort batch operation — failure on one sales package does not prevent\nprocessing of the others. The response body conveys per-item results; callers must\ninspect each item's status rather than relying solely on the HTTP status code.\n\nIf the supplement product is already assigned to a sales package but with a different version,\nthe version reference is updated (upsert semantics).\n\nThe caller must have an agreement with the sales package owner (verified against the agreement\nregister). The caller must also own the supplement product.\n",
+        "operationId": "createSalesOfferPackageAssignments",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "Supplement product version and target sales packages.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesOfferPackageAssignmentRequest"
+              },
+              "examples": {
+                "assignParking": {
+                  "$ref": "#/components/examples/assignParking"
+                },
+                "assignParkingAsDraft": {
+                  "$ref": "#/components/examples/assignParkingAsDraft"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Per-sales-offer-package results. Each item indicates SUCCESS or FAILED with details;\ninspect individual results rather than relying solely on the HTTP status.\n",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesOfferPackageAssignmentResponse"
+                },
+                "examples": {
+                  "multiStatus": {
+                    "$ref": "#/components/examples/multiStatus"
+                  },
+                  "allSuccess": {
+                    "$ref": "#/components/examples/allSuccess"
+                  },
+                  "draftCreated": {
+                    "$ref": "#/components/examples/draftCreated"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Supplement product not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Supplement product not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "SupplementProduct 'BNR:SupplementProduct:e006fb5c' not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/supplement-products/{id}/sales-offer-package-assignments/{salesOfferPackageId}": {
+      "delete": {
+        "tags": [
+          "Sales package assignment"
+        ],
+        "summary": "Remove supplement product from a sales package",
+        "description": "Remove the assignment of a supplement product from a sales package. This creates a new\nversion of the sales package without the supplement product reference.\n\nOnly the supplement product owner or the sales package owner can remove the assignment.\n",
+        "operationId": "deleteSalesOfferPackageAssignment",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          },
+          {
+            "name": "salesOfferPackageId",
+            "in": "path",
+            "description": "NeTEx ID of the sales package to remove the assignment from.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+              "type": "string"
+            },
+            "examples": {
+              "default": {
+                "value": "VYG:SalesOfferPackage:07c4332c"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Assignment removed successfully"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Supplement product or sales package not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Assignment not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "Assignment of 'BNR:SupplementProduct:e006fb5c' to 'VYG:SalesOfferPackage:07c4332c' not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/sales-offer-packages/{id}": {
+      "get": {
+        "tags": [
+          "Sales package"
+        ],
+        "summary": "Get a sales package by ID",
+        "description": "Retrieve a sales package by its NeTEx ID.\n",
+        "operationId": "getSalesOfferPackageById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sales package found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesOfferPackageResponse"
+                },
+                "examples": {
+                  "withFareProducts": {
+                    "$ref": "#/components/examples/withFareProducts"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Sales package not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Sales package not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c' not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "put": {
+        "tags": [
+          "Sales package"
+        ],
+        "summary": "Update a sales package",
+        "description": "Update a sales package with a full replacement of its content. The client should\nfirst retrieve the current sales package, modify the desired fields, and send the\ncomplete object back.\n\nThis creates a new version of the sales package. The status field controls whether\nthe version is auto-published (VERSIONED) or created as a draft.\n",
+        "operationId": "updateSalesOfferPackage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "Full sales package representation including all fare product references.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesOfferPackageRequest"
+              },
+              "examples": {
+                "updateWithFareProducts": {
+                  "$ref": "#/components/examples/updateWithFareProducts"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Sales package updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesOfferPackageResponse"
+                },
+                "examples": {
+                  "withFareProducts": {
+                    "$ref": "#/components/examples/withFareProducts"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Sales package not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Sales package not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c' not found."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - e.g. draft already in progress",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "draftInProgress": {
+                    "summary": "Draft already in progress",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/conflict",
+                      "title": "Conflict",
+                      "status": 409,
+                      "detail": "Cannot create new version: a draft version is already in progress for VYG:SalesOfferPackage:07c4332c."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/sales-offer-packages/{id}/publication": {
+      "put": {
+        "tags": [
+          "Sales package"
+        ],
+        "summary": "Publish or promote a sales package version",
+        "description": "Change the status of a sales package version. Used to promote versions through the\npublication workflow: DRAFT -> (PROPOSED ->) VERSIONED (-> DEPRECATED) \nor send back: PROPOSED -> DRAFT.\n",
+        "operationId": "publishSalesOfferPackageVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "Version ID, target status, and validity period.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalesOfferPackagePublicationRequest"
+              },
+              "examples": {
+                "publishVersion": {
+                  "$ref": "#/components/examples/publishVersion"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Version status updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SalesOfferPackagePublicationResponse"
+                },
+                "examples": {
+                  "published": {
+                    "$ref": "#/components/examples/published"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Sales package or version not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Version not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "Version 'VYG:Version:SP-905ec954-...' not found for SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c'."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Invalid status transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidTransition": {
+                    "summary": "Invalid status transition",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/conflict",
+                      "title": "Conflict",
+                      "status": 409,
+                      "detail": "Cannot transition from VERSIONED to DRAFT for VYG:SalesOfferPackage:07c4332c."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/sales-offer-packages/{id}/fare-products": {
+      "get": {
+        "tags": [
+          "Sales package"
+        ],
+        "summary": "List fare products on a sales package",
+        "description": "List all fare products currently assigned to a sales package.\n",
+        "operationId": "listSalesOfferPackageFareProducts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of fare products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FareProductListItem"
+                  }
+                },
+                "examples": {
+                  "fareProducts": {
+                    "$ref": "#/components/examples/fareProducts"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Sales package not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Sales package not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c' not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/parameters/limitations/usage-validity-period": {
+      "get": {
+        "tags": [
+          "Usage Validity Period"
+        ],
+        "summary": "List usage validity period instances",
+        "description": "Returns a paginated list of all UsageValidityPeriod instances.",
+        "operationId": "listUsageValidityPeriods",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/page"
+          },
+          {
+            "$ref": "#/components/parameters/size"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of UsageValidityPeriod instances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageValidityPeriodListResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "instances": [
+                        {
+                          "id": "ENT:UsageValidityPeriod:DuringTravel",
+                          "name": [
+                            {
+                              "lang": "nb-NO",
+                              "value": "Under reise"
+                            }
+                          ],
+                          "usageValidityType": "SINGLE_TRIP",
+                          "validityPeriod": "PT60M",
+                          "activationType": "ON_CHECK_IN"
+                        }
+                      ],
+                      "totalCount": 1,
+                      "page": 0,
+                      "size": 100
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "post": {
+        "tags": [
+          "Usage Validity Period"
+        ],
+        "summary": "Create a usage validity period instance",
+        "description": "Create a new UsageValidityPeriod instance.",
+        "operationId": "createUsageValidityPeriod",
+        "requestBody": {
+          "description": "The UsageValidityPeriod instance to create.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsageValidityPeriodRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "name": [
+                      {
+                        "lang": "nb-NO",
+                        "value": "Under reise"
+                      }
+                    ],
+                    "usageValidityType": "SINGLE_TRIP",
+                    "validityPeriod": "PT60M",
+                    "activationType": "ON_CHECK_IN"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "UsageValidityPeriod instance created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageValidityPeriod"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "id": "ENT:UsageValidityPeriod:DuringTravel",
+                      "name": [
+                        {
+                          "lang": "nb-NO",
+                          "value": "Under reise"
+                        }
+                      ],
+                      "usageValidityType": "SINGLE_TRIP",
+                      "validityPeriod": "PT60M",
+                      "activationType": "ON_CHECK_IN"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid data or schema violation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "schemaViolation": {
+                    "summary": "Request does not match type schema",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/bad-request",
+                      "title": "Bad Request",
+                      "status": 400,
+                      "detail": "Field 'usageValidityType' is required for type 'usage-validity-period'."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/parameters/limitations/usage-validity-period/{id}": {
+      "get": {
+        "tags": [
+          "Usage Validity Period"
+        ],
+        "summary": "Get a usage validity period instance",
+        "description": "Retrieve the full detail of a single UsageValidityPeriod instance.",
+        "operationId": "getUsageValidityPeriod",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "UsageValidityPeriod instance found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageValidityPeriod"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "id": "ENT:UsageValidityPeriod:DuringTravel",
+                      "name": [
+                        {
+                          "lang": "nb-NO",
+                          "value": "Under reise"
+                        }
+                      ],
+                      "usageValidityType": "SINGLE_TRIP",
+                      "validityPeriod": "PT60M",
+                      "activationType": "ON_CHECK_IN"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "UsageValidityPeriod instance not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Instance not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "UsageValidityPeriod instance ENT:UsageValidityPeriod:nonexistent not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "put": {
+        "tags": [
+          "Usage Validity Period"
+        ],
+        "summary": "Update a usage validity period instance",
+        "description": "Update an existing UsageValidityPeriod instance.",
+        "operationId": "updateUsageValidityPeriod",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The updated UsageValidityPeriod data.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsageValidityPeriodRequest"
+              },
+              "examples": {
+                "default": {
+                  "value": {
+                    "name": [
+                      {
+                        "lang": "nb-NO",
+                        "value": "Under reise"
+                      }
+                    ],
+                    "usageValidityType": "SINGLE_TRIP",
+                    "validityPeriod": "PT60M",
+                    "activationType": "ON_CHECK_IN"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "UsageValidityPeriod instance updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageValidityPeriod"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "id": "ENT:UsageValidityPeriod:DuringTravel",
+                      "name": [
+                        {
+                          "lang": "nb-NO",
+                          "value": "Under reise"
+                        }
+                      ],
+                      "usageValidityType": "SINGLE_TRIP",
+                      "validityPeriod": "PT60M",
+                      "activationType": "ON_CHECK_IN"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid data or schema violation",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "schemaViolation": {
+                    "summary": "Request does not match type schema",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/bad-request",
+                      "title": "Bad Request",
+                      "status": 400,
+                      "detail": "Field 'usageValidityType' is required for type 'usage-validity-period'."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "UsageValidityPeriod instance not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Instance not found",
+                    "value": {
+                      "type": "https://developer.entur.org/errors/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "UsageValidityPeriod instance ENT:UsageValidityPeriod:nonexistent not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/versions/{id}": {
+      "get": {
+        "tags": [
+          "Version"
+        ],
+        "summary": "Get a version by ID",
+        "description": "Retrieve a specific version by its netex ID.",
+        "operationId": "getVersionById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Version found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                },
+                "examples": {
+                  "draftVersion": {
+                    "$ref": "#/components/examples/draftVersion"
+                  },
+                  "versionedVersion": {
+                    "$ref": "#/components/examples/versionedVersion"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidTransition": {
+                    "summary": "Invalid ID format",
+                    "value": {
+                      "type": "https://example.com/probs/illegal-transition",
+                      "title": "Illegal status transition",
+                      "status": 400,
+                      "detail": "Invalid netex ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Version not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Version not found",
+                    "value": {
+                      "type": "https://example.com/probs/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "Version ENT:Version:001 not found."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "put": {
+        "tags": [
+          "Version"
+        ],
+        "summary": "Update an existing version",
+        "description": "Update an existing version. Can be used to change status (e.g., from DRAFT to PROPOSED or PROPOSED to VERSIONED) or modify dates.",
+        "operationId": "updateVersion",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "requestBody": {
+          "description": "The request body must include the new status and startDate. The endDate is optional. Valid status transitions are:\n  - DRAFT -> PROPOSED\n  - PROPOSED -> VERSIONED\n  - DRAFT -> DEPRECATED\n  - PROPOSED -> DEPRECATED\n",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionRequest"
+              },
+              "examples": {
+                "draft": {
+                  "$ref": "#/components/examples/draft"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Version updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                },
+                "examples": {
+                  "draftVersion": {
+                    "$ref": "#/components/examples/draftVersion"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid data or illegal status transition",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidTransition": {
+                    "summary": "Illegal status transition",
+                    "value": {
+                      "type": "https://example.com/probs/illegal-transition",
+                      "title": "Illegal status transition",
+                      "status": 400,
+                      "detail": "Invalid status transition: DRAFT -> $to"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Version not found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "notFound": {
+                    "summary": "Version not found",
+                    "value": {
+                      "type": "https://example.com/probs/not-found",
+                      "title": "Not Found",
+                      "status": 404,
+                      "detail": "Version ENT:Version:001 not found."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - Version already exists or overlaps with existing version",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "conflict": {
+                    "summary": "Version already exists",
+                    "value": {
+                      "type": "https://example.com/probs/conflict",
+                      "title": "Conflict",
+                      "status": 409,
+                      "detail": "Version ENT:Version:001 exists already."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/versions": {
+      "post": {
+        "tags": [
+          "Version"
+        ],
+        "summary": "Create a new version",
+        "description": "Create a new version in DRAFT status. The version will be assigned the current date as startDate if not provided.",
+        "operationId": "createVersion",
+        "requestBody": {
+          "description": "The request body must include the netex ID and status (must be DRAFT). The startDate is optional and will default to the current date if not provided. The endDate is also optional.\n",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionRequest"
+              },
+              "examples": {
+                "draft": {
+                  "$ref": "#/components/examples/draft"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Version created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionResponse"
+                },
+                "examples": {
+                  "draftVersion": {
+                    "$ref": "#/components/examples/draftVersion"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidStatus": {
+                    "summary": "Illegal status",
+                    "value": {
+                      "type": "https://example.com/probs/illegal-transition",
+                      "title": "Illegal status for new version",
+                      "status": 400,
+                      "detail": "Invalid version status VERSIONED. New versions must be created with status DRAFT."
+                    }
+                  },
+                  "invalidDate": {
+                    "summary": "Illegal date",
+                    "value": {
+                      "type": "https://example.com/probs/illegal-transition",
+                      "title": "Illegal date for new version",
+                      "status": 400,
+                      "detail": "Invalid version dates: endDate must be strictly after startDate."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "conflict": {
+                    "summary": "Version already exists",
+                    "value": {
+                      "type": "https://example.com/probs/conflict",
+                      "title": "Conflict",
+                      "status": 409,
+                      "detail": "Version ENT:Version:001 exists already."
+                    }
+                  },
+                  "inProgress": {
+                    "summary": "Version already in progress",
+                    "value": {
+                      "type": "https://example.com/probs/conflict",
+                      "title": "Conflict with other in progress",
+                      "status": 409,
+                      "detail": "Cannot create new version: ENT:Version:001 are already in PROPOSED (only one in-progress version allowed)."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v3/versions/history/{id}": {
+      "get": {
+        "tags": [
+          "Version"
+        ],
+        "summary": "Get version history for a versionable element by ID",
+        "description": "Retrieve the list for all version that is related to the given versionable element.",
+        "operationId": "getVersionHistoryById",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Version history found successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VersionResponse"
+                  }
+                },
+                "examples": {
+                  "versionHistory": {
+                    "$ref": "#/components/examples/versionHistory"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                },
+                "examples": {
+                  "invalidTransition": {
+                    "summary": "Invalid ID format",
+                    "value": {
+                      "type": "https://example.com/probs/illegal-transition",
+                      "title": "Illegal status transition",
+                      "status": 400,
+                      "detail": "Invalid NetEx ID format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "product-api-access:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "LocalizedString": {
+        "type": "array",
+        "items": {
+          "required": [
+            "lang",
+            "value"
+          ],
+          "type": "object",
+          "properties": {
+            "lang": {
+              "pattern": "^[a-z]{2}-[A-Z]{2}$",
+              "type": "string",
+              "description": "BCP-47 language tag (e.g., 'nb-NO', 'en-GB').",
+              "examples": [
+                "nb-NO"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "description": "The localized string value for the specified lang."
+            }
+          }
+        }
+      },
+      "EntitlementRequired": {
+        "required": [
+          "entitlementType",
+          "fareProductRef",
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^([A-Z]{3}):EntitlementRequired:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "The NeTEx ID of this EntitlementRequired.",
+            "examples": [
+              "ENT:EntitlementRequired:SingleTicket"
+            ]
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "entitlementType": {
+            "type": "string",
+            "description": "The type of entitlement that is required.",
+            "enum": [
+              "SINGLE_TRIP",
+              "PERIOD_PASS",
+              "DAY_PASS",
+              "CARNET"
+            ]
+          },
+          "fareProductRef": {
+            "pattern": "^([A-Z]{3}):PreassignedFareProduct:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "Reference to the fare product that satisfies this entitlement.",
+            "examples": [
+              "ENT:PreassignedFareProduct:SingleTrip"
+            ]
+          }
+        }
+      },
+      "EntitlementRequiredListResponse": {
+        "required": [
+          "instances",
+          "page",
+          "size",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "instances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntitlementRequired"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "Total number of EntitlementRequired instances.",
+            "examples": [
+              4
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current zero-based page number.",
+            "examples": [
+              0
+            ]
+          },
+          "size": {
+            "type": "integer",
+            "description": "Number of instances per page.",
+            "examples": [
+              100
+            ]
+          }
+        }
+      },
+      "ProblemDetails": {
+        "required": [
+          "detail",
+          "status",
+          "title",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "A URI reference that identifies the problem type.",
+            "format": "uri",
+            "examples": [
+              "https://developer.entur.org/errors/bad-request"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "Short, human-readable summary of the problem type.",
+            "examples": [
+              "Bad Request"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "description": "The HTTP status code.",
+            "format": "int32",
+            "examples": [
+              400
+            ]
+          },
+          "detail": {
+            "type": "string",
+            "description": "Human-readable explanation specific to this occurrence.",
+            "examples": [
+              "The supplied ruleId is not a valid UUID."
+            ]
+          },
+          "instance": {
+            "type": "string",
+            "description": "A URI reference that identifies the specific occurrence.",
+            "format": "uri",
+            "examples": [
+              "https://api.example.com/requests/12345"
+            ]
+          }
+        },
+        "description": "RFC 9457 Problem Details"
+      },
+      "EntitlementRequiredRequest": {
+        "required": [
+          "entitlementType",
+          "fareProductRef",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "entitlementType": {
+            "type": "string",
+            "description": "The type of entitlement that is required.",
+            "enum": [
+              "SINGLE_TRIP",
+              "PERIOD_PASS",
+              "DAY_PASS",
+              "CARNET"
+            ]
+          },
+          "fareProductRef": {
+            "pattern": "^([A-Z]{3}):PreassignedFareProduct:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "Reference to the fare product that satisfies this entitlement.",
+            "examples": [
+              "ENT:PreassignedFareProduct:SingleTrip"
+            ]
+          }
+        }
+      },
+      "VersionStatus": {
+        "type": "string",
+        "enum": [
+          "DRAFT",
+          "PROPOSED",
+          "VERSIONED",
+          "DEPRECATED"
+        ]
+      },
+      "ChargingMomentType": {
+        "type": "string",
+        "description": "Charging moment type.\n\nNote: Currently, only `BEFORE_TRAVEL` is supported in Entur sales platform.\n",
+        "enum": [
+          "BEFORE_TRAVEL",
+          "ON_START_OF_TRAVEL",
+          "BEFORE_END_OF_TRAVEL",
+          "BEFORE_TRAVEL_THEN_ADJUST_AT_END_OF_TRAVEL",
+          "ON_START_THEN_ADJUST_AT_END_OF_TRAVEL",
+          "ON_START_THEN_ADJUST_AT_END_OF_FARE_DAY",
+          "ON_START_THEN_ADJUST_AT_END_OF_CHARGE_PERIOD",
+          "AT_END_OF_TRAVEL",
+          "AT_END_OF_FARE_DAY",
+          "AT_END_OF_CHARGE_PERIOD",
+          "FREE",
+          "ANY_TIME",
+          "OTHER"
+        ]
+      },
+      "SupplementProductType": {
+        "type": "string",
+        "description": "The type of the supplement product. This can be used to determine which parameters are relevant for the product.",
+        "enum": [
+          "SEAT_RESERVATION",
+          "BICYCLE",
+          "DOG",
+          "ANIMAL",
+          "MEAL",
+          "WIFI",
+          "EXTRA_LUGGAGE",
+          "PENALTY",
+          "UPGRADE",
+          "JOURNEY_EXTENSION",
+          "JOURNEY_ADD_ON",
+          "EVENT_ADD_ON",
+          "PARKING"
+        ]
+      },
+      "FareStructureType": {
+        "type": "string",
+        "description": "The type of fare structure. This indicates the method by which the fare is calculated, e.g. flat fare, zonal fare, point-to-point fare, etc.",
+        "enum": [
+          "CAPPED_FLAT_FARE",
+          "CAPPED_POINT_TO_POINT_FARE",
+          "CAPPED_ZONAL_FARE",
+          "LINE_FLAT_FARE",
+          "NETWORK_FLAT_FARE",
+          "POINT_TO_POINT_FARE",
+          "POINT_TO_POINT_DISTANCE_FARE",
+          "STAGE_FARE",
+          "ZONE_FLAT_FARE",
+          "ZONE_SEQUENCE_FARE",
+          "ZONE_TO_ZONE_FARE",
+          "ZONE_COUNT_FARE",
+          "PENALTY_FARE",
+          "OTHER"
+        ]
+      },
+      "ConditionsSummary": {
+        "required": [
+          "exchangeable",
+          "fareStructureType",
+          "refundable"
+        ],
+        "type": "object",
+        "properties": {
+          "exchangeable": {
+            "type": "boolean",
+            "description": "Whether the supplement product is exchangeable.",
+            "examples": [
+              true
+            ]
+          },
+          "refundable": {
+            "type": "boolean",
+            "description": "Whether the supplement product is refundable.",
+            "examples": [
+              false
+            ]
+          },
+          "fareStructureType": {
+            "$ref": "#/components/schemas/FareStructureType"
+          }
+        }
+      },
+      "VatGrpupType": {
+        "type": "string",
+        "description": "VAT group type. This is used to determine which VAT rate applies to a product. The VAT group type is determined by the product type and the country of sale. For example, in Norway, food products are subject to a reduced VAT rate of 15%, while other products are subject to the standard VAT rate of 25%. In this case, food products would be classified as FOOD_VAT, while other products would be classified as GENERAL_VAT.",
+        "default": "TRANSPORT_AND_TICKETS_VAT",
+        "enum": [
+          "EXCEPTION_FROM_VAT",
+          "GENERAL_VAT",
+          "FOOD_VAT",
+          "TRANSPORT_AND_TICKETS_VAT"
+        ]
+      },
+      "GenericParameterAssignmentGroupingType": {
+        "type": "string",
+        "description": "How multiple GPA parameters should be combined (AND/OR)",
+        "enum": [
+          "AND",
+          "OR"
+        ]
+      },
+      "ValidityParameters": {
+        "required": [
+          "groupingType",
+          "validityParameterRefs",
+          "validityParameterType"
+        ],
+        "type": "object",
+        "properties": {
+          "groupingType": {
+            "$ref": "#/components/schemas/GenericParameterAssignmentGroupingType"
+          },
+          "validityParameterType": {
+            "type": "string",
+            "enum": [
+              "LINE",
+              "ZONE",
+              "ZONE_GROUP",
+              "STOP_PLACE",
+              "PARKING",
+              "ROUTE_SECTION",
+              "TARIFF_AUTHORITY",
+              "OPERATOR",
+              "TRANSPORT_MODE",
+              "FLEXIBLE_LINE",
+              "CLASS_OF_USE",
+              "FACILITY",
+              "SALES_CHANNEL",
+              "AUTHORITY"
+            ]
+          },
+          "validityParameterRefs": {
+            "type": "array",
+            "description": "List of references for the validity parameters",
+            "items": {
+              "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+              "type": "string",
+              "description": "NeTEx reference to validity parameter"
+            }
+          }
+        },
+        "examples": [
+          {
+            "groupingType": "OR",
+            "validityParameterType": "LINE",
+            "validityParameterRefs": [
+              "VYG:Line:L1",
+              "VYG:Line:L2"
+            ]
+          }
+        ]
+      },
+      "FareTableRef": {
+        "required": [
+          "ref",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "ref": {
+            "pattern": "^([A-Z]{3}):FareTable:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx id of the FareTable that prices this supplement product.",
+            "examples": [
+              "ENT:FareTable:bike-supplement"
+            ]
+          },
+          "version": {
+            "type": "string",
+            "description": "NeTEx version id of the referenced FareTable.",
+            "examples": [
+              "ENT:Version:8f1b2c3d"
+            ]
+          }
+        },
+        "description": "A reference to a versioned FareTable that prices a supplement product. The priceable object\nside authors this link (mirroring products-spring), so the fare table version is required to\npin the exact fare table the link resolves to.\n"
+      },
+      "SupplementProductRequest": {
+        "required": [
+          "chargingMomentType",
+          "conditionsSummary",
+          "entitlementRequiredRefs",
+          "names",
+          "purchaseWindowRef",
+          "startDate",
+          "status",
+          "supplementProductType",
+          "usageValidityPeriodRef",
+          "validityParameters",
+          "vatGroup"
+        ],
+        "type": "object",
+        "properties": {
+          "privateCodes": {
+            "type": "array",
+            "description": "Optional external system identifiers.",
+            "items": {
+              "type": "string",
+              "examples": [
+                "123"
+              ]
+            },
+            "default": []
+          },
+          "ownerOrganisationId": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.",
+            "format": "int64"
+          },
+          "names": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date of the version.",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date of the version (optional).",
+            "format": "date"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "Status of the supplement product. Defaults to VERSIONED.\n\n- **DRAFT** - Under construction and not ready for operational use.\n- **PROPOSED** - Complete but pending review and approval.\n- **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.\n- **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.\n",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          },
+          "chargingMomentType": {
+            "$ref": "#/components/schemas/ChargingMomentType"
+          },
+          "supplementProductType": {
+            "$ref": "#/components/schemas/SupplementProductType"
+          },
+          "conditionsSummary": {
+            "$ref": "#/components/schemas/ConditionsSummary"
+          },
+          "vatGroup": {
+            "$ref": "#/components/schemas/VatGrpupType"
+          },
+          "purchaseWindowRef": {
+            "pattern": "^([A-Z]{3}):PurchaseWindow:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of a PurchaseWindow instance (Product Parameters API, /v3/parameters/purchase-windows). Available values are listed in the Product Parameters API.\n",
+            "examples": [
+              "ENT:PurchaseWindow:120days"
+            ]
+          },
+          "usageValidityPeriodRef": {
+            "pattern": "^([A-Z]{3}):UsageValidityPeriod:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of a UsageValidityPeriod instance (limitations/usage-validity-period).\nAvailable values are listed in the Product Parameters API.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+            "x-implementation-status": "not-persisted",
+            "examples": [
+              "ENT:UsageValidityPeriod:DuringTravel"
+            ]
+          },
+          "entitlementRequiredRefs": {
+            "minItems": 1,
+            "type": "array",
+            "description": "List of NeTEx IDs of EntitlementRequired instances (limitations/entitlement-required).\nAvailable values are listed in the Product Parameters API.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+            "items": {
+              "pattern": "^([A-Z]{3}):EntitlementRequired:([0-9A-Za-z_\\-]*)$",
+              "type": "string",
+              "description": "NeTEx ID of an EntitlementRequired instance.",
+              "examples": [
+                "ENT:EntitlementRequired:SingleTicket"
+              ]
+            },
+            "x-implementation-status": "not-persisted"
+          },
+          "validityParameters": {
+            "type": "array",
+            "description": "List of validity parameters. The specified parameter tells where the supplement product is valid. This can be lines, zones, stops etc.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+            "items": {
+              "$ref": "#/components/schemas/ValidityParameters"
+            },
+            "x-implementation-status": "not-persisted"
+          },
+          "fareTableRefs": {
+            "type": "array",
+            "description": "References to the versioned FareTable instances that price this supplement product.\n\nThe priceable object owns this link (as in products-spring): supply the fare tables that\nprice it here on write. Prices themselves live on the fare table — create/update them via the\npricing/fare-table API, then reference the fare table here. On read, `SupplementProductResponse`\nsurfaces the resolved fare-table NeTEx ids.\n",
+            "items": {
+              "$ref": "#/components/schemas/FareTableRef"
+            },
+            "default": []
+          }
+        }
+      },
+      "SupplementProductResponse": {
+        "required": [
+          "chargingMomentType",
+          "conditionsSummary",
+          "entitlementRequiredRefs",
+          "id",
+          "names",
+          "ownerOrganisationId",
+          "privateCodes",
+          "purchaseWindowRef",
+          "startDate",
+          "status",
+          "supplementProductType",
+          "usageValidityPeriodRef",
+          "validityParameters",
+          "vatGroup",
+          "versionId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^([A-Z]{3}):SupplementProduct:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "The NeTEx ID of the supplement product.",
+            "examples": [
+              "BNR:SupplementProduct:123"
+            ]
+          },
+          "versionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "The netex id reference to the object.",
+            "examples": [
+              "EXA:Version:001"
+            ]
+          },
+          "versionNumber": {
+            "type": "integer",
+            "description": "Version number of the version. Only present when versionStatus is VERSIONED. Starts at 1 for a new product and is incremented by 1 for each new version.",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "datasource": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The ID of the datasource.",
+                "examples": [
+                  "entur"
+                ]
+              }
+            },
+            "description": "The datasource that owns this supplement product."
+          },
+          "privateCodes": {
+            "type": "array",
+            "description": "Optional external system identifiers.",
+            "items": {
+              "type": "string",
+              "examples": [
+                "123"
+              ]
+            },
+            "default": []
+          },
+          "ownerOrganisationId": {
+            "type": "integer",
+            "description": "Internal id of the organisation that owns this supplement product.",
+            "format": "int64"
+          },
+          "names": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "descriptions": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date of the version.",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date of the version (optional).",
+            "format": "date"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "Status of the supplement product.\n\n- **DRAFT** - Under construction and not ready for operational use.\n- **PROPOSED** - Complete but pending review and approval.\n- **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.\n- **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.\n",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          },
+          "chargingMomentType": {
+            "$ref": "#/components/schemas/ChargingMomentType"
+          },
+          "supplementProductType": {
+            "$ref": "#/components/schemas/SupplementProductType"
+          },
+          "conditionsSummary": {
+            "$ref": "#/components/schemas/ConditionsSummary"
+          },
+          "vatGroup": {
+            "$ref": "#/components/schemas/VatGrpupType"
+          },
+          "purchaseWindowRef": {
+            "pattern": "^([A-Z]{3}):PurchaseWindow:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of a PurchaseWindow instance (Product Parameters API, /v3/parameters/purchase-windows). Available values are listed in the Product Parameters API.\n",
+            "examples": [
+              "ENT:PurchaseWindow:120days"
+            ]
+          },
+          "usageValidityPeriodRef": {
+            "pattern": "^([A-Z]{3}):UsageValidityPeriod:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of a UsageValidityPeriod instance (limitations/usage-validity-period).\nAvailable values are listed in the Product Parameters API.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+            "x-implementation-status": "not-persisted",
+            "examples": [
+              "ENT:UsageValidityPeriod:DuringTravel"
+            ]
+          },
+          "entitlementRequiredRefs": {
+            "minItems": 1,
+            "type": "array",
+            "description": "List of NeTEx IDs of EntitlementRequired instances (limitations/entitlement-required).\nAvailable values are listed in the Product Parameters API.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+            "items": {
+              "pattern": "^([A-Z]{3}):EntitlementRequired:([0-9A-Za-z_\\-]*)$",
+              "type": "string",
+              "description": "NeTEx ID of an EntitlementRequired instance.",
+              "examples": [
+                "ENT:EntitlementRequired:SingleTicket"
+              ]
+            },
+            "x-implementation-status": "not-persisted"
+          },
+          "validityParameters": {
+            "type": "array",
+            "description": "List of validity parameters. The specified parameter tells where the supplement product is valid. This can be lines, zones, stops etc.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+            "items": {
+              "$ref": "#/components/schemas/ValidityParameters"
+            },
+            "x-implementation-status": "not-persisted"
+          },
+          "fareTableRefs": {
+            "type": "array",
+            "description": "NeTEx IDs of the FareTable instances that price this supplement product.\n\nRead-only. Prices themselves are not exposed here; use the pricing/fare-table API with these\nreferences to retrieve the actual prices. This lets clients discover the relevant fare\ntables for a priceable object directly, without fetching and scanning every fare table.\n",
+            "readOnly": true,
+            "items": {
+              "pattern": "^([A-Z]{3}):FareTable:([0-9A-Za-z_\\-]*)$",
+              "type": "string",
+              "description": "NeTEx ID of a FareTable that prices this supplement product.",
+              "examples": [
+                "ENT:FareTable:123"
+              ]
+            },
+            "default": []
+          }
+        }
+      },
+      "VersionResponse": {
+        "required": [
+          "changed",
+          "created",
+          "id",
+          "startDate",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "The netex id reference to the object.",
+            "examples": [
+              "EXA:Version:001"
+            ]
+          },
+          "number": {
+            "type": "integer",
+            "description": "Version number of the version. Only present when versionStatus is VERSIONED. Starts at 1 for a new product and is incremented by 1 for each new version.",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/VersionStatus"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date of the version.",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date of the version.",
+            "format": "date"
+          },
+          "published": {
+            "type": "string",
+            "description": "Timestamp for when the version was published (set to status VERSIONED).",
+            "format": "date-time"
+          },
+          "created": {
+            "type": "string",
+            "description": "Created datetime",
+            "format": "date-time"
+          },
+          "changed": {
+            "type": "string",
+            "description": "Changed datetime",
+            "format": "date-time"
+          }
+        }
+      },
+      "SalesOfferPackageAssignmentListItem": {
+        "required": [
+          "fareProductId",
+          "fareProductVersionId",
+          "salesOfferPackageId"
+        ],
+        "type": "object",
+        "properties": {
+          "salesOfferPackageId": {
+            "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of the sales package.",
+            "examples": [
+              "VYG:SalesOfferPackage:07c4332c"
+            ]
+          },
+          "salesOfferPackageName": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "fareProductId": {
+            "type": "string",
+            "description": "NeTEx ID of the fare product.",
+            "examples": [
+              "EXA:SupplementProduct:e006fb5c"
+            ]
+          },
+          "fareProductVersionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID of the assigned fare product version.",
+            "examples": [
+              "EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef"
+            ]
+          }
+        }
+      },
+      "SalesOfferPackageAssignmentRequest": {
+        "required": [
+          "fareProductVersionId",
+          "salesOfferPackageIds"
+        ],
+        "type": "object",
+        "properties": {
+          "fareProductVersionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID of the fare product version to assign.",
+            "examples": [
+              "EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef"
+            ]
+          },
+          "salesOfferPackageIds": {
+            "minItems": 1,
+            "type": "array",
+            "description": "List of sales package NeTEx IDs to assign the fare product to.",
+            "items": {
+              "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+              "type": "string",
+              "description": "NeTEx ID of a sales package.",
+              "examples": [
+                "VYG:SalesOfferPackage:07c4332c"
+              ]
+            }
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "Status of the created sales package version. Defaults to VERSIONED (auto-publish).\n\n- **DRAFT** - Creates a draft version that must be manually published via PUT /sales-offer-packages/{id}/publication.\n- **PROPOSED** - Creates a proposed version pending review.\n- **VERSIONED** - Auto-publishes the new version immediately (default).\n",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "AssignmentError": {
+        "required": [
+          "code",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Machine-readable error code.",
+            "enum": [
+              "NO_AGREEMENT",
+              "NOT_FOUND",
+              "ACCESS_DENIED",
+              "VALIDITY_CONFLICT",
+              "DRAFT_IN_PROGRESS"
+            ],
+            "examples": [
+              "NO_AGREEMENT"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message.",
+            "examples": [
+              "Ingen avtale med SJN for denne salgspakka"
+            ]
+          }
+        },
+        "description": "Error details for a failed assignment."
+      },
+      "SalesOfferPackageAssignmentResultItem": {
+        "required": [
+          "salesOfferPackageId",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "salesOfferPackageId": {
+            "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of the sales package.",
+            "examples": [
+              "VYG:SalesOfferPackage:07c4332c"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "Whether the assignment succeeded or failed for this sales package.",
+            "enum": [
+              "SUCCESS",
+              "FAILED"
+            ],
+            "examples": [
+              "SUCCESS"
+            ]
+          },
+          "versionStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "The status of the created sales package version. Only present on success.",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          },
+          "createdVersionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID of the newly created sales package version. Only present on success.",
+            "examples": [
+              "VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef"
+            ]
+          },
+          "versionNumber": {
+            "type": "integer",
+            "description": "Version number of the created version. Only present when versionStatus is VERSIONED.",
+            "examples": [
+              14
+            ]
+          },
+          "error": {
+            "$ref": "#/components/schemas/AssignmentError"
+          }
+        }
+      },
+      "SalesOfferPackageAssignmentResponse": {
+        "required": [
+          "results"
+        ],
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "description": "Per-sales-offer-package result. Best-effort — failure on one sales package does not stop others.",
+            "items": {
+              "$ref": "#/components/schemas/SalesOfferPackageAssignmentResultItem"
+            }
+          }
+        }
+      },
+      "FareProductRef": {
+        "required": [
+          "fareProductId",
+          "fareProductVersionId"
+        ],
+        "type": "object",
+        "properties": {
+          "fareProductId": {
+            "type": "string",
+            "description": "NeTEx ID of the fare product.",
+            "examples": [
+              "EXA:SupplementProduct:e006fb5c"
+            ]
+          },
+          "fareProductVersionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID of the fare product.",
+            "examples": [
+              "EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef"
+            ]
+          },
+          "fareProductVersionNumber": {
+            "type": "integer",
+            "description": "Sequence number of the fare product version. Optional — set at publication.",
+            "examples": [
+              5
+            ]
+          }
+        },
+        "description": "Reference to a specific version of a fare product (e.g. SupplementProduct, PreassignedFareProduct)."
+      },
+      "SalesOfferPackageResponse": {
+        "required": [
+          "id",
+          "name",
+          "status",
+          "versionId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of the sales package.",
+            "examples": [
+              "VYG:SalesOfferPackage:07c4332c"
+            ]
+          },
+          "versionNumber": {
+            "type": "integer",
+            "description": "The version number. Only present for published versions.",
+            "examples": [
+              14
+            ]
+          },
+          "versionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID.",
+            "examples": [
+              "VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef"
+            ]
+          },
+          "ownerOrganisationId": {
+            "type": "integer",
+            "description": "The ID of the organization that owns the sales package.",
+            "examples": [
+              1
+            ]
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "Status of this sales package version.",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          },
+          "fareProducts": {
+            "type": "array",
+            "description": "List of fare product references included in this sales package.",
+            "items": {
+              "$ref": "#/components/schemas/FareProductRef"
+            }
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "Start of the validity period (travel dates, not version date).",
+            "format": "date",
+            "examples": [
+              "2026-03-18"
+            ]
+          },
+          "validTo": {
+            "type": "string",
+            "description": "End of the validity period. No specified date means that the validity period has no end-date.",
+            "format": "date",
+            "examples": [
+              "2026-12-31"
+            ]
+          },
+          "publishedDate": {
+            "type": "string",
+            "description": "System-assigned timestamp of when the version was published. Only present for VERSIONED status.",
+            "format": "date-time",
+            "examples": [
+              "2026-03-18T10:30:00Z"
+            ]
+          }
+        }
+      },
+      "SalesOfferPackageRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "fareProducts": {
+            "type": "array",
+            "description": "List of fare product references to include in this sales package.",
+            "items": {
+              "$ref": "#/components/schemas/FareProductRef"
+            }
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "Status of the created sales package version. Defaults to VERSIONED.\n\n- **DRAFT** - Creates a draft version.\n- **PROPOSED** - Creates a proposed version pending review.\n- **VERSIONED** - Publishes the version immediately (default).\n",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "SalesOfferPackagePublicationRequest": {
+        "required": [
+          "status",
+          "validFrom",
+          "versionId"
+        ],
+        "type": "object",
+        "properties": {
+          "versionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID of the sales package version to publish.",
+            "examples": [
+              "VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef"
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "Target status. Valid transitions: DRAFT → PROPOSED → VERSIONED, PROPOSED → DRAFT.\n",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "Start of the validity period (travel dates).",
+            "format": "date",
+            "examples": [
+              "2026-03-18"
+            ]
+          },
+          "validTo": {
+            "type": "string",
+            "description": "End of the validity period. No specified date means that the validity period has no end-date.",
+            "format": "date",
+            "examples": [
+              "2026-12-31"
+            ]
+          }
+        }
+      },
+      "SalesOfferPackagePublicationResponse": {
+        "required": [
+          "salesOfferPackageId",
+          "status",
+          "validFrom",
+          "versionId"
+        ],
+        "type": "object",
+        "properties": {
+          "salesOfferPackageId": {
+            "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx ID of the sales package.",
+            "examples": [
+              "VYG:SalesOfferPackage:07c4332c"
+            ]
+          },
+          "versionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID.",
+            "examples": [
+              "VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef"
+            ]
+          },
+          "versionNumber": {
+            "type": "integer",
+            "description": "Version number assigned at publication. Only present for VERSIONED status.",
+            "examples": [
+              14
+            ]
+          },
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "The resulting version status.",
+                "examples": [
+                  "VERSIONED"
+                ]
+              }
+            ]
+          },
+          "publishedDate": {
+            "type": "string",
+            "description": "System-assigned publication timestamp. Only present for VERSIONED status.",
+            "format": "date-time",
+            "examples": [
+              "2026-03-18T10:30:00Z"
+            ]
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "Start of the validity period.",
+            "format": "date",
+            "examples": [
+              "2026-03-18"
+            ]
+          },
+          "validTo": {
+            "type": "string",
+            "description": "End of the validity period. No specified date means that the validity period has no end-date.",
+            "format": "date",
+            "examples": [
+              "2026-12-31"
+            ]
+          }
+        }
+      },
+      "FareProductListItem": {
+        "required": [
+          "id",
+          "productType",
+          "versionId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "NeTEx ID of the fare product.",
+            "examples": [
+              "EXA:SupplementProduct:e006fb5c"
+            ]
+          },
+          "productType": {
+            "type": "string",
+            "description": "Type of the fare product.",
+            "enum": [
+              "SUPPLEMENT_PRODUCT",
+              "PREASSIGNED_FARE_PRODUCT"
+            ],
+            "examples": [
+              "SUPPLEMENT_PRODUCT"
+            ]
+          },
+          "versionId": {
+            "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx version ID of the fare product.",
+            "examples": [
+              "EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef"
+            ]
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          }
+        }
+      },
+      "UsageValidityPeriod": {
+        "required": [
+          "id",
+          "name",
+          "usageValidityType"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^([A-Z]{3}):UsageValidityPeriod:([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "The NeTEx ID of this UsageValidityPeriod.",
+            "examples": [
+              "ENT:UsageValidityPeriod:DuringTravel"
+            ]
+          },
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "usageValidityType": {
+            "type": "string",
+            "description": "The type of usage validity.",
+            "enum": [
+              "SINGLE_TRIP",
+              "RETURN_TRIP",
+              "CARNET",
+              "DAY_PASS",
+              "WEEKLY_PASS",
+              "MONTHLY_PASS",
+              "ANNUAL_PASS",
+              "CUSTOM_PERIOD"
+            ]
+          },
+          "validityPeriod": {
+            "type": "string",
+            "description": "How long the product is valid after activation. ISO 8601 duration.",
+            "examples": [
+              "PT60M"
+            ]
+          },
+          "activationType": {
+            "type": "string",
+            "description": "What triggers the start of the validity period.",
+            "enum": [
+              "ON_PURCHASE",
+              "ON_FIRST_USE",
+              "ON_CHECK_IN"
+            ]
+          }
+        }
+      },
+      "UsageValidityPeriodListResponse": {
+        "required": [
+          "instances",
+          "page",
+          "size",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "instances": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UsageValidityPeriod"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "Total number of UsageValidityPeriod instances.",
+            "examples": [
+              8
+            ]
+          },
+          "page": {
+            "type": "integer",
+            "description": "Current zero-based page number.",
+            "examples": [
+              0
+            ]
+          },
+          "size": {
+            "type": "integer",
+            "description": "Number of instances per page.",
+            "examples": [
+              100
+            ]
+          }
+        }
+      },
+      "UsageValidityPeriodRequest": {
+        "required": [
+          "name",
+          "usageValidityType"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/LocalizedString"
+          },
+          "usageValidityType": {
+            "type": "string",
+            "description": "The type of usage validity.",
+            "enum": [
+              "SINGLE_TRIP",
+              "RETURN_TRIP",
+              "CARNET",
+              "DAY_PASS",
+              "WEEKLY_PASS",
+              "MONTHLY_PASS",
+              "ANNUAL_PASS",
+              "CUSTOM_PERIOD"
+            ]
+          },
+          "validityPeriod": {
+            "type": "string",
+            "description": "How long the product is valid after activation. ISO 8601 duration.",
+            "examples": [
+              "PT60M"
+            ]
+          },
+          "activationType": {
+            "type": "string",
+            "description": "What triggers the start of the validity period.",
+            "enum": [
+              "ON_PURCHASE",
+              "ON_FIRST_USE",
+              "ON_CHECK_IN"
+            ]
+          }
+        }
+      },
+      "VersionRequest": {
+        "required": [
+          "startDate",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VersionStatus"
+              },
+              {
+                "description": "Must be DRAFT for new versions."
+              }
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date of the version. Defaults to current date if not provided.",
+            "format": "date"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date of the version (optional).",
+            "format": "date"
+          },
+          "ownerOrganisationId": {
+            "minimum": 1,
+            "type": "integer",
+            "description": "Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.",
+            "format": "int64"
+          }
+        }
+      }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Unauthorized - Authentication required",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "unauthorized": {
+                "summary": "Authentication required",
+                "value": {
+                  "type": "https://example.com/probs/unauthorized",
+                  "title": "Unauthorized",
+                  "status": 401,
+                  "detail": "Authentication credentials were missing or invalid."
+                }
+              }
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Forbidden - Insufficient permissions",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "forbidden": {
+                "summary": "Access forbidden",
+                "value": {
+                  "type": "https://example.com/probs/forbidden",
+                  "title": "Forbidden",
+                  "status": 403,
+                  "detail": "You do not have permission to access this resource."
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequestError": {
+        "description": "Bad request - Invalid data or schema violation",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/ProblemDetails"
+            },
+            "examples": {
+              "schemaViolation": {
+                "summary": "Request does not match schema",
+                "value": {
+                  "type": "https://developer.entur.org/errors/bad-request",
+                  "title": "Bad Request",
+                  "status": 400,
+                  "detail": "Field 'name' is required."
+                }
+              },
+              "purchaseWindowNotFound": {
+                "summary": "Referenced purchase window not found",
+                "value": {
+                  "type": "https://developer.entur.org/errors/bad-request",
+                  "title": "Bad Request",
+                  "status": 400,
+                  "detail": "PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "page": {
+        "name": "page",
+        "in": "query",
+        "description": "Zero-based page number. Defaults to 0.",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "minimum": 0,
+          "type": "integer",
+          "default": 0
+        },
+        "examples": {
+          "default": {
+            "value": 0
+          }
+        }
+      },
+      "size": {
+        "name": "size",
+        "in": "query",
+        "description": "Number of instances per page. Defaults to 100.",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "maximum": 1000,
+          "minimum": 1,
+          "type": "integer",
+          "default": 100
+        },
+        "examples": {
+          "default": {
+            "value": 100
+          }
+        }
+      },
+      "id": {
+        "name": "id",
+        "in": "path",
+        "description": "The netex ID of the element to retrieve",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string"
+        },
+        "examples": {
+          "default": {
+            "value": "ENT:PreassignedFareProduct:001"
+          }
+        }
+      },
+      "validOnDate": {
+        "name": "validOnDate",
+        "in": "query",
+        "description": "The date that the element should be valid for, e.g. the travel date.\nDefaults to the current date.\n",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "examples": {
+          "default": {
+            "value": "2026-12-01"
+          }
+        }
+      },
+      "version": {
+        "name": "version",
+        "in": "path",
+        "description": "The netex ID or sequence number of the version to retrieve",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "pattern": "^(([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)|[1-9][0-9]*)$",
+          "type": "string"
+        },
+        "examples": {
+          "default": {
+            "value": "ENT:Version:001"
+          }
+        }
+      },
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "examples": {
+      "bicycle": {
+        "summary": "Bicycle reservation",
+        "value": {
+          "ownerOrganisationId": 1,
+          "names": [
+            {
+              "lang": "en-GB",
+              "value": "Bike reservation"
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Sykkelreservasjon"
+            }
+          ],
+          "descriptions": [
+            {
+              "lang": "en-GB",
+              "value": "Valid on the given departure and require a valid ticket for traveller who brings the bike."
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Gyldig på en gitt avgang og krever gyldig billett for den reisende som reiser med sykkel."
+            }
+          ],
+          "status": "DRAFT",
+          "startDate": "2025-01-01",
+          "supplementProductType": "BICYCLE",
+          "chargingMomentType": "BEFORE_TRAVEL",
+          "conditionsSummary": {
+            "exchangeable": true,
+            "refundable": true,
+            "fareStructureType": "NETWORK_FLAT_FARE"
+          },
+          "vatGroup": "TRANSPORT_AND_TICKETS_VAT",
+          "purchaseWindowRef": "EXA:PurchaseWindow:120days",
+          "usageValidityPeriodRef": "EXA:UsageValidityPeriod:DuringTravel",
+          "entitlementRequiredRefs": [
+            "EXA:EntitlementRequired:SingleTicket",
+            "EXA:EntitlementRequired:PeriodTicket"
+          ],
+          "validityParameters": [
+            {
+              "groupingType": "OR",
+              "validityParameterType": "LINE",
+              "validityParameterRefs": [
+                "EXA:Line:X1"
+              ]
+            }
+          ]
+        }
+      },
+      "seatReservation": {
+        "summary": "Seat reservation",
+        "value": {
+          "ownerOrganisationId": 1,
+          "names": [
+            {
+              "lang": "en-GB",
+              "value": "Seat reservation"
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Setereservasjon"
+            }
+          ],
+          "descriptions": [
+            {
+              "lang": "en-GB",
+              "value": "Mandatory seat reservation for all passengers on Bergensbanen."
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Obligatorisk setereservasjon for alle passasjerer på Bergensbanen."
+            }
+          ],
+          "status": "DRAFT",
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31",
+          "supplementProductType": "SEAT_RESERVATION",
+          "chargingMomentType": "BEFORE_TRAVEL",
+          "conditionsSummary": {
+            "exchangeable": true,
+            "refundable": false,
+            "fareStructureType": "NETWORK_FLAT_FARE"
+          },
+          "vatGroup": "TRANSPORT_AND_TICKETS_VAT",
+          "purchaseWindowRef": "EXA:PurchaseWindow:120days",
+          "usageValidityPeriodRef": "EXA:UsageValidityPeriod:DuringTravel",
+          "entitlementRequiredRefs": [
+            "EXA:EntitlementRequired:StandardTicket",
+            "EXA:EntitlementRequired:FlexibleTicket"
+          ],
+          "validityParameters": [
+            {
+              "groupingType": "OR",
+              "validityParameterType": "LINE",
+              "validityParameterRefs": [
+                "EXA:Line:X1"
+              ]
+            }
+          ]
+        }
+      },
+      "dog": {
+        "summary": "Dog onboard",
+        "value": {
+          "ownerOrganisationId": 1,
+          "names": [
+            {
+              "lang": "en-GB",
+              "value": "Dog"
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Hund"
+            }
+          ],
+          "descriptions": [
+            {
+              "lang": "en-GB",
+              "value": "Bring your dog onboard the train."
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Ta med hunden din ombord på toget."
+            }
+          ],
+          "status": "DRAFT",
+          "startDate": "2025-01-01",
+          "supplementProductType": "DOG",
+          "chargingMomentType": "BEFORE_TRAVEL",
+          "conditionsSummary": {
+            "exchangeable": true,
+            "refundable": true,
+            "fareStructureType": "POINT_TO_POINT_FARE"
+          },
+          "vatGroup": "TRANSPORT_AND_TICKETS_VAT",
+          "purchaseWindowRef": "EXA:PurchaseWindow:90days",
+          "usageValidityPeriodRef": "EXA:UsageValidityPeriod:60minutes",
+          "entitlementRequiredRefs": [
+            "EXA:EntitlementRequired:StandardTicket"
+          ],
+          "validityParameters": [
+            {
+              "groupingType": "OR",
+              "validityParameterType": "ZONE",
+              "validityParameterRefs": [
+                "EXA:FareZone:A",
+                "EXA:FareZone:B"
+              ]
+            }
+          ]
+        }
+      },
+      "luggage": {
+        "summary": "Extra luggage",
+        "value": {
+          "ownerOrganisationId": 1,
+          "names": [
+            {
+              "lang": "en-GB",
+              "value": "Extra luggage"
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Ekstra bagasje"
+            }
+          ],
+          "descriptions": [
+            {
+              "lang": "en-GB",
+              "value": "Bring additional luggage beyond the standard allowance."
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Ta med ekstra bagasje utover standard bagasjemengde."
+            }
+          ],
+          "status": "DRAFT",
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31",
+          "supplementProductType": "EXTRA_LUGGAGE",
+          "chargingMomentType": "BEFORE_TRAVEL",
+          "conditionsSummary": {
+            "exchangeable": true,
+            "refundable": true,
+            "fareStructureType": "POINT_TO_POINT_FARE"
+          },
+          "vatGroup": "TRANSPORT_AND_TICKETS_VAT",
+          "purchaseWindowRef": "EXA:PurchaseWindow:120days",
+          "usageValidityPeriodRef": "EXA:UsageValidityPeriod:DuringTravel",
+          "entitlementRequiredRefs": [
+            "EXA:EntitlementRequired:StandardTicket",
+            "EXA:EntitlementRequired:FlexibleTicket"
+          ],
+          "validityParameters": [
+            {
+              "groupingType": "OR",
+              "validityParameterType": "LINE",
+              "validityParameterRefs": [
+                "EXA:Line:X1"
+              ]
+            }
+          ]
+        }
+      },
+      "parking": {
+        "summary": "Parking reservation",
+        "value": {
+          "privateCodes": [
+            "123"
+          ],
+          "ownerOrganisationId": 47,
+          "names": [
+            {
+              "lang": "en-GB",
+              "value": "Parking reservation"
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Parkeringsreservasjon"
+            }
+          ],
+          "descriptions": [
+            {
+              "lang": "en-GB",
+              "value": "Reserve a parking spot at the station."
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Reserver parkeringsplass på stasjonen."
+            }
+          ],
+          "status": "DRAFT",
+          "startDate": "2025-01-01",
+          "supplementProductType": "PARKING",
+          "chargingMomentType": "BEFORE_TRAVEL",
+          "conditionsSummary": {
+            "exchangeable": false,
+            "refundable": false,
+            "fareStructureType": "NETWORK_FLAT_FARE"
+          },
+          "vatGroup": "TRANSPORT_AND_TICKETS_VAT",
+          "purchaseWindowRef": "EXA:PurchaseWindow:120days",
+          "usageValidityPeriodRef": "EXA:UsageValidityPeriod:30days",
+          "entitlementRequiredRefs": [
+            "EXA:EntitlementRequired:PeriodTicket30days"
+          ],
+          "validityParameters": [
+            {
+              "groupingType": "OR",
+              "validityParameterType": "PARKING",
+              "validityParameterRefs": [
+                "NSR:Parking:P01",
+                "NSR:Parking:P02",
+                "NSR:Parking:P03"
+              ]
+            }
+          ]
+        }
+      },
+      "upgrade": {
+        "summary": "First class upgrade with entitlement requirement",
+        "value": {
+          "ownerOrganisationId": 1,
+          "names": [
+            {
+              "lang": "en-GB",
+              "value": "First Class Upgrade"
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Oppgradering til 1. klasse"
+            }
+          ],
+          "descriptions": [
+            {
+              "lang": "en-GB",
+              "value": "Valid on the given departure and require a valid ticket."
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Gyldig på en gitt avgang og krever gyldig billett."
+            }
+          ],
+          "status": "DRAFT",
+          "startDate": "2025-01-01",
+          "supplementProductType": "UPGRADE",
+          "chargingMomentType": "BEFORE_TRAVEL",
+          "conditionsSummary": {
+            "exchangeable": false,
+            "refundable": false,
+            "fareStructureType": "NETWORK_FLAT_FARE"
+          },
+          "vatGroup": "TRANSPORT_AND_TICKETS_VAT",
+          "purchaseWindowRef": "EXA:PurchaseWindow:120days",
+          "usageValidityPeriodRef": "EXA:UsageValidityPeriod:DuringTravel",
+          "entitlementRequiredRefs": [
+            "EXA:EntitlementRequired:StandardTicket",
+            "EXA:EntitlementRequired:FlexibleTicket"
+          ],
+          "validityParameters": [
+            {
+              "groupingType": "OR",
+              "validityParameterType": "LINE",
+              "validityParameterRefs": [
+                "EXA:Line:X1"
+              ]
+            }
+          ]
+        }
+      },
+      "parking-2": {
+        "summary": "Parking reservation response",
+        "value": {
+          "privateCodes": [
+            "123"
+          ],
+          "id": "EXA:SupplementProduct:456",
+          "versionId": "EXA:Version:07ce871e-b84d-47c0-99ba-c7fdb5fa4df9",
+          "versionNumber": 1,
+          "ownerOrganisationId": 47,
+          "datasource": {
+            "id": "some-client-system"
+          },
+          "status": "VERSIONED",
+          "startDate": "2025-01-01",
+          "names": [
+            {
+              "lang": "en-GB",
+              "value": "Parking reservation"
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Parkeringsreservasjon"
+            }
+          ],
+          "descriptions": [
+            {
+              "lang": "en-GB",
+              "value": "Reserve a parking spot at the station."
+            },
+            {
+              "lang": "nb-NO",
+              "value": "Reserver parkeringsplass på stasjonen."
+            }
+          ],
+          "supplementProductType": "PARKING",
+          "chargingMomentType": "BEFORE_TRAVEL",
+          "conditionsSummary": {
+            "exchangeable": false,
+            "refundable": false,
+            "fareStructureType": "NETWORK_FLAT_FARE"
+          },
+          "vatGroup": "TRANSPORT_AND_TICKETS_VAT",
+          "purchaseWindowRef": "EXA:PurchaseWindow:120days",
+          "usageValidityPeriodRef": "EXA:UsageValidityPeriod:30days",
+          "entitlementRequiredRefs": [
+            "EXA:EntitlementRequired:PeriodTicket30days"
+          ],
+          "validityParameters": [
+            {
+              "groupingType": "OR",
+              "validityParameterType": "PARKING",
+              "validityParameterRefs": [
+                "NSR:Parking:P01",
+                "NSR:Parking:P02",
+                "NSR:Parking:P03"
+              ]
+            }
+          ],
+          "fareTableRefs": [
+            "EXA:FareTable:parking-2025"
+          ]
+        }
+      },
+      "versionHistory": {
+        "summary": "Example version history",
+        "value": [
+          {
+            "id": "EXA:Version:853a7d14-794e-4af5-b569-301711a26e26",
+            "status": "VERSIONED",
+            "startDate": "2025-01-01",
+            "endDate": "2025-12-31",
+            "created": "2024-12-01T10:00:00Z",
+            "changed": "2024-12-01T10:00:00Z",
+            "published": "2024-12-30T10:00:00Z",
+            "number": 1
+          },
+          {
+            "id": "EXA:Version:e7104d26-16a5-4db5-aa42-b32ae0a3f684",
+            "status": "VERSIONED",
+            "startDate": "2026-01-01",
+            "created": "2025-12-01T10:00:00Z",
+            "changed": "2025-12-01T10:00:00Z",
+            "published": "2025-12-01T13:00:00Z",
+            "number": 2
+          },
+          {
+            "id": "EXA:Version:6be856a5-dd98-496b-b3f2-ad9939270ec3",
+            "status": "PROPOSED",
+            "startDate": "2026-07-01",
+            "created": "2026-06-01T10:00:00Z",
+            "changed": "2026-06-01T10:00:00Z"
+          }
+        ]
+      },
+      "assignmentList": {
+        "summary": "List of sales package assignments for a fare product",
+        "value": [
+          {
+            "salesOfferPackageId": "TOG:SalesOfferPackage:a1b2c3d4",
+            "salesOfferPackageName": [
+              {
+                "lang": "nb-NO",
+                "value": "Salgspakke tog + parkering"
+              }
+            ],
+            "fareProductId": "FJO:SupplementProduct:f9e8d7c6",
+            "fareProductVersionId": "FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc"
+          },
+          {
+            "salesOfferPackageId": "KYS:SalesOfferPackage:t4u5v6",
+            "salesOfferPackageName": [
+              {
+                "lang": "nb-NO",
+                "value": "Salgspakke buss + parkering"
+              }
+            ],
+            "fareProductId": "FJO:SupplementProduct:f9e8d7c6",
+            "fareProductVersionId": "FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc"
+          }
+        ]
+      },
+      "assignParking": {
+        "summary": "Assign parking supplement to two sales packages",
+        "value": {
+          "fareProductVersionId": "FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc",
+          "salesOfferPackageIds": [
+            "TOG:SalesOfferPackage:a1b2c3d4",
+            "KYS:SalesOfferPackage:q7r8s9"
+          ]
+        }
+      },
+      "assignParkingAsDraft": {
+        "summary": "Assign parking supplement as draft (requires manual publication)",
+        "value": {
+          "fareProductVersionId": "FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc",
+          "salesOfferPackageIds": [
+            "TOG:SalesOfferPackage:a1b2c3d4"
+          ],
+          "status": "DRAFT"
+        }
+      },
+      "multiStatus": {
+        "summary": "Mixed success and failure response",
+        "value": {
+          "results": [
+            {
+              "salesOfferPackageId": "TOG:SalesOfferPackage:a1b2c3d4",
+              "status": "SUCCESS",
+              "versionStatus": "VERSIONED",
+              "createdVersionId": "TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc",
+              "versionNumber": 14
+            },
+            {
+              "salesOfferPackageId": "KYS:SalesOfferPackage:q7r8s9",
+              "status": "FAILED",
+              "error": {
+                "code": "NO_AGREEMENT",
+                "message": "Ingen avtale med KYS for denne salgspakka"
+              }
+            }
+          ]
+        }
+      },
+      "allSuccess": {
+        "summary": "All assignments succeeded",
+        "value": {
+          "results": [
+            {
+              "salesOfferPackageId": "TOG:SalesOfferPackage:a1b2c3d4",
+              "status": "SUCCESS",
+              "versionStatus": "VERSIONED",
+              "createdVersionId": "TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc",
+              "versionNumber": 14
+            }
+          ]
+        }
+      },
+      "draftCreated": {
+        "summary": "Draft version created (no version number)",
+        "value": {
+          "results": [
+            {
+              "salesOfferPackageId": "TOG:SalesOfferPackage:a1b2c3d4",
+              "status": "SUCCESS",
+              "versionStatus": "DRAFT",
+              "createdVersionId": "TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc"
+            }
+          ]
+        }
+      },
+      "withFareProducts": {
+        "summary": "Sales package with fare products",
+        "value": {
+          "id": "TOG:SalesOfferPackage:a1b2c3d4",
+          "versionNumber": 14,
+          "versionId": "TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc",
+          "ownerOrganisationId": 1,
+          "name": [
+            {
+              "lang": "nb-NO",
+              "value": "Salgspakke tog + parkering"
+            }
+          ],
+          "status": "VERSIONED",
+          "fareProducts": [
+            {
+              "fareProductId": "TOG:PreassignedFareProduct:trainTicket",
+              "fareProductVersionId": "TOG:Version:FP-x1y-5678",
+              "fareProductVersionNumber": 3
+            },
+            {
+              "fareProductId": "FJO:SupplementProduct:f9e8d7c6",
+              "fareProductVersionId": "FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc",
+              "fareProductVersionNumber": 7
+            }
+          ],
+          "validFrom": "2026-03-18",
+          "publishedDate": "2026-03-18T10:30:00Z"
+        }
+      },
+      "updateWithFareProducts": {
+        "summary": "Update sales package with fare products",
+        "value": {
+          "name": [
+            {
+              "lang": "nb-NO",
+              "value": "Salgspakke tog + parkering"
+            }
+          ],
+          "fareProducts": [
+            {
+              "fareProductId": "TOG:PreassignedFareProduct:trainTicket",
+              "fareProductVersionId": "TOG:Version:FP-x1y-5678"
+            },
+            {
+              "fareProductId": "FJO:SupplementProduct:f9e8d7c6",
+              "fareProductVersionId": "FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc"
+            }
+          ],
+          "status": "VERSIONED"
+        }
+      },
+      "publishVersion": {
+        "summary": "Publish a draft sales package version",
+        "value": {
+          "versionId": "TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc",
+          "status": "VERSIONED",
+          "validFrom": "2026-03-18"
+        }
+      },
+      "published": {
+        "summary": "Successfully published sales package version",
+        "value": {
+          "salesOfferPackageId": "TOG:SalesOfferPackage:a1b2c3d4",
+          "versionId": "TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc",
+          "versionNumber": 14,
+          "status": "VERSIONED",
+          "publishedDate": "2026-03-18T10:30:00Z",
+          "validFrom": "2026-03-18"
+        }
+      },
+      "fareProducts": {
+        "summary": "Fare products on a sales package",
+        "value": [
+          {
+            "id": "FJO:SupplementProduct:f9e8d7c6",
+            "productType": "SUPPLEMENT_PRODUCT",
+            "versionId": "FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc",
+            "name": [
+              {
+                "lang": "nb-NO",
+                "value": "Parkeringsreservasjon"
+              }
+            ]
+          },
+          {
+            "id": "TOG:PreassignedFareProduct:trainTicket",
+            "productType": "PREASSIGNED_FARE_PRODUCT",
+            "versionId": "TOG:Version:FP-x1y-5678",
+            "name": [
+              {
+                "lang": "nb-NO",
+                "value": "Togbillett Oslo-Bergen"
+              }
+            ]
+          }
+        ]
+      },
+      "draftVersion": {
+        "summary": "Draft version",
+        "value": {
+          "id": "EXA:Version:bf4d317a-8e61-49fd-b095-906b79c05872",
+          "status": "DRAFT",
+          "startDate": "2025-01-01",
+          "created": "2025-01-01T10:00:00Z",
+          "changed": "2025-01-01T10:00:00Z"
+        }
+      },
+      "versionedVersion": {
+        "summary": "Versioned version",
+        "value": {
+          "id": "EXA:Version:d88d0af0-4fe1-4457-a3a6-dbe1db5b3005",
+          "status": "VERSIONED",
+          "startDate": "2025-01-01",
+          "endDate": "2025-12-31",
+          "created": "2025-01-01T10:00:00Z",
+          "changed": "2025-01-01T10:00:00Z",
+          "published": "2025-01-15T10:00:00Z",
+          "number": 1
+        }
+      },
+      "draft": {
+        "summary": "Create a new version in DRAFT",
+        "value": {
+          "id": "EXA:Version:7775e5aa-eb05-4190-9330-25c7f62b0b53",
+          "status": "DRAFT",
+          "startDate": "2025-01-01"
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,273 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-current-level-summary-schema.json",
+  "title": "CurrentLevelSummary",
+  "description": "Summary of the current level of a member",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personalisation-client-openapi.yml#/components/schemas/CurrentLevelSummary",
+  "required": [
+    "currentRewards",
+    "memberId",
+    "pointDefinitionStatuses",
+    "programId",
+    "suspensionStatuses"
+  ],
+  "type": "object",
+  "properties": {
+    "programId": {
+      "type": "integer",
+      "description": "\nId of the program.\nWARNING: Don't use this for matching with a specific program, since it may vary across environments. \nUse \"programReference\" instead.\n    ",
+      "format": "int64"
+    },
+    "programReference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "\nReference to the program.\nThis is a unique reference that is the same in all environments, and can be used to identify the program.\nNullable for backwards compatibility reasons. Should be filled out in most cases.\n    "
+    },
+    "memberId": {
+      "type": "integer",
+      "description": "\nId of the member within the program. Can be used to look up more information about the member.\n    ",
+      "format": "int64"
+    },
+    "currentLevel": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/LevelStatus"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "currentRewards": {
+      "type": "array",
+      "description": "The current rewards the member has achieved in the program",
+      "items": {
+        "$ref": "#/$defs/CurrentReward"
+      }
+    },
+    "suspensionStatuses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SuspensionStatus"
+      }
+    },
+    "pointDefinitionStatuses": {
+      "type": "array",
+      "description": "The current status of each point definition in the program",
+      "items": {
+        "$ref": "#/$defs/PointDefinitionStatus"
+      }
+    }
+  },
+  "readOnly": true,
+  "$defs": {
+    "CappingStatus": {
+      "required": [
+        "cappingAmount",
+        "isReached"
+      ],
+      "type": "object",
+      "properties": {
+        "cappingAmount": {
+          "type": "number",
+          "description": "The amount that this point definition is capped at"
+        },
+        "isReached": {
+          "type": "boolean",
+          "description": "Whether the capping amount has been reached by the member"
+        }
+      },
+      "description": "The capping status for this point definition, if capping is enabled"
+    },
+    "CurrentPointsPeriod": {
+      "required": [
+        "startOfPeriod"
+      ],
+      "type": "object",
+      "properties": {
+        "startOfPeriod": {
+          "type": "string",
+          "description": "The start of the period for which the current points are valid",
+          "format": "date-time"
+        },
+        "endOfPeriod": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The end of the period for which the current points are valid",
+          "format": "date-time"
+        }
+      },
+      "description": "\nThe period for which the current points are valid. Only filled out if the point definition is periodic.\nCan return the first active period after the queried time if there is no period active at that point.\n"
+    },
+    "CurrentReward": {
+      "required": [
+        "@type",
+        "description",
+        "rewardId"
+      ],
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "rewardId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "@type": {
+          "type": "string"
+        }
+      },
+      "description": "The current rewards the member has achieved in the program"
+    },
+    "LevelStatus": {
+      "required": [
+        "levelId",
+        "rewards"
+      ],
+      "type": "object",
+      "properties": {
+        "levelId": {
+          "type": "integer",
+          "description": "Id of the level in the reward ladder",
+          "format": "int64"
+        },
+        "rewards": {
+          "type": "array",
+          "description": "Rewards for this level",
+          "items": {
+            "$ref": "#/$defs/LevelStatusReward"
+          }
+        }
+      },
+      "description": "The current level in the reward ladder the member has achieved"
+    },
+    "LevelStatusReward": {
+      "required": [
+        "@type",
+        "description",
+        "rewardId"
+      ],
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "rewardId": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "@type": {
+          "type": "string"
+        }
+      },
+      "description": "Rewards for this level"
+    },
+    "PointDefinitionStatus": {
+      "required": [
+        "currentPoints",
+        "pendingPoints",
+        "pointDefinitionId",
+        "pointDefinitionPluralName",
+        "pointDefinitionReference",
+        "pointDefinitionSingularName"
+      ],
+      "type": "object",
+      "properties": {
+        "pointDefinitionId": {
+          "type": "integer",
+          "description": "Id of the point definition",
+          "format": "int64"
+        },
+        "pointDefinitionReference": {
+          "type": "string",
+          "description": "\nUnique reference for the point. Meant to be used to identify what kind of point this is, across different environments\nwhere the id might be different. This enables clients of the api to enrich the presentation of the point definition,\nbeyond what this api delivers (for example giving the point definition an icon, or more descriptive text).\n"
+        },
+        "pointDefinitionSingularName": {
+          "type": "string",
+          "description": "Singular name of the point definition"
+        },
+        "pointDefinitionPluralName": {
+          "type": "string",
+          "description": "Plural name of the point definition"
+        },
+        "currentPoints": {
+          "type": "number",
+          "description": "The amount of points the member currently has of this point definition"
+        },
+        "pendingPoints": {
+          "type": "number",
+          "description": "\nThe amount of points the member has received, but are not valid yet.\nIf the point definition is periodic, this field will only contain the pending points in the current point period.\n"
+        },
+        "cappingStatus": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CappingStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currentPointsPeriod": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CurrentPointsPeriod"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "description": "The current status of a point definition in a program for a member"
+    },
+    "SuspensionStatus": {
+      "required": [
+        "endAt",
+        "referenceId",
+        "startAt",
+        "suspensionType"
+      ],
+      "type": "object",
+      "properties": {
+        "referenceId": {
+          "type": "string",
+          "description": "The reference id of the suspension"
+        },
+        "suspensionType": {
+          "$ref": "#/$defs/SuspensionStatusType"
+        },
+        "startAt": {
+          "type": "string",
+          "description": "When the suspension started",
+          "format": "date-time"
+        },
+        "endAt": {
+          "type": "string",
+          "description": "When the suspension will end",
+          "format": "date-time"
+        }
+      },
+      "description": "Status of a suspension"
+    },
+    "SuspensionStatusType": {
+      "type": "string",
+      "description": "\n        The type of suspension:\n        - Rewards: Member is suspended from receiving rewards\n        - GivePointsEffect: Member is suspended from being given points\n        - ConsumePointsEffect: Member is suspended from using points\n        - UpdateMemberMetadata: Member is suspended from updating their metadata. \n        - SuspendRewardsEffect: Member is suspended from being put into reward suspension\n        - SuspendEffectEffect: Member is suspended from being put into effect suspension\n    ",
+      "enum": [
+        "Rewards",
+        "GivePointsEffect",
+        "SuspendRewardsEffect",
+        "SuspendEffectEffect",
+        "ConsumePointsEffect"
+      ]
+    }
+  }
+}

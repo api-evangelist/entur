@@ -1,0 +1,623 @@
+openapi: 3.2.0
+info:
+  title: Entur Recurring Payments API
+  version: 2026.10.2
+  contact:
+    name: Entur
+    url: https://developer.entur.org
+  description: 'Operations tagged Recurring Payments across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: Entur's Production environment
+- url: https://api.staging.entur.io/sales
+  description: Entur's Staging environment
+- url: https://api.dev.entur.io/sales
+  description: Entur's Development environment
+security:
+- jwt: []
+tags:
+- name: Recurring Payments
+  description: Set up and manage stored payment methods.
+paths:
+  /v1/recurring-payments:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Recurring Payments
+      summary: Get recurring payments
+      description: Get recurring payments, which are not CANCELLED, for a customer. By default, EXPIRED are not included.
+      operationId: queryRecurringPayments
+      parameters:
+      - name: customerNumber
+        in: query
+        description: Query for a given customer number
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value: '1'
+          equals:
+            value: eq:1
+          not equals:
+            value: ne:1
+      - name: includeExpired
+        in: query
+        description: Whether or not to include expired recurring payments. Default false.
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: boolean
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value: true
+          equals:
+            value: true
+          not equals:
+            value: false
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecurringPaymentResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+      - Recurring Payments
+      summary: Create a recurring payment
+      description: Creates a new recurring payment with status CREATED and couples it to the customer number sent in the request. If this is the first recurring payment coupled to the customer number it is made to be the primary recurring payment for the customer number. If it is not the first recurring payment, it defaults to not primary. However, if the requests makes it primary, the customers other recurring payment with primary status is set to not primary.
+      operationId: createRecurringPayment
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecurringPaymentRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/RecurringPaymentResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/recurring-payments/{recurringPaymentId}:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/recurringPaymentIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    delete:
+      tags:
+      - Recurring Payments
+      summary: End recurring payment
+      description: Ends a recurring payment, the recurring payment is no longer usable after this call.
+      operationId: endRecurringPayment
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/RecurringPaymentResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    patch:
+      tags:
+      - Recurring Payments
+      summary: Update recurring payment
+      description: Updates a recurring payment's nickname and/or isPrimary status. If the recurring payment is set to be the primary recurring payment, the last primary recurring payment is no longer the primary recurring payment.
+      operationId: updateRecurringPayment
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecurringPaymentRequest'
+        required: true
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/RecurringPaymentResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/recurring-payments/{recurringPaymentId}/authorize:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/recurringPaymentIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Recurring Payments
+      summary: Authorize a recurring payment
+      description: Authorize the card details provided by the customers in the terminal were valid and accepted by Nets and by calling Nets with a process call. If valid, the recurring payment has its status set to ACTIVE and the returned pan hash is stored. This pan hash is later used when paying with a recurring payment.
+      operationId: authorizeRecurringPayment
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/RecurringPaymentResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/recurring-payments/{recurringPaymentId}/terminal:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/recurringPaymentIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Recurring Payments
+      summary: Create terminal
+      description: Registers the transaction with Nets and returns the location of the payment terminal where the user will provide card information. The terminal is available for 15min before the transaction times out. If this happens a new terminal must be created.
+      operationId: createRecurringPaymentTerminal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TerminalResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+components:
+  schemas:
+    PaymentType:
+      type: string
+      description: The actual type of payment.
+      enum:
+      - AMEX
+      - BANKAXEPT
+      - COLLECTOR
+      - GIFTCARD
+      - MASTERCARD
+      - PAYPAL
+      - VIPPS
+      - VISA
+      - XLEDGER
+      - COLLECTOR_B2B
+      - TWO_B2B
+      examples:
+      - VISA
+    TransactionType:
+      type: string
+      description: Set the type of transaction. Only set this field to MIT_UCOF if you want to create a Merchant Initiated Transaction (MIT) which refers to a card payment started by a merchant without the customer being actively involved. If this value is not set, a payment terminal will be created as normal.
+      enum:
+      - MIT_UCOF
+      examples:
+      - MIT_UCOF
+    TerminalResponse:
+      title: Terminal
+      required:
+      - terminalUri
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          description: ID of the payment the transaction belongs to. Used with the transactionId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        recurringPaymentId:
+          type: integer
+          description: ID of the recurring payment this terminal belongs to.
+          format: int64
+          examples:
+          - 1
+        terminalUri:
+          type: string
+          description: Location of the payment terminal.
+          examples:
+          - https://epayment.nets.eu/Terminal/default.aspx?merchantId=700000&transactionId=8841532204d4426da913a5abfbg322f0
+        transactionId:
+          type: integer
+          description: ID of the transaction this terminal belongs to. Used with the paymentId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+      description: Information about how to access the terminal.
+      examples:
+      - paymentId: 1
+        recurringPaymentId: 1
+        terminalUri: https://epayment.nets.eu/Terminal/default.aspx?merchantId=1234567&transactionId=77770fb3a53347777071cd6f4a3e7777
+        transactionId: 1
+    TerminalRequest:
+      title: TerminalRequest
+      required:
+      - redirectUrl
+      type: object
+      properties:
+        callbackUrl:
+          type: string
+          description: Location where notification of payment completion will be sent. If this is not provided, then the client will have to check for completion manually by getting the transaction and checking its status. The callback will be repeated until the server receives an HTTP 202 response.
+          examples:
+          - https://entur.org
+        customerNumber:
+          type: string
+          description: Customer number used with recurring payment creation. This field is optional and will only be considered for certain privileged clients.
+          examples:
+          - '123456789'
+        redirectUrl:
+          pattern: ^(https?://).{0,1024}
+          type: string
+          description: Location to be redirected to from the payment terminal.
+          examples:
+          - https://www.entur.org
+        storePayment:
+          type: boolean
+          description: Should the card be stored for recurring payments. If customer is not logged in, the value of this will be disregarded.
+          default: false
+          examples:
+          - false
+        terminalLanguage:
+          $ref: '#/components/schemas/TerminalLanguage'
+        countryCode:
+          $ref: '#/components/schemas/TerminalCountryCode'
+        autoSale:
+          type: boolean
+          description: If this flag is set to true, the capture call after a customer returns from the terminal is not needed. The processing starts automatically. This is only compatible with payments done with payment cards.
+          default: false
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        singlePage:
+          type: boolean
+          description: If this flag is set to true, we will attempt to generate a single-page terminal. If false, multi-page terminal might be used.
+          default: false
+          examples:
+          - false
+      description: Information used to customize the payment terminal.
+      examples:
+      - callbackUrl: https://entur.org
+        customerNumber: '123456789'
+        redirectUrl: https://www.entur.org
+        storePayment: true
+        terminalLanguage: no_NO
+        countryCode: 'NO'
+        autoSale: true
+        singlePage: true
+    TerminalLanguage:
+      type: string
+      description: Language used in the payment terminal. Default is 'no_NO'.
+      enum:
+      - da_DK
+      - de_DE
+      - en_GB
+      - es_ES
+      - et_EE
+      - fi_FI
+      - fr_FR
+      - it_IT
+      - lt_LT
+      - lv_LV
+      - nl_NL
+      - no_NO
+      - pl_PL
+      - ru_RU
+      - sv_SE
+      examples:
+      - no_NO
+    RecurringPaymentRequest:
+      title: RecurringPaymentRequest
+      type: object
+      properties:
+        customerNumber:
+          type: string
+          description: The customer number this recurring payment belongs to. This field is optional and will only be considered for certain privileged clients. This value can not be updated.
+          examples:
+          - '42'
+        isPrimary:
+          type: boolean
+          description: Is the recurring payment the primary recurring payment of the user. There can only be one primary recurring payment at a time. Therefore, changing this status to true might set another recurring payment's isPrimary to false.
+          examples:
+          - false
+        nickname:
+          type: string
+          description: Nickname for the recurring payment
+          examples:
+          - Bottomless mastercard
+      description: Recurring payment API resource.
+      examples:
+      - customerNumber: '123456789'
+        isPrimary: true
+        nickname: Bottomless mastercard
+    PaymentError:
+      title: PaymentError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error that occurred.
+          examples:
+          - Internal Server Error
+        exception:
+          type: string
+          description: What exception caused the error.
+          examples:
+          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message:
+          type: string
+          description: A message detailing the error.
+          examples:
+          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path:
+          type: string
+          description: The url path that was accessed when the error happenened.
+          examples:
+          - /v1/payments/1/transactions/1/capture
+        status:
+          type: integer
+          description: The http status of the response.
+          format: int32
+          examples:
+          - 500
+        timestamp:
+          type: string
+          description: When the error occurred
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        errorReason:
+          type: string
+          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
+          examples:
+          - SOFT_DECLINE
+      x-examples: {}
+      examples:
+      - error: Internal Server Error
+        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path: /v1/payments/1/transactions/1/capture
+        status: 500
+        timestamp: '2025-08-24T14:15:22Z'
+    TerminalCountryCode:
+      type: string
+      description: ISO 3166-1 Alpha 2 country code used for certain terminals (PayPal, Collector). Used to decide which country store the customer wants to use. Default is 'NO'
+      default: 'NO'
+      enum:
+      - 'NO'
+      - DK
+      - SE
+      - FI
+      examples:
+      - 'NO'
+    RecurringPaymentResponse:
+      title: RecurringPaymentResponse
+      required:
+      - cardExpiresAt
+      - createdAt
+      - expiresAt
+      - maskedPan
+      - paymentType
+      - primary
+      - recurringPaymentId
+      - recurringStatus
+      type: object
+      properties:
+        cardExpiresAt:
+          type: string
+          description: The stored card's expiration date, may be longer than the recurring payment's expiration date, but never shorter.
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        createdAt:
+          type: string
+          description: Timestamp for when the recurring payment was created.
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        expiresAt:
+          type: string
+          description: When the recurring payment is no longer valid
+          format: date-time
+          examples:
+          - '2025-02-12T16:13:13Z'
+        maskedPan:
+          type: string
+          description: The stored card's masked number
+          examples:
+          - 4925 **** **** 0004
+        nickname:
+          type: string
+          description: Nickname for the recurring payment
+          examples:
+          - Bottomless mastercard
+        paymentType:
+          $ref: '#/components/schemas/PaymentType'
+        primary:
+          type: boolean
+          description: Is the recurring payment the primary recurring payment of the user. There can only be one primary recurring payment at a time. Therefore, changing this status to true might set another recurring payment's isPrimary to false.
+          examples:
+          - false
+        recurringPaymentId:
+          type: integer
+          description: ID of the recurring payment
+          format: int64
+          examples:
+          - 111
+        recurringStatus:
+          $ref: '#/components/schemas/RecurringStatus'
+      description: Response type for the Recurring Payment API
+      examples:
+      - cardExpiresAt: '2025-01-12T16:13:13Z'
+        createdAt: '2025-01-12T16:13:13Z'
+        expiresAt: '2025-01-12T16:13:13Z'
+        maskedPan: 4925 **** **** 0004
+        nickname: Bottomless mastercard
+        paymentType: VISA
+        primary: false
+        recurringPaymentId: 111
+        recurringStatus: ACTIVE
+    RecurringStatus:
+      type: string
+      description: Status of this recurring payment
+      enum:
+      - ACTIVE
+      - CANCELLED
+      - CREATED
+      - DEFAULTED
+      - EXPIRED
+      examples:
+      - ACTIVE
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+  parameters:
+    recurringPaymentIdPathParam:
+      name: recurringPaymentId
+      in: path
+      description: recurringPaymentId
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-POS
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-payment-partner-openapi.json
+- entur-payment-partner-openapi.yml

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-credit-response-schema.json",
+  "title": "Credit",
+  "description": "Information about credits performed on an order.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-payment-partner-openapi.yml#/components/schemas/CreditResponse",
+  "required": [
+    "creditId",
+    "creditTransactions",
+    "orderId",
+    "orderVersion",
+    "totalCreditAmount"
+  ],
+  "type": "object",
+  "properties": {
+    "active": {
+      "type": "boolean",
+      "description": "If active is false, credit is considered uneditable. The only way to change this property is through an internal Admin endpoint or the mergePatch endpoint. Editable: true"
+    },
+    "creditId": {
+      "type": "integer",
+      "description": "Identification of this credit resource.",
+      "format": "int64"
+    },
+    "creditTransactions": {
+      "type": "array",
+      "description": "List of individual transactions to credit.",
+      "items": {
+        "$ref": "#/$defs/CreditTransactionResponse"
+      }
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency used for this credit."
+    },
+    "customerNumber": {
+      "type": "string",
+      "description": "ID of the customer who owns this credit."
+    },
+    "orderId": {
+      "type": "string",
+      "description": "ID of the order this payment belongs to."
+    },
+    "orderVersion": {
+      "type": "integer",
+      "description": "Version of the order this credit belongs to.",
+      "format": "int32"
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "ID of the organisation who created this credit.",
+      "format": "int64"
+    },
+    "settlementId": {
+      "type": "integer",
+      "description": "Supplied to the client by an external system for handling settlements. For Internal Entur Clients this is Entur’s Electronic Journal.",
+      "format": "int64"
+    },
+    "totalCreditAmount": {
+      "type": "string",
+      "description": "Total amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot."
+    }
+  },
+  "$defs": {
+    "CreditTransactionResponse": {
+      "title": "CreditTransaction",
+      "required": [
+        "amount",
+        "paymentId",
+        "paymentTransactionId",
+        "reimbursementTypeGroup"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp for when transaction was first created.",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "creditedAt": {
+          "type": "string",
+          "description": "Time when credit was confirmed.",
+          "format": "date-time"
+        },
+        "currency": {
+          "type": "string",
+          "description": "3-letter ISO 4217 currency code. Default is NOK."
+        },
+        "newGiftCardId": {
+          "type": "string",
+          "description": "Reference to the gift card id (contract uuid) the credited payment transaction belongs to. Note: This field will be set if the transaction was credited to a gift card.",
+          "readOnly": true
+        },
+        "paymentId": {
+          "type": "integer",
+          "description": "Reference to the payment the credited payment transaction belongs to.",
+          "format": "int64"
+        },
+        "paymentTransactionId": {
+          "type": "integer",
+          "description": "Reference to the transaction this credit transaction credits.",
+          "format": "int64"
+        },
+        "reimbursementMethod": {
+          "type": "string",
+          "description": "Specific type of reimbursement method."
+        },
+        "reimbursementTypeGroup": {
+          "type": "string",
+          "description": "General type of reimbursement method."
+        },
+        "rrn": {
+          "type": "string",
+          "description": "Reconciliation reference number used to track a transaction through different economy systems."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of this credit transaction.",
+          "enum": [
+            "CREATED",
+            "CREDITED"
+          ]
+        },
+        "transactionData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Extra transaction data from external client. Only relevant for clients using the import flow."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp for when transaction was last updated.",
+          "format": "date-time",
+          "readOnly": true
+        }
+      },
+      "description": "Represents a credit transaction referring to a payment transaction."
+    }
+  }
+}

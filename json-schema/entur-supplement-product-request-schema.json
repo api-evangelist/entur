@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-supplement-product-request-schema.json",
+  "title": "SupplementProductRequest",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-products-api-openapi.yml#/components/schemas/SupplementProductRequest",
+  "required": [
+    "chargingMomentType",
+    "conditionsSummary",
+    "entitlementRequiredRefs",
+    "names",
+    "purchaseWindowRef",
+    "startDate",
+    "status",
+    "supplementProductType",
+    "usageValidityPeriodRef",
+    "validityParameters",
+    "vatGroup"
+  ],
+  "type": "object",
+  "properties": {
+    "privateCodes": {
+      "type": "array",
+      "description": "Optional external system identifiers.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "ownerOrganisationId": {
+      "minimum": 1,
+      "type": "integer",
+      "description": "Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.",
+      "format": "int64"
+    },
+    "names": {
+      "$ref": "#/$defs/LocalizedString"
+    },
+    "descriptions": {
+      "$ref": "#/$defs/LocalizedString"
+    },
+    "startDate": {
+      "type": "string",
+      "description": "The start date of the version.",
+      "format": "date"
+    },
+    "endDate": {
+      "type": "string",
+      "description": "The end date of the version (optional).",
+      "format": "date"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/VersionStatus"
+        },
+        {
+          "description": "Status of the supplement product. Defaults to VERSIONED.\n\n- **DRAFT** - Under construction and not ready for operational use.\n- **PROPOSED** - Complete but pending review and approval.\n- **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.\n- **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.\n"
+        }
+      ]
+    },
+    "chargingMomentType": {
+      "$ref": "#/$defs/ChargingMomentType"
+    },
+    "supplementProductType": {
+      "$ref": "#/$defs/SupplementProductType"
+    },
+    "conditionsSummary": {
+      "$ref": "#/$defs/ConditionsSummary"
+    },
+    "vatGroup": {
+      "$ref": "#/$defs/VatGrpupType"
+    },
+    "purchaseWindowRef": {
+      "pattern": "^([A-Z]{3}):PurchaseWindow:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "NeTEx ID of a PurchaseWindow instance (Product Parameters API, /v3/parameters/purchase-windows). Available values are listed in the Product Parameters API.\n"
+    },
+    "usageValidityPeriodRef": {
+      "pattern": "^([A-Z]{3}):UsageValidityPeriod:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "NeTEx ID of a UsageValidityPeriod instance (limitations/usage-validity-period).\nAvailable values are listed in the Product Parameters API.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+      "x-implementation-status": "not-persisted"
+    },
+    "entitlementRequiredRefs": {
+      "minItems": 1,
+      "type": "array",
+      "description": "List of NeTEx IDs of EntitlementRequired instances (limitations/entitlement-required).\nAvailable values are listed in the Product Parameters API.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+      "items": {
+        "pattern": "^([A-Z]{3}):EntitlementRequired:([0-9A-Za-z_\\-]*)$",
+        "type": "string",
+        "description": "NeTEx ID of an EntitlementRequired instance."
+      },
+      "x-implementation-status": "not-persisted"
+    },
+    "validityParameters": {
+      "type": "array",
+      "description": "List of validity parameters. The specified parameter tells where the supplement product is valid. This can be lines, zones, stops etc.\n\n**Not yet implemented:** this endpoint currently accepts but does not persist or return this field.\n",
+      "items": {
+        "$ref": "#/$defs/ValidityParameters"
+      },
+      "x-implementation-status": "not-persisted"
+    },
+    "fareTableRefs": {
+      "type": "array",
+      "description": "References to the versioned FareTable instances that price this supplement product.\n\nThe priceable object owns this link (as in products-spring): supply the fare tables that\nprice it here on write. Prices themselves live on the fare table — create/update them via the\npricing/fare-table API, then reference the fare table here. On read, `SupplementProductResponse`\nsurfaces the resolved fare-table NeTEx ids.\n",
+      "items": {
+        "$ref": "#/$defs/FareTableRef"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "ChargingMomentType": {
+      "type": "string",
+      "description": "Charging moment type.\n\nNote: Currently, only `BEFORE_TRAVEL` is supported in Entur sales platform.\n",
+      "enum": [
+        "BEFORE_TRAVEL",
+        "ON_START_OF_TRAVEL",
+        "BEFORE_END_OF_TRAVEL",
+        "BEFORE_TRAVEL_THEN_ADJUST_AT_END_OF_TRAVEL",
+        "ON_START_THEN_ADJUST_AT_END_OF_TRAVEL",
+        "ON_START_THEN_ADJUST_AT_END_OF_FARE_DAY",
+        "ON_START_THEN_ADJUST_AT_END_OF_CHARGE_PERIOD",
+        "AT_END_OF_TRAVEL",
+        "AT_END_OF_FARE_DAY",
+        "AT_END_OF_CHARGE_PERIOD",
+        "FREE",
+        "ANY_TIME",
+        "OTHER"
+      ]
+    },
+    "ConditionsSummary": {
+      "required": [
+        "exchangeable",
+        "fareStructureType",
+        "refundable"
+      ],
+      "type": "object",
+      "properties": {
+        "exchangeable": {
+          "type": "boolean",
+          "description": "Whether the supplement product is exchangeable."
+        },
+        "refundable": {
+          "type": "boolean",
+          "description": "Whether the supplement product is refundable."
+        },
+        "fareStructureType": {
+          "$ref": "#/$defs/FareStructureType"
+        }
+      }
+    },
+    "FareStructureType": {
+      "type": "string",
+      "description": "The type of fare structure. This indicates the method by which the fare is calculated, e.g. flat fare, zonal fare, point-to-point fare, etc.",
+      "enum": [
+        "CAPPED_FLAT_FARE",
+        "CAPPED_POINT_TO_POINT_FARE",
+        "CAPPED_ZONAL_FARE",
+        "LINE_FLAT_FARE",
+        "NETWORK_FLAT_FARE",
+        "POINT_TO_POINT_FARE",
+        "POINT_TO_POINT_DISTANCE_FARE",
+        "STAGE_FARE",
+        "ZONE_FLAT_FARE",
+        "ZONE_SEQUENCE_FARE",
+        "ZONE_TO_ZONE_FARE",
+        "ZONE_COUNT_FARE",
+        "PENALTY_FARE",
+        "OTHER"
+      ]
+    },
+    "FareTableRef": {
+      "required": [
+        "ref",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "ref": {
+          "pattern": "^([A-Z]{3}):FareTable:([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "NeTEx id of the FareTable that prices this supplement product."
+        },
+        "version": {
+          "type": "string",
+          "description": "NeTEx version id of the referenced FareTable."
+        }
+      },
+      "description": "A reference to a versioned FareTable that prices a supplement product. The priceable object\nside authors this link (mirroring products-spring), so the fare table version is required to\npin the exact fare table the link resolves to.\n"
+    },
+    "GenericParameterAssignmentGroupingType": {
+      "type": "string",
+      "description": "How multiple GPA parameters should be combined (AND/OR)",
+      "enum": [
+        "AND",
+        "OR"
+      ]
+    },
+    "LocalizedString": {
+      "type": "array",
+      "items": {
+        "required": [
+          "lang",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "lang": {
+            "pattern": "^[a-z]{2}-[A-Z]{2}$",
+            "type": "string",
+            "description": "BCP-47 language tag (e.g., 'nb-NO', 'en-GB')."
+          },
+          "value": {
+            "type": "string",
+            "description": "The localized string value for the specified lang."
+          }
+        }
+      }
+    },
+    "SupplementProductType": {
+      "type": "string",
+      "description": "The type of the supplement product. This can be used to determine which parameters are relevant for the product.",
+      "enum": [
+        "SEAT_RESERVATION",
+        "BICYCLE",
+        "DOG",
+        "ANIMAL",
+        "MEAL",
+        "WIFI",
+        "EXTRA_LUGGAGE",
+        "PENALTY",
+        "UPGRADE",
+        "JOURNEY_EXTENSION",
+        "JOURNEY_ADD_ON",
+        "EVENT_ADD_ON",
+        "PARKING"
+      ]
+    },
+    "ValidityParameters": {
+      "required": [
+        "groupingType",
+        "validityParameterRefs",
+        "validityParameterType"
+      ],
+      "type": "object",
+      "properties": {
+        "groupingType": {
+          "$ref": "#/$defs/GenericParameterAssignmentGroupingType"
+        },
+        "validityParameterType": {
+          "type": "string",
+          "enum": [
+            "LINE",
+            "ZONE",
+            "ZONE_GROUP",
+            "STOP_PLACE",
+            "PARKING",
+            "ROUTE_SECTION",
+            "TARIFF_AUTHORITY",
+            "OPERATOR",
+            "TRANSPORT_MODE",
+            "FLEXIBLE_LINE",
+            "CLASS_OF_USE",
+            "FACILITY",
+            "SALES_CHANNEL",
+            "AUTHORITY"
+          ]
+        },
+        "validityParameterRefs": {
+          "type": "array",
+          "description": "List of references for the validity parameters",
+          "items": {
+            "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+            "type": "string",
+            "description": "NeTEx reference to validity parameter"
+          }
+        }
+      }
+    },
+    "VatGrpupType": {
+      "type": "string",
+      "description": "VAT group type. This is used to determine which VAT rate applies to a product. The VAT group type is determined by the product type and the country of sale. For example, in Norway, food products are subject to a reduced VAT rate of 15%, while other products are subject to the standard VAT rate of 25%. In this case, food products would be classified as FOOD_VAT, while other products would be classified as GENERAL_VAT.",
+      "default": "TRANSPORT_AND_TICKETS_VAT",
+      "enum": [
+        "EXCEPTION_FROM_VAT",
+        "GENERAL_VAT",
+        "FOOD_VAT",
+        "TRANSPORT_AND_TICKETS_VAT"
+      ]
+    },
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    }
+  }
+}

@@ -1,0 +1,23 @@
+name: Entur Sandbox
+generated: '2026-10-09'
+method: searched
+source: https://developer.entur.no/docs/authentication
+docs: https://developer.entur.no/docs/authentication
+description: Partner APIs have separate Staging and Dev environments, each with its own OAuth2 authentication service and audience. You create client credentials per environment in Entur Partner. The docs publish no test cards, test accounts or time-simulation tools.
+environments:
+- name: Production
+  auth_service: https://partner.entur.org
+  audience: https://api.entur.io
+- name: Staging
+  auth_service: https://partner.staging.entur.org
+  audience: https://api.staging.entur.io
+  client_admin: https://entur-partner.staging.entur.org/permission-admin/clients
+- name: Dev
+  auth_service: https://partner.dev.entur.org
+  audience: https://api.dev.entur.io
+examples:
+- 'OSDM Staging base URL: https://api.staging.entur.io/bifrost/osdm (https://developer.entur.no/docs/partner-services/osdm)'
+dry_run:
+- operationId: dryRun
+  spec: openapi/entur-refund-partner-openapi.yml
+  description: Perform a 'dry-run' of a refund (PUT /v1/refunds/{orderId}/dry-run)

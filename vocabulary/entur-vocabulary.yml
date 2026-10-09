@@ -1,0 +1,430 @@
+generated: '2026-10-09'
+method: derived
+generator: derive-vocabulary.py
+source:
+- openapi/entur-clearing-openapi.yml
+- openapi/entur-clearing-reports-openapi.yml
+- openapi/entur-consents-openapi.yml
+- openapi/entur-customers-openapi.yml
+- openapi/entur-geocoder-openapi.yml
+vocabulary:
+  name: Entur Domain Vocabulary
+  description: 'Terms declared by Entur''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-09'
+  terms:
+  - term: Incoming Settlements
+    definition: Create and manage settlements to be cleared by CLEOS
+    tags:
+    - Resource Group
+    source: openapi/entur-clearing-openapi.yml
+  - term: Outgoing Data Products
+    definition: Discover, inspect and download generated data products
+    tags:
+    - Resource Group
+    source: openapi/entur-clearing-reports-openapi.yml
+  - term: Consents client
+    definition: Api for creating, fetching, modifying and deleting given consents by clients
+    tags:
+    - Resource Group
+    source: openapi/entur-consents-openapi.yml
+  - term: Consents DWH
+    definition: API for displaying all consent info (Data warehouse API)
+    tags:
+    - Resource Group
+    source: openapi/entur-consents-openapi.yml
+  - term: Consents admin
+    definition: Api for creating, fetching, modifying and deleting consents by admins
+    tags:
+    - Resource Group
+    source: openapi/entur-consents-openapi.yml
+  - term: Deprecated
+    definition: Endpoints deprecated in v2
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Preferences admin
+    definition: Api for creating, fetching, modifying and deleting preferences a customer can have
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Temporary profiles client
+    definition: Api for creating, fetching, modifying and deleting temporary customer profiles.
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Authentication admin
+    definition: Api for verify credentials, generate and update password.
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Profile connections
+    definition: API for managing profile connections. A profile connection is a connection between two customer profiles, |where one profile is
+      the main profile and the other profile is the connected profile. The main profile has access |to everything on the connected profile. |
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Profiles client
+    definition: Api for creating, fetching, modifying and deleting customers and related information.
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Customer accounts client
+    definition: Api for creating, fetching and modifying customers account ids.
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Traveller information
+    definition: API for retrieving contact info for all travellers on a given journey. Given a serviceJourneyId or, preferably, an originalServiceJourneyId,
+      returns contact info for the travellers on this journey
+    tags:
+    - Resource Group
+    source: openapi/entur-customers-openapi.yml
+  - term: Search offers
+    definition: Endpoints that are available for generating offers by various means.
+    tags:
+    - Resource Group
+    source: openapi/entur-offers-partner-openapi.yml
+  - term: discovery
+    definition: Discovery endpoints for landing page, conformance, and API metadata.
+    tags:
+    - Resource Group
+    source: openapi/entur-omsa-openapi.yml
+  - term: collections
+    definition: Collection endpoints for retrieving resources and query results.
+    tags:
+    - Resource Group
+    source: openapi/entur-omsa-openapi.yml
+  - term: processes
+    definition: Process endpoints for creating and mutating packages, offers, and refunds.
+    tags:
+    - Resource Group
+    source: openapi/entur-omsa-openapi.yml
+  - term: authentication
+    definition: Authentication endpoints for issuing OAuth tokens.
+    tags:
+    - Resource Group
+    source: openapi/entur-omsa-openapi.yml
+  - term: Order Notes
+    definition: Services for creating, updating, retrieving and deleting order notes.
+    tags:
+    - Resource Group
+    source: openapi/entur-order-note-partner-openapi.yml
+  - term: Orders
+    definition: Top level services for order
+    tags:
+    - Resource Group
+    source: openapi/entur-order-partner-openapi.yml
+  - term: Order lines
+    definition: Services related to order lines on order.
+    tags:
+    - Resource Group
+    source: openapi/entur-order-partner-openapi.yml
+  - term: Fees
+    definition: Services related to fees on order.
+    tags:
+    - Resource Group
+    source: openapi/entur-order-partner-openapi.yml
+  - term: Reservations
+    definition: Services related to reservations on order.
+    tags:
+    - Resource Group
+    source: openapi/entur-order-partner-openapi.yml
+  - term: Travellers
+    definition: Services related to travellers on order.
+    tags:
+    - Resource Group
+    source: openapi/entur-order-partner-openapi.yml
+  - term: Payments
+    definition: Create, update, deactivate and retrieve payments. Create, initiate, capture, cancel, and retrieve payment transactions
+    tags:
+    - Resource Group
+    source: openapi/entur-payment-partner-openapi.yml
+  - term: Credits
+    definition: Create and update credits. Create and execute credit transactions.
+    tags:
+    - Resource Group
+    source: openapi/entur-payment-partner-openapi.yml
+  - term: Recurring Payments
+    definition: Set up and manage stored payment methods.
+    tags:
+    - Resource Group
+    source: openapi/entur-payment-partner-openapi.yml
+  - term: Configurations
+    definition: Configurations directly configurable by partners. E.g. Webhooks.
+    tags:
+    - Resource Group
+    source: openapi/entur-payment-partner-openapi.yml
+  - term: API Documentation
+    definition: OpenAPI specification endpoints.
+    tags:
+    - Resource Group
+    source: openapi/entur-payment-partner-openapi.yml
+  - term: Payment Agreements
+    definition: Register and manage payment agreements for recurring billing.
+    tags:
+    - Resource Group
+    source: openapi/entur-payment-partner-openapi.yml
+  - term: Programs
+    definition: Get information about a program.
+    tags:
+    - Resource Group
+    source: openapi/entur-personalisation-client-openapi.yml
+  - term: Members
+    definition: Information and management of members in a program.
+    tags:
+    - Resource Group
+    source: openapi/entur-personalisation-client-openapi.yml
+  - term: Customers
+    definition: Find information about memberships and status a customer might have in programs.
+    tags:
+    - Resource Group
+    source: openapi/entur-personalisation-client-openapi.yml
+  - term: Privacy
+    definition: Get all personal information stored about a customer.
+    tags:
+    - Resource Group
+    source: openapi/entur-personalisation-privacy-openapi.yml
+  - term: Ticket rights
+    definition: List generated ticket rights
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Family members
+    definition: Administration of family members. Each family member must be connected to an employee
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Codes
+    definition: Updated lists of valid codes to use for different properties
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Companies
+    definition: Administer companies and workplaces within the personnel ticket system
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Employee import
+    definition: Import employees from an external system to be added to the personnel ticket system
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Ticket right holders
+    definition: List generated ticket right holders
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Reports
+    definition: Api for getting tax and FIP reports
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Employee
+    definition: API for fetching employees in the personnel ticket system. An employee is the main entity of the pbsys system. They are hired
+      by a Company and work at a WorkPlace. Employees are created from ImportedEmployee
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Contracts client
+    definition: API for handling loyalty program contracts.
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Entitlements
+    definition: API for handling personnel ticket entitlements.
+    tags:
+    - Resource Group
+    source: openapi/entur-personnel-tickets-openapi.yml
+  - term: Fare table
+    definition: A fare table holds the price(s) that a product references. A flat price is a table with a single selector-less entry; per-zone
+      or per-distance pricing use the same shape with selector fields filled in. The table is versioned independently of the products that reference
+      it.
+    tags:
+    - Resource Group
+    source: openapi/entur-pricing-api-openapi.yml
+  - term: Version
+    definition: Version management endpoints
+    tags:
+    - Resource Group
+    source: openapi/entur-pricing-api-openapi.yml
+  - term: Purchase window
+    definition: A purchase window defines when a product can be purchased relative to the time of travel — for example up to 90 days before and
+      at least one hour before departure, or only until the day before travel. Products reference it through `purchaseWindowRef`.
+    tags:
+    - Resource Group
+    source: openapi/entur-product-parameters-api-openapi.yml
+  - term: Entitlement Required
+    definition: Manage EntitlementRequired instances. Defines what existing entitlement (e.g., a valid ticket) is required to purchase a product.
+    tags:
+    - Resource Group
+    source: openapi/entur-products-api-openapi.yml
+  - term: Supplement product
+    definition: 'A supplement product can be purchased in addition to a preassigned fare product. Examples of supplement product types include:
+      - Seat reservation - Bicycle - Animal - Meal - Wi-fi - Luggage - Parking'
+    tags:
+    - Resource Group
+    source: openapi/entur-products-api-openapi.yml
+  - term: Sales package assignment
+    definition: Assign the supplement products to sales packages without knowledge of the full sales package structure.
+    tags:
+    - Resource Group
+    source: openapi/entur-products-api-openapi.yml
+  - term: Sales package
+    definition: Fine-grained modification of sales packages. The client sends a full request body and has full control over the sales package
+      content.
+    tags:
+    - Resource Group
+    source: openapi/entur-products-api-openapi.yml
+  - term: Usage Validity Period
+    definition: Manage UsageValidityPeriod instances. Defines how long a product is valid after purchase or activation (e.g., single trip, 60
+      minutes, 30 days).
+    tags:
+    - Resource Group
+    source: openapi/entur-products-api-openapi.yml
+  - term: supplement-products
+    definition: This API is deprecated and will be removed in future releases. Please migrate to the new API version. New api will support all
+      supplementProductTypeEnums according to the netex-standard
+    tags:
+    - Resource Group
+    source: openapi/entur-products-openapi.yml
+  - term: Raw Timetable Data
+    definition: Give access to the original NeTEx datasets delivered by data providers
+    tags:
+    - Resource Group
+    source: openapi/entur-raw-timetable-data-openapi.yml
+  - term: Partner Receipts
+    definition: Create, send, and query receipts
+    tags:
+    - Resource Group
+    source: openapi/entur-receipt-partner-openapi.yml
+  - term: Refund
+    definition: Check refundable options and perform refunds on customer orders.
+    tags:
+    - Resource Group
+    source: openapi/entur-refund-partner-openapi.yml
+  - term: Compensation
+    definition: Reduce the price of one or more orders to compensate customers without performing a full refund. Used when a price adjustment
+      is sufficient instead of cancelling or refunding order lines.
+    tags:
+    - Resource Group
+    source: openapi/entur-refund-partner-openapi.yml
+  - term: Reserve Offers
+    definition: Add regular products to order through offer.
+    tags:
+    - Resource Group
+    source: openapi/entur-reserve-offers-partner-openapi.yml
+  - term: Reserve Third Party Products
+    definition: Add external products to order.
+    tags:
+    - Resource Group
+    source: openapi/entur-reserve-offers-partner-openapi.yml
+  - term: Change Options
+    definition: Retrieve possible change options for an order.
+    tags:
+    - Resource Group
+    source: openapi/entur-reserve-offers-partner-openapi.yml
+  - term: Skoleskyss
+    definition: Opprette og slette skyssrettigheter for elever.
+    tags:
+    - Resource Group
+    source: openapi/entur-skoleskyss-openapi.yml
+  - term: Stop Places
+    definition: Query and retrieve stop place information including stations, terminals, bus stops, and ferry ports. Includes filtering by transport
+      mode, location, and other attributes.
+    tags:
+    - Resource Group
+    source: openapi/entur-stop-place-v1-read-openapi.yml
+  - term: Quays
+    definition: Access detailed information about quays (platforms, boarding positions) and their relationship to stop places. Query by ID or
+      retrieve version history.
+    tags:
+    - Resource Group
+    source: openapi/entur-stop-place-v1-read-openapi.yml
+  - term: Scheduled Stop Points
+    definition: Retrieve scheduled stop points used in route planning and timetables, and their mappings to physical stop places.
+    tags:
+    - Resource Group
+    source: openapi/entur-stop-place-v1-read-openapi.yml
+  - term: Fare Zones
+    definition: Access fare zone definitions and boundaries used for ticket pricing calculations. Query by authority or specific zones.
+    tags:
+    - Resource Group
+    source: openapi/entur-stop-place-v1-read-openapi.yml
+  - term: Parking
+    definition: Find parking facilities associated with stop places, including capacity, pricing, and accessibility information.
+    tags:
+    - Resource Group
+    source: openapi/entur-stop-place-v1-read-openapi.yml
+  - term: Geographic Areas
+    definition: Query topographic places (municipalities, counties, countries) and tariff zones for geographic and administrative boundaries.
+    tags:
+    - Resource Group
+    source: openapi/entur-stop-place-v1-read-openapi.yml
+  - term: Groupings
+    definition: Access logical groupings of stop places and fare zones for organizational and operational purposes.
+    tags:
+    - Resource Group
+    source: openapi/entur-stop-place-v1-read-openapi.yml
+  - term: Third Party Products by Order
+    definition: Get third party products for an order
+    tags:
+    - Resource Group
+    source: openapi/entur-third-party-product-partner-openapi.yml
+  - term: Ticket Distribution Groups
+    definition: Services regarding ticket distribution group level.
+    tags:
+    - Resource Group
+    source: openapi/entur-ticket-distribution-partner-openapi.yml
+  - term: Ticket Distributions
+    definition: Services regarding ticket distribution level.
+    tags:
+    - Resource Group
+    source: openapi/entur-ticket-distribution-partner-openapi.yml
+  - term: PDF Tickets
+    definition: Services for generating and sending pdf tickets.
+    tags:
+    - Resource Group
+    source: openapi/entur-ticket-distribution-partner-openapi.yml
+  - term: timetable-delivery-status
+    definition: Status of a timetable data delivery
+    tags:
+    - Resource Group
+    source: openapi/entur-timetable-delivery-status-openapi.yml
+  - term: timetable-import-info
+    definition: Status of the latest import dates for timetable datasets by codespace
+    tags:
+    - Resource Group
+    source: openapi/entur-timetable-import-info-openapi.yml
+  - term: Datasets
+    definition: Standard timetable dataset operations
+    tags:
+    - Resource Group
+    source: openapi/entur-timetable-management-openapi.yml
+  - term: Flexible Transport
+    definition: Flexible transport dataset operations
+    tags:
+    - Resource Group
+    source: openapi/entur-timetable-management-openapi.yml
+  - term: CleosProblemJsonDto
+    definition: DTO representing the generic response of an error condition according to the JSON+ERROR content type (RFC 9457).
+    tags:
+    - Object
+    source: openapi/entur-clearing-openapi.yml#/components/schemas/CleosProblemJsonDto
+  - term: PartnerRefDto
+    definition: A REF is a reference that is intended for business logic use, with best effort NAME lookups in GUI and reporting. For most practical
+      purposes it can be considered a URN on the format NAMESPACE:TYPE:ID, but this is not guaranteed.
+    tags:
+    - Object
+    source: openapi/entur-clearing-openapi.yml#/components/schemas/PartnerRefDto
+  - term: PartnerAnnexDto
+    definition: Generic representation of a node in a recursive transaction tree structure.
+    tags:
+    - Object
+    source: openapi/entur-clearing-openapi.yml#/components/schemas/PartnerAnnexDto
+  - term: PartnerCommentDto
+    definition: Any external comments relevant for clearing the settlement. This will not be part of the reporting context. Useful for guiding
+      potential corrections.
+    tags:
+    - Object
+    source: openapi/entur-clearing-openapi.yml#/components/schemas/PartnerCommentDto

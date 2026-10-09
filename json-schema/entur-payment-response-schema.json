@@ -1,0 +1,373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-payment-response-schema.json",
+  "title": "Payment",
+  "description": "Information about an order's payment.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-payment-partner-openapi.yml#/components/schemas/PaymentResponse",
+  "required": [
+    "createdAt",
+    "currency",
+    "orderId",
+    "orderVersion",
+    "organisationId",
+    "paymentId",
+    "totalAmount"
+  ],
+  "type": "object",
+  "properties": {
+    "active": {
+      "type": "boolean",
+      "description": "This is to block any transactions after the corresponding order version is reset. Clients importing transactions need to either cancel or credit each transaction externally, and the credit the transaction directly using the transaction's credit endpoint. To continue using the same order id, the payment has to be reactivated with the correct total amount before any new actions can be made to this payment. Editable: true"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "Timestamp for when payment was created.",
+      "format": "date-time"
+    },
+    "currency": {
+      "type": "string",
+      "description": "3-letter ISO 4217 currency code. Default is NOK.",
+      "default": "NOK"
+    },
+    "customerNumber": {
+      "type": "string",
+      "description": "ID of the customer who owns this payment."
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Id of the order this payment belongs to."
+    },
+    "orderVersion": {
+      "type": "integer",
+      "description": "Version of the order this payment belongs to.",
+      "format": "int32"
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "Id of the organisation who created this payment.",
+      "format": "int64"
+    },
+    "paymentId": {
+      "type": "integer",
+      "description": "Id of payment",
+      "format": "int64"
+    },
+    "settlementId": {
+      "type": "integer",
+      "description": "Supplied to the client by an external system for handling settlements. For Internal Entur Clients this is Entur’s Electronic Journal.",
+      "format": "int64"
+    },
+    "totalAmount": {
+      "type": "string",
+      "description": "Amount to pay, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot. Editable: true"
+    },
+    "transactionHistory": {
+      "type": "array",
+      "description": "List of all transactions belonging to this payment.",
+      "items": {
+        "$ref": "#/$defs/TransactionResponse"
+      }
+    },
+    "updatedAt": {
+      "type": "string",
+      "description": "Timestamp for when payment was last updated.",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "ErrorResponse": {
+      "title": "Error",
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "The error code. Used in combination with the error source to find more information about the error."
+        },
+        "source": {
+          "type": "string",
+          "description": "Where the error originates from."
+        },
+        "message": {
+          "type": "string",
+          "description": "A description of the error that occurred."
+        }
+      },
+      "description": "Information about an error that occurred."
+    },
+    "Operation": {
+      "type": "string",
+      "description": "A transaction has a list of operations performed on a transaction. These operations can have one of the values in this enum.",
+      "enum": [
+        "AUTHENTICATE",
+        "CANCEL",
+        "CAPTURE",
+        "CREATE",
+        "CREDIT",
+        "IMPORT",
+        "INITIATE",
+        "REJECT",
+        "SOFT_DECLINE",
+        "ON_HOLD",
+        "AUTHORIZE",
+        "AUTHORIZE_INCREMENT",
+        "AUTHORIZE_REVERSE"
+      ]
+    },
+    "PaymentType": {
+      "type": "string",
+      "description": "The actual type of payment.",
+      "enum": [
+        "AMEX",
+        "BANKAXEPT",
+        "COLLECTOR",
+        "GIFTCARD",
+        "MASTERCARD",
+        "PAYPAL",
+        "VIPPS",
+        "VISA",
+        "XLEDGER",
+        "COLLECTOR_B2B",
+        "TWO_B2B"
+      ]
+    },
+    "PaymentTypeFee": {
+      "title": "PaymentTypeFee",
+      "required": [
+        "amount",
+        "currency",
+        "name",
+        "taxAmount"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "maxLength": 19,
+          "pattern": "^[1-9][0-9]{0,17}\\.[0-9]{1,5}$|^([1-9])[0-9]{0,17}$|^[0]\\.[1-9][0-9]{1,5}$",
+          "type": "string",
+          "description": "Total amount including taxes"
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency in 3-letter ISO-4217 standard codes",
+          "default": "NOK"
+        },
+        "name": {
+          "pattern": "[A-Z]{3}:[^:]+:[^:]+",
+          "type": "string",
+          "description": "Name of the fee in NeTEX format identifying a fee."
+        },
+        "reason": {
+          "type": "string",
+          "description": "The reason for the fee, if applicable."
+        },
+        "taxAmount": {
+          "type": "string",
+          "description": "The total amount of taxes this fee consists of"
+        },
+        "taxCode": {
+          "type": "string",
+          "description": "The tax code for the tax rate, if applicable"
+        },
+        "taxRate": {
+          "type": "string",
+          "description": "The tax rate of this fee, if applicable"
+        }
+      },
+      "description": "Fee related to a payment method.",
+      "deprecated": true
+    },
+    "PaymentTypeGroup": {
+      "type": "string",
+      "description": "A PaymentTypeGroup used to override which kind of method to use for reimbursement, instead of using same as used for the payment transaction.This will only take effect if the payment method on the payment transaction allows for overriding.",
+      "enum": [
+        "AGENT",
+        "CASH",
+        "ECARD",
+        "GIFTCARD",
+        "INVOICE",
+        "MOBILE",
+        "PAYMENTCARD",
+        "PAYPAL",
+        "REMITTED",
+        "REQUISITION"
+      ]
+    },
+    "TransactionOperationResponse": {
+      "title": "TransactionOperation",
+      "required": [
+        "amount",
+        "operation",
+        "pos",
+        "timestamp"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount for this operation, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  "
+        },
+        "distributionChannelId": {
+          "type": "string",
+          "description": "Distribution Channels controls which organisations can sell, refund or inform on available products or salepoints. The distribution channel id represents a specific distribution channel."
+        },
+        "operation": {
+          "$ref": "#/$defs/Operation"
+        },
+        "pos": {
+          "type": "string",
+          "description": "Point-of-sale id which performed this operation."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Time when operation was completed. A date without a time zone in the ISO 8601 calendar system.",
+          "format": "date-time"
+        },
+        "error": {
+          "$ref": "#/$defs/ErrorResponse"
+        }
+      },
+      "description": "Describes an operation performed on a transaction."
+    },
+    "TransactionResponse": {
+      "title": "Transaction",
+      "required": [
+        "amount",
+        "createdAt",
+        "currency",
+        "status",
+        "transactionId"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount to pay, represented in the standard currency unit. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot. Deprecated and will be removed in next version of API. Use summary instead."
+        },
+        "cardNumber": {
+          "type": "string",
+          "description": "Last 4 digits in card number (PAN - Personal Account Number)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp for when transaction was first created.",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "currency": {
+          "type": "string",
+          "description": "3-letter currency code. (ISO 4217)",
+          "default": "NOK"
+        },
+        "operationLog": {
+          "type": "array",
+          "description": "Log of each successful operation made on the transaction. Failing operations will not be included.",
+          "items": {
+            "$ref": "#/$defs/TransactionOperationResponse"
+          }
+        },
+        "paymentType": {
+          "$ref": "#/$defs/PaymentType"
+        },
+        "paymentTypeFee": {
+          "deprecated": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/PaymentTypeFee"
+            }
+          ]
+        },
+        "paymentTypeGroup": {
+          "$ref": "#/$defs/PaymentTypeGroup"
+        },
+        "paymentId": {
+          "type": "integer",
+          "description": "ID of the payment this transaction belongs to.",
+          "format": "int64"
+        },
+        "paymentAgreementId": {
+          "type": "integer",
+          "description": "ID of the payment agreement associated with this transaction, if any.",
+          "format": "int64"
+        },
+        "recurringPaymentId": {
+          "type": "integer",
+          "description": "Reference to the saved payment agreement this transaction will use, if any was specified.",
+          "format": "int64"
+        },
+        "rrn": {
+          "type": "string",
+          "description": "Reconciliation reference number used to track a transaction through different economy systems."
+        },
+        "status": {
+          "$ref": "#/$defs/TransactionStatus"
+        },
+        "summary": {
+          "$ref": "#/$defs/TransactionSummary"
+        },
+        "transactionData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Extra transaction data from external client. Only relevant for clients using the import flow."
+        },
+        "transactionId": {
+          "type": "integer",
+          "description": "ID of the specific transaction.",
+          "format": "int64"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp for when transaction was last updated.",
+          "format": "date-time",
+          "readOnly": true
+        }
+      },
+      "description": "Payment transaction information"
+    },
+    "TransactionStatus": {
+      "type": "string",
+      "description": "Current state of the transaction.",
+      "enum": [
+        "CANCELLED",
+        "CAPTURED",
+        "CREATED",
+        "CREDITED",
+        "INITIATED",
+        "REJECTED"
+      ]
+    },
+    "TransactionSummary": {
+      "title": "TransactionSummary",
+      "required": [
+        "capturedAmount",
+        "creditedAmount",
+        "remainingAmountToCapture",
+        "remainingAmountToCredit"
+      ],
+      "type": "object",
+      "properties": {
+        "capturedAmount": {
+          "type": "string",
+          "description": "Captured amount, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  "
+        },
+        "creditedAmount": {
+          "type": "string",
+          "description": "Credited amount, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  "
+        },
+        "remainingAmountToCapture": {
+          "type": "string",
+          "description": "Remaining amount to capture, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  "
+        },
+        "remainingAmountToCredit": {
+          "type": "string",
+          "description": "Remaining amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  "
+        }
+      },
+      "description": "Aggregated summary of amounts on a transaction."
+    }
+  }
+}

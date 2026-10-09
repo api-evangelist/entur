@@ -1,0 +1,1221 @@
+openapi: 3.2.0
+info:
+  title: Entur Temporary profiles client API
+  version: 2026.10.0
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Temporary profiles client across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2
+security:
+- jwt: []
+tags:
+- name: Temporary profiles client
+  description: Api for creating, fetching, modifying and deleting temporary customer profiles.
+paths:
+  /profiles/temporary/{customerNumber}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Temporary profiles client
+      summary: Update temporary profile
+      description: Updates the temporary customer profile with the value provided. All fields are overwritten.
+      operationId: updateTemporaryProfileByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemporaryCustomerPutRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemporaryCustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/temporary:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Temporary profiles client
+      summary: Create temporary profile
+      description: Creates a new temporary customer profile. Temporary profiles are used when consents are given by an anonymous user, or where we need to add just a name to a hardcopy pdf ticket when the buyer doesn't have a full profile. In those cases, we still require a customer reference in the consents API, so a customer profile must exist. However, the profile does not need to be permanent. Specifically, temporary profiles have an expiration date. On that date, they will be deleted from the system. Also, several fields that are required for a permanent profile, are voluntary for a temporary profile. A mechanism exists for converting a temporary profile into a permanent one.
+      operationId: createTemporaryProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemporaryCustomerPostRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemporaryCustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:opprett
+          - customers-profile-global:opprett
+          - customers-profile-jdir:opprett
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/temporary/{customerNumber}/convert:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Temporary profiles client
+      summary: Convert to permanent
+      description: Converts the temporary customer profile to a permanent profile. Note that this is a one-way change, there is no going back. When converting, all fields not present in the temporary profile need to be supplied.
+      operationId: convertToPermanentByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConvertTemporaryCustomerRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+components:
+  schemas:
+    CustomerConsent:
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer consent was last changed.
+          format: date-time
+        consentChoice:
+          type: boolean
+          description: Whether the customer has approved or declined this consent.
+        consentCode:
+          maxLength: 20
+          type: string
+          description: The consent code.
+        createdAt:
+          type: string
+          description: When the customer consent was created.
+          format: date-time
+        customerId:
+          type: integer
+          description: Id of the customer.
+          format: int64
+      description: Legacy consents for a customer
+    CustomerAccountResponse:
+      required:
+      - createdAt
+      - createdBy
+      - customerAccountId
+      - customerNumber
+      - id
+      type: object
+      properties:
+        alias:
+          type: string
+          description: Alias for the customer account
+          examples:
+          - Tommy
+        changedAt:
+          type: string
+          description: When the customer account was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          type: string
+          description: Who changed the customer account.
+        createdAt:
+          type: string
+          description: When the customer account was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          type: string
+          description: Who created the customer account.
+        customerAccountId:
+          type: string
+          description: Customer account id string
+          examples:
+          - ATB:CustomerAccount:abc58673cde-1c82-4bc5-989c-9d5eaa7ea866
+        customerNumber:
+          type: integer
+          description: Unique customer number
+          format: int64
+        id:
+          type: integer
+          description: Customer account unique id.
+          format: int64
+        isDefault:
+          type: boolean
+          description: True if the account is the default account for the customer
+      description: Customer account connected to a customer
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: 'An Error message. '
+    LocalDateResponse:
+      required:
+      - day
+      - month
+      - year
+      type: object
+      properties:
+        day:
+          type: integer
+          description: day of month
+          format: int32
+        month:
+          type: integer
+          description: month number
+          format: int32
+        year:
+          type: integer
+          description: year
+          format: int32
+      description: Date as object
+    PostalAddressResponse:
+      required:
+      - changedAt
+      - countryCode
+      - createdAt
+      - customerId
+      - id
+      - postCode
+      - town
+      - typeOfAddress
+      type: object
+      properties:
+        addressLine1:
+          maxLength: 80
+          type: string
+          description: Address line 1.
+        addressLine2:
+          maxLength: 80
+          type: string
+          description: Address line 2, often used for c/o information.
+        changedAt:
+          type: string
+          description: When the postal address was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        countryCode:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The address country code. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        createdAt:
+          type: string
+          description: When the postal address was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: The customer connected to the address.
+          format: int64
+        id:
+          type: integer
+          description: Postal address id.
+          format: int64
+        postCode:
+          maxLength: 10
+          type: string
+          description: The address post code.
+        town:
+          maxLength: 50
+          type: string
+          description: The address post town.
+        typeOfAddress:
+          type: string
+          description: 'The type of address. Types supported: ''P'' = Private, ''I'' = Invoice, ''S'' = Shadow.'
+          enum:
+          - P
+          - I
+          - S
+        verifiedAt:
+          type: string
+          description: When the address was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Postal address connected to a customer
+    CustomerResponse:
+      required:
+      - changedAt
+      - changedBy
+      - changedByChannel
+      - createdAt
+      - createdBy
+      - createdByChannel
+      - customerNumber
+      - firstName
+      - organisationId
+      - profileType
+      - status
+      - surname
+      - uuid
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          maxLength: 100
+          type: string
+          description: Who last changed the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        changedByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
+        countryCode:
+          maxLength: 4
+          type: string
+          description: Telephone number country code, starting with +.
+          examples:
+          - '+47'
+        createdAt:
+          type: string
+          description: When the customer was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        createdByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who created the customer. Used for traceability in accordance with GDPR
+        customerAccountId:
+          maxLength: 60
+          type: string
+          description: Customer account id used for account based ticketing
+          examples:
+          - XYZ:CustomerAccount:<uuid>
+        customerAccounts:
+          type: array
+          description: Customer accounts used for account based ticketing
+          items:
+            $ref: '#/components/schemas/CustomerAccountResponse'
+        customerConsents:
+          type: array
+          description: The legacy consents connected to the customer.
+          items:
+            $ref: '#/components/schemas/CustomerConsent'
+        customerNumber:
+          type: integer
+          description: Customer number.
+          format: int64
+        customerRef:
+          maxLength: 40
+          type: string
+          description: Optional customer reference. Defaults to customer number if not set.
+        dateOfBirth:
+          $ref: '#/components/schemas/LocalDateResponse'
+        dateOfDeath:
+          $ref: '#/components/schemas/LocalDateResponse'
+        ecardOwnerships:
+          type: array
+          description: The ecards connected to the customer.
+          items:
+            $ref: '#/components/schemas/EcardOwnershipResponse'
+        email:
+          maxLength: 80
+          type: string
+          description: Contact email. May become different from username
+        emailOld:
+          maxLength: 80
+          type: string
+          description: When customer is deleted (status='D'), the value of 'email' is moved here to allow creation of a new customer with the same email.
+        emailVerifiedAt:
+          type: string
+          description: When the email was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        firstName:
+          maxLength: 50
+          type: string
+          description: First and middle name.
+        givenConsents:
+          type: array
+          description: The consents connected to the customer. Deprecated
+          deprecated: true
+          items:
+            type: object
+            description: The consents connected to the customer. Deprecated
+            deprecated: true
+        id:
+          type: integer
+          description: Customer id. Deprecated
+          format: int64
+          deprecated: true
+        landlineNumber:
+          maxLength: 20
+          type: string
+          description: Landline telephone number.
+        languagePreference:
+          type: string
+          description: Deprecated, please use languagePreferenceISO6393. Which language the customer wants information in. Default is 'NO'.
+          deprecated: true
+          enum:
+          - 'NO'
+          - EN
+        languagePreferenceISO6393:
+          type: string
+          description: Which language the customer wants information in. ISO 639-3 format. Default is 'NOB'.
+          enum:
+          - NOB
+          - NNO
+          - ENG
+        lastSignInAt:
+          type: string
+          description: When the customer last signed in. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        lastSignInFrom:
+          maxLength: 100
+          type: string
+          description: Where the customer last signed in from. Typically web or app. Typically used to display to the user where the last login was performed.
+        nationality:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The customers nationality. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        notes:
+          type: array
+          description: Deprecated. The notes connected to the customer.
+          deprecated: true
+          items:
+            $ref: '#/components/schemas/NoteResponse'
+        organisationId:
+          type: integer
+          description: The organisation the customer is registered with.
+          format: int64
+        parentId:
+          type: object
+          description: Id of the parent customer. Used to connect different customer types.
+        personnelTicketBearer:
+          $ref: '#/components/schemas/PersonnelTicketBearer'
+        postalAddresses:
+          type: array
+          description: The postal addresses connected to the customer.
+          items:
+            $ref: '#/components/schemas/PostalAddressResponse'
+        preferences:
+          type: array
+          description: The preferences connected to the customer.
+          items:
+            $ref: '#/components/schemas/CustomerPreferenceResponse'
+        profileType:
+          type: string
+          description: 'Type of profile. Types supported: ''S'' = Standard customer, ''P'' = Personnel ticket customer, ''T'' = Temporary customer. Default is ''S''.'
+          enum:
+          - S
+          - P
+          - T
+        relatedCustomerNumbers:
+          type: array
+          description: The customer number of profiles which has been merged into the current profile. These may be used to lookup customer information in other systems
+          items:
+            type: integer
+            description: The customer number of profiles which has been merged into the current profile. These may be used to lookup customer information in other systems
+            format: int64
+        status:
+          type: string
+          description: 'Customer status. Statuses supported: ''A'' = Active, ''P'' = Passive, ''D'' = Deleted. Default is ''A''.'
+          enum:
+          - A
+          - P
+          - D
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname.
+        telephoneNumber:
+          maxLength: 20
+          type: string
+          description: Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number.
+        telephoneNumberNoCountryCode:
+          maxLength: 12
+          type: string
+          description: Telephone number without country code or punctuation.
+        telephoneNumberVerifiedAt:
+          type: string
+          description: When the telephone number was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        username:
+          type: string
+          description: Username the customer can use to log unto their profile. Only available on profile type S(tamkunde) and profile status A(ctive)
+        uuid:
+          maxLength: 32
+          minLength: 32
+          type: string
+          description: A universal unique id for the customer. 32 random alphanumeric characters. Not RFC 4122 compliant
+          examples:
+          - 7018222E18CB5C46E05400144FF9F89C
+        vippsId:
+          type: string
+          description: Deprecated. The field is no longer stored. Vipps unique user identifier.
+          format: uuid
+          deprecated: true
+      description: A registered customer response
+    TemporaryCustomerPutRequest:
+      required:
+      - changedBy
+      - changedByChannel
+      - expirationDate
+      type: object
+      properties:
+        changedBy:
+          maxLength: 100
+          type: string
+          description: Who last changed the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        changedByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
+        countryCode:
+          maxLength: 4
+          type: string
+          description: Telephone number country code, starting with +.
+          examples:
+          - '+47'
+        customerAccountId:
+          maxLength: 60
+          type: string
+          description: Deprecated. Use /profiles/{customerNumber}/customer-accounts. Customer account id used for account based ticketing
+          deprecated: true
+          examples:
+          - XYZ:CustomerAccount:<uuid>
+        dateOfBirth:
+          type: string
+          description: Date of birth. ISO 8601 date format
+          format: date
+          examples:
+          - '2019-04-05'
+        email:
+          maxLength: 80
+          type: string
+          description: Contact email
+        expirationDate:
+          type: string
+          description: The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        firstName:
+          maxLength: 50
+          type: string
+          description: First and middle name.
+        landlineNumber:
+          maxLength: 20
+          type: string
+          description: Landline telephone number.
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname.
+        telephoneNumber:
+          maxLength: 20
+          type: string
+          description: Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number.
+        telephoneNumberNoCountryCode:
+          maxLength: 12
+          type: string
+          description: Telephone number without country code or punctuation.
+      description: A registered customer
+    NoteResponse:
+      required:
+      - changedAt
+      - changedBy
+      - createdAt
+      - createdBy
+      - customerId
+      - id
+      - text
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the note was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          maxLength: 100
+          type: string
+          description: Who last changed the note.
+        createdAt:
+          type: string
+          description: When the note was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the note.
+        customerId:
+          type: integer
+          description: Id of the customer connected to the note.
+          format: int64
+        id:
+          type: integer
+          description: Note id.
+          format: int64
+        text:
+          maxLength: 4000
+          type: string
+          description: Note content.
+      description: Deprecated
+    PersonnelTicketBearer:
+      type: object
+      properties:
+        bearerCustomerId:
+          type: integer
+          format: int64
+        changedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        isSelfServedRetrieval:
+          type: boolean
+        ticketRightBearer:
+          type: string
+        ticketRightOwner:
+          type: string
+      description: The personnel tickets connected to the customer. Deprecated. Does not contain updated information.
+    ConvertTemporaryCustomerRequest:
+      required:
+      - changedBy
+      - changedByChannel
+      - firstName
+      - surname
+      type: object
+      properties:
+        changedBy:
+          maxLength: 100
+          type: string
+          description: ChangedBy of the temporary customer to be converted to a permanent customer
+        changedByChannel:
+          maxLength: 100
+          type: string
+          description: ChangedByChannel of the temporary customer to be converted to a permanent customer
+        customerRef:
+          maxLength: 40
+          minLength: 1
+          type: string
+          description: Optional customer reference. Defaults to customer number if not set
+        email:
+          maxLength: 80
+          type: string
+          description: Optional email of the temporary customer to be converted to a permanent customer
+        firstName:
+          maxLength: 50
+          type: string
+          description: First name of the temporary customer to be converted to a permanent customer
+        organisationId:
+          type: integer
+          description: Organisation id of the temporary customer to be converted to a permanent customer
+          format: int64
+        password:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Password of the temporary customer to be converted to a permanent customer
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname of the temporary customer to be converted to a permanent customer
+      description: The properties used when converting a temporary customer profile
+    PreferenceResponse:
+      required:
+      - changedAt
+      - createdAt
+      - id
+      - isActive
+      - preferenceCode
+      - preferenceDescription
+      - preferenceType
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the preference was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the preference was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Preference id.
+          format: int64
+        isActive:
+          type: boolean
+          description: Whether the preference is active.
+        preferenceCode:
+          maxLength: 20
+          type: string
+          description: The preference code.
+        preferenceDescription:
+          maxLength: 255
+          type: string
+          description: A description of the preference.
+        preferenceType:
+          maxLength: 20
+          type: string
+          description: Type of preference.
+      description: Preference
+    TemporaryCustomerResponse:
+      required:
+      - changedAt
+      - changedBy
+      - changedByChannel
+      - createdAt
+      - createdBy
+      - createdByChannel
+      - customerNumber
+      - expirationDate
+      - firstName
+      - organisationId
+      - status
+      - surname
+      - uuid
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          maxLength: 100
+          type: string
+          description: Who last changed the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        changedByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
+        countryCode:
+          maxLength: 4
+          type: string
+          description: Telephone number country code, starting with +.
+          examples:
+          - '+47'
+        createdAt:
+          type: string
+          description: When the customer was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        createdByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who created the customer. Used for traceability in accordance with GDPR
+        customerAccountId:
+          maxLength: 60
+          type: string
+          description: Customer account id used for account based ticketing
+          examples:
+          - XYZ:CustomerAccount:<uuid>
+        customerConsents:
+          type: array
+          description: The legacy consents connected to the customer.
+          items:
+            $ref: '#/components/schemas/CustomerConsent'
+        customerNumber:
+          type: integer
+          description: Customer number.
+          format: int64
+        customerRef:
+          maxLength: 40
+          type: string
+          description: Optional customer reference. Defaults to customer number if not set.
+        dateOfBirth:
+          type: string
+          description: Date of birth. ISO 8601 date format
+          format: date
+          examples:
+          - '2019-04-05'
+        dateOfDeath:
+          type: string
+          description: Date of death. ISO 8601 date format
+          format: date
+          examples:
+          - '2019-04-05'
+        email:
+          maxLength: 80
+          type: string
+          description: Contact email.
+        emailOld:
+          maxLength: 80
+          type: string
+          description: When customer is deleted (status='D'), the value of 'email' is moved here to allow creation of a new customer with the same email.
+        emailVerifiedAt:
+          type: string
+          description: When the email was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        firstName:
+          maxLength: 50
+          type: string
+          description: First and middle name.
+        givenConsents:
+          type: array
+          description: The consents connected to the customer. Deprecated
+          deprecated: true
+          items:
+            type: object
+            description: The consents connected to the customer. Deprecated
+            deprecated: true
+        landlineNumber:
+          maxLength: 20
+          type: string
+          description: Landline telephone number.
+        nationality:
+          maxLength: 3
+          type: string
+          description: The customers nationality. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        notes:
+          type: array
+          description: The notes connected to the customer.
+          items:
+            $ref: '#/components/schemas/NoteResponse'
+        organisationId:
+          type: integer
+          description: The organisation the customer is registered with.
+          format: int64
+        postalAddresses:
+          type: array
+          description: The postal addresses connected to the customer.
+          items:
+            $ref: '#/components/schemas/PostalAddressResponse'
+        preferences:
+          type: array
+          description: The preferences connected to the customer.
+          items:
+            $ref: '#/components/schemas/CustomerPreferenceResponse'
+        status:
+          type: string
+          description: 'Customer status. Statuses supported: ''A'' = Active, ''P'' = Passive, ''D'' = Deleted. Default is ''A''.'
+          enum:
+          - A
+          - P
+          - D
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname.
+        telephoneNumber:
+          maxLength: 20
+          type: string
+          description: Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number.
+        telephoneNumberNoCountryCode:
+          maxLength: 12
+          type: string
+          description: Telephone number without country code or punctuation.
+        telephoneNumberVerifiedAt:
+          type: string
+          description: When the telephone number was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        uuid:
+          maxLength: 32
+          minLength: 32
+          type: string
+          description: A universal unique id for the customer. 32 random alphanumeric characters. Not RFC 4122 compliant
+          examples:
+          - 7018222E18CB5C46E05400144FF9F89C
+      description: A registered customer
+    TemporaryCustomerPostRequest:
+      required:
+      - createdBy
+      - createdByChannel
+      - expirationDate
+      type: object
+      properties:
+        countryCode:
+          maxLength: 4
+          type: string
+          description: Telephone number country code, starting with +.
+          examples:
+          - '+47'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        createdByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who created the customer. Used for traceability in accordance with GDPR
+        customerAccountId:
+          maxLength: 60
+          type: string
+          description: Deprecated. Use /profiles/{customerNumber}/customer-accounts. Customer account id used for account based ticketing
+          deprecated: true
+          examples:
+          - XYZ:CustomerAccount:<uuid>
+        dateOfBirth:
+          type: string
+          description: Date of birth. ISO 8601 date format
+          format: date
+          examples:
+          - '2019-04-05'
+        email:
+          maxLength: 80
+          type: string
+          description: Contact email
+        expirationDate:
+          type: string
+          description: The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        firstName:
+          maxLength: 50
+          type: string
+          description: First and middle name.
+        landlineNumber:
+          maxLength: 20
+          type: string
+          description: Landline telephone number.
+        organisationId:
+          type: integer
+          description: The organisation the customer is registered with.
+          format: int64
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname.
+        telephoneNumber:
+          maxLength: 20
+          type: string
+          description: Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number.
+        telephoneNumberNoCountryCode:
+          maxLength: 12
+          type: string
+          description: Telephone number without country code or punctuation.
+      description: A registered customer. Required fields are expirationDate, createdBy and createdByChannel.
+    CustomerPreferenceResponse:
+      required:
+      - changedAt
+      - createdAt
+      - preference
+      - preferenceId
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer preference was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the customer preference was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: Id of the customer. Deprecated
+          format: int64
+          deprecated: true
+        preference:
+          $ref: '#/components/schemas/PreferenceResponse'
+        preferenceId:
+          type: integer
+          description: Id of the preference
+          format: int64
+        preferenceValue:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Value of the preference. This can be things like membership number.
+      description: Preferences response for a customer
+    EcardOwnershipResponse:
+      required:
+      - changedAt
+      - createdAt
+      - customerId
+      - ecardNumber
+      - ecardNumber16digits
+      - ecardOperator
+      - id
+      - startOfOwnership
+      type: object
+      properties:
+        bookingDate:
+          type: string
+          description: When the physical ecard was booked. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedAt:
+          type: string
+          description: When the ecard was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the ecard was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: The customer connected to the ecard. Deprecated
+          format: int64
+          deprecated: true
+        ecardName:
+          maxLength: 100
+          type: string
+          description: Customer defined ecard alias.
+        ecardNumber:
+          type: integer
+          description: Ecard number.
+          format: int64
+        ecardNumber16digits:
+          maxLength: 16
+          minLength: 16
+          type: string
+          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
+        ecardOperator:
+          type: integer
+          description: Ecard operator.
+          format: int32
+        endOfOwnership:
+          type: string
+          description: When the customer removed the ecard connection. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: When the physical ecard expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Ecard id.
+          format: int64
+        shippingDate:
+          type: string
+          description: When the physical ecard was shipped to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        startOfOwnership:
+          type: string
+          description: When the ecard was first connected to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Ecards connected to a customer
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-customers-openapi.json
+- entur-customers-openapi.yml

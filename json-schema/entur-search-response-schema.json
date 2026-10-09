@@ -1,0 +1,1066 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-search-response-schema.json",
+  "title": "SearchResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-offers-partner-openapi.yml#/components/schemas/SearchResponse",
+  "type": "object",
+  "properties": {
+    "tripPatternId": {
+      "type": "string"
+    },
+    "offers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OfferSummary"
+      }
+    },
+    "recommendations": {
+      "$ref": "#/$defs/RecommendationResult"
+    },
+    "optionalProducts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OptionalProduct"
+      }
+    },
+    "unavailableProducts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/UnavailableProduct"
+      }
+    },
+    "notices": {
+      "type": "array",
+      "description": "Additional information about potentially missing information or functionality due to transient errors.",
+      "items": {
+        "type": "string",
+        "description": "A code identifying which downstream service was unavailable. Known values: OSDM (OSDM-gateway unavailable), PERSONALISATION (Personalisation service unavailable), INVENTORY (Inventory service unavailable), SEATING (Seating service unavailable). This list may be extended without a spec change."
+      }
+    }
+  },
+  "required": [
+    "offers",
+    "recommendations"
+  ],
+  "$defs": {
+    "AccommodationFacilityEnum": {
+      "type": "string",
+      "default": "ANY",
+      "description": "Subset of AccommodationFacilityEnumeration from NeTEx facility support.",
+      "enum": [
+        "ANY",
+        "SLEEPER",
+        "SEATING",
+        "COUCHETTE",
+        "RECLINING_SEATS",
+        "STANDING"
+      ]
+    },
+    "AccommodationForServiceJourney": {
+      "type": "object",
+      "description": "Accommodation for service journey.",
+      "properties": {
+        "serviceJourney": {
+          "$ref": "#/$defs/ServiceJourneySummary"
+        },
+        "accommodation": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Accommodation facility. Compatible with the current NeTEx implementation of AccommodationFacilityEnumeration at Entur. Related to but may include more than 'AccommodationFacilityEnum'."
+          }
+        }
+      },
+      "required": [
+        "accommodation",
+        "serviceJourney"
+      ]
+    },
+    "AvailableFulfilmentMethod": {
+      "type": "object",
+      "description": "Describes which fulfilmentMethods are available for an Offer,.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "NeTEx standard."
+        },
+        "version": {
+          "type": "string",
+          "description": "NeTEx standard."
+        },
+        "distributionRights": {
+          "type": "array",
+          "description": "Says what the distribution channel is allowed to do with this offer. Compatible with the current NeTEx implementation of DistributionRightsEnumeration at Entur.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ]
+    },
+    "CappedDiscountOption": {
+      "type": "object",
+      "description": "A discount might be given based on previous transactions if CappedDiscountRequest was specified. A cappingSpecification must be specified in the traveller attribute in the request to the search/ endpoints in order to receive a discount. Capping must also be enabled by the operator of the service journey.",
+      "properties": {
+        "cappedDiscountRightRef": {
+          "$ref": "#/$defs/ObjectRef"
+        },
+        "cappedDiscountRuleRef": {
+          "$ref": "#/$defs/ObjectRef"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CappingAlternative"
+          }
+        }
+      },
+      "required": [
+        "cappedDiscountRightRef",
+        "cappedDiscountRuleRef"
+      ]
+    },
+    "CappingAlternative": {
+      "type": "object",
+      "description": "An alternative is based on previous transactions might have a discount at the expense of setting the start date in the past.",
+      "properties": {
+        "selectableId": {
+          "type": "string",
+          "description": "A pseudo random string that is used to select what alternative to use when purchasing an offer."
+        },
+        "discount": {
+          "$ref": "#/$defs/Price"
+        },
+        "startDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The start date of this alternative."
+        },
+        "endDateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The end date of this alternative."
+        }
+      },
+      "required": [
+        "discount",
+        "endDateTime",
+        "selectableId",
+        "startDateTime"
+      ]
+    },
+    "Carnet": {
+      "type": "object",
+      "description": "Representation of a repeatable ticket, with an optional duration for each instance and an amount of times the ticket can be used.",
+      "properties": {
+        "amount": {
+          "type": "integer",
+          "description": "Number of times the ticket can be used."
+        },
+        "duration": {
+          "type": "string",
+          "format": "duration",
+          "description": "Validity duration of each use, formatted according to ISO-8601."
+        }
+      },
+      "required": [
+        "amount"
+      ]
+    },
+    "DiscountRightSummary": {
+      "type": "object",
+      "description": "Summary of a sale discount right that has been applied to the fare product.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "price": {
+          "$ref": "#/$defs/Price"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "originatingFromProductId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "description",
+        "id",
+        "name",
+        "price",
+        "version"
+      ]
+    },
+    "DurationEnum": {
+      "type": "string",
+      "default": "ANY",
+      "description": "Validity duration. Subset of UsageValidityTypeEnumeration from NeTEx usage parameter travel support.",
+      "enum": [
+        "SINGLE_TRIP",
+        "RETURN_TRIP",
+        "CARNET",
+        "DAY_PASS",
+        "WEEKLY_PASS",
+        "WEEKEND_PASS",
+        "MONTHLY_PASS",
+        "SEASON_TICKET",
+        "PROFILE_MEMBERSHIP",
+        "OPEN_ENDED",
+        "OTHER",
+        "ANY"
+      ]
+    },
+    "FareClassEnum": {
+      "type": "string",
+      "default": "ANY",
+      "description": "A type of FareClass. Subset of FareClassEnumeration from NeTEx service restrictions support.",
+      "enum": [
+        "FIRST_CLASS",
+        "SECOND_CLASS",
+        "THIRD_CLASS",
+        "ECONOMY_CLASS",
+        "BUSINESS_CLASS",
+        "TURISTA",
+        "PREFERENTE",
+        "PREMIUM_CLASS",
+        "ANY",
+        "STANDARD_CLASS",
+        "UNKNOWN"
+      ]
+    },
+    "GeographicalValidity": {
+      "type": "object",
+      "description": "Describes the geographical validity of a product. Includes information on ServiceJourneys, PointToPointValidity and ZonalValidity. In cases of replacement transport, these fields describe the replacement journey.",
+      "properties": {
+        "serviceJourneys": {
+          "type": "array",
+          "description": "Service journeys where this product is valid.",
+          "items": {
+            "$ref": "#/$defs/ServiceJourneySummary"
+          }
+        },
+        "pointToPointValidity": {
+          "$ref": "#/$defs/PointToPointValidity"
+        },
+        "zonalValidity": {
+          "$ref": "#/$defs/ZonalValidity"
+        }
+      }
+    },
+    "GeographicalValidityCovered": {
+      "type": "object",
+      "description": "Describes the geographical validity covered by the recommendation.",
+      "properties": {
+        "coversEntireJourney": {
+          "type": "boolean",
+          "description": "Indicates whether the geographical validity covers the entire journey or not."
+        },
+        "serviceJourneys": {
+          "type": "array",
+          "description": "The service journeys this geographical validity applies to.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "pointToPointValidity": {
+          "$ref": "#/$defs/PointToPointValidity"
+        },
+        "zonalValidity": {
+          "$ref": "#/$defs/ZonalValidity"
+        }
+      },
+      "required": [
+        "coversEntireJourney"
+      ]
+    },
+    "GroupSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "userProfiles": {
+          "type": "array",
+          "description": "User profiles and their required number of travellers in the group.",
+          "items": {
+            "$ref": "#/$defs/UserProfileInGroupSummary"
+          }
+        }
+      },
+      "required": [
+        "description",
+        "id",
+        "userProfiles",
+        "version"
+      ]
+    },
+    "NamedReference": {
+      "type": "object",
+      "description": "A simple reference with id and name.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "ObjectRef": {
+      "type": "object",
+      "description": "Object ref.",
+      "properties": {
+        "ref": {
+          "type": "string",
+          "description": "object ref ref."
+        },
+        "version": {
+          "type": "string",
+          "description": "object ref version."
+        }
+      },
+      "required": [
+        "ref"
+      ]
+    },
+    "OfferSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id of an offer. This id will be referenced in recommendations where there are \"offersToBuy\". Also, the offerId can be used to obtain the original offer-structure from v1."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the SalesPackage that this OfferSummary represents."
+        },
+        "salesPackageId": {
+          "type": "string",
+          "description": "Id of the SalesPackage."
+        },
+        "salesPackageVersion": {
+          "type": "string",
+          "description": "Version of the SalesPackage."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the offer."
+        },
+        "price": {
+          "$ref": "#/$defs/Price"
+        },
+        "availableFulfilmentMethods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AvailableFulfilmentMethod"
+          }
+        },
+        "geographicalValidity": {
+          "$ref": "#/$defs/GeographicalValidity"
+        },
+        "preassignedProducts": {
+          "type": "array",
+          "description": "All mandatory products that give the buyer a right to travel is found here.",
+          "items": {
+            "$ref": "#/$defs/PreassignedProduct"
+          }
+        },
+        "optionalProductsSelectableIds": {
+          "type": "array",
+          "description": "This field contains an array of selectableId's to optional products associated with an offer. The optional products are found in the field \"optionalProducts\" in the search response.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "travellerMapping": {
+          "type": "array",
+          "description": "Mapping of which travellers this offer applies to.",
+          "items": {
+            "$ref": "#/$defs/TravellerMappingSummary"
+          },
+          "uniqueItems": true
+        },
+        "available": {
+          "type": "integer",
+          "description": "Number of this offer available to buy at this point in time."
+        },
+        "cappedDiscountOption": {
+          "$ref": "#/$defs/CappedDiscountOption"
+        },
+        "eligibleForAccrualInPrograms": {
+          "type": "array",
+          "description": "Buying this offer may give points in these personalisation programs.",
+          "items": {
+            "$ref": "#/$defs/ProgramAccrualSummary"
+          }
+        },
+        "availablePrograms": {
+          "type": "array",
+          "description": "The customer may join the following programs to get points from buying this offer. It is expected that the caller does work to add the customer to the program.",
+          "items": {
+            "$ref": "#/$defs/ProgramSummary"
+          }
+        }
+      },
+      "required": [
+        "availableFulfilmentMethods",
+        "description",
+        "geographicalValidity",
+        "id",
+        "name",
+        "preassignedProducts",
+        "price",
+        "salesPackageId",
+        "salesPackageVersion"
+      ]
+    },
+    "OfferToBuy": {
+      "type": "object",
+      "description": "Describes which offer to buy and how many of this offer to buy to satisfy a recommendation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of the offer to buy."
+        },
+        "numberToBuy": {
+          "type": "integer",
+          "description": "Number of this offer to buy."
+        },
+        "selectableProductIds": {
+          "type": "array",
+          "description": "List of selectableIds of supplement products which upgrades a product.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "possibleTravellerIds": {
+          "type": "array",
+          "description": "One possible grouping of travellers for the number of offers to buy.",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "numberToBuy",
+        "possibleTravellerIds",
+        "selectableProductIds"
+      ]
+    },
+    "OptionalProduct": {
+      "type": "object",
+      "description": "Representation of a optional product that can be selected together with mandatory products in an offer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of the optional product."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the optional product."
+        },
+        "selectableId": {
+          "type": "string",
+          "description": "This is the id that is referred to from the OfferSummary's optionalProductsSelectableId's. It is also the id used when reserving the offer in later steps."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the optional product."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the optional product."
+        },
+        "price": {
+          "$ref": "#/$defs/Price"
+        },
+        "properties": {
+          "$ref": "#/$defs/PropertiesSummary"
+        },
+        "geographicalValidity": {
+          "$ref": "#/$defs/GeographicalValidity"
+        },
+        "discountRights": {
+          "type": "array",
+          "description": "Optional discounts applied to this product.",
+          "items": {
+            "$ref": "#/$defs/DiscountRightSummary"
+          },
+          "minItems": 1
+        },
+        "available": {
+          "type": "integer",
+          "description": "How many of this optional product is available to buy at this point in time."
+        },
+        "supplementProductType": {
+          "type": "string",
+          "description": "Describes what type of supplement product this is. Compatible with the current NeTEx implementation of SupplementProductTypeEnumeration at Entur."
+        }
+      },
+      "required": [
+        "description",
+        "geographicalValidity",
+        "id",
+        "name",
+        "price",
+        "properties",
+        "selectableId",
+        "version"
+      ]
+    },
+    "OrganisationSummary": {
+      "type": "object",
+      "description": "id and and name of an organisation.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "the netex-id of organisation."
+        },
+        "name": {
+          "type": "string",
+          "description": "the name of the organisation."
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "PointToPointValidity": {
+      "type": "object",
+      "description": "Start and stop places where the product is valid.",
+      "properties": {
+        "fromPlace": {
+          "$ref": "#/$defs/NamedReference",
+          "description": "Valid from place."
+        },
+        "toPlace": {
+          "$ref": "#/$defs/NamedReference",
+          "description": "Valid to place."
+        }
+      },
+      "required": [
+        "fromPlace",
+        "toPlace"
+      ]
+    },
+    "PreassignedProduct": {
+      "type": "object",
+      "description": "Representation of a mandatory product that is included in an offer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id if the preassigned product."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the preassigned product."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the preassigned product."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of the preassigned product."
+        },
+        "properties": {
+          "$ref": "#/$defs/PropertiesSummary"
+        },
+        "geographicalValidity": {
+          "$ref": "#/$defs/GeographicalValidity"
+        },
+        "discountRights": {
+          "type": "array",
+          "description": "Optional discounts applied to this product.",
+          "items": {
+            "$ref": "#/$defs/DiscountRightSummary"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "description",
+        "geographicalValidity",
+        "id",
+        "name",
+        "properties",
+        "version"
+      ]
+    },
+    "Price": {
+      "type": "object",
+      "description": "Price with currency and optional VAT information for this element.",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "The amount."
+        },
+        "vatGroup": {
+          "type": "string",
+          "description": "The VAT group."
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the amount."
+        }
+      },
+      "required": [
+        "amount",
+        "currency"
+      ]
+    },
+    "ProgramAccrualSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string",
+          "description": "Identifier for the loyalty program."
+        },
+        "name": {
+          "type": "string"
+        },
+        "infoLink": {
+          "type": "string",
+          "description": "URL to information about the loyalty program."
+        },
+        "paused": {
+          "type": "boolean",
+          "description": "Whether accrual for this program is currently paused."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "ProgramSummary": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string",
+          "description": "Identifier for the loyalty program."
+        },
+        "name": {
+          "type": "string"
+        },
+        "infoLink": {
+          "type": "string",
+          "description": "URL to information about the loyalty program."
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "PropertiesSummary": {
+      "type": "object",
+      "description": "Summary of properties for a product. The properties field contains all necessary information about a product. Here you will find accommodations, baggageTypes, fareClass, userProfiles and more.",
+      "properties": {
+        "isExchangeable": {
+          "type": "boolean",
+          "description": "Whether the ticket can be exchanged for a different departure."
+        },
+        "isRefundable": {
+          "type": "boolean",
+          "description": "Whether the ticket can be refunded."
+        },
+        "accommodations": {
+          "type": "array",
+          "description": "Accommodation facilities available per service journey.",
+          "items": {
+            "$ref": "#/$defs/AccommodationForServiceJourney"
+          }
+        },
+        "baggageTypes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Type of baggage. Compatible with the current NeTEx implementation of BaggageTypeEnumeration at Entur. Related to but may include more than 'BaggageTypeEnum'."
+          }
+        },
+        "reservingRequirements": {
+          "type": "array",
+          "description": "Reservation requirements per service journey.",
+          "items": {
+            "$ref": "#/$defs/ReservingRequirementForServiceJourney"
+          }
+        },
+        "userProfileSummary": {
+          "$ref": "#/$defs/UserProfileSummary"
+        },
+        "organisation": {
+          "$ref": "#/$defs/OrganisationSummary"
+        },
+        "duration": {
+          "type": "string",
+          "description": "Validity duration of the product, formatted according to ISO-8601."
+        },
+        "group": {
+          "$ref": "#/$defs/GroupSummary"
+        },
+        "fareClasses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A type of FareClass. Compatible with the current NeTEx implementation of FareClassEnumeration at Entur. Related to but may include more than 'FareClassEnum'."
+          }
+        },
+        "carnet": {
+          "$ref": "#/$defs/Carnet"
+        },
+        "durationType": {
+          "type": "string",
+          "description": "Validity duration. Compatible with the current NeTEx implementation of UsageValidityTypeEnumeration at Entur. Related to but may include more than 'DurationTypeEnum'."
+        },
+        "nuisanceFacilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Nuisance facility for the product. Compatible with the current NeTEx implementation of NuisanceFacilityEnumeration at Entur."
+          }
+        }
+      },
+      "required": [
+        "organisation"
+      ]
+    },
+    "Recommendation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of a recommendation within this response."
+        },
+        "geographicalValidityCovered": {
+          "$ref": "#/$defs/GeographicalValidityCovered"
+        },
+        "typeOfRecommendation": {
+          "$ref": "#/$defs/TypeOfRecommendationEnum"
+        },
+        "durationType": {
+          "$ref": "#/$defs/DurationEnum"
+        },
+        "fareClass": {
+          "$ref": "#/$defs/FareClassEnum"
+        },
+        "facilitySet": {
+          "$ref": "#/$defs/AccommodationFacilityEnum"
+        },
+        "offersToBuy": {
+          "type": "array",
+          "description": "Describes which offer to buy and how many of this offer to buy to satisfy a recommendation.",
+          "items": {
+            "$ref": "#/$defs/OfferToBuy"
+          }
+        },
+        "combineWithToCoverEntireJourney": {
+          "type": "array",
+          "description": "List of RecommendationCombination covering remaining parts of the journey. The current recommendation can be combined with one of these to cover the entire journey.",
+          "items": {
+            "$ref": "#/$defs/RecommendationCombination"
+          }
+        }
+      },
+      "required": [
+        "geographicalValidityCovered",
+        "id",
+        "offersToBuy",
+        "typeOfRecommendation"
+      ]
+    },
+    "RecommendationCombination": {
+      "type": "object",
+      "description": "A combination of recommendations that together cover the entire journey.",
+      "properties": {
+        "geographicalValidityCovered": {
+          "$ref": "#/$defs/GeographicalValidityCovered"
+        },
+        "recommendationsToCoverEntireJourney": {
+          "type": "array",
+          "description": "You must select all recommendations in the list to cover the geographical validity.",
+          "items": {
+            "type": "string",
+            "description": "Id of the recommendation(s) to select."
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "geographicalValidityCovered",
+        "recommendationsToCoverEntireJourney"
+      ],
+      "title": "RecommendationCombination"
+    },
+    "RecommendationResult": {
+      "type": "object",
+      "description": "A set of recommendations matching the provided recommendation configuration.",
+      "properties": {
+        "coveringEntireJourney": {
+          "type": "array",
+          "description": "Recommendations that cover the entire journey.",
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          }
+        },
+        "coveringPartOfJourney": {
+          "type": "array",
+          "description": "Recommendations that cover part of the journey. Use `combineWithToCoverEntireJourney` when available to build recommendations to achieve full journey coverage.",
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          }
+        }
+      }
+    },
+    "ReservingRequirementForServiceJourney": {
+      "type": "object",
+      "properties": {
+        "serviceJourney": {
+          "$ref": "#/$defs/ServiceJourneySummary"
+        },
+        "reservingRequirement": {
+          "type": "string",
+          "description": "Indicates requirements for reservation. Compatible with the current NeTEx implementation of ReservationEnumeration at Entur."
+        },
+        "seatMapIsAvailable": {
+          "type": "boolean",
+          "description": "Whether a seat map is available for seat selection on this service journey."
+        }
+      },
+      "required": [
+        "seatMapIsAvailable",
+        "serviceJourney"
+      ]
+    },
+    "ServiceJourneySummary": {
+      "type": "object",
+      "properties": {
+        "datedServiceJourneyId": {
+          "type": "string"
+        },
+        "serviceJourneyId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "datedServiceJourneyId",
+        "serviceJourneyId"
+      ]
+    },
+    "TravellerMappingSummary": {
+      "type": "object",
+      "description": "A specification of which travellers can use an offer, along with limitations on the number of travellers that must be selected from the group for the OFFER to be valid.",
+      "properties": {
+        "travellerIds": {
+          "type": "array",
+          "description": "The ids of the travellers.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "maxNumberOfTravellers": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The maximum number of travellers that can be selected from the group."
+        },
+        "minNumberOfTravellers": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The minimum number of travellers that can be selected from the group."
+        },
+        "userType": {
+          "type": "string",
+          "description": "A type of person. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Compatible with the current NeTEx implementation of UserTypeEnumeration at Entur. Related to but may include more than 'UserTypeEnum'."
+        }
+      },
+      "required": [
+        "maxNumberOfTravellers",
+        "minNumberOfTravellers",
+        "travellerIds",
+        "userType"
+      ]
+    },
+    "TypeOfRecommendationEnum": {
+      "type": "string",
+      "default": "CHEAPEST",
+      "description": "Describes the degree of flexibility in a recommendation (refundable vs non-refundable, exchangeable vs non-exchangeable). Whether the recommendation is the CHEAPEST - regardless of flexibility, or whether the recommendation is for a specified product.",
+      "enum": [
+        "FLEXIBLE",
+        "SEMI_FLEXIBLE",
+        "NON_FLEXIBLE",
+        "CHEAPEST"
+      ]
+    },
+    "UnavailableProduct": {
+      "type": "object",
+      "description": "Representation of a product that is unavailable, but would have been included in an offer if available.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "NeTEx ID of the unavailable product."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human readable name for the product."
+        },
+        "unavailableStatus": {
+          "type": "string",
+          "description": "Status of why a product is unavailable.\n NOT_IN_PURCHASE_WINDOW - Product is outside of window where it can be purchased.\n NOT_YET_AVAILABLE - The product is not available yet, no further information is specified\n NO_QUOTAS_DEFINED - The product requires quotas to be purchased, but no quotas are defined yet.\nNO_LONGER_AVAILABLE - The product is no longer available for purchase, no further information is specified.\nSOLD_OUT - The product has no more seats or quotas available for sale.\nCLOSED - The product is closed for sale.\n"
+        },
+        "serviceJourney": {
+          "$ref": "#/$defs/ServiceJourneySummary"
+        },
+        "properties": {
+          "$ref": "#/$defs/UnavailableProductProperties"
+        }
+      },
+      "required": [
+        "id",
+        "unavailableStatus"
+      ]
+    },
+    "UnavailableProductProperties": {
+      "type": "object",
+      "description": "Properties of an unavailable product.",
+      "properties": {
+        "accommodations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Accommodation facility. Compatible with the current NeTEx implementation of AccommodationFacilityEnumeration at Entur. Related to but may include more than 'AccommodationFacilityEnum'."
+          }
+        },
+        "fareClasses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A type of FareClass. Compatible with the current NeTEx implementation of FareClassEnumeration at Entur. Related to but may include more than 'FareClassEnum'."
+          }
+        },
+        "isExchangeable": {
+          "type": "boolean",
+          "description": "Whether the product would have been exchangeable."
+        },
+        "isRefundable": {
+          "type": "boolean",
+          "description": "Whether the product would have been refundable."
+        },
+        "organisation": {
+          "$ref": "#/$defs/OrganisationSummary"
+        }
+      }
+    },
+    "UserProfileInGroupSummary": {
+      "type": "object",
+      "description": "Reference to a group.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "numberOfPeople": {
+          "type": "integer",
+          "description": "Number of travellers required for this user profile in the group."
+        }
+      },
+      "required": [
+        "id",
+        "numberOfPeople"
+      ]
+    },
+    "UserProfileSummary": {
+      "type": "object",
+      "description": "id, version, name and user type of a user.",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "userType": {
+          "type": "string",
+          "description": "A type of person. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Compatible with the current NeTEx implementation of UserTypeEnumeration at Entur. Related to but may include more than 'UserTypeEnum'."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "version"
+      ]
+    },
+    "ZonalValidity": {
+      "type": "object",
+      "description": "Describes zones where a product is valid. Either a specific list of from, to and viaZones, or a reference to a GroupOfTariffZones.",
+      "properties": {
+        "fromZone": {
+          "$ref": "#/$defs/NamedReference",
+          "description": "Zone at the start of the journey."
+        },
+        "toZone": {
+          "$ref": "#/$defs/NamedReference",
+          "description": "Zone at the end of the journey."
+        },
+        "viaZones": {
+          "type": "array",
+          "description": "Unordered list of valid fare zones through which the trip traverses.",
+          "items": {
+            "$ref": "#/$defs/NamedReference"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "groupOfTariffZones": {
+          "type": "array",
+          "description": "Reference to a group of fare zones. The offer is valid through all of the zones in this group.",
+          "items": {
+            "$ref": "#/$defs/NamedReference"
+          }
+        }
+      }
+    }
+  }
+}

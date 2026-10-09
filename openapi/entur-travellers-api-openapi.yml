@@ -1,0 +1,379 @@
+openapi: 3.2.0
+info:
+  title: Entur Travellers API
+  version: 2026.09.0
+  description: 'Operations tagged Travellers across 2 of this provider''s published API definitions: entur-order-partner-openapi.json, entur-order-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.staging.entur.io/sales
+  description: Staging test environment
+- url: https://api.dev.entur.io/sales
+  description: Development test environment
+- url: https://api.entur.io/sales
+  description: Production environment
+security:
+- authHeader: []
+tags:
+- name: Travellers
+  description: Services related to travellers on order.
+paths:
+  /v1/orders/{orderId}/travellers:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Travellers
+      summary: Add Traveller to Order
+      description: Deprecated. Please use POST /v1/orders/{orderId}/travellers/bulk.
+      operationId: addTravellerToOrder
+      requestBody:
+        description: traveller
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TravellerRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Traveller'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailable'
+      deprecated: true
+    servers:
+    - url: https://api.staging.entur.io/sales
+      description: Staging test environment
+    - url: https://api.dev.entur.io/sales
+      description: Development test environment
+    - url: https://api.entur.io/sales
+      description: Production environment
+  /v1/orders/{orderId}/travellers/bulk:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Travellers
+      summary: Add list of Traveller to Order
+      description: This endpoint adds a list of Traveller to the specified Order, and returns the List that was added. If the Order does not exist, it will throw an exception.
+      operationId: addTravellersToOrder
+      requestBody:
+        description: travellers
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TravellerRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Traveller'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailable'
+    delete:
+      tags:
+      - Travellers
+      summary: Remove list of travellers from Order
+      description: This endpoint removes the list of travellerIds from the specified Order.
+      operationId: removeTravellersFromOrder
+      parameters:
+      - name: travellerIds
+        in: query
+        description: List of traveller IDs to remove from order
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          $ref: '#/components/responses/noContent'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailable'
+    servers:
+    - url: https://api.staging.entur.io/sales
+      description: Staging test environment
+    - url: https://api.dev.entur.io/sales
+      description: Development test environment
+    - url: https://api.entur.io/sales
+      description: Production environment
+  /v1/orders/{orderId}/travellers/{travellerId}:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - name: travellerId
+      in: path
+      description: Traveller ID associated with Order
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        format: uuid
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Travellers
+      summary: Update Traveller
+      description: This endpoint updates a Traveller for the specified Order, and returns the Traveller that was updated. If either the Order or the Traveller does not exist, it will throw an exception.
+      operationId: updateTravellerOnOrder
+      requestBody:
+        description: traveller
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TravellerRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Traveller'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailable'
+    delete:
+      tags:
+      - Travellers
+      summary: Remove Traveller from Order
+      description: Deprecated. Please use DELETE /v1/orders/{orderId}/travellers/bulk
+      operationId: removeTravellerFromOrder
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailable'
+      deprecated: true
+    servers:
+    - url: https://api.staging.entur.io/sales
+      description: Staging test environment
+    - url: https://api.dev.entur.io/sales
+      description: Development test environment
+    - url: https://api.entur.io/sales
+      description: Production environment
+components:
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    serviceUnavailable:
+      description: Service unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    noContent:
+      description: No Content
+  schemas:
+    CustomerRef:
+      title: CustomerRef
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID for Customer
+          examples:
+          - '12345'
+      description: Customer reference.
+    ApiError:
+      title: ApiError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      type: object
+      properties:
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      examples:
+      - timestamp: '2025-05-13T07:19:30.389Z'
+        status: 404
+        error: Not Found
+        title: Not Found
+        exception: NotFoundException
+        message: The requested resource was not found.
+        path: /orders/ABDC1234
+    TravellerRequest:
+      title: TravellerRequest
+      type: object
+      properties:
+        ref:
+          $ref: '#/components/schemas/CustomerRef'
+      description: A Traveller object which might hold a reference to a Customer
+    Traveller:
+      title: Traveller
+      type: object
+      description: A Traveller object which might hold a reference to a Customer
+      allOf:
+      - required:
+        - id
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+      - $ref: '#/components/schemas/TravellerRequest'
+  parameters:
+    orderIdPathParam:
+      name: orderId
+      in: path
+      description: Order ID
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: A header containing the distribution channel ID.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+x-refined-from:
+- entur-order-partner-openapi.json
+- entur-order-partner-openapi.yml

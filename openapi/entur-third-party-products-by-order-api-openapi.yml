@@ -1,0 +1,474 @@
+openapi: 3.2.0
+info:
+  title: Entur Third Party Products by Order API
+  version: 2026.09.0
+  description: 'Operations tagged Third Party Products by Order across 2 of this provider''s published API definitions: entur-third-party-product-partner-openapi.json, entur-third-party-product-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: production
+- url: https://api.staging.entur.io/sales
+  description: staging
+- url: https://api.dev.entur.io/sales
+  description: dev
+security:
+- jwt: []
+tags:
+- name: Third Party Products by Order
+  description: Get third party products for an order
+paths:
+  /v1/third-party-products/orders/{orderId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Third Party Products by Order
+      summary: Get third party products for an order
+      description: Returns third party products for given orderId
+      operationId: getThirdPartyProducts
+      parameters:
+      - name: orderId
+        in: path
+        description: The id of the order.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThirdPartyProductsResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: production
+    - url: https://api.staging.entur.io/sales
+      description: staging
+    - url: https://api.dev.entur.io/sales
+      description: dev
+  /v1/third-party-products/orders/{orderId}/order-lines/{orderLineId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Third Party Products by Order
+      summary: Get specific third party product for an orderLine
+      description: Returns third party products for given orderId, orderLineId and orderLineVersion. A Third party product is a product in the system that belongs to an external provider/operator, but is sold or handled through our platform.
+      operationId: getThirdPartyProductByOrderLine
+      parameters:
+      - name: orderId
+        in: path
+        description: The id of the order.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: orderLineId
+        in: path
+        description: The id of the order line.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: orderLineVersion
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThirdPartyProduct'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: production
+    - url: https://api.staging.entur.io/sales
+      description: staging
+    - url: https://api.dev.entur.io/sales
+      description: dev
+components:
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-01-01T12:00:00Z'
+                status: 500
+                title: Internal Server Error
+                error: Internal Server Error
+                exception: RuntimeException
+                message: An unexpected error occurred
+                path: /v1/third-party-products/XYZ123
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-01-01T12:00:00Z'
+                status: 400
+                title: Bad Request
+                error: Bad Request
+                exception: ValidationException
+                message: Validation failed
+                path: /v1/third-party-products/XYZ123
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-01-01T12:00:00Z'
+                status: 403
+                title: Forbidden
+                error: Forbidden
+                exception: AccessDeniedException
+                message: Access denied
+                path: /v1/third-party-products/XYZ123
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-01-01T12:00:00Z'
+                status: 404
+                title: Not Found
+                error: Not Found
+                exception: EntityNotFoundException
+                message: Entity not found
+                path: /v1/third-party-products/XYZ123
+  schemas:
+    UserProfile:
+      title: UserProfile
+      required:
+      - name
+      - userProfileRef
+      type: object
+      properties:
+        userProfileRef:
+          $ref: '#/components/schemas/RefType'
+        name:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A human-readable list of names for the product
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        price:
+          $ref: '#/components/schemas/PriceWithTax'
+        priceContribution:
+          $ref: '#/components/schemas/PriceWithTax'
+      description: ''
+    ThirdPartyProduct:
+      required:
+      - name
+      - orderId
+      - orderLineId
+      - orderLineVersion
+      - orderVersion
+      - parameters
+      - price
+      - priceContribution
+      - productRef
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: The orderId for which the product belongs to.
+        orderVersion:
+          type: integer
+          description: The version of the order for which the product belongs to.
+        orderLineId:
+          type: string
+          description: The orderLineId for which the product belongs to.
+        orderLineVersion:
+          type: integer
+          description: The version of the order line for which the product belongs to.
+        productRef:
+          $ref: '#/components/schemas/RefType'
+        validity:
+          $ref: '#/components/schemas/Validity'
+        name:
+          type: array
+          description: A human-readable list of names for the product
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        price:
+          $ref: '#/components/schemas/PriceWithTax'
+        priceContribution:
+          $ref: '#/components/schemas/PriceWithTax'
+        authorityId:
+          type: string
+          description: Owner of the product.
+        parameters:
+          $ref: '#/components/schemas/Parameters'
+      description: A third party product for given order and order line.
+      examples:
+      - orderId: WAYFARE-ORDER-98765
+        orderVersion: 1
+        orderLineId: WAYFARE-ORDERLINE-2
+        orderLineVersion: 1
+        productRef:
+          id: WAYFARE:ThirdPartyProduct:LuggageReservation
+          version: WAYFARE:Version:LuggageReservation-1
+        name:
+        - lang: eng
+          value: Wayfare luggage space reservation
+        - lang: nob
+          value: Wayfare bagasjeplassreservasjon
+        price:
+          amount: '59.00'
+          taxAmount: '11.80'
+          currency: NOK
+          taxRate: '25.00'
+          taxCode: '03'
+        priceContribution:
+          amount: '59.00'
+          taxAmount: '11.80'
+          currency: NOK
+          taxRate: '25.00'
+          taxCode: '03'
+        parameters: {}
+        authorityId: WAYFARE:Authority:WAYFARE
+    Validity:
+      title: Validity period of the product
+      required:
+      - endOfValidity
+      - startOfValidity
+      type: object
+      properties:
+        startOfValidity:
+          type: string
+          format: date-time
+        endOfValidity:
+          type: string
+          format: date-time
+      description: Holds the start and end of validity for the product if this is relevant
+    ApiError:
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        error:
+          type: string
+        errors:
+          type: array
+          items:
+            type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      examples:
+      - timestamp: '2025-01-01T12:00:00Z'
+        status: 400
+        title: Bad Request
+        error: Bad Request
+        exception: ValidationException
+        message: Validation failed
+        path: /v1/third-party-products/XYZ123
+    RefType:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: The identifier to distinguish the product
+          examples:
+          - ENT:ThirdPartyProduct:MyProduct
+        version:
+          type: string
+          description: Version for the id
+          examples:
+          - ENT:Version:MyProduct-1
+      description: Versioned ID of the product.
+    ThirdPartyProductsResponse:
+      required:
+      - thirdPartyProducts
+      type: object
+      properties:
+        thirdPartyProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ThirdPartyProduct'
+      description: Response containing third party products.
+      examples:
+      - thirdPartyProducts:
+        - orderId: WAYFARE-ORDER-98765
+          orderVersion: 1
+          orderLineId: WAYFARE-ORDERLINE-2
+          orderLineVersion: 1
+          productRef:
+            id: WAYFARE:ThirdPartyProduct:LuggageReservation
+            version: WAYFARE:Version:LuggageReservation-1
+          name:
+          - lang: eng
+            value: Wayfare luggage space reservation
+          - lang: nob
+            value: Wayfare bagasjeplassreservasjon
+          price:
+            amount: '59.00'
+            taxAmount: '11.80'
+            currency: NOK
+            taxRate: '25.00'
+            taxCode: '03'
+          priceContribution:
+            amount: '59.00'
+            taxAmount: '11.80'
+            currency: NOK
+            taxRate: '25.00'
+            taxCode: '03'
+          parameters: {}
+          authorityId: WAYFARE:Authority:WAYFARE
+    Parameters:
+      title: Parameters
+      type: object
+      properties:
+        userProfile:
+          $ref: '#/components/schemas/UserProfile'
+      description: Similar to OrderLine.fareProducts.parameters, but with additional fields for third party products.
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          type: string
+          description: The language of the text
+        value:
+          type: string
+          description: The value of the text in the given language
+      description: Contains a text value in a given language
+      x-examples:
+        example-1:
+          lang: nob
+          value: Bergen Stasjon
+    PriceWithTax:
+      title: PriceWithTax
+      required:
+      - amount
+      - currency
+      - taxAmount
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount including tax amount.
+          examples:
+          - '399'
+        taxAmount:
+          type: string
+          description: Tax amount
+          examples:
+          - '36.27'
+        taxRate:
+          type: string
+          description: Tax rate
+          examples:
+          - '12'
+        taxCode:
+          type: string
+          description: Tax code for this tax rate
+          examples:
+          - '12'
+        currency:
+          type: string
+          description: Currency
+          default: NOK
+          examples:
+          - NOK
+      description: Price with included tax amounts and an optional rate.
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-third-party-product-partner-openapi.json
+- entur-third-party-product-partner-openapi.yml

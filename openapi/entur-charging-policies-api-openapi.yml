@@ -1,0 +1,284 @@
+openapi: 3.2.0
+info:
+  title: Entur Charging Policies API
+  version: 2026.10.0
+  description: 'Operations tagged charging-policies across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: charging-policies
+paths:
+  /charging-policies:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - charging-policies
+      summary: Retrieves all charging policies
+      operationId: charging-policies_getAll
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify a dataset to an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChargingPolicy'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    ChargingPolicy:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        billingPolicy:
+          type: string
+          description: TravelBillingPolicy is optional. No default value
+          enum:
+          - BILL_AS_YOU_GO
+          - BILL_ON_THRESHOLD
+          - BILL_AT_FARE_DAY_END
+          - BILL_AT_PERIOD_END
+        changed:
+          type: string
+          description: ChargingPolicy changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: ChargingPolicy create datetime.
+          readOnly: true
+        creditPolicy:
+          type: string
+          description: Travel credit policy enum is optional. No default value
+          enum:
+          - ALLOW_TRAVEL
+          - BLOCK_PAY_AS_YOU_GO_TRAVEL
+          - BLOCK_ALL_TRAVEL
+          - OTHER
+        description:
+          type: array
+          description: ChargingPolicy description in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        expireAfterPeriod:
+          type: string
+          description: Expire after period. Represented as a string formatted according to ISO-8601
+          examples:
+          - PT1H
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ChargingPolicy:Ordinary
+        modification:
+          type: string
+          description: Modification status
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: ChargingPolicy name in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ChargingPolicy
+        paymentGracePeriod:
+          type: string
+          description: Payment grace period. Represented as a string formatted according to ISO-8601
+          examples:
+          - PT1H
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        typeOfUsageParameter:
+          type: string
+          description: type of UsageParameter.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A ChargingPolicy response
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

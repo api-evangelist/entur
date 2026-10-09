@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-purchase-window-request-schema.json",
+  "title": "PurchaseWindowRequest",
+  "description": "A purchase window (NeTEx `PurchaseWindow`, a `UsageParameter`) defines when a product can be\npurchased relative to the time of travel. Products reference it through `purchaseWindowRef`;\nthe underlying NeTEx `GenericParameterAssignment` is managed by the backend.\n",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-product-parameters-api-openapi.yml#/components/schemas/PurchaseWindowRequest",
+  "required": [
+    "names",
+    "startDate",
+    "status"
+  ],
+  "type": "object",
+  "properties": {
+    "ownerOrganisationId": {
+      "minimum": 1,
+      "type": "integer",
+      "description": "Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.",
+      "format": "int64"
+    },
+    "names": {
+      "$ref": "#/$defs/LocalizedString"
+    },
+    "descriptions": {
+      "$ref": "#/$defs/LocalizedString"
+    },
+    "startDate": {
+      "type": "string",
+      "description": "First day this purchase window version is valid.",
+      "format": "date"
+    },
+    "endDate": {
+      "type": "string",
+      "description": "Last day this purchase window version is valid (optional). Omit for an open-ended version.",
+      "format": "date"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/VersionStatus"
+        },
+        {
+          "description": "Status of the purchase window version. Required; on create only DRAFT or\nPROPOSED is accepted — a new version cannot be published directly.\n"
+        }
+      ]
+    },
+    "purchaseWhen": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/PurchaseWhen"
+        },
+        {
+          "description": "When a purchase can be made relative to the time of travel. Optional: when omitted, the\npurchase window sets no restriction on when the purchase can be made, only the periods\nbefore departure (if set) apply.\n"
+        }
+      ]
+    },
+    "latestTime": {
+      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$",
+      "type": "string",
+      "description": "Latest time of day a purchase can be made (NeTEx `LatestTime`), formatted `HH:mm:ss`."
+    },
+    "minimumPeriodBeforeDeparture": {
+      "type": "string",
+      "description": "Minimum period before departure that a purchase must be made (NeTEx\n`MinimumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.\n"
+    },
+    "maximumPeriodBeforeDeparture": {
+      "type": "string",
+      "description": "Maximum period before departure that a purchase can be made (NeTEx\n`MaximumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.\nMust not be shorter than `minimumPeriodBeforeDeparture`.\n"
+    },
+    "purchaseAction": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/PurchaseAction"
+        },
+        {
+          "description": "The purchase action this window applies to (NeTEx `PurchaseAction`).\n"
+        }
+      ]
+    },
+    "purchaseMoments": {
+      "uniqueItems": true,
+      "type": "array",
+      "description": "The moments at which a purchase can be made (NeTEx `PurchaseMoment`, a list).\n",
+      "items": {
+        "$ref": "#/$defs/PurchaseMoment"
+      }
+    }
+  },
+  "$defs": {
+    "LocalizedString": {
+      "type": "array",
+      "items": {
+        "required": [
+          "lang",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "lang": {
+            "pattern": "^[a-z]{2}-[A-Z]{2}$",
+            "type": "string",
+            "description": "BCP-47 language tag (e.g., 'nb-NO', 'en-GB')."
+          },
+          "value": {
+            "type": "string",
+            "description": "The localized string value for the specified lang."
+          }
+        }
+      }
+    },
+    "PurchaseAction": {
+      "type": "string",
+      "description": "The type of purchase action the window applies to.\n",
+      "enum": [
+        "PURCHASE",
+        "ORDER_WITHOUT_PAYMENT",
+        "RESERVE",
+        "PAY_FOR_PREVIOUS_ORDER",
+        "SUBSCRIBE",
+        "PAY_INSTALLMENT",
+        "OTHER"
+      ]
+    },
+    "PurchaseMoment": {
+      "type": "string",
+      "description": "A moment at which a purchase can be made.\n",
+      "enum": [
+        "ON_RESERVATION",
+        "IN_ADVANCE",
+        "IN_ADVANCE_ONLY",
+        "BEFORE_BOARDING",
+        "BEFORE_BOARDING_ONLY",
+        "ON_BOARDING",
+        "ON_BOARDING_ONLY",
+        "AFTER_BOARDING",
+        "ON_CHECK_IN",
+        "ON_CHECK_OUT",
+        "SUBSCRIPTION_ONLY",
+        "NO_TICKET_REQUIRED",
+        "OTHER"
+      ]
+    },
+    "PurchaseWhen": {
+      "type": "string",
+      "description": "When a purchase can be made relative to the time of travel.\n\n- **ADVANCE_ONLY** - Only in advance of the day of travel.\n- **UNTIL_PREVIOUS_DAY** - Until the end of the day before travel.\n- **DAY_OF_TRAVEL_ONLY** - Only on the day of travel.\n- **ADVANCE_AND_DAY_OF_TRAVEL** - In advance or on the day of travel.\n- **TIME_OF_TRAVEL_ONLY** - Only at the time of travel.\n- **SUBSCRIPTION_CHARGE_MOMENT** - At the charge moment of a subscription.\n- **OTHER** - Other rule.\n",
+      "enum": [
+        "ADVANCE_ONLY",
+        "UNTIL_PREVIOUS_DAY",
+        "DAY_OF_TRAVEL_ONLY",
+        "ADVANCE_AND_DAY_OF_TRAVEL",
+        "TIME_OF_TRAVEL_ONLY",
+        "SUBSCRIPTION_CHARGE_MOMENT",
+        "OTHER"
+      ]
+    },
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    }
+  }
+}

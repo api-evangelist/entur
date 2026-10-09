@@ -1,0 +1,474 @@
+# Source: introspection of https://api.entur.io/mobility/v2/graphql (fetched 2026-10-09)
+"""This directive allows results to be deferred during execution"""
+directive @defer(
+  """Deferred behaviour is controlled by this argument"""
+  if: Boolean! = true
+
+  """A unique label that represents the fragment being deferred"""
+  label: String
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""
+This directive disables error propagation when a non nullable field returns null for the given operation.
+"""
+directive @experimental_disableErrorPropagation on QUERY | MUTATION | SUBSCRIPTION
+
+type BrandAssets {
+  brandLastModified: String!
+  brandTermsUrl: String
+  brandImageUrl: String!
+  brandImageUrlDark: String
+  color: String
+}
+
+type EcoLabel {
+  countryCode: String!
+  ecoSticker: String!
+}
+
+type Feature {
+  type: String
+  geometry: MultiPolygon
+  properties: GeofencingZoneProperties
+}
+
+type FeatureCollection {
+  type: String
+  features: [Feature]
+}
+
+enum FormFactor {
+  BICYCLE
+  CARGO_BICYCLE
+  CAR
+  MOPED
+  SCOOTER @deprecated(reason: "Use SCOOTER_STANDING")
+  SCOOTER_STANDING
+  SCOOTER_SEATED
+  OTHER
+}
+
+type GeofencingZoneProperties {
+  name: String
+  start: Int
+  end: Int
+  rules: [GeofencingZoneRule]
+
+  """
+  MultiPolygon where the lists of coordinates are encoded as polyline strings using precision of 6 decimals (see http://code.google.com/apis/maps/documentation/polylinealgorithm.html). Meant to be used instead of geometry.coordinates to minimize the response payload size.
+  """
+  polylineEncodedMultiPolygon: [[String]]
+}
+
+type GeofencingZoneRule {
+  vehicleTypeIds: [String]
+  rideAllowed: Boolean! @deprecated(reason: "Use rideStartAllowed and rideEndAllowed")
+  rideStartAllowed: Boolean!
+  rideEndAllowed: Boolean!
+  rideThroughAllowed: Boolean!
+  maximumSpeedKph: Int
+  stationParking: Boolean
+}
+
+type GeofencingZones {
+  systemId: ID
+  geojson: FeatureCollection
+}
+
+type MultiPolygon {
+  type: String
+
+  """
+  See properties.polylineEncodedMultiPolygon, and consider using that instead of coordinates
+  """
+  coordinates: [[[[Float]]]]
+}
+
+type Operator {
+  id: ID!
+  name: TranslatedString!
+}
+
+enum ParkingType {
+  PARKING_LOT
+  STREET_PARKING
+  UNDERGROUND_PARKING
+  SIDEWALK_PARKING
+  OTHER
+}
+
+type PricingPlan {
+  id: ID!
+  url: String
+  name: TranslatedString!
+  currency: String!
+  price: Float!
+  isTaxable: Boolean!
+  description: TranslatedString!
+  perKmPricing: [PricingSegment]
+  perMinPricing: [PricingSegment]
+  surgePricing: Boolean
+}
+
+type PricingSegment {
+  start: Int!
+  rate: Float!
+  interval: Int!
+  end: Int
+}
+
+enum PropulsionType {
+  HUMAN
+  ELECTRIC_ASSIST
+  ELECTRIC
+  COMBUSTION
+  COMBUSTION_DIESEL
+  HYBRID
+  PLUG_IN_HYBRID
+  HYDROGEN_FUEL_CELL
+}
+
+type Query {
+  codespaces: [String]
+  operators: [Operator]
+  vehicle(id: String!): Vehicle
+  vehicles(
+    """Fetch vehicles with specific ids. All other filters are ignored!"""
+    ids: [String!]
+
+    """Required unless using 'ids'"""
+    lat: Float
+
+    """Required unless using 'ids'"""
+    lon: Float
+
+    """Search radius in meters. Required unless using 'ids'"""
+    range: Int
+
+    """Bounding box minimum latitude"""
+    minimumLatitude: Float
+
+    """Bounding box minimum longitude"""
+    minimumLongitude: Float
+
+    """Bounding box maximum latitude"""
+    maximumLatitude: Float
+
+    """Bounding box maximum longitude"""
+    maximumLongitude: Float
+
+    """Max results to return."""
+    count: Int
+
+    """Filter by codespaces"""
+    codespaces: [String]
+
+    """Filter by systems"""
+    systems: [String]
+
+    """Filter by operators"""
+    operators: [String]
+
+    """Filter by form factors"""
+    formFactors: [FormFactor]
+
+    """Filter by propulsion type"""
+    propulsionTypes: [PropulsionType]
+
+    """Include reserved vehicles in result"""
+    includeReserved: Boolean = false
+
+    """Include disabled vehicles in result"""
+    includeDisabled: Boolean = false
+  ): [Vehicle]
+  station(id: String!): Station
+  stations(
+    """Fetch vehicles with specific ids. All other filters are ignored!"""
+    ids: [String!]
+
+    """Required unless using 'ids'"""
+    lat: Float
+
+    """Required unless using 'ids'"""
+    lon: Float
+
+    """Search radius in meters. Required unless using 'ids'"""
+    range: Int
+
+    """Bounding box minimum latitude"""
+    minimumLatitude: Float
+
+    """Bounding box minimum longitude"""
+    minimumLongitude: Float
+
+    """Bounding box maximum latitude"""
+    maximumLatitude: Float
+
+    """Bounding box maximum longitude"""
+    maximumLongitude: Float
+
+    """Max results to return."""
+    count: Int
+
+    """Filter by codespaces"""
+    codespaces: [String]
+
+    """Filter by systems"""
+    systems: [String]
+
+    """Filter by operators"""
+    operators: [String]
+
+    """Filter by available form factors at station"""
+    availableFormFactors: [FormFactor]
+
+    """Filter by available propulsion types at station"""
+    availablePropulsionTypes: [PropulsionType]
+  ): [Station]
+  stationsById(ids: [String]!): [Station] @deprecated(reason: "stationsById is deprecated. Use stations query instead.")
+  geofencingZones(systemIds: [ID]): [GeofencingZones]
+  systems(
+    """Fetch systems with specific ids. If omitted, all systems are returned."""
+    ids: [String!]
+  ): [System]
+}
+
+type Region {
+  id: ID!
+  name: String!
+}
+
+type RentalApp {
+  storeUri: String
+  discoveryUri: String
+}
+
+type RentalApps {
+  ios: RentalApp
+  android: RentalApp
+}
+
+enum RentalMethod {
+  KEY
+  CREDITCARD
+  PAYPASS
+  APPLEPLAY
+  ANDROIDPAY
+  TRANSITCARD
+  ACCOUNTNUMBER
+  PHONE
+}
+
+type RentalUris {
+  android: String
+  ios: String
+  web: String
+}
+
+enum ReturnConstraint {
+  FREE_FLOATING
+  ROUNDTRIP_STATION
+  ANY_STATION
+  HYBRID
+}
+
+type Station {
+  id: ID!
+  name: TranslatedString!
+  shortName: TranslatedString
+  lat: Float!
+  lon: Float!
+  address: String
+  crossStreet: String
+  region: Region
+  postCode: String
+  rentalMethods: [RentalMethod]
+  isVirtualStation: Boolean
+  stationArea: MultiPolygon
+  parkingType: ParkingType
+  parkingHoop: Boolean
+  contactPhone: String
+  capacity: Int
+  vehicleCapacity: [VehicleTypeCapacity] @deprecated(reason: "Use vehicleTypesCapacity")
+  vehicleTypesCapacity: [VehicleTypesCapacity]
+  vehicleTypeCapacity: [VehicleTypeCapacity] @deprecated(reason: "Use vehicleDocksCapacity")
+  vehicleDocksCapacity: [VehicleDocksCapacity]
+  isValetStation: Boolean
+  isChargingStation: Boolean
+  rentalUris: RentalUris
+  numBikesAvailable: Int! @deprecated(reason: "Use numVehiclesAvailable")
+  numVehiclesAvailable: Int!
+  vehicleTypesAvailable: [VehicleTypeAvailability]
+  numBikesDisabled: Int @deprecated(reason: "Use numVehiclesDisabled")
+  numVehiclesDisabled: Int
+  numDocksAvailable: Int
+  vehicleDocksAvailable: [VehicleDocksAvailability]
+  numDocksDisabled: Int
+  isInstalled: Boolean!
+  isRenting: Boolean!
+  isReturning: Boolean!
+  lastReported: Int!
+  system: System!
+  pricingPlans: [PricingPlan]!
+
+  """
+  MultiPolygon where the lists of coordinates are encoded as polyline strings using precision of 6 decimals (see http://code.google.com/apis/maps/documentation/polylinealgorithm.html). Meant to be used instead of stationArea to minimize the response payload size.
+  """
+  stationAreaPolylineEncodedMultiPolygon: [[String]]
+}
+
+type StationUpdate {
+  stationId: String!
+  updateType: UpdateType!
+  station: Station
+}
+
+type Subscription {
+  vehicles(lat: Float, lon: Float, range: Int, minimumLatitude: Float, minimumLongitude: Float, maximumLatitude: Float, maximumLongitude: Float, codespaces: [String], systems: [String], operators: [String], formFactors: [FormFactor], propulsionTypes: [PropulsionType], includeReserved: Boolean = false, includeDisabled: Boolean = false): [VehicleUpdate] @deprecated(reason: "Experimental feature - API is subject to change")
+  stations(lat: Float, lon: Float, range: Int, minimumLatitude: Float, minimumLongitude: Float, maximumLatitude: Float, maximumLongitude: Float, codespaces: [String], systems: [String], operators: [String], availableFormFactors: [FormFactor], availablePropulsionTypes: [PropulsionType]): [StationUpdate] @deprecated(reason: "Experimental feature - API is subject to change")
+}
+
+type System {
+  id: ID!
+  language: String! @deprecated(reason: "Use languages")
+  languages: [String!]!
+  name: TranslatedString!
+  shortName: TranslatedString
+  openingHours: String
+  operator: Operator!
+  url: String
+  purchaseUrl: String
+  startDate: String
+  phoneNumber: String
+  email: String
+  feedContactEmail: String
+  timezone: String!
+  licenseUrl: String
+  brandAssets: BrandAssets
+  termsUrl: String
+  termsLastUpdated: String
+  privacyUrl: String
+  privacyLastUpdated: String
+  attributionOrganizationName: TranslatedString
+  attributionUrl: String
+  rentalApps: RentalApps
+  terminationDate: String
+}
+
+type TranslatedString {
+  translation: [Translation]!
+}
+
+type Translation {
+  language: String!
+  value: String!
+}
+
+enum UpdateType {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+type Vehicle {
+  id: ID!
+  lat: Float!
+  lon: Float!
+  isReserved: Boolean!
+  isDisabled: Boolean!
+  currentRangeMeters: Float!
+  currentFuelPercent: Float
+  vehicleType: VehicleType!
+  pricingPlan: PricingPlan!
+  vehicleEquipment: [VehicleEquipment]
+  rentalUris: RentalUris
+  system: System!
+  station: Station
+  availableUntil: String
+}
+
+enum VehicleAccessory {
+  AIR_CONDITIONING
+  AUTOMATIC
+  MANUAL
+  CONVERTIBLE
+  CRUISE_CONTROL
+  DOORS_2
+  DOORS_3
+  DOORS_4
+  DOORS_5
+  NAVIGATION
+}
+
+type VehicleAssets {
+  iconUrl: String!
+  iconUrlDark: String
+  iconLastModified: String!
+}
+
+type VehicleDocksAvailability {
+  vehicleTypes: [VehicleType]!
+  count: Int!
+}
+
+type VehicleDocksCapacity {
+  vehicleTypes: [VehicleType!]!
+  count: Int!
+}
+
+enum VehicleEquipment {
+  CHILD_SEAT_A
+  CHILD_SEAT_B
+  CHILD_SEAT_C
+  WINTER_TIRES
+  SNOW_CHAINS
+}
+
+type VehicleType {
+  id: ID!
+  formFactor: FormFactor!
+  riderCapacity: Int
+  cargoVolumeCapacity: Int
+  cargoLoadCapacity: Int
+  propulsionType: PropulsionType!
+  ecoLabel: [EcoLabel] @deprecated(reason: "Use ecoLabels")
+  ecoLabels: [EcoLabel]
+  maxRangeMeters: Float
+  name: TranslatedString
+  description: TranslatedString
+  vehicleAccessories: [VehicleAccessory]
+  gCO2km: Int
+  vehicleImage: String
+  make: String
+  model: String
+  color: String
+  wheelCount: Int
+  maxPermittedSpeed: Int
+  ratedPower: Int
+  defaultReserveTime: Int
+  returnConstraint: ReturnConstraint
+  vehicleAssets: VehicleAssets
+  defaultPricingPlan: PricingPlan
+  pricingPlans: [PricingPlan]
+}
+
+type VehicleTypeAvailability {
+  vehicleType: VehicleType!
+  count: Int!
+}
+
+type VehicleTypeCapacity {
+  vehicleType: VehicleType!
+  count: Int!
+}
+
+type VehicleTypesCapacity {
+  vehicleTypes: [VehicleType!]!
+  count: Int!
+}
+
+type VehicleUpdate {
+  vehicleId: String!
+  updateType: UpdateType!
+  vehicle: Vehicle
+}

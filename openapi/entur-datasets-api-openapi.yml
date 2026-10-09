@@ -1,0 +1,246 @@
+openapi: 3.2.0
+info:
+  title: Entur Datasets API
+  version: 2026.09.0
+  description: 'Operations tagged Datasets across 2 of this provider''s published API definitions: entur-timetable-management-openapi.json, entur-timetable-management-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/timetable/v1/timetable-management
+  description: Production
+- url: https://api.staging.entur.io/timetable/v1/timetable-management
+  description: Staging
+- url: https://api.dev.entur.io/timetable/v1/timetable-management
+  description: Development
+security:
+- jwt: []
+tags:
+- name: Datasets
+  description: Standard timetable dataset operations
+paths:
+  /datasets/{codespace}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Datasets
+      summary: Upload NeTEx dataset
+      description: This endpoint allows for uploading a NeTEx dataset into Entur import and validation pipeline. It provides the same feature as a manual upload from the Operator Portal application.
+      operationId: upload
+      parameters:
+      - name: codespace
+        in: path
+        description: 'Lowercase codespace attributed to the data provider. Examples: rut, sky, vyg, …'
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  contentMediaType: application/octet-stream
+                  description: NeTEx dataset file (ZIP archive)
+            examples:
+              dataset-upload:
+                summary: Upload timetable dataset
+                description: Example of uploading a NeTEx dataset ZIP file for provider RUT
+                value:
+                  file: netex-dataset-rut-2024-01-15.zip
+        required: true
+      responses:
+        '200':
+          description: OK - the dataset has been received successfully (this is only a technical acknowledgement, before applying any validation rule. The dataset may be rejected further down in the validation pipeline)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResult'
+              examples:
+                upload-success:
+                  summary: Successful upload
+                  description: Dataset upload initiated successfully, correlationId can be used to track progress
+                  value:
+                    correlationId: 550e8400-e29b-41d4-a716-446655440000
+        '401':
+          description: Unauthorized - the authorization token is missing or has expired.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: User is not authenticated
+        '403':
+          description: Forbidden - the authorization token is present, but it does not provide sufficient privileges to perform the operation.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Access denied for codespace 'rut'
+        '404':
+          description: Not Found - most likely a typo in the request URL.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Unknown codespace
+        '500':
+          description: Internal Server Error - a processing error on Entur's side.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Internal server error
+    servers:
+    - url: https://api.entur.io/timetable/v1/timetable-management
+      description: Production
+    - url: https://api.staging.entur.io/timetable/v1/timetable-management
+      description: Staging
+    - url: https://api.dev.entur.io/timetable/v1/timetable-management
+      description: Development
+  /datasets/{codespace}/filtered:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Datasets
+      summary: Download filtered NeTEx dataset
+      description: 'This endpoint gives access to private NeTEx datasets not available on Entur open data portal.
+
+        These datasets include, in addition to the data available on the open data portal, the following private data:
+
+        - NeTEx Block data
+
+        - DeadRuns
+
+        - Lines and Service Journeys with restricted publication
+
+
+        This dataset is time-filtered (past trips are removed) and content-filtered (unknown NeTEx entities are filtered out).
+
+        Datasets that failed validation are not published on this endpoint.
+
+        To access the original NeTEx dataset sent by the data provider, without any alteration,
+
+        use instead Latest original dataset download endpoint.'
+      operationId: download
+      parameters:
+      - name: codespace
+        in: path
+        description: Codespace of the NeTEx dataset
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: dsjcompatibility
+        in: query
+        description: 'Structure of DatedServiceJourney in the returned dataset, during the transition to NeTEx 1.16:
+
+          `legacy` (the default) returns the NeTEx 1.15 structure, in which replaced journeys are repeated
+
+          `DatedServiceJourneyRef` elements; `new` returns the NeTEx 1.16 structure, in which they are held in a
+
+          `replacedJourneys` container. Only datasets that contain replacement information differ between the
+
+          two; the others are returned unchanged and declare the NeTEx version the pipeline exported.
+
+          '
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - legacy
+          - new
+      responses:
+        '200':
+          description: NeTEx dataset ZIP archive with private data. Expired data and unsupported NeTEx entities are filtered out.
+          content:
+            application/x-octet-stream:
+              schema: {}
+        '400':
+          description: Bad Request - invalid value for the dsjcompatibility parameter.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: 'Invalid value for parameter dsjcompatibility: ''old'', expected legacy or new'
+        '401':
+          description: Unauthorized - the authorization token is missing or has expired.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: User is not authenticated
+        '403':
+          description: Forbidden - the authorization token is present, but it does not provide sufficient privileges to perform the operation.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Access denied
+        '404':
+          description: Not Found - most likely a typo in the request URL.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Not found
+        '500':
+          description: Internal Server Error - a processing error on Entur's side.
+          content:
+            text/plain:
+              examples:
+                default:
+                  value: Internal server error
+    servers:
+    - url: https://api.entur.io/timetable/v1/timetable-management
+      description: Production
+    - url: https://api.staging.entur.io/timetable/v1/timetable-management
+      description: Staging
+    - url: https://api.dev.entur.io/timetable/v1/timetable-management
+      description: Development
+components:
+  schemas:
+    UploadResult:
+      type: object
+      properties:
+        correlationId:
+          type: string
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-timetable-management-openapi.json
+- entur-timetable-management-openapi.yml

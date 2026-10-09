@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-current-level-summary-query-schema.json",
+  "title": "CurrentLevelSummaryQuery",
+  "description": "Status query for a member",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personalisation-client-openapi.yml#/components/schemas/CurrentLevelSummaryQuery",
+  "required": [
+    "customerId"
+  ],
+  "type": "object",
+  "properties": {
+    "programId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Id of the program to query. If null, will return summary of all programs the customer is enrolled in.",
+      "format": "int64"
+    },
+    "programReference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Reference to the program to query. Better to use than programId, since programId might vary in different environments."
+    },
+    "customerId": {
+      "type": "string",
+      "description": "Customer id of the member"
+    },
+    "programReferences": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "List of reference to the programs to query. If given then it overrides the programReference parameter.",
+      "items": {
+        "type": "string",
+        "description": "List of reference to the programs to query. If given then it overrides the programReference parameter."
+      }
+    },
+    "statusAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Get current level summary at a given date and time. Defaults to now if not set.",
+      "format": "date-time"
+    }
+  },
+  "writeOnly": true
+}

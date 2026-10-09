@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-consent-crm-response-schema.json",
+  "title": "ConsentCrmResponse",
+  "description": "A condensed view of consent information",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-consents-openapi.yml#/components/schemas/ConsentCrmResponse",
+  "required": [
+    "consentBaseVersion",
+    "consentCode",
+    "consentId",
+    "consentOrganisationId",
+    "createdByOrgId",
+    "customerNumber",
+    "customerRef",
+    "givenConsentId"
+  ],
+  "type": "object",
+  "properties": {
+    "consentBaseVersion": {
+      "type": "integer",
+      "description": "The consent base version associated with the consent",
+      "format": "int32"
+    },
+    "consentCode": {
+      "type": "string",
+      "description": "The consent code of the base consent associated with the consent"
+    },
+    "consentId": {
+      "type": "integer",
+      "description": "The id of the Consent that has been consented",
+      "format": "int64"
+    },
+    "consentOrganisationId": {
+      "type": "integer",
+      "description": "The organisation that owns the Consent. Typically an 'Operatør'",
+      "format": "int64"
+    },
+    "countryCode": {
+      "type": "string",
+      "description": "The telephone number country code"
+    },
+    "createdByOrgId": {
+      "type": "integer",
+      "description": "The organisation through which the consent was given",
+      "format": "int64"
+    },
+    "customerNumber": {
+      "type": "integer",
+      "description": "Customer number, a unique identifier for the customer.",
+      "format": "int64"
+    },
+    "customerRef": {
+      "type": "string",
+      "description": "Customer ref, a unique identifier for the customer within an organisation"
+    },
+    "email": {
+      "type": "string",
+      "description": "The customer's email"
+    },
+    "fromStopPlace": {
+      "type": "string",
+      "description": "The stop place where the customer’s journey started, in NeTEx format."
+    },
+    "givenConsentId": {
+      "type": "integer",
+      "description": "Given consent id.",
+      "format": "int64"
+    },
+    "lineRef": {
+      "type": "string",
+      "description": "Reference to the customers journey line, in NeTEx format"
+    },
+    "originalDatedServiceJourneyId": {
+      "type": "string",
+      "description": "Unique Id for a specific Service Journey, in NeTEx format with ENT as operator"
+    },
+    "telephoneNumber": {
+      "type": "string",
+      "description": "The customer's telephone number"
+    },
+    "toStopPlace": {
+      "type": "string",
+      "description": "The stop place where the customer’s journey ended, in NeTEx format."
+    }
+  }
+}

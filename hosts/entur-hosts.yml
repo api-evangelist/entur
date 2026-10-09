@@ -1,0 +1,208 @@
+generated: '2026-10-09'
+method: derived
+source: the pre-flight dossier, apis.yml pointers, spec servers, well-known, vendors -- nothing fetched here
+generator: derive-hosts.py
+summary:
+  hosts: 16
+  own: 9
+  other_domain: 5
+  platform: 2
+  roles:
+  - api
+  - data
+  - other
+  - portal
+  - source
+  - support
+  - website
+hosts:
+- host: api.entur.io
+  found_by:
+  - apis[]
+  - docs-index
+  types: []
+  serves:
+  - api
+  - docs
+  registrable_domain: entur.io
+  role: api
+  relation: other-domain
+- host: api.entur.no
+  found_by:
+  - contract-discovery
+  types: []
+  serves: []
+  registrable_domain: entur.no
+  role: api
+  relation: own
+- host: data.entur.no
+  found_by:
+  - probed
+  - site-links
+  - contract-discovery
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: entur.no
+  role: data
+  relation: own
+- host: dev.entur.no
+  found_by:
+  - probed
+  - site-links
+  - docs-index
+  - contract-discovery
+  - well-known
+  types: []
+  serves:
+  - docs
+  registrable_domain: entur.no
+  role: other
+  relation: own
+- host: developer.entur.no
+  found_by:
+  - pointer
+  - apis[]
+  - probed
+  - site-links
+  - namespace-probe
+  - docs-index
+  - contract-discovery
+  - well-known
+  types:
+  - DeveloperPortal
+  - Documentation
+  - APIReference
+  - GettingStarted
+  - Authentication
+  - OpenData
+  - TermsOfService
+  serves:
+  - docs
+  title: Home | Entur for Developers
+  status: 200
+  registrable_domain: entur.no
+  role: portal
+  relation: own
+- host: developer.entur.org
+  found_by:
+  - docs-index
+  types: []
+  serves:
+  - docs
+  registrable_domain: entur.org
+  role: portal
+  relation: other-domain
+- host: developer.vippsmobilepay.com
+  found_by:
+  - docs-index
+  types: []
+  serves:
+  - docs
+  registrable_domain: vippsmobilepay.com
+  role: portal
+  relation: other-domain
+- host: entur.no
+  found_by:
+  - pointer
+  - probed
+  - contract-discovery
+  - well-known
+  - vendor-detect
+  types:
+  - Website
+  serves:
+  - cdn
+  vendor: fastly
+  registrable_domain: entur.no
+  role: website
+  relation: own
+- host: example.com
+  found_by:
+  - apis[]
+  - vendor-detect
+  types: []
+  serves:
+  - api
+  - cdn
+  vendor: cloudflare
+  registrable_domain: example.com
+  role: other
+  relation: other-domain
+- host: github.com
+  found_by:
+  - pointer
+  - apis[]
+  types:
+  - SpectralRules
+  - GitHubOrganization
+  serves:
+  - docs
+  registrable_domain: github.com
+  role: source
+  relation: platform
+- host: gtfs.org
+  found_by:
+  - docs-index
+  types: []
+  serves:
+  - docs
+  registrable_domain: gtfs.org
+  role: other
+  relation: other-domain
+- host: linje.entur.no
+  found_by:
+  - probed
+  - site-links
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: entur.no
+  role: other
+  relation: own
+- host: om.entur.no
+  found_by:
+  - pointer
+  - probed
+  - site-links
+  - well-known
+  types:
+  - PrivacyPolicy
+  - Support
+  - Blog
+  - About
+  serves: []
+  registrable_domain: entur.no
+  role: support
+  relation: own
+- host: portal.entur.no
+  found_by:
+  - probed
+  - site-links
+  - docs-index
+  - well-known
+  types: []
+  serves:
+  - docs
+  registrable_domain: entur.no
+  role: other
+  relation: own
+- host: tavla.entur.no
+  found_by:
+  - probed
+  - site-links
+  - well-known
+  types: []
+  serves: []
+  registrable_domain: entur.no
+  role: other
+  relation: own
+- host: www.linkedin.com
+  found_by:
+  - pointer
+  types:
+  - LinkedIn
+  serves: []
+  registrable_domain: linkedin.com
+  role: other
+  relation: platform

@@ -1,0 +1,801 @@
+openapi: 3.2.0
+info:
+  title: Entur Discovery API
+  version: 2026.10.0
+  contact:
+    name: Team Selgerintegrasjoner
+    url: https://github.com/entur/omsa
+  x-stability-level: draft
+  description: 'Operations tagged discovery across 2 of this provider''s published API definitions: entur-omsa-openapi.json, entur-omsa-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/omsa/v1
+  description: Production environment
+- url: https://api.dev.entur.io/omsa/v1
+  description: Development environment
+- url: https://api.staging.entur.io/omsa/v1
+  description: Staging environment
+tags:
+- name: Discovery
+  description: Discovery endpoints for landing page, conformance, and API metadata.
+paths:
+  /:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Discovery
+      summary: Get API landing page
+      description: Gives a (technical & human readable) output describing how this API must be used. If the parameter f=html is supplied, a human readable page must be responded.
+      externalDocs:
+        url: https://app.swaggerhub.com/apis/OGC/ogcapi-features-1-example-1/1.0.1
+      operationId: landingPage
+      parameters:
+      - $ref: '#/components/parameters/f'
+      - $ref: '#/components/parameters/acceptLanguage'
+      responses:
+        '200':
+          $ref: '#/components/responses/landingPageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - OpenData: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /api:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Discovery
+      summary: Get OpenAPI specification document
+      description: Returns this OpenAPI document in JSON or YAML format.
+      operationId: apiGet
+      parameters:
+      - name: f
+        in: query
+        description: Output format for the OpenAPI document.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: json
+          enum:
+          - json
+          - yaml
+          - yml
+      responses:
+        '200':
+          description: General Success response.
+          content:
+            application/json:
+              schema:
+                type: string
+              examples:
+                default:
+                  value: '{"openapi":"3.0.0"}'
+            application/x-yaml:
+              schema:
+                type: string
+              examples:
+                default:
+                  value: 'openapi: 3.0.0'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - OpenData: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /conformance:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Discovery
+      summary: Get API conformance declaration
+      description: A list of all conformance classes specified in a standard that the server conforms to.
+      operationId: getConformanceDeclaration
+      parameters:
+      - $ref: '#/components/parameters/f'
+      - $ref: '#/components/parameters/acceptLanguage'
+      responses:
+        '200':
+          $ref: '#/components/responses/conformanceDeclarationResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - OpenData: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /collections:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Discovery
+      summary: List available collections
+      description: returns a collection of available collection (like offers, packages, legs, support-requests and payments)
+      operationId: getCollections
+      responses:
+        '200':
+          description: A list of available collections
+          headers:
+            Content-Language:
+              $ref: '#/components/headers/contentLanguage'
+            Version:
+              $ref: '#/components/headers/version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/collections'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - OpenData: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /collections/{collectionId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Discovery
+      summary: Get collection metadata
+      description: a (machine or human) readable description of this collection
+      operationId: describeCollection
+      parameters:
+      - name: collectionId
+        in: path
+        description: local identifier of a collection
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - $ref: '#/components/parameters/acceptLanguage'
+      responses:
+        '200':
+          description: description of data delivered by this collection
+          headers:
+            Content-Language:
+              $ref: '#/components/headers/contentLanguage'
+            Version:
+              $ref: '#/components/headers/version'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/collectionInfo'
+            text/html:
+              schema:
+                type: string
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - OpenData: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Discovery
+      summary: List available processes
+      description: 'The list of processes contains a summary of each process the OGC API - Processes offers, including the link to a more detailed description of the process.
+
+
+        For more information, see Section 7.9.'
+      operationId: getProcesses
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      responses:
+        '200':
+          description: Information about the available processes
+          headers:
+            Version:
+              $ref: '#/components/headers/version'
+            Content-Language:
+              $ref: '#/components/headers/contentLanguage'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/processList'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - OpenData: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/{processID}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Discovery
+      summary: Get process description
+      description: 'The process description contains information about inputs and outputs and a link to the execution-endpoint for the process. The Core does not mandate the use of a specific process description to specify the interface of a process. That said, the Core requirements class makes the following recommendation: Implementations SHOULD consider supporting the OGC process description. For more information, see Section 7.10.'
+      operationId: getProcessDescription
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - name: processID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          enum:
+          - search-offers
+          - select-offers
+          - add-traveller
+          - update-traveller
+          - remove-traveller
+          - assign-asset
+          - assign-ancillary
+          - purchase-offers
+          - purchase-package
+          - confirm-package
+          - release-package
+          - extend-expiry-time
+          - update-travel-document-validity
+          - cancel-package
+          - claim-refund-option
+          - confirm-refund-option
+      responses:
+        '200':
+          description: A process description.
+          headers:
+            Content-Language:
+              $ref: '#/components/headers/contentLanguage'
+            Version:
+              $ref: '#/components/headers/version'
+          content:
+            application/json:
+              schema:
+                type: object
+                externalDocs:
+                  url: https://raw.githubusercontent.com/opengeospatial/ogcapi-processes/refs/heads/master/openapi/schemas/processes-core/process.yaml
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - OpenData: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+components:
+  headers:
+    contentLanguage:
+      description: The language/localization of user-facing content, One IETF BCP 47 (RFC 5646) language tag (nl-NL)
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^[a-zA-Z]+-[a-zA-Z]+$
+        type: string
+    version:
+      description: the version used to format the response
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    collectionInfo:
+      required:
+      - id
+      - links
+      type: object
+      properties:
+        id:
+          type: string
+          description: identifier of the collection used, for example, in URIs
+          examples:
+          - dem
+        title:
+          type: string
+          description: human readable title of the collection
+          examples:
+          - Digital Elevation Model
+        description:
+          type: string
+          description: a description of the data in the collection
+          examples:
+          - A Digital Elevation Model.
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        extent:
+          type: object
+          externalDocs:
+            url: https://raw.githubusercontent.com/opengeospatial/ogcapi-processes/refs/heads/master/openapi/schemas/common-geodata/extent-uad.yaml
+        itemType:
+          type: string
+          description: indicator about the type of the items in the collection if the collection has an accessible /collections/{collectionId}/items endpoint
+          default: unknown
+        crs:
+          type: array
+          description: the list of coordinate reference systems supported by the API; the first item is the default coordinate reference system
+          items:
+            type: string
+          default:
+          - http://www.opengis.net/def/crs/OGC/1.3/CRS84
+          examples:
+          - - http://www.opengis.net/def/crs/OGC/1.3/CRS84
+            - http://www.opengis.net/def/crs/EPSG/0/4326
+        dataType:
+          $ref: '#/components/schemas/dataType'
+        geometryDimension:
+          maximum: 3
+          minimum: 0
+          type: integer
+          description: 'The geometry dimension of the features shown in this layer (0: points, 1: curves, 2: surfaces, 3: solids), unspecified: mixed or unknown'
+        minScaleDenominator:
+          type: number
+          description: Minimum scale denominator for usage of the collection
+        maxScaleDenominator:
+          type: number
+          description: Maximum scale denominator for usage of the collection
+        minCellSize:
+          type: number
+          description: Minimum cell size for usage of the collection
+        maxCellSize:
+          type: number
+          description: Maximum cell size for usage of the collection
+    processSummary:
+      allOf:
+      - $ref: '#/components/schemas/descriptionType'
+      - required:
+        - id
+        - version
+        type: object
+        properties:
+          id:
+            type: string
+          version:
+            type: string
+          jobControlOptions:
+            type: array
+            items:
+              $ref: '#/components/schemas/jobControlOptions'
+          links:
+            type: array
+            items:
+              $ref: '#/components/schemas/link'
+    processList:
+      required:
+      - links
+      - processes
+      type: object
+      properties:
+        processes:
+          type: array
+          items:
+            $ref: '#/components/schemas/processSummary'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+    day:
+      type: string
+      enum:
+      - MON
+      - TUE
+      - WED
+      - THU
+      - FRI
+      - SAT
+      - SUN
+      x-tm: DAY OF WEEK
+    metadata:
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/link'
+        - type: object
+          properties:
+            role:
+              type: string
+      - type: object
+        properties:
+          role:
+            type: string
+          title:
+            type: string
+          lang:
+            type: string
+          value:
+            oneOf:
+            - type: string
+            - type: object
+    longString:
+      maxLength: 10000
+      type: string
+      description: long string, memos etc (length 0-10.000)
+    shortString:
+      maxLength: 75
+      type: string
+      description: short string, display names (length 0-75)
+    normalInt:
+      maximum: 1000
+      minimum: 0
+      type: integer
+      description: default length for an integer (0-1000)
+      default: 0
+    descriptionType:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/metadata'
+    dateTime:
+      type: string
+      description: https://www.rfc-editor.org/rfc/rfc3339#section-5.6, date-time (2019-10-12T07:20:50.52Z)
+      format: date-time
+      x-pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$
+    jobControlOptions:
+      type: string
+      enum:
+      - sync-execute
+      - async-execute
+      - dismiss
+    confClasses:
+      required:
+      - conformsTo
+      type: object
+      properties:
+        conformsTo:
+          type: array
+          items:
+            type: string
+            examples:
+            - http://www.opengis.net/spec/ogcapi-processes-1/1.0/conf/core
+    collections:
+      required:
+      - collections
+      - links
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        timeStamp:
+          type: string
+          format: date-time
+        numberMatched:
+          minimum: 0
+          type: integer
+          examples:
+          - 1
+        numberReturned:
+          minimum: 0
+          type: integer
+          examples:
+          - 1
+        collections:
+          type: array
+          items:
+            $ref: '#/components/schemas/collectionInfo'
+    httpStatus:
+      maximum: 599
+      minimum: 100
+      type: integer
+      description: HTTP status code (100–599)
+    link:
+      required:
+      - href
+      - rel
+      type: object
+      properties:
+        rel:
+          type: string
+          description: the action that can be performed OR part of the URI allowed values include the 'processId's, prefixes for the referenced data sources, prefixes for deeplinks ('apple' and 'android'), OGC compliant ones (alternative, next, etc)
+        href:
+          $ref: '#/components/schemas/url'
+        type:
+          $ref: '#/components/schemas/shortString'
+        method:
+          type: string
+          description: to indicate the http method.
+          enum:
+          - POST
+          - GET
+          - PUT
+          - DELETE
+          - PATCH
+        description:
+          type: string
+          description: the description of the external data source
+        body:
+          type: object
+          description: the (prefilled) body for the request
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        isMandatory:
+          type: boolean
+          description: is this link informative, or must it be used?
+        hash:
+          type: string
+          description: to validate that the content of the link hasn't been changed.
+        validity:
+          $ref: '#/components/schemas/temporalParameter'
+      additionalProperties: false
+      x-externalDocs:
+        url: https://github.com/opengeospatial/ogcapi-processes/raw/refs/heads/master/openapi/schemas/common-core/link.yaml
+    temporalParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(temporal)$
+          type: string
+        startTime:
+          $ref: '#/components/schemas/dateTime'
+        endTime:
+          $ref: '#/components/schemas/dateTime'
+        duration:
+          $ref: '#/components/schemas/normalInt'
+        dayType:
+          $ref: '#/components/schemas/day'
+      x-tm: TEMPORAL VALIDITY PARAMETERS
+    dataType:
+      oneOf:
+      - type: string
+      - type: string
+        enum:
+        - map
+        - vector
+        - coverage
+    error:
+      required:
+      - category
+      - code
+      - detail
+      - hint
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/url'
+        title:
+          $ref: '#/components/schemas/shortString'
+        status:
+          $ref: '#/components/schemas/httpStatus'
+        detail:
+          $ref: '#/components/schemas/longString'
+        instance:
+          $ref: '#/components/schemas/url'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        code:
+          type: string
+          description: Stable machine-readable problem code.
+        category:
+          type: string
+          description: Public problem category used by curated problems.
+          enum:
+          - authorization
+          - validation
+          - downstream
+          - state
+          - resource
+          - availability
+          - server
+        hint:
+          type: string
+          description: Short client-facing remediation hint.
+        context:
+          type: object
+          additionalProperties: true
+          description: Safe structured context fields for the problem.
+      additionalProperties: true
+      description: JSON schema for exceptions based on RFC 7807
+    landingPage:
+      required:
+      - links
+      type: object
+      properties:
+        title:
+          type: string
+          examples:
+          - Example processing server
+        description:
+          type: string
+          examples:
+          - Example server implementing the OGC API - Processes 1.0 Standard
+        attribution:
+          title: attribution for the Processes API
+          type: string
+          description: The `attribution` should be short and intended for presentation to a user, for example, in a corner of a map. Parts of the text can be links to other resources if additional information is needed. The string can include HTML markup.
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+    url:
+      type: string
+      description: valid URL
+      format: uri
+  responses:
+    conformanceDeclarationResponse:
+      description: 'The URIs of all conformance classes supported by the server.
+
+
+        To support "generic" clients that want to access multiple
+
+        OGC API Features implementations - and not "just" a specific
+
+        API / server, the server declares the conformance
+
+        classes it implements and conforms to.'
+      headers:
+        Content-Language:
+          $ref: '#/components/headers/contentLanguage'
+        Version:
+          $ref: '#/components/headers/version'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/confClasses'
+        text/html:
+          schema:
+            type: string
+    landingPageResponse:
+      description: The reponse containing a landing page
+      headers:
+        Version:
+          $ref: '#/components/headers/version'
+        Content-Language:
+          $ref: '#/components/headers/contentLanguage'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/landingPage'
+        text/html:
+          schema:
+            type: string
+    errorResponse:
+      description: Bad request.
+      headers:
+        Version:
+          $ref: '#/components/headers/version'
+        Content-Language:
+          $ref: '#/components/headers/contentLanguage'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    f:
+      name: f
+      in: query
+      description: The optional f parameter indicates the output format that the server shall provide as part of the response document.  The default format is JSON.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: string
+        default: json
+        enum:
+        - json
+        - html
+    acceptLanguage:
+      name: Accept-Language
+      in: header
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/shortString'
+      x-externalDocs:
+        description: A comma-separated list of BCP 47 (RFC 5646) language tags and optional weights as described in IETF RFC7231 section 5.3.5. A list of the languages/localizations the user would like to see the results in. For user privacy and ease of use on the TO side, this list should be kept as short as possible
+  securitySchemes:
+    OpenData:
+      type: http
+      description: this data set is open. If it is one of the options, it is up to the implementing party whether it is open or not.
+      scheme: none
+    BearerAuth:
+      type: http
+      description: This authentication is the basic one. If you have obtained a JWT (somewhere), you can use this token to identify you at endpoints.
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth:
+      type: oauth2
+      description: This flow facilitates to get access tokens based on username/password. These can be obtained by the owner of the service, look at the landing page to find out how to contact it.
+      flows:
+        authorizationCode:
+          authorizationUrl: /
+          tokenUrl: /oauth/token
+          scopes:
+            processes: Access to /processes/
+    OAuthPKI:
+      type: oauth2
+      description: OAuth 2.0 with PKI and mutual TLS for client authentication The client sends its X.509 during the handshake. The server validates and accepts the certificate. The call to the /oauth/token can use the provided credentials (O or CN) to provide a access_token (JWT).
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            processes: Access to /processes/
+x-refined-from:
+- entur-omsa-openapi.json
+- entur-omsa-openapi.yml

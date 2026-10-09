@@ -1,0 +1,1554 @@
+openapi: 3.2.0
+info:
+  title: Entur User Profiles API
+  version: 2026.10.0
+  description: 'Operations tagged user-profiles across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: user-profiles
+paths:
+  /user-profiles:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - user-profiles
+      summary: Retrieves all user profile
+      operationId: user-profiles_getAll
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify a organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify dataset to an organization
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: validOnDate
+        in: query
+        description: 'Return the UserProfiles valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED UserProfiles are returned. And in the staging environment, PROPOSED UserProfiles are preferred to VERSIONED ones'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - user-profiles
+      summary: Create a userprofile
+      operationId: user-profiles_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity created successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /user-profiles/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - user-profiles
+      summary: Retrieves a userprofile by id
+      operationId: user-profiles_getById
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a userprofile
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: The id for the version of the userprofile
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: validOnDate
+        in: query
+        description: 'Return the UserProfiles valid on this date, example: 2024-06-01T00:00:00Z. Note that if this parameter is given, the version parameter is ignored.Also note that, if called in the production environment, only VERSIONED UserProfiles are returned. And in the staging environment, PROPOSED UserProfiles are preferred to VERSIONED ones'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /user-profiles/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - user-profiles
+      summary: Retrives a userprofile by id and version
+      operationId: user-profiles_getByIdAndVersion
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a userprofile
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the userprofile
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - user-profiles
+      summary: Update a user profile
+      operationId: user-profiles_update
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a userprofile
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the userprofile
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v1/user-profiles/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - user-profiles
+      summary: Retrieves a user profile by id
+      operationId: user-profiles_getByIdV2
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a user profile
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: startDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: endDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: The version status of the user profile
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: validOnDate
+        in: query
+        description: 'Return the UserProfiles valid on this date, example: 2024-06-01T00:00:00Z. Note that if this parameter is given, the other parameters startDate, endDate and status are ignored. Only one UserProfile will be returned.Also note that, if called in the production environment, only VERSIONED UserProfiles are returned. And in the staging environment, PROPOSED UserProfiles are preferred to VERSIONED ones'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: fromDate
+        in: query
+        description: The from date of the user profiles version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: toDate
+        in: query
+        description: The to date of the user profiles version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    CompanionProfileInject:
+      required:
+      - fareFrameRef
+      - id
+      - version
+      type: object
+      properties:
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountBasis:
+          type: string
+          description: Basis for discount.
+          enum:
+          - NONE
+          - FREE
+          - DISCOUNT
+          - FULLRATE
+          examples:
+          - DISCOUNT
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        generalGroupOfEntities:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:CompanionProfile:Adult
+        maximumNumberOfPersons:
+          type: integer
+          description: Maximum number of allowed companions.
+          format: int32
+        minimumNumberOfPersons:
+          type: integer
+          description: Minimum number of allowed companions.
+          format: int32
+        name:
+          type: array
+          description: The name of the companion profile represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        parentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        prices:
+          type: array
+          description: Fare prices for the companion profile.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        ticketing:
+          type: string
+          description: The type of way that tickets are issued to the group.
+          deprecated: true
+          enum:
+          - ALL_ON_ONE_TICKET
+          - SEPARATE_TICKETS
+          - TICKET_WITH_COUPONS
+          - OTHER
+          examples:
+          - SEPARATE_TICKETS
+        typeOfUsageParameter:
+          type: string
+          description: typeOfUsageParameter.
+        userProfileId:
+          type: string
+          description: A user profile defining a category of people eligible to be a companion.
+        userProfileRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The version of the companion profile.
+          examples:
+          - NSB:Version:V1
+      description: A companion profile create request
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    UserProfile:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        baseUserProfileRef:
+          type: string
+          description: The id of the base user profile which this profile is a specialization of.
+        changed:
+          type: string
+          description: Changed datetime.
+          format: date-time
+        companionProfiles:
+          type: array
+          description: Companion Profiles in Group Ticket
+          items:
+            $ref: '#/components/schemas/CompanionProfile'
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          format: date-time
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables that provide prices or discounts for the user profile.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:UserProfile:Child
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        maxAge:
+          type: string
+          description: Maximum age.
+          examples:
+          - '16'
+        minAge:
+          type: string
+          description: Minimum age.
+          examples:
+          - '4'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: UserProfile Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - UserProfile
+        organisationId:
+          type: string
+          description: Organisation related to the userProfile
+          readOnly: true
+        prices:
+          type: array
+          description: Fare prices for the user profile.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        proofOfIdentity:
+          type: string
+          description: proofOfIdentity.
+          enum:
+          - NONE_REQUIRED
+          - PASSPORT
+          - DRIVERS_LICENCE
+          - IDENTITY_DOCUMENT
+          - CREDIT_CARD
+          - MEMBERSHIP_CARD
+          - STUDENT_CARD
+          - LETTER_WITH_ADDRESS
+          - MEDICAL_DOCUMENT
+          - MEASUREMENT
+          - OTHER
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        typeOfConcessionRef:
+          type: string
+          description: typeOfConcessionRef.
+        typeOfUsageParameter:
+          type: string
+          description: typeOfUsageParameter.
+        userType:
+          type: string
+          description: UserType.
+          enum:
+          - ANYONE
+          - ADULT
+          - CHILD
+          - INFANT
+          - ANIMAL
+          - SENIOR
+          - GUIDE_DOG
+          - YOUTH
+          - STUDENT
+          - MILITARY
+          examples:
+          - CHILD
+        validityConditions:
+          type: array
+          description: Validity conditions for the user profile.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: UserProfile version.
+          examples:
+          - NSB:Version:V1
+      description: A UserProfile
+    ValidityCondition:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        fromDate:
+          type: string
+          description: From Date.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ValidBetween:2018
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ValidBetween
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        toDate:
+          type: string
+          description: To Date.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A condition of the validity of the priceable object
+    FarePrice:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          maximum: 100
+          minimum: -100
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - FarePrice
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/Rounding'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+          description: Version.
+          readOnly: true
+          examples:
+          - NSB:Version:V1
+      description: A description of the price and factor for a set fare
+    UserProfileInsert:
+      required:
+      - fareFrameRef
+      - id
+      - name
+      - proofOfIdentity
+      - version
+      type: object
+      properties:
+        baseUserProfileRef:
+          type: string
+          description: The id of the base user profile which this profile is a specialization of.
+        companionProfileIds:
+          type: array
+          description: Companion profiles describing users who may travel with user.
+          deprecated: true
+          items:
+            type: string
+        companionProfiles:
+          type: array
+          description: Companion profiles describing users who may travel with user.
+          items:
+            $ref: '#/components/schemas/CompanionProfileInject'
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+          examples:
+          - NSB:Version:V1
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+          examples:
+          - NSB:Version:V1
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables that provide prices or discounts for the user profile.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id
+          examples:
+          - NSB:UserProfile:Child
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        maxAge:
+          type: integer
+          description: Maximum age.
+          format: int32
+          examples:
+          - 16
+        minAge:
+          type: integer
+          description: Minimum age.
+          format: int32
+          examples:
+          - 4
+        name:
+          type: array
+          description: UserProfile Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        prices:
+          type: array
+          description: Fare prices for the user profile.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        proofOfIdentity:
+          type: string
+          description: proofOfIdentity.
+          enum:
+          - NONE_REQUIRED
+          - PASSPORT
+          - DRIVERS_LICENCE
+          - IDENTITY_DOCUMENT
+          - CREDIT_CARD
+          - MEMBERSHIP_CARD
+          - STUDENT_CARD
+          - LETTER_WITH_ADDRESS
+          - MEDICAL_DOCUMENT
+          - MEASUREMENT
+          - OTHER
+        typeOfConcessionRef:
+          type: string
+          description: typeOfConcessionRef.
+        typeOfUsageParameter:
+          type: string
+          description: typeOfUsageParameter.
+        userType:
+          type: string
+          description: UserType.
+          enum:
+          - ANYONE
+          - ADULT
+          - CHILD
+          - INFANT
+          - ANIMAL
+          - SENIOR
+          - GUIDE_DOG
+          - YOUTH
+          - STUDENT
+          - MILITARY
+          examples:
+          - CHILD
+        validityConditions:
+          type: array
+          description: Validity conditions for the user profile.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: UserProfile version.
+          examples:
+          - NSB:Version:V1
+      description: A UserProfile create request
+    LimitingRule:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        canBeCumulative:
+          type: boolean
+          description: CanBeCumulative.
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountAsPercentage:
+          type: number
+          description: DiscountAsPercentage.
+          format: float
+        discountAsValue:
+          type: number
+          description: DiscountAsValue.
+          format: float
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        maximumPrice:
+          type: string
+          description: MaximumPrice.
+          examples:
+          - '164.0'
+        maximumPriceAsPercentage:
+          type: number
+          description: MaximumPriceAsPercentage.
+          format: double
+        minimumLimitPrice:
+          type: string
+          description: MinimumLimitPrice.
+          examples:
+          - '164.0'
+        minimumPrice:
+          type: string
+          description: MinimumPrice.
+          examples:
+          - '164.0'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - LimitingRule
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A LimitingRule
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    CompanionProfile:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          format: date-time
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          format: date-time
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountBasis:
+          type: string
+          description: Basis for discount.
+          enum:
+          - NONE
+          - FREE
+          - DISCOUNT
+          - FULLRATE
+          examples:
+          - DISCOUNT
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables that provide prices or discounts for the companion profile.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        generalGroupOfEntities:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:CompanionProfile:Adult
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        maximumNumberOfPersons:
+          type: integer
+          description: Maximum number of allowed companions.
+          format: int32
+        minimumNumberOfPersons:
+          type: integer
+          description: Minimum number of allowed companions.
+          format: int32
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: The name of the companion profile represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - CompanionProfile
+        parentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        prices:
+          type: array
+          description: Fare prices for the companion profile.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        ticketing:
+          type: string
+          description: The type of way that tickets are issued to the group.
+          deprecated: true
+          enum:
+          - ALL_ON_ONE_TICKET
+          - SEPARATE_TICKETS
+          - TICKET_WITH_COUPONS
+          - OTHER
+          examples:
+          - SEPARATE_TICKETS
+        typeOfUsageParameter:
+          type: string
+          description: typeOfUsageParameter.
+        userProfileId:
+          type: string
+          description: A user profile defining a category of people eligible to be a companion.
+        userProfileRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        validityConditions:
+          type: array
+          description: Validity conditions for the companion profile.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The version of the companion profile.
+          examples:
+          - NSB:Version:V1
+      description: A companion profile
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

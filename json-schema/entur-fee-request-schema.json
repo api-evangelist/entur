@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-fee-request-schema.json",
+  "title": "FeeRequest",
+  "description": "Fee related to one or more OrderLines",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-order-partner-openapi.yml#/components/schemas/FeeRequest",
+  "required": [
+    "orderLineIds",
+    "price",
+    "reason",
+    "type"
+  ],
+  "type": "object",
+  "properties": {
+    "price": {
+      "$ref": "#/$defs/PriceWithTax"
+    },
+    "type": {
+      "type": "string",
+      "description": "Type of Fee. Valid types: MANUAL, REFUNDING, ONBOARD, CHANGE, INVOICE, CHANGE_NON_REFUNDABLE, PENALTY, BOOKING, REDUCTION"
+    },
+    "externalRef": {
+      "$ref": "#/$defs/RefType"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Explanatory text describing the reason for the Fee, if applicable",
+      "default": ""
+    },
+    "orderLineIds": {
+      "type": "array",
+      "description": "References to the OrderLines this Fee refers to, if applicable. If empty, the fee refers to all order lines",
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "default": []
+    },
+    "orderVersion": {
+      "type": "integer",
+      "description": "The version of the Order this Fee is added to",
+      "format": "int32"
+    },
+    "linkedByExtRef": {
+      "$ref": "#/$defs/RefType"
+    }
+  },
+  "$defs": {
+    "PriceWithTax": {
+      "title": "PriceWithTax",
+      "required": [
+        "amount",
+        "currency",
+        "taxAmount"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount including tax amount."
+        },
+        "taxAmount": {
+          "type": "string",
+          "description": "Tax amount"
+        },
+        "taxRate": {
+          "type": "string",
+          "description": "Tax rate. Must be in valid BigDecimal format"
+        },
+        "taxCode": {
+          "type": "string",
+          "description": "Tax code for this tax rate"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency",
+          "default": "NOK"
+        }
+      },
+      "description": "Price with included tax amounts and an optional rate."
+    },
+    "RefType": {
+      "title": "RefType",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the resources"
+        },
+        "version": {
+          "type": "string",
+          "description": "A specific version of the resource if applicable"
+        }
+      },
+      "description": "Reference to a resource available in a different APIs"
+    }
+  }
+}

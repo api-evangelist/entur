@@ -1,0 +1,489 @@
+openapi: 3.2.0
+info:
+  title: Entur Partner Receipts API
+  version: 2026.06.0
+  contact:
+    name: Entur Team Salg
+    url: https://www.entur.org
+    email: team.salg@entur.org
+  license:
+    name: Proprietary
+  termsOfService: https://developer.entur.org/pages-intro-setup-and-access
+  description: 'Operations tagged Partner Receipts across 2 of this provider''s published API definitions: entur-receipt-partner-openapi.json, entur-receipt-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: production
+- url: https://api.staging.entur.io/sales
+  description: staging
+- url: https://api.dev.entur.io/sales
+  description: dev
+security:
+- jwt: []
+tags:
+- name: Partner Receipts
+  description: Create, send, and query receipts
+paths:
+  /v1/receipts/send:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Partner Receipts
+      summary: Send receipt
+      description: Send a receipt. Content will be defined by order ID and version of order. Receipts can only be made for orderVersions where there been a payment or a credit.
+      operationId: sendReceipt
+      parameters:
+      - name: organisationId
+        in: query
+        description: ''
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: receiptType
+        in: query
+        description: Overwrite receipt type if present
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - SALE
+          - REFUND
+          - CANCEL
+          - CHANGE
+      requestBody:
+        description: A send receipt request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendReceiptRequest'
+            examples:
+              default:
+                value:
+                  orderId: 2H1K65IM
+                  orderVersion: 1
+                  distribution:
+                    email: customer@example.com
+                    telephone:
+                      countryCode: '47'
+                      number: '61051910'
+                  receiptLanguage: nob
+                  serialNumber: RCP-2024-000123
+                  copyReceipt: false
+        required: true
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserReceiptResponse'
+              examples:
+                default:
+                  value:
+                    reference: a49f7259-7285-42ce-b7b0-e48a77fbfb39
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+      deprecated: false
+    servers:
+    - url: https://api.entur.io/sales
+      description: production
+    - url: https://api.staging.entur.io/sales
+      description: staging
+    - url: https://api.dev.entur.io/sales
+      description: dev
+  /v1/receipts/type:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Partner Receipts
+      summary: Get receipt type
+      description: Returns the type of receipt a combination of order ID and version will result in.
+      operationId: getReceiptType
+      parameters:
+      - name: orderId
+        in: query
+        description: Filters by order ID
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: S1P87KKP
+      - name: orderVersion
+        in: query
+        description: Filters by order version
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: '1'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptTypeResponse'
+              examples:
+                default:
+                  value:
+                    receiptType: SALE
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+      deprecated: false
+    servers:
+    - url: https://api.entur.io/sales
+      description: production
+    - url: https://api.staging.entur.io/sales
+      description: staging
+    - url: https://api.dev.entur.io/sales
+      description: dev
+  /v1/receipts/pickup-code-message/{orderId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Partner Receipts
+      summary: Get pickup code message
+      description: Get the text used for pickup code message for an order in given language to send as message to the customer.
+      operationId: getPickupCodeMessage
+      parameters:
+      - name: orderId
+        in: path
+        description: Order id to generate pickup code message for
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ABDC1234
+      - name: orderVersion
+        in: query
+        description: Which version of the order that should be used to generate a summary
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+        examples:
+          default:
+            value: 1
+      - name: language
+        in: query
+        description: Desired language of the message. Currently supporting 'nob', 'nno' and 'eng'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: nob
+        examples:
+          default:
+            value: nob
+      responses:
+        '200':
+          description: Ok
+          content:
+            text/html:
+              schema:
+                type: string
+              examples:
+                default:
+                  value: '<p>Pickup code: <strong>AB12CD</strong><br />Show this code and a valid ID when boarding.</p>'
+            application/json:
+              schema:
+                type: string
+              examples:
+                default:
+                  value: 'Pickup code: AB12CD. Show this code and a valid ID when boarding.'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: production
+    - url: https://api.staging.entur.io/sales
+      description: staging
+    - url: https://api.dev.entur.io/sales
+      description: dev
+components:
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 500
+                title: Internal Server Error
+                error: Internal Server Error
+                exception: InternalServerException
+                message: Unexpected error while rendering receipt template
+                path: /v1/receipts/render-version
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 400
+                title: Bad Request
+                error: Bad Request
+                exception: BAD_REQUEST
+                message: Required parameter 'orderId' is not present.
+                path: /v1/receipts
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 403
+                title: Forbidden
+                error: Forbidden
+                exception: ForbiddenException
+                message: The request requires higher privileges than provided by the access token.
+                path: /v1/receipts?organisationId=1
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 409
+                title: Conflict
+                error: Conflict
+                exception: ConflictException
+                message: Receipt with ID 1 and organisation ID 1 is disabled.
+                path: /v1/receipts/1/versions
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 404
+                title: Not Found
+                error: Not Found
+                exception: NotFoundException
+                message: This receipt does not have any versions
+                path: /v1/receipts/1/latest-version
+  schemas:
+    SendReceiptRequest:
+      title: SendReceiptRequest
+      required:
+      - distribution
+      - orderId
+      - orderVersion
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: Order id to generate receipt
+          examples:
+          - '1234567890'
+        orderVersion:
+          type: integer
+          description: Which version of the order that should be used to generate a receipt
+          format: int32
+          examples:
+          - 1
+        distribution:
+          $ref: '#/components/schemas/Distribution'
+        receiptLanguage:
+          type: string
+          description: Desired language of the receipt. Currently only supporting 'nob' and 'eng'
+          default: nob
+          examples:
+          - nob
+        serialNumber:
+          type: string
+          description: The desired serial number for the receipt
+        copyReceipt:
+          type: boolean
+          description: Set to true when the receipt is a copy.
+      description: Request for sending a sale receipt to a customer using one or more distribution methods
+      examples:
+      - orderId: 2H1K65IM
+        orderVersion: 1
+        distribution:
+          email: customer@example.com
+          telephone:
+            countryCode: '47'
+            number: '61051910'
+        receiptLanguage: nob
+        serialNumber: RCP-2024-000123
+        copyReceipt: false
+    Telephone:
+      title: Telephone
+      required:
+      - countryCode
+      - number
+      type: object
+      properties:
+        countryCode:
+          type: string
+          description: Country code
+          examples:
+          - '47'
+        number:
+          type: string
+          description: Phone number
+          examples:
+          - '61051910'
+      description: Telephone model for distribution
+    Distribution:
+      title: Distribution
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email to receive receipt
+          examples:
+          - example@entur.org
+        telephone:
+          $ref: '#/components/schemas/Telephone'
+      description: Request for sending a receipt to a customer using one or more distribution methods. Will only send email if both email and telephone are provided. To send sms, leave email as null.
+    ReceiptTypeResponse:
+      title: ReceiptTypeResponse
+      type: object
+      properties:
+        receiptType:
+          $ref: '#/components/schemas/ReceiptType'
+      description: Response from a successful type query.
+    ApiError:
+      title: ApiError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    UserReceiptResponse:
+      title: UserReceiptResponse
+      required:
+      - reference
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference to receipt
+          examples:
+          - a49f7259-7285-42ce-b7b0-e48a77fbfb39
+      description: Response from a accepted receipt request.
+    ReceiptType:
+      type: string
+      description: Type of receipt
+      enum:
+      - SALE
+      - REFUND
+      - CANCEL
+      - CHANGE
+      - DAY_SUMMARY
+      examples:
+      - SALE
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-receipt-partner-openapi.json
+- entur-receipt-partner-openapi.yml

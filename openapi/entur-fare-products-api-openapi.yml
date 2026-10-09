@@ -1,0 +1,1601 @@
+openapi: 3.2.0
+info:
+  title: Entur Fare Products API
+  version: 2026.10.0
+  description: 'Operations tagged fare-products across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: fare-products
+paths:
+  /fare-products:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-products
+      summary: Retrieves all fare-products, filtered by given parameter(s)
+      operationId: fare-products_findByOrganisationIdOrFareFrameId
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify a organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify data owned by organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: typeOfFareProductId
+        in: query
+        description: The unique id to identify the type of fare product
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: statusFilter
+        in: query
+        description: 'Filter by status. Allowed values: DRAFT, PROPOSED, VERSIONED, DEPRECATED, ALL. Defaults to ALL if not specified. Mutually exclusive with validOnDate.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - DRAFT
+            - PROPOSED
+      - name: validOnDate
+        in: query
+        description: 'Return the FareProducts valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED FareProducts are returned. And in the staging environment, PROPOSED FareProducts are preferred to VERSIONED ones. Mutually exclusive with statusFilter.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FareProduct'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    TypeOfFareProduct:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - nameOfClass
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:TypeOfFareProduct:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - TypeOfFareProduct
+        status:
+          type: string
+          description: Type of fare product status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Type of fare product version.
+          examples:
+          - NSB:Version:V1
+      description: A classification of FARE PRODUCTs.
+    GenericParameterAssignment:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        canIgnoreInOffering:
+          type: boolean
+          description: Indicates whether gpa leaf node is supposed to be ignored when generating offer.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+        chargingBasisType:
+          type: string
+          description: ChargingBasisType.
+          enum:
+          - FREE
+          - DISCOUNTED
+          - NORMAL
+          - ANY
+          examples:
+          - FREE
+        comparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef.
+          examples:
+          - NSB:Version:V1
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+          examples:
+          - NSB:Version:V1
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareProductRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareStructureElementRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:GenericParameterAssignment:AllowedOperators
+        includes:
+          type: array
+          description: Includes genericParameterAssignments.
+          items:
+            $ref: '#/components/schemas/GenericParameterAssignment'
+        includesGroupingType:
+          type: string
+          description: Includes grouping type.
+          enum:
+          - AND
+          - OR
+          - XOR
+          - NOT
+          examples:
+          - AND
+        limitationGroupingType:
+          type: string
+          description: Limitation grouping type.
+          enum:
+          - AND
+          - OR
+          - XOR
+          - NOT
+          examples:
+          - AND
+        limitations:
+          type: array
+          description: Limitations as UsageParameters.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class
+          examples:
+          - GenericParameterAssignment
+        parentParameterAssignmentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        requiredElements:
+          type: array
+          description: Required elements.
+          items:
+            type: string
+        requiredInContext:
+          type: string
+          description: Required in context.
+          enum:
+          - OFFERING
+          - BOOKING
+          - RESERVATION
+          - SALE
+          - FULFILMENT
+          - ACTIVATION
+          - CONSUMPTION
+          - REVALIDATION
+        requiredType:
+          type: string
+          description: Required type.
+          enum:
+          - SERVICE_JOURNEY_REF
+          - TARIFF_ZONE_REF
+          - PASSENGER_SEAT_REF
+          - USER_PROFILE_REF
+          - USAGE_VALIDITY_PERIOD_REF
+          - DATED_SERVICE_JOURNEY_REF
+          - DYNAMIC_DISTANCE_MATRIX_ELEMENT
+          - USAGE_VALIDITY_PERIOD
+          - DISTANCE_MATRIX_ELEMENT_REF
+          - SCHEDULED_STOP_POINT_REF
+          - GROUP_TICKET_REF
+          - GROUP_TICKET
+          - GROUP_OF_TARIFF_ZONES_REF
+          - FARE_ZONE_REF
+          examples:
+          - SERVICE_JOURNEY_REF
+        salesPackageRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        temporalValidityParameters:
+          type: array
+          description: Temporal validity parameter.
+          items:
+            $ref: '#/components/schemas/TemporalValidityParameter'
+        typeOfAccessRightAssignment:
+          $ref: '#/components/schemas/TypeOfAccessRightAssignment'
+        validableElementRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        validityParameterAssignmentType:
+          type: string
+          description: Validity parameter assignment type.
+          enum:
+          - EQ
+          - NE
+          - GT
+          - LT
+          - GE
+          - LE
+          examples:
+          - EQ
+        validityParameterGroupingType:
+          type: string
+          description: Validity parameter grouping type.
+          enum:
+          - AND
+          - OR
+          - XOR
+          - NOT
+          examples:
+          - AND
+        validityParameterSetSelectionType:
+          type: string
+          description: Validity parameter set operator.
+          enum:
+          - ONE_OF_ANY_ONE_SET
+          - ONE_OF_EACH_SET
+          - SOME_OF_ANY_SET
+          - ALL_OF_ONE_SET
+          - ALL_OF_ALL_SETS
+        validityParameters:
+          type: array
+          description: Validity parameters as scoping validity parameters
+          items:
+            $ref: '#/components/schemas/ScopingValidityParameter'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V2
+      description: A GenericParameterAssignment
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    ValidityCondition:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        fromDate:
+          type: string
+          description: From Date.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ValidBetween:2018
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ValidBetween
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        toDate:
+          type: string
+          description: To Date.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A condition of the validity of the priceable object
+    TypeOfAccessRightAssignment:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - ENT:TypeOfAccessRightAssignment:ActivationPolicyAssignment
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - TypeOfAccessRightAssignment
+        status:
+          type: string
+          description: Type of access right assignment status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Type of access right assignment version.
+          examples:
+          - NSB:Version:V1
+      description: A classification of Access Right Assignments.
+    FareProduct:
+      required:
+      - accessRightParameterAssignments
+      - accessRightsInProduct
+      - changed
+      - chargingMoment
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - validityConditions
+      type: object
+      properties:
+        accessRightParameterAssignments:
+          type: array
+          description: AccessRightParameterAssignments.
+          items:
+            $ref: '#/components/schemas/GenericParameterAssignment'
+        accessRightsInProduct:
+          type: array
+          description: AccessRightsInProduct.
+          items:
+            $ref: '#/components/schemas/AccessRightInProduct'
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored.'
+          examples:
+          - E
+        changed:
+          type: string
+          description: SalesPackage changed datetime.
+        chargingMoment:
+          $ref: '#/components/schemas/ChargingMoment'
+        chargingMomentType:
+          type: string
+          description: ChargingMomentType. Default value is BEFORE_TRAVEL.
+          enum:
+          - BEFORE_TRAVEL
+          - ON_START_OF_TRAVEL
+          - BEFORE_END_OF_TRAVEL
+          - ON_START_THEN_ADJUST_AT_END_OF_TRAVEL
+          - ON_START_THEN_ADJUST_AT_END_OF_FARE_DAY
+          - ON_START_THEN_ADJUST_AT_END_OF_CHARGE_PERIOD
+          - AT_END_OF_TRAVEL
+          - AT_END_OF_CHARGE_PERIOD
+          - FREE
+          - ANY_TIME
+          - OTHER
+          examples:
+          - BEFORE_TRAVEL
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef
+        conditionSummary:
+          $ref: '#/components/schemas/ConditionSummary'
+        created:
+          type: string
+          description: SalesPackage create datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareStructureType:
+          type: string
+          description: FareStructureType.
+          enum:
+          - CAPPED_FLAT_FARE
+          - CAPPED_POINT_TO_POINT_FARE
+          - CAPPED_ZONAL_FARE
+          - LINE_FLAT_FARE
+          - NETWORK_FLAT_FARE
+          - POINT_TO_POINT_FARE
+          - POINT_TO_POINT_DISTANCE_FARE
+          - STAGE_FARE
+          - ZONE_FLAT_FARE
+          - ZONE_SEQUENCE_FARE
+          - ZONE_TO_ZONE_FARE
+          - ZONE_COUNT_FARE
+          - PENALTY_FARE
+          - OTHER
+          examples:
+          - ZONE_TO_ZONE_FARE
+        fareTableRefs:
+          type: array
+          description: FareTableRef.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - RUT:PreassignedFareProduct:RuterSingleTicket
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - PreassignedFareProduct
+        operatorRef:
+          type: string
+          description: OperatorRef.
+          examples:
+          - RUT:Authority:RUT
+        organisation:
+          type: string
+          description: Organisation who own the product.
+        organisationId:
+          type: string
+          description: Organisation related to the fareProduct
+        privateCode:
+          type: string
+          description: PrivateCode.
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        typeOfFareProduct:
+          $ref: '#/components/schemas/TypeOfFareProduct'
+        validityConditions:
+          type: array
+          description: ValidityCondition.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A FARE PRODUCT response consisting of one or several VALIDABLE ELEMENTs, specific to a CHARGING MOMENT
+    GroupOfTimeBands:
+      required:
+      - changed
+      - created
+      - id
+      - members
+      - modification
+      - nameOfClass
+      - status
+      - validityConditions
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        members:
+          type: array
+          description: Members.
+          items:
+            $ref: '#/components/schemas/Timeband'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - FareStructureElement
+        status:
+          type: string
+          description: Status.
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validityConditions:
+          type: array
+          description: ValidityConditions sequence.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A GroupOfTimeband describe during which the assignments applies
+    ChargingMoment:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+          readOnly: true
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ChargingMoment:Prepaid
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ChargingMoment
+        status:
+          type: string
+          description: Charging moment status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Charging moment version.
+          examples:
+          - NSB:Version:V1
+      description: 'A classification of FARE PRODUCTs according to the payment method and the account location: pre-payment with cancellation (throw-away), pre-payment with debit on a value card, pre-payment without consumption registration (pass), post-payment etc.'
+      readOnly: true
+      deprecated: true
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    AccessRightInProduct:
+      required:
+      - fareFrameRef
+      - id
+      - preassignedFareProductRef
+      - validableElementRef
+      - version
+      type: object
+      properties:
+        accessNumber:
+          type: integer
+          description: The actual access number
+          format: int32
+        accessNumberIsLimited:
+          type: boolean
+          description: Flag indicating if access number is limited
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:AccessRightInProduct:Ordinary
+        isFirstInSequence:
+          type: boolean
+          description: Whether element is first in sequence
+        isLastInSequence:
+          type: boolean
+          description: Whether element is last in sequence
+        limitedAccessNumber:
+          type: integer
+          description: Flag indicating whether this rights gives an unlimited number of accesses or not
+          format: int32
+        maximumAccess:
+          type: integer
+          description: Maximum number of times use of this element may occur in a given trip
+          format: int32
+        minimumAccess:
+          type: integer
+          description: Minimum number of times use of this element must occur in a given trip
+          format: int32
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Refunding
+        orderOfElement:
+          type: integer
+          description: The actual order in the sequence
+          format: int32
+        preassignedFareProductRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Access right in product status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validableElementRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Access right in product version.
+          examples:
+          - NSB:Version:V1
+      description: A VALIDABLE ELEMENT as a part of a PRE-ASSIGNED FARE PRODUCT, including its possible order in the set of all VALIDABLE ELEMENTs grouped together to define the access right assigned to that PRE-ASSIGNED FARE PRODUCT.
+    Timeband:
+      required:
+      - changed
+      - created
+      - dayOffset
+      - description
+      - endTime
+      - fareFrameRef
+      - id
+      - modification
+      - name
+      - nameOfClass
+      - startTime
+      - status
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        dayOffset:
+          type: integer
+          description: Days offset. This will determine if endTime is x number of days from today. ie. 1 is tomorrow 0 is today.
+          format: int32
+          examples:
+          - 1
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+          readOnly: true
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        endTime:
+          type: string
+          description: End time.
+          examples:
+          - '11:11:11'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Timeband:2HoursValidPlus1
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: The name of the luggage allowance represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - TimeBand
+        startTime:
+          type: string
+          description: Start time.
+          examples:
+          - '11:11:11'
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        timeZone:
+          type: string
+          description: Time zone.
+          default: Europe/Oslo
+          examples:
+          - Europe/Oslo
+        validityConditions:
+          type: array
+          description: ValidityConditions sequence.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: The TimeBand describe during which the assignment applies
+    ConditionSummary:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ConditionSummary:1005TEN
+        isExchangeable:
+          type: boolean
+          description: Whether the ticket is exchangeable.
+          examples:
+          - true
+        isRefundable:
+          type: boolean
+          description: Whether the ticket is refundable.
+          examples:
+          - true
+      description: A summary of a condition.
+    ScopingValidityParameter:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - genericParameterAssignmentRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        authorityRef:
+          type: string
+          description: AuthorityRef.
+          examples:
+          - NSB:Authority:NSB
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        distributionChannelRef:
+          type: string
+          description: Distribution channel ref.
+          examples:
+          - ENT:DistributionChannel:App
+        facilitySetRef:
+          type: string
+          description: facilitySetRef.
+        fareClasses:
+          type: array
+          description: 'FareClasses. Enum as string with the following values: FIRST_CLASS, SECOND_CLASS, THIRD_CLASS, ECONOMY_CLASS, BUSINESS_CLASS, TURISTA, PREFERENTE, STANDARD_CLASS, PREMIUM_CLASS, ANY, UNKNOWN'
+          items:
+            type: string
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareSectionRef:
+          type: string
+          description: Fare section ref.
+        fareZoneRef:
+          type: string
+          description: FareZoneRef.
+          examples:
+          - KOL:FareZone:250
+        genericParameterAssignmentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfLinesRef:
+          type: string
+          description: Group of Lines ref.
+          examples:
+          - ENT:GroupOfLines:AllLines
+        groupOfTariffZonesRef:
+          type: string
+          description: Group of Tariff Zones ref.
+          examples:
+          - ENT:GroupOfTariffZones:AllZones
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ScopingValidityParameter:OperatorNSB
+        lineRef:
+          type: string
+          description: LineRef.
+        lineType:
+          type: string
+          description: LineType.
+          enum:
+          - LOCAL
+          - URBAN
+          - LONG_DISTANCE
+          - EXPRESS
+          - SEASONAL
+          - REPLACEMENT
+          - FLEXIBLE
+          - CORRIDOR_SERVICE
+          - MAIN_ROUTE_WITH_FLEXIBLE_ENDS
+          - FLEXIBLE_AREAS_ONLY
+          - HAIL_AND_RIDE_SECTIONS
+          - FIXED_STOP_AREA_WIDE
+          - FREE_AREA_AREA_WIDE
+          - MIXED_FLEXIBLE
+          - MIXED_FLEXIBLE_AND_FIXED
+          - FIXED
+          - OTHER
+          examples:
+          - EXPRESS
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - ScopingValidityParameter
+        operatorRef:
+          type: string
+          description: Operator referance.
+        placeUse:
+          type: string
+          description: PlaceUse
+          enum:
+          - START_AT
+          - END_AT
+          - VIA
+          - RESTRICT_TO
+          - OTHER
+        scheduledStopPointRef:
+          type: string
+          description: Scheduled stop Point ref.
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        tariffZoneRef:
+          type: string
+          description: TariffZoneRef. This field is deprecated, please use the field FareZoneRef.
+          deprecated: true
+          examples:
+          - RUT:TariffZone:2S
+        topographicPlaceRef:
+          type: string
+          description: TopographicPlaceRef
+        transportSubmode:
+          type: string
+          description: TransportSubmode.
+          enum:
+          - unknown
+          - undefined
+          - internationalFlight
+          - domesticFlight
+          - intercontinentalFlight
+          - domesticScheduledFlight
+          - shuttleFlight
+          - intercontinentalCharterFlight
+          - internationalCharterFlight
+          - roundTripCharterFlight
+          - sightseeingFlight
+          - helicopterService
+          - domesticCharterFlight
+          - SchengenAreaFlight
+          - airshipService
+          - shortHaulInternationalFlight
+          - canalBarge
+          - localBus
+          - regionalBus
+          - expressBus
+          - nightBus
+          - postBus
+          - specialNeedsBus
+          - mobilityBus
+          - mobilityBusForRegisteredDisabled
+          - sightseeingBus
+          - shuttleBus
+          - highFrequencyBus
+          - dedicatedLaneBus
+          - schoolBus
+          - schoolAndPublicServiceBus
+          - railReplacementBus
+          - demandAndResponseBus
+          - airportLinkBus
+          - internationalCoach
+          - nationalCoach
+          - shuttleCoach
+          - regionalCoach
+          - specialCoach
+          - schoolCoach
+          - sightseeingCoach
+          - touristCoach
+          - commuterCoach
+          - funicular
+          - streetCableCar
+          - allFunicularServices
+          - undefinedFunicular
+          - metro
+          - tube
+          - urbanRailway
+          - cityTram
+          - localTram
+          - regionalTram
+          - sightseeingTram
+          - shuttleTram
+          - trainTram
+          - telecabin
+          - cableCar
+          - lift
+          - chairLift
+          - dragLift
+          - telecabinLink
+          - local
+          - highSpeedRail
+          - suburbanRailway
+          - regionalRail
+          - interregionalRail
+          - longDistance
+          - international
+          - sleeperRailService
+          - nightRail
+          - carTransportRailService
+          - touristRailway
+          - airportLinkRail
+          - railShuttle
+          - replacementRailService
+          - specialTrain
+          - crossCountryRail
+          - rackAndPinionRailway
+          - internationalCarFerry
+          - nationalCarFerry
+          - regionalCarFerry
+          - localCarFerry
+          - internationalPassengerFerry
+          - nationalPassengerFerry
+          - regionalPassengerFerry
+          - localPassengerFerry
+          - postBoat
+          - trainFerry
+          - roadFerryLink
+          - airportBoatLink
+          - highSpeedVehicleService
+          - highSpeedPassengerService
+          - sightseeingService
+          - schoolBoat
+          - cableFerry
+          - riverBus
+          - scheduledFerry
+          - shuttleFerryService
+          - communalTaxi
+          - charterTaxi
+          - waterTaxi
+          - railTaxi
+          - bikeTaxi
+          - blackCab
+          - miniCab
+          - allTaxiServices
+          - hireCar
+          - hireVan
+          - hireMotorbike
+          - hireCycle
+          - allHireVehicles
+          examples:
+          - expressBus
+        vehicleMode:
+          type: string
+          description: VehicleModeRef.
+          enum:
+          - AIR
+          - BUS
+          - COACH
+          - CABLE_WAY
+          - WATER
+          - FUNICULAR
+          - LIFT
+          - RAIL
+          - METRO
+          - TAXI
+          - TRAM
+          - UNKNOWN
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A ScopingValidityParameter
+    TemporalValidityParameter:
+      required:
+      - changed
+      - created
+      - genericParameterAssignmentRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        dayType:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        genericParameterAssignmentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfTimeBands:
+          $ref: '#/components/schemas/GroupOfTimeBands'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:TemporalValidityParameter:OperatorNSB
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - TemporalValidityParameter
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validityCondition:
+          $ref: '#/components/schemas/ValidityCondition'
+        validityConditionRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A TemporalValidityParameter
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

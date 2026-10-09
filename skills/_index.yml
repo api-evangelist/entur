@@ -1,0 +1,9 @@
+type: AgentSkillIndex
+provider: entur
+generated: '2026-10-09'
+method: generated
+skills:
+  - {name: entur-geocode-locations, file: skills/entur-geocode-locations.md, api: openapi/entur-geocoder-openapi.yml}
+  - {name: entur-look-up-stop-places, file: skills/entur-look-up-stop-places.md, api: openapi/entur-stop-place-v1-read-openapi.yml}
+  - {name: entur-purchase-travel-sales-v2, file: skills/entur-purchase-travel-sales-v2.md, api: openapi/entur-omsa-openapi.yml}
+  - {name: entur-shared-mobility-bookings, file: skills/entur-shared-mobility-bookings.md, api: openapi/entur-shared-mobility-openapi.yml}

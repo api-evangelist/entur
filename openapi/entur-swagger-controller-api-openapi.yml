@@ -1,0 +1,63 @@
+openapi: 3.2.0
+info:
+  title: Entur Swagger Controller API
+  version: 2026.09.0
+  description: 'Operations tagged swagger-controller across 2 of this provider''s published API definitions: entur-seatingservices-openapi.json, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seatingservices
+tags:
+- name: swagger-controller
+paths:
+  /v2/api-docs:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - swagger-controller
+      operationId: swagger
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+      summary: Swagger
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+components:
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seatingservices-openapi.json
+- entur-seatingservices-openapi.yml

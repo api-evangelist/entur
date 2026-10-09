@@ -1,0 +1,207 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Timetable Import Info",
+    "description": "API for checking the status of timetable data imports.\nThe endpoint returns the date of the latest successful import of timetable data into Entur's systems for each data provider.\nData providers are identified by their [codespaces](https://enturas.atlassian.net/wiki/spaces/PUBLIC/pages/637370434/List+of+current+Codespaces)\n\nThis import date is also displayed in the list of NeTEx files available on Entur Open Data Portal.\nAdditionally, the import date is stored in each NeTEx archive available on this page, in the \"created\" timestamp of the CompositeFrame. For example: created=\"2019-05-29T12:59:32.202\"\n\nThe date returned by this service is the original import date, i.e. the date Entur received the source dataset from the data provider.\nIt may be different from the creation date of the archives listed on open data page, since these archives are regenerated every day through a filtering process that removes obsolete data.\n\n## Authentication\n\nThis API is open under NLOD licence, however, it is required that all consumers identify themselves by using the header ET-Client-Name. Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers. The structure of ET-Client-Name should be: \"company-application\"\n\n *Header examples:*\n- \"brakar-journeyplanner\"\n- \"fosen_utvikling-departureboard\"\n- \"nor_way_bussekspress-nwy-app\"\n",
+    "contact": {
+      "name": "Entur",
+      "url": "https://developer.entur.org"
+    },
+    "license": {
+      "name": "EUPL-1.2",
+      "url": "https://joinup.ec.europa.eu/software/page/eupl"
+    },
+    "version": "2026.04.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.entur.io/timetable-public/v1",
+      "description": "Production server"
+    },
+    {
+      "url": "https://api.staging.entur.io/timetable-public/v1",
+      "description": "Staging server"
+    },
+    {
+      "url": "https://api.dev.entur.io/timetable-public/v1",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "timetable-import-info",
+      "description": "Status of the latest import dates for timetable datasets by codespace"
+    }
+  ],
+  "paths": {
+    "/timetable-import-info/import_date": {
+      "get": {
+        "tags": [
+          "timetable-import-info"
+        ],
+        "summary": "Return the date of the latest NeTEx import for all codespaces",
+        "description": "Returns a map of codespace identifiers to their latest import timestamps",
+        "operationId": "getAllImportDates",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved import dates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "avi": "2021-04-21T11:51:59",
+                      "rut": "2021-05-15T09:30:00",
+                      "atb": "2021-06-10T14:20:30"
+                    }
+                  }
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/timetable-import-info/import_date/{codespace}": {
+      "get": {
+        "tags": [
+          "timetable-import-info"
+        ],
+        "summary": "Return the date of the latest NeTEx import for a given codespace",
+        "description": "Returns the import date for a specific codespace identifier",
+        "operationId": "getImportDateByCodespace",
+        "parameters": [
+          {
+            "name": "codespace",
+            "in": "path",
+            "description": "Codespace of the data provider (e.g., 'avi', 'rut', 'atb')",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "default": {
+                "value": "avi"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved import date",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "default": {
+                    "value": "2021-04-21T11:51:59"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown codespace - no import data available",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "default": {
+                    "value": "Codespace not found"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "parameters": {
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

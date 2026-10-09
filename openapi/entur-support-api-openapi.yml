@@ -1,0 +1,253 @@
+openapi: 3.2.0
+info:
+  title: Entur Support API
+  version: 2026.09.2
+  contact:
+    name: Team Delingsmobilitet
+  description: 'Operations tagged Support across 2 of this provider''s published API definitions: entur-shared-mobility-openapi.json, entur-shared-mobility-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/shared-mobility/v1
+  description: Generated server url
+security:
+- Authorization: []
+tags:
+- name: Support
+paths:
+  /support:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Support
+      summary: Create a support case
+      description: Create a support case base on the given supportRequest. The operatorId is used to identify the correct receiving operator.
+      operationId: createSupportCase
+      parameters:
+      - name: Accept-Language
+        in: header
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Entur-Distribution-Channel
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Operator-Id
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportRequest'
+        required: true
+      responses:
+        '200':
+          description: SupportStatus
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/SupportStatus'
+        '400':
+          description: Invalid request data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '403':
+          description: Insufficient permissions
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Resource conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          description: Unexpected server error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    servers:
+    - url: https://api.entur.io/shared-mobility/v1
+      description: Generated server url
+components:
+  schemas:
+    Coordinates:
+      type: object
+      properties:
+        longitude:
+          type: number
+          format: float
+        latitude:
+          type: number
+          format: float
+        altitude:
+          type:
+          - number
+          - 'null'
+          format: float
+      required:
+      - latitude
+      - longitude
+    ContactInformation:
+      type: object
+      properties:
+        email:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
+    SupportStatus:
+      type: object
+      properties:
+        status:
+          type:
+          - string
+          - 'null'
+        timeToResolution:
+          type:
+          - integer
+          - 'null'
+          format: int32
+    ApiError:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: integer
+          format: int32
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        exception:
+          type: string
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      required:
+      - detail
+      - error
+      - exception
+      - instance
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      - type
+    Place:
+      type: object
+      properties:
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        name:
+          type:
+          - string
+          - 'null'
+      required:
+      - coordinates
+    SupportRequest:
+      type: object
+      properties:
+        bookingId:
+          type:
+          - string
+          - 'null'
+          format: uuid
+        assetId:
+          type:
+          - string
+          - 'null'
+        supportType:
+          type: string
+          enum:
+          - BROKEN_DOWN
+          - NOT_AT_LOCATION
+          - MISSING_AFTER_PAUSE
+          - NOT_CLEAN
+          - NOT_AVAILABLE
+          - UNABLE_TO_OPEN
+          - UNABLE_TO_CLOSE
+          - API_TECHNICAL
+          - API_FUNCTIONAL
+          - ACCIDENT
+          - OTHER
+        contactInformationEndUser:
+          $ref: '#/components/schemas/ContactInformation'
+        comment:
+          type:
+          - string
+          - 'null'
+        place:
+          oneOf:
+          - $ref: '#/components/schemas/Place'
+          - type: 'null'
+        stationId:
+          type:
+          - string
+          - 'null'
+      required:
+      - contactInformationEndUser
+      - supportType
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    Authorization:
+      type: http
+      description: Authorization header
+      scheme: bearer
+      bearerFormat: Bearer eyJhbGciOiJIUzI1NiIsInR5cCIf36POk6yJV_adQssw5c
+x-refined-from:
+- entur-shared-mobility-openapi.json
+- entur-shared-mobility-openapi.yml

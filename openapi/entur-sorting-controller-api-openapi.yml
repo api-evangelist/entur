@@ -1,0 +1,145 @@
+openapi: 3.2.0
+info:
+  title: Entur Sorting Controller API
+  version: 2026.09.0
+  description: 'Operations tagged sorting-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seating-manager
+security:
+- bearer-key: []
+tags:
+- name: sorting-controller
+paths:
+  /v1-beta/sorting:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sorting-controller
+      summary: Get sorting properties for a tenant
+      description: Sorting properties control the order in which reservations are rebooked.
+      operationId: getSortingPriorities
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SortingResponseV1'
+    put:
+      tags:
+      - sorting-controller
+      summary: Reset sorting properties for a tenant
+      description: Sorting properties control the order in which reservations are rebooked.This function will delete all existing sorting priorities for the tenant and then insert the new ones.
+      operationId: putSortingPriorities
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/SortingRequestV1'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SortingResponseV1'
+    servers:
+    - url: https://api.entur.io/seating-manager
+components:
+  schemas:
+    SortingResponseV1:
+      required:
+      - sortingKey
+      - sortingValue
+      type: object
+      properties:
+        sortingKey:
+          type: string
+          description: Sorting key.
+          examples:
+          - NuisanceFacilityEnum.noAnimals
+        sortingValue:
+          type: integer
+          description: Sorting value.
+          format: int32
+          examples:
+          - 2
+      description: Sorting property for rebooking of reservations.
+    SortingRequestV1:
+      required:
+      - sortingKey
+      - sortingValue
+      type: object
+      properties:
+        sortingKey:
+          type: string
+          description: Sorting key.
+          examples:
+          - NuisanceFacilityEnum.noAnimals
+        sortingValue:
+          type: integer
+          description: Sorting value.
+          format: int32
+          examples:
+          - 2
+      description: Sorting property for rebooking of reservations.
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seating-manager-openapi.json
+- entur-seating-manager-openapi.yml

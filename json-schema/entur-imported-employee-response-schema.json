@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-imported-employee-response-schema.json",
+  "title": "ImportedEmployeeResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personnel-tickets-openapi.yml#/components/schemas/ImportedEmployeeResponse",
+  "required": [
+    "companyId",
+    "employeeNo",
+    "firstName",
+    "id",
+    "surname"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "The id of the imported employee",
+      "format": "int64"
+    },
+    "employeeNo": {
+      "type": "string",
+      "description": "Employee number"
+    },
+    "companyId": {
+      "type": "integer",
+      "description": "The company the employee is employed by",
+      "format": "int64"
+    },
+    "workPlaceId": {
+      "type": "integer",
+      "description": "Unused",
+      "format": "int64",
+      "deprecated": true
+    },
+    "employmentTypeId": {
+      "type": "string",
+      "description": "The type of employment"
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "description": "When the employee was born",
+      "format": "date"
+    },
+    "ssn": {
+      "type": "string",
+      "description": "The employee's social security number"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "The employee's first name"
+    },
+    "surname": {
+      "type": "string",
+      "description": "The employee's surname"
+    },
+    "addressLine": {
+      "type": "string",
+      "description": "The employee's postal address"
+    },
+    "postalData": {
+      "$ref": "#/$defs/PostalPlaceResponse"
+    },
+    "preferredProductId": {
+      "type": "integer",
+      "description": "Deprecated. Use separate endpoint categories.",
+      "format": "int64",
+      "deprecated": true
+    },
+    "abstainFromTicket": {
+      "type": "boolean",
+      "description": "Whether a ticket should be created"
+    },
+    "sendTicketToPrivateAddress": {
+      "type": "boolean",
+      "description": "Unused",
+      "deprecated": true
+    },
+    "jobDescription": {
+      "type": "string",
+      "description": "Unused",
+      "deprecated": true
+    },
+    "hireStartDate": {
+      "type": "string",
+      "description": "When the employee was hired",
+      "format": "date"
+    },
+    "payType": {
+      "type": "string",
+      "description": "Pay type - see the codes in the API documentation"
+    },
+    "hireEndDate": {
+      "type": "string",
+      "description": "When the employee left the company",
+      "format": "date"
+    },
+    "hireEndCause": {
+      "type": "string",
+      "description": "Why the employee left the company"
+    },
+    "disabilityGrade": {
+      "type": "integer",
+      "description": "The employee's degree of disability. Default 0.",
+      "format": "int32"
+    },
+    "disabilityFromDate": {
+      "type": "string",
+      "description": "When the employee's disability was granted",
+      "format": "date"
+    },
+    "disabilityProofRegistered": {
+      "type": "boolean",
+      "description": "Deprecated. Use separate endpoint for disability proofs.",
+      "deprecated": true
+    },
+    "disabilityProofRegisteredDate": {
+      "type": "string",
+      "description": "Unused",
+      "format": "date",
+      "deprecated": true
+    },
+    "employmentPercentage": {
+      "type": "integer",
+      "description": "Employment percentage",
+      "format": "int32"
+    },
+    "employmentPercentageDate": {
+      "type": "string",
+      "description": "Date for registered employment percentage",
+      "format": "date"
+    },
+    "paidPercentage": {
+      "type": "integer",
+      "description": "The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply",
+      "format": "int32"
+    },
+    "paidPercentageDate": {
+      "type": "string",
+      "description": "Unused",
+      "format": "date",
+      "deprecated": true
+    },
+    "leaveFromDate": {
+      "type": "string",
+      "description": "When the employee starts a leave",
+      "format": "date"
+    },
+    "isOnWaitPay": {
+      "type": "boolean",
+      "description": "Unused",
+      "deprecated": true
+    },
+    "waitPayDate": {
+      "type": "string",
+      "description": "Unused",
+      "format": "date",
+      "deprecated": true
+    },
+    "isFeePaid": {
+      "type": "boolean",
+      "description": "Deprecated. Use separate endpoint for yearlyFees. Whether the ticket fee has been paid, if applicable",
+      "deprecated": true
+    },
+    "note": {
+      "type": "string",
+      "description": "Any additional information"
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Whether the employee has been marked for deletion"
+    },
+    "lastUpdate": {
+      "type": "string",
+      "description": "When the imported employee was last updated",
+      "format": "date-time"
+    },
+    "sourceLastUpdate": {
+      "type": "string",
+      "description": "The source for the last update"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "The date of creation.",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "The source for the first creation"
+    }
+  },
+  "$defs": {
+    "PostalPlaceResponse": {
+      "required": [
+        "code",
+        "country",
+        "isDeleted",
+        "place"
+      ],
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Postal code"
+        },
+        "place": {
+          "type": "string",
+          "description": "Postal place"
+        },
+        "country": {
+          "type": "string",
+          "description": "Country, format ISO 3166-1 alpha-3"
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "description": "If the postal place has been deleted"
+        }
+      },
+      "description": "The postal data for the employee's address"
+    }
+  }
+}

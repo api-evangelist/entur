@@ -1,0 +1,149 @@
+openapi: 3.2.0
+info:
+  title: Entur Authentication API
+  version: 2026.10.0
+  contact:
+    name: Team Selgerintegrasjoner
+    url: https://github.com/entur/omsa
+  x-stability-level: draft
+  description: 'Operations tagged authentication across 2 of this provider''s published API definitions: entur-omsa-openapi.json, entur-omsa-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/omsa/v1
+  description: Production environment
+- url: https://api.dev.entur.io/omsa/v1
+  description: Development environment
+- url: https://api.staging.entur.io/omsa/v1
+  description: Staging environment
+tags:
+- name: Authentication
+  description: Authentication endpoints for issuing OAuth tokens.
+paths:
+  /oauth/token:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Authentication
+      summary: Issue OAuth access token
+      description: This endpoint is used to obtain an access token and optionally an ID token through different OAuth 2.0 grant types, including Client Credentials Flow. Whenever the mTLS flow is taken, the properties will be ignored, and the access token will be generated based on the credentials in the certificate (O or CN).
+      operationId: oauthTokenPost
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+              - grant_type
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  description: 'The grant type: ''client_credentials'', ''password'', or ''refresh_token''.'
+                  default: client_credentials
+                  enum:
+                  - client_credentials
+                  - password
+                  - refresh_token
+                username:
+                  type: string
+                  description: The username
+                password:
+                  type: string
+                  description: The password
+                client_id:
+                  type: string
+                  description: The client ID (Client Credentials Flow)
+                client_secret:
+                  type: string
+                  description: The client secret (Client Credentials Flow)
+        required: true
+      responses:
+        '200':
+          description: Successful token issuance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    description: The issued access token.
+                  refresh_token:
+                    type: string
+                    description: The optional refresh token.
+                  token_type:
+                    type: string
+                    description: The type of the token.
+                    default: Bearer
+                  expires_in:
+                    type: integer
+                    description: The lifetime of the access token in seconds.
+        '400':
+          description: 'Bad Request: Invalid request or wrong grant type.'
+        '401':
+          description: 'Unauthorized: Invalid client ID or secret.'
+        '500':
+          description: 'Internal Server Error: Something went wrong.'
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+components:
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    OpenData:
+      type: http
+      description: this data set is open. If it is one of the options, it is up to the implementing party whether it is open or not.
+      scheme: none
+    BearerAuth:
+      type: http
+      description: This authentication is the basic one. If you have obtained a JWT (somewhere), you can use this token to identify you at endpoints.
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth:
+      type: oauth2
+      description: This flow facilitates to get access tokens based on username/password. These can be obtained by the owner of the service, look at the landing page to find out how to contact it.
+      flows:
+        authorizationCode:
+          authorizationUrl: /
+          tokenUrl: /oauth/token
+          scopes:
+            processes: Access to /processes/
+    OAuthPKI:
+      type: oauth2
+      description: OAuth 2.0 with PKI and mutual TLS for client authentication The client sends its X.509 during the handshake. The server validates and accepts the certificate. The call to the /oauth/token can use the provided credentials (O or CN) to provide a access_token (JWT).
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            processes: Access to /processes/
+x-refined-from:
+- entur-omsa-openapi.json
+- entur-omsa-openapi.yml

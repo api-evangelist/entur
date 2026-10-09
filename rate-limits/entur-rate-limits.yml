@@ -1,0 +1,77 @@
+name: Entur Rate Limits
+generated: '2026-10-09'
+method: searched
+source: https://developer.entur.no/docs/open-services/journey-planner/rate-limiting
+limit_count: 8
+note: limit_text quotes the table row of the policy level as the page renders it. The table shows numbers only; Quota is per minute and Spike Arrest is per second, as the page defines them. The terms of service say "Specific rate limit values are defined per service". This page is the only one that publishes values (Journey Planner). Entur Partners get custom policies.
+status_on_exhaustion: 429
+headers:
+  quota: [Rate-Limit-Allowed, Rate-Limit-Available, Rate-Limit-Expiry-Time, Rate-Limit-Range, Rate-Limit-Used]
+  spike_arrest: [Spike-Allowed, Spike-Range]
+retry_guidance: Clients should **NOT** implement a retry policy for **quota violations**. Upon quota violation, clients should wait at least until the time indicated by `Rate-Limit-Expiry-Time` before trying again.
+limits:
+- name: Trip-request quota, non-identified consumers
+  endpoint: Journey Planner trip-requests
+  plan: Non-identified consumers
+  scope: per-client
+  max: 30
+  window: 1 minute
+  limit_text: Non-identified consumers 30 2 60 20
+- name: Trip-request spike arrest, non-identified consumers
+  endpoint: Journey Planner trip-requests
+  plan: Non-identified consumers
+  kind: burst
+  scope: per-client
+  max: 2
+  window: 1 second
+  limit_text: Non-identified consumers 30 2 60 20
+- name: Other-request quota, non-identified consumers
+  endpoint: Journey Planner other requests
+  plan: Non-identified consumers
+  scope: per-client
+  max: 60
+  window: 1 minute
+  limit_text: Non-identified consumers 30 2 60 20
+- name: Other-request spike arrest, non-identified consumers
+  endpoint: Journey Planner other requests
+  plan: Non-identified consumers
+  kind: burst
+  scope: per-client
+  max: 20
+  window: 1 second
+  limit_text: Non-identified consumers 30 2 60 20
+- name: Trip-request quota, ET-Client-Name identified
+  endpoint: Journey Planner trip-requests
+  plan: Consumers identified with ET-Client-Name
+  scope: per-ET-Client-Name
+  max: 500
+  window: 1 minute
+  limit_text: Consumers identified with ET-Client-Name 500 150 1000 200
+- name: Trip-request spike arrest, ET-Client-Name identified
+  endpoint: Journey Planner trip-requests
+  plan: Consumers identified with ET-Client-Name
+  kind: burst
+  scope: per-ET-Client-Name
+  max: 150
+  window: 1 second
+  limit_text: Consumers identified with ET-Client-Name 500 150 1000 200
+- name: Other-request quota, ET-Client-Name identified
+  endpoint: Journey Planner other requests
+  plan: Consumers identified with ET-Client-Name
+  scope: per-ET-Client-Name
+  max: 1000
+  window: 1 minute
+  limit_text: Consumers identified with ET-Client-Name 500 150 1000 200
+- name: Other-request spike arrest, ET-Client-Name identified
+  endpoint: Journey Planner other requests
+  plan: Consumers identified with ET-Client-Name
+  kind: burst
+  scope: per-ET-Client-Name
+  max: 200
+  window: 1 second
+  limit_text: Consumers identified with ET-Client-Name 500 150 1000 200
+- name: Entur Partners
+  endpoint: Journey Planner
+  plan: Entur Partners
+  scope: per-partner
+  limit_text: Entur Partners custom custom custom custom

@@ -1,0 +1,421 @@
+openapi: 3.2.0
+info:
+  title: Entur Reserve Third Party Products API
+  version: 2026.07.0
+  description: 'Operations tagged Reserve Third Party Products across 2 of this provider''s published API definitions: entur-reserve-offers-partner-openapi.json, entur-reserve-offers-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.staging.entur.io/sales
+  description: Staging test environment
+- url: https://api.dev.entur.io/sales
+  description: Development test environment
+- url: https://api.entur.io/sales
+  description: Production environment
+security:
+- authHeader: []
+tags:
+- name: Reserve Third Party Products
+  description: Add external products to order.
+paths:
+  /v1beta/reserve-third-party-products:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Reserve Third Party Products
+      summary: Add a third party product to an order
+      description: Take one or more third party products and add them as order lines to an existing order
+      operationId: createThirdPartyProducts
+      parameters: []
+      requestBody:
+        description: The request for creating third party products.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveThirdPartyProductsRequest'
+            examples:
+              default:
+                value:
+                  orderId: ABCD1234
+                  thirdPartyProductConfigurations:
+                  - productRef:
+                      id: EXT:ThirdPartyProduct:Baguette
+                    quantity: 2
+                    name:
+                    - lang: eng
+                      value: La baguette
+                    price:
+                      amount: '50.00'
+                      taxAmount: '2.00'
+                      currency: NOK
+                    priceContribution:
+                      amount: '50.00'
+                      taxAmount: '2.00'
+                      taxRate: '0.04'
+                      currency: NOK
+                    parameters:
+                      userProfile:
+                        userProfileRef:
+                          id: EXT:UserProfile:Adult
+                        name:
+                        - lang: eng
+                          value: Adult
+                    externalReference: external-ref-5678
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReserveThirdPartyProductsResponse'
+              examples:
+                default:
+                  value:
+                    orderId: ABCD1234
+                    orderLineIds:
+                    - 09f682e5-5cb4-4a1a-a2d7-168d95164bf6
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.staging.entur.io/sales
+      description: Staging test environment
+    - url: https://api.dev.entur.io/sales
+      description: Development test environment
+    - url: https://api.entur.io/sales
+      description: Production environment
+components:
+  schemas:
+    ReserveThirdPartyProductsRequest:
+      required:
+      - orderId
+      - thirdPartyProductConfigurations
+      type: object
+      properties:
+        orderId:
+          type: string
+          description: The orderId the third party products belongs to.
+          examples:
+          - ABCD1234
+        thirdPartyProductConfigurations:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ThirdPartyProductConfiguration'
+      description: The requested list of third party products to create and add to the order.
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          type: string
+          description: The language of the text
+        value:
+          type: string
+          description: The value of the text in the given language
+      description: Contains a text value in a given language
+      x-examples:
+        example-1:
+          lang: nob
+          value: Bergen Stasjon
+    Parameters:
+      title: Parameters
+      type: object
+      properties:
+        userProfile:
+          $ref: '#/components/schemas/UserProfile'
+      description: Similar to OrderLine.fareProducts.parameters, but with additional fields for third party products.
+    ReserveThirdPartyProductsResponse:
+      required:
+      - orderId
+      - orderLineIds
+      type: object
+      properties:
+        orderId:
+          type: string
+          examples:
+          - ABCD1234
+        orderLineIds:
+          type: array
+          items:
+            type: string
+          examples:
+          - - 717b54f7-b573-42c7-a807-5f0c09c0eb0a
+      description: The order lines created when reserving third party product on the given order
+    TPPTravelSpecification:
+      type: object
+      properties:
+        aimedStartTime:
+          type: string
+          description: Timestamp used when determining the beginning of the product's validity.
+          format: date-time
+          examples:
+          - '2025-01-01T12:00:00Z'
+        aimedEndTime:
+          type: string
+          description: Timestamp used when determining the end of the product's validity.
+          format: date-time
+          examples:
+          - '2025-01-01T12:00:00Z'
+      description: Optional travel information for the order lines to be created
+    UserProfile:
+      title: UserProfile
+      required:
+      - name
+      - userProfileRef
+      type: object
+      properties:
+        userProfileRef:
+          $ref: '#/components/schemas/RefType'
+        name:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A human-readable list of names for the product
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        price:
+          $ref: '#/components/schemas/PriceWithTax'
+        priceContribution:
+          $ref: '#/components/schemas/PriceWithTax'
+    ApiError:
+      title: ApiError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          examples:
+          - '2025-01-01T12:00:00Z'
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 500
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    ThirdPartyProductConfiguration:
+      required:
+      - name
+      - price
+      - priceContribution
+      - productRef
+      - quantity
+      type: object
+      properties:
+        quantity:
+          minimum: 1
+          type: integer
+          description: The amount of equal third party products to add to the order
+          default: 1
+        productRef:
+          $ref: '#/components/schemas/RefType'
+        name:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          description: A human-readable list of names for the product
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        price:
+          $ref: '#/components/schemas/PriceWithTax'
+        priceContribution:
+          $ref: '#/components/schemas/PriceWithTax'
+        authorityId:
+          type: string
+          description: Owner of the product.
+          examples:
+          - ENT:Authority:ENT
+        externalReference:
+          type: string
+          description: External reference to an order line. Only used by external operators to identify order lines created by ThirdPartyProductConfigurations.
+        clientProvidedData:
+          type: object
+          additionalProperties:
+            type: string
+          description: A map of client provided data to be placed on the order line. No validation is performed, and no guarantee can be made about its contents.
+        customerIds:
+          type: array
+          description: Entur customer ids that will be linked to the order line created
+          items:
+            type: string
+            examples:
+            - '1234565'
+          default: []
+        travelSpecification:
+          $ref: '#/components/schemas/TPPTravelSpecification'
+        distributionDetails:
+          $ref: '#/components/schemas/DistributionDetails'
+        parameters:
+          $ref: '#/components/schemas/Parameters'
+      description: The request object used to create a third party product
+    PriceWithTax:
+      title: PriceWithTax
+      required:
+      - amount
+      - currency
+      - taxAmount
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount including tax amount.
+          examples:
+          - '399.00'
+        taxAmount:
+          type: string
+          description: Tax amount
+          examples:
+          - '36.27'
+        taxRate:
+          type: string
+          description: Tax rate
+          examples:
+          - '12'
+        taxCode:
+          type: string
+          description: Tax code for this tax rate
+          examples:
+          - '12'
+        currency:
+          type: string
+          description: Currency
+          default: NOK
+          examples:
+          - NOK
+      description: Price with included tax amounts and an optional rate.
+    RefType:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Value to identify a given resource
+        version:
+          type: string
+          description: Optional version for a given resource
+      description: Versioned Reference to a resource
+    DistributionDetails:
+      title: DistributionDetails
+      type: object
+      properties:
+        fulfillmentMethodRef:
+          $ref: '#/components/schemas/RefType'
+        typeOfTravelDocumentToIssueRef:
+          $ref: '#/components/schemas/RefType'
+        customerAccountRef:
+          $ref: '#/components/schemas/RefType'
+        distributionHolderCustomerId:
+          type: string
+          description: The Entur customer id that will be linked to the distribution of the order line created
+          examples:
+          - '1234556'
+      description: Wrapper for references connected to distribution of travel rights and/or tickets
+  responses:
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: A header containing the distribution channel ID.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+x-refined-from:
+- entur-reserve-offers-partner-openapi.json
+- entur-reserve-offers-partner-openapi.yml

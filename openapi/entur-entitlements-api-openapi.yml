@@ -1,0 +1,310 @@
+openapi: 3.2.0
+info:
+  title: Entur Entitlements API
+  version: 2026.08.0
+  contact:
+    name: Entur Team Personalisering
+    email: team.personalisering@entur.org
+  termsOfService: http://entur.org
+  description: 'Operations tagged Entitlements across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io
+security:
+- jwt: []
+tags:
+- name: Entitlements
+  description: API for handling personnel ticket entitlements.
+paths:
+  /customers/v2/benefits/entitlements/{customerNumber}/by-customer-number:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Entitlements
+      summary: Gets entitlements for a customer
+      description: Gets entitlements for a customer by customer number, including information about the product, contract and contract holder.
+      operationId: getEntitlementsByCustomerNumber
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: travelDate
+        in: query
+        description: Get valid entitlements for travel date
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: excludeSubContracts
+        in: query
+        description: Exclude day trip entitlements. Default is false
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EntitlementResponse'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+    servers:
+    - url: https://api.entur.io
+components:
+  schemas:
+    LocalDateResponse:
+      required:
+      - day
+      - month
+      - year
+      type: object
+      properties:
+        day:
+          type: integer
+          format: int32
+        month:
+          type: integer
+          format: int32
+        year:
+          type: integer
+          format: int32
+      description: Contract owners birth day
+    EntitlementResponse:
+      required:
+      - contractOwnerCustomerNumber
+      - contractOwnerDisplayName
+      - contractUUID
+      - contractValidFrom
+      - isSeniorCitizen
+      - passengerCategory
+      - productId
+      - productVersion
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Id of the product connected to the contracts loyalty program
+        displayName:
+          type: array
+          description: Display name for loyalty program
+          items:
+            $ref: '#/components/schemas/LocalizedText'
+        productVersion:
+          type: string
+          description: Version of the product connected to the contracts loyalty program
+        contractUUID:
+          type: string
+          description: Contract UUID, used to identify a contract
+        contractExternalRef:
+          type: string
+          description: External contract reference if set.
+        contractOwnerCustomerNumber:
+          type: integer
+          description: Contract owner customer number
+          format: int64
+        contractOwnerDisplayName:
+          type: string
+          description: Contract owners first and last name
+        contractOwnerBirthDate:
+          $ref: '#/components/schemas/LocalDateResponse'
+        contractValidFrom:
+          type: string
+          description: Contract consumable from date
+        contractValidTo:
+          type: string
+          description: Contract expiration date
+        contractParent:
+          type: string
+          description: If present, contract UUID of the parent contract. This field is usually set if the contract is created by a coupon usage, whereas this contract has a time constraint and the parent has a coupon constraint.
+          examples:
+          - fd29908d-a2ae-4fe0-8e10-7f0db437c554
+        remainingCoupons:
+          type: integer
+          description: Remaining coupons connected to the contract
+          format: int64
+        couponsLimit:
+          type: integer
+          description: How many coupons the contract has. Default is cascaded from Loyalty Program Version. If set, the contract will be blocked for usage when all coupons are used. Coupons are registered via an OrderLineEvent.
+          format: int64
+          examples:
+          - 10
+        ticketOrderId:
+          type: string
+          description: If present, a ticket is included in this right. It may be distributed or redistributed to this device.
+        isSeniorCitizen:
+          type: boolean
+          description: Whether the contract owner is considered a senior citizen
+          deprecated: true
+        passengerCategory:
+          type: string
+          description: Passenger category.
+          enum:
+          - STUDENT
+          - SENIOR_CITIZEN
+          - ADULT
+      description: Entitlement containing information about contract, product, contract holder and ticker order
+    LocalizedText:
+      required:
+      - description
+      - languageCode
+      - text
+      type: object
+      properties:
+        languageCode:
+          type: string
+          description: Language code according to ISO 639-3
+          examples:
+          - NOB
+        text:
+          type: string
+          description: Text localized to the language given in languageCode
+        description:
+          type: string
+          description: Loyalty program description. Supports any kind of text
+      description: Localized text with language code
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
+  responses:
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-personnel-tickets-openapi.json
+- entur-personnel-tickets-openapi.yml

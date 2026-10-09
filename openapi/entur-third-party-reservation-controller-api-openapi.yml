@@ -1,0 +1,154 @@
+openapi: 3.2.0
+info:
+  title: Entur Third Party Reservation Controller API
+  version: 2026.09.0
+  description: 'Operations tagged third-party-reservation-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seating-manager
+security:
+- bearer-key: []
+tags:
+- name: third-party-reservation-controller
+paths:
+  /v1-beta/third-party-reservations:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - third-party-reservation-controller
+      summary: Create a third party reservation
+      description: Creates a third party reservation. Seating Manager will contact the owning system if a client tries to get a reservation with the corresponding reference.
+      operationId: createThirdPartyReservation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateThirdPartyReservationsRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateThirdPartyReservationsResponse'
+    servers:
+    - url: https://api.entur.io/seating-manager
+components:
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    CreateThirdPartyReservationsRequest:
+      required:
+      - reservations
+      type: object
+      properties:
+        reservations:
+          type: array
+          description: The third party reservations to create
+          items:
+            $ref: '#/components/schemas/ThirdPartyReservation'
+    CreateThirdPartyReservationsResponse:
+      required:
+      - thirdPartyReservations
+      type: object
+      properties:
+        thirdPartyReservations:
+          type: array
+          description: The third party reservations that were created
+          items:
+            $ref: '#/components/schemas/ThirdPartyReservationResponse'
+    ThirdPartyReservationResponse:
+      required:
+      - createdAt
+      - orderId
+      - owningSystem
+      - reference
+      type: object
+      properties:
+        reference:
+          type: string
+          description: If supplied this id will be used as reference for this reservation. If not it will be generated automatically.
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        orderId:
+          type: string
+          description: An orderId that can be used for lookup purposes
+          examples:
+          - A1B2C3D4
+        owningSystem:
+          type: string
+          description: The ID of the system that owns this reservation
+          examples:
+          - osdm-gateway
+        createdAt:
+          minLength: 1
+          type: string
+          description: When this reservation was initially created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+      description: The third party reservations that were created
+    ThirdPartyReservation:
+      required:
+      - datedServiceJourneyId
+      - orderId
+      - owningSystem
+      - reference
+      type: object
+      properties:
+        reference:
+          type: string
+          description: This id will be used as reference for this reservation.
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        orderId:
+          type: string
+          description: An orderId that can be used for lookup purposes
+          examples:
+          - A1B2C3D4
+        datedServiceJourneyId:
+          type: string
+          description: The `id` of the dated service journey which the `reservation` belongs to.
+          examples:
+          - ENT:DatedServiceJourney:4788391
+        owningSystem:
+          type: string
+          description: The ID of the system that owns this reservation
+          examples:
+          - osdm-gateway
+      description: The third party reservations to create
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seating-manager-openapi.json
+- entur-seating-manager-openapi.yml

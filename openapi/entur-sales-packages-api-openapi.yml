@@ -1,0 +1,3723 @@
+openapi: 3.2.0
+info:
+  title: Entur Sales Packages API
+  version: 2026.10.0
+  description: 'Operations tagged sales-packages across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: sales-packages
+paths:
+  /sales-packages:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves sales packages by organisation id
+      operationId: sales-packages_getAll
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify a organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify a fare frame
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesPackage'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - sales-packages
+      summary: Create a salespackage
+      operationId: sales-packages_create_1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesPackageInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity created successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /sales-packages/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves a sales package by id
+      operationId: sales-packages_getById
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: query
+        description: version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPackage'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /sales-packages/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves a sales package by id
+      operationId: sales-packages_getByIdAndVersion
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: version
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPackage'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - sales-packages
+      summary: Update a sales-package
+      operationId: sales-packages_update_1
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: version
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesPackageInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v1/sales-packages/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves a sales package by id
+      operationId: sales-packages_getByIdV2
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: startDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: endDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: The version status of the sales package
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fromDate
+        in: query
+        description: The from date of the sales packages version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: toDate
+        in: query
+        description: The to date of the sales packages version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SalesPackage'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v2/sales-packages:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves all sales packages
+      operationId: sales-packages_getAllWithGpaDataSetAndStatusFilter
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify a dataset to an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        description: Possibility of opting out of including child elements
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: statusFilter
+        in: query
+        description: 'Filter by status. Allowed values: DRAFT, PROPOSED, VERSIONED, DEPRECATED, ALL. Defaults to ALL if not specified. Mutually exclusive with validOnDate.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - DRAFT
+            - PROPOSED
+      - name: validOnDate
+        in: query
+        description: 'Return the SalesPackages valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED SalesPackages are returned. And in the staging environment, PROPOSED SalesPackages are preferred to VERSIONED ones. Mutually exclusive with statusFilter.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/v2.SalesPackage'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - sales-packages
+      summary: Create a sales package
+      operationId: sales-packages_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2.SalesPackage'
+        required: true
+      responses:
+        '204':
+          description: Entity created successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v2/sales-packages/count:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves the number of sales packages
+      operationId: sales-packages_count
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify a dataset to an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: statusFilter
+        in: query
+        description: 'Filter by status. Allowed values: DRAFT, PROPOSED, VERSIONED, DEPRECATED, ALL. Defaults to ALL if not specified. Mutually exclusive with validOnDate.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - DRAFT
+            - PROPOSED
+      - name: validOnDate
+        in: query
+        description: 'Count SalesPackages valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED SalesPackages are counted. And in the staging environment, PROPOSED SalesPackages are preferred to VERSIONED ones. Mutually exclusive with statusFilter.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the number of sales packages
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int32
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v2/sales-packages/pages:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves the number of pages of sales packages
+      operationId: sales-packages_pages
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify a dataset to an organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        description: Possibility of opting out of including child elements
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: pageSize
+        in: query
+        description: The number of sales packages per page
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: pageNumber
+        in: query
+        description: The page number
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: statusFilter
+        in: query
+        description: 'Filter by status. Allowed values: DRAFT, PROPOSED, VERSIONED, DEPRECATED, ALL. Defaults to ALL if not specified. Mutually exclusive with validOnDate.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - DRAFT
+            - PROPOSED
+      - name: validOnDate
+        in: query
+        description: 'Return the SalesPackages valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED SalesPackages are returned. And in the staging environment, PROPOSED SalesPackages are preferred to VERSIONED ones. Mutually exclusive with statusFilter.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the number of pages of sales packages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPackagePageWrapper'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v2/sales-packages/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves a sales package by id.
+      description: Optional validOnDate query parameter (defaults to now). In prod returns the VERSIONED element; in staging/dev PROPOSED is preferred over VERSIONED.
+      operationId: sales-packages_getByIdAndValidOnDate
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: validOnDate
+        in: query
+        description: Return the version valid on the given date (ISO-8601). Defaults to now.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v2.SalesPackage'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v2/sales-packages/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - sales-packages
+      summary: Retrieves sales package given id and version
+      operationId: sales-packages_getByIdWithGpaDataSet
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The version of the sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: gpaDataSet
+        in: query
+        description: 'Deprecated: this parameter is ignored. Only E-variant GPAs are returned.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v2.SalesPackage'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - sales-packages
+      summary: Updates an existing sales package
+      operationId: sales-packages_update
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The version of the sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2.SalesPackage'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    delete:
+      tags:
+      - sales-packages
+      summary: Delete a sales package given id and version
+      operationId: sales-packages_deleteById
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The version of the sales package
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      responses:
+        '204':
+          description: Entity deleted successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    GroupOfTimeBands:
+      required:
+      - changed
+      - created
+      - id
+      - members
+      - modification
+      - nameOfClass
+      - status
+      - validityConditions
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        members:
+          type: array
+          description: Members.
+          items:
+            $ref: '#/components/schemas/Timeband'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - FareStructureElement
+        status:
+          type: string
+          description: Status.
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validityConditions:
+          type: array
+          description: ValidityConditions sequence.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A GroupOfTimeband describe during which the assignments applies
+    DistributionAssignmentInsert:
+      required:
+      - allDistributionChannelsRef
+      - distributionRights
+      - fareFrameRef
+      - id
+      - name
+      - organisationRef
+      - salesPackageRef
+      - version
+      type: object
+      properties:
+        allDistributionChannelsRef:
+          type: boolean
+          description: Flag for distribution in all channels.
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        distributionChannelRef:
+          type: string
+          description: Distribution channel Ref.
+        distributionRights:
+          type: string
+          description: Distribution rights.
+          enum:
+          - NONE
+          - SELL
+          - REFUND
+          - EXCHANGE
+          - INFROM
+          - PRIVATE
+          - OTHER
+          examples:
+          - SELL
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fulfilmentMethodRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfDistributionChannelsRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:DistributionAssignment:Ordinary
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        organisationRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        paymentMethods:
+          type: array
+          description: Payment methods.
+          items:
+            type: string
+        salesPackageRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+    GenericParameterAssignment:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        canIgnoreInOffering:
+          type: boolean
+          description: Indicates whether gpa leaf node is supposed to be ignored when generating offer.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+        chargingBasisType:
+          type: string
+          description: ChargingBasisType.
+          enum:
+          - FREE
+          - DISCOUNTED
+          - NORMAL
+          - ANY
+          examples:
+          - FREE
+        comparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef.
+          examples:
+          - NSB:Version:V1
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+          examples:
+          - NSB:Version:V1
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareProductRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareStructureElementRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:GenericParameterAssignment:AllowedOperators
+        includes:
+          type: array
+          description: Includes genericParameterAssignments.
+          items:
+            $ref: '#/components/schemas/GenericParameterAssignment'
+        includesGroupingType:
+          type: string
+          description: Includes grouping type.
+          enum:
+          - AND
+          - OR
+          - XOR
+          - NOT
+          examples:
+          - AND
+        limitationGroupingType:
+          type: string
+          description: Limitation grouping type.
+          enum:
+          - AND
+          - OR
+          - XOR
+          - NOT
+          examples:
+          - AND
+        limitations:
+          type: array
+          description: Limitations as UsageParameters.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class
+          examples:
+          - GenericParameterAssignment
+        parentParameterAssignmentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        requiredElements:
+          type: array
+          description: Required elements.
+          items:
+            type: string
+        requiredInContext:
+          type: string
+          description: Required in context.
+          enum:
+          - OFFERING
+          - BOOKING
+          - RESERVATION
+          - SALE
+          - FULFILMENT
+          - ACTIVATION
+          - CONSUMPTION
+          - REVALIDATION
+        requiredType:
+          type: string
+          description: Required type.
+          enum:
+          - SERVICE_JOURNEY_REF
+          - TARIFF_ZONE_REF
+          - PASSENGER_SEAT_REF
+          - USER_PROFILE_REF
+          - USAGE_VALIDITY_PERIOD_REF
+          - DATED_SERVICE_JOURNEY_REF
+          - DYNAMIC_DISTANCE_MATRIX_ELEMENT
+          - USAGE_VALIDITY_PERIOD
+          - DISTANCE_MATRIX_ELEMENT_REF
+          - SCHEDULED_STOP_POINT_REF
+          - GROUP_TICKET_REF
+          - GROUP_TICKET
+          - GROUP_OF_TARIFF_ZONES_REF
+          - FARE_ZONE_REF
+          examples:
+          - SERVICE_JOURNEY_REF
+        salesPackageRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        temporalValidityParameters:
+          type: array
+          description: Temporal validity parameter.
+          items:
+            $ref: '#/components/schemas/TemporalValidityParameter'
+        typeOfAccessRightAssignment:
+          $ref: '#/components/schemas/TypeOfAccessRightAssignment'
+        validableElementRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        validityParameterAssignmentType:
+          type: string
+          description: Validity parameter assignment type.
+          enum:
+          - EQ
+          - NE
+          - GT
+          - LT
+          - GE
+          - LE
+          examples:
+          - EQ
+        validityParameterGroupingType:
+          type: string
+          description: Validity parameter grouping type.
+          enum:
+          - AND
+          - OR
+          - XOR
+          - NOT
+          examples:
+          - AND
+        validityParameterSetSelectionType:
+          type: string
+          description: Validity parameter set operator.
+          enum:
+          - ONE_OF_ANY_ONE_SET
+          - ONE_OF_EACH_SET
+          - SOME_OF_ANY_SET
+          - ALL_OF_ONE_SET
+          - ALL_OF_ALL_SETS
+        validityParameters:
+          type: array
+          description: Validity parameters as scoping validity parameters
+          items:
+            $ref: '#/components/schemas/ScopingValidityParameter'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V2
+      description: A GenericParameterAssignment
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    LimitingRule:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        canBeCumulative:
+          type: boolean
+          description: CanBeCumulative.
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountAsPercentage:
+          type: number
+          description: DiscountAsPercentage.
+          format: float
+        discountAsValue:
+          type: number
+          description: DiscountAsValue.
+          format: float
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        maximumPrice:
+          type: string
+          description: MaximumPrice.
+          examples:
+          - '164.0'
+        maximumPriceAsPercentage:
+          type: number
+          description: MaximumPriceAsPercentage.
+          format: double
+        minimumLimitPrice:
+          type: string
+          description: MinimumLimitPrice.
+          examples:
+          - '164.0'
+        minimumPrice:
+          type: string
+          description: MinimumPrice.
+          examples:
+          - '164.0'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - LimitingRule
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A LimitingRule
+    SalesPackageElement:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - fareTableRefs
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareProductRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:SalesPackageElement:Ordinary
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - SalesPackageElement
+        salesPackageRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        typeOfTravelDocumentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A SalesPackageElement
+    SalesPackage:
+      required:
+      - accessRightParameterAssignments
+      - changed
+      - created
+      - distributionAssignments
+      - fareFrameRef
+      - fareTableRefs
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        accessRightParameterAssignments:
+          type: array
+          description: Access Right Parameter assignments.
+          items:
+            $ref: '#/components/schemas/GenericParameterAssignment'
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        changed:
+          type: string
+          description: SalesPackage changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef
+        created:
+          type: string
+          description: SalesPackage create datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        distributionAssignments:
+          type: array
+          description: Distribution assignments.
+          items:
+            $ref: '#/components/schemas/DistributionAssignment'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:SalesPackage:Ordinary
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: SalesPackage Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - SalesPackage
+        prices:
+          type: array
+          description: Fare prices.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        salesPackageElements:
+          type: array
+          description: Sales package elements.
+          items:
+            $ref: '#/components/schemas/SalesPackageElement'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        vatGroupRegister:
+          type: string
+          description: VatGroupRegister is optional. No default value
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A SalesPackage response
+    Timeband:
+      required:
+      - changed
+      - created
+      - dayOffset
+      - description
+      - endTime
+      - fareFrameRef
+      - id
+      - modification
+      - name
+      - nameOfClass
+      - startTime
+      - status
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        dayOffset:
+          type: integer
+          description: Days offset. This will determine if endTime is x number of days from today. ie. 1 is tomorrow 0 is today.
+          format: int32
+          examples:
+          - 1
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+          readOnly: true
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        endTime:
+          type: string
+          description: End time.
+          examples:
+          - '11:11:11'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Timeband:2HoursValidPlus1
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: The name of the luggage allowance represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - TimeBand
+        startTime:
+          type: string
+          description: Start time.
+          examples:
+          - '11:11:11'
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        timeZone:
+          type: string
+          description: Time zone.
+          default: Europe/Oslo
+          examples:
+          - Europe/Oslo
+        validityConditions:
+          type: array
+          description: ValidityConditions sequence.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: The TimeBand describe during which the assignment applies
+    TypeOfAccessRightAssignment:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - ENT:TypeOfAccessRightAssignment:ActivationPolicyAssignment
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - TypeOfAccessRightAssignment
+        status:
+          type: string
+          description: Type of access right assignment status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Type of access right assignment version.
+          examples:
+          - NSB:Version:V1
+      description: A classification of Access Right Assignments.
+    SalesPackageElementInsert:
+      required:
+      - fareFrameRef
+      - fareTableRefs
+      - id
+      - name
+      type: object
+      properties:
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareProductRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:SalesPackageElement:Ordinary
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        typeOfTravelDocumentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+    ScopingValidityParameter:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - genericParameterAssignmentRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        authorityRef:
+          type: string
+          description: AuthorityRef.
+          examples:
+          - NSB:Authority:NSB
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        distributionChannelRef:
+          type: string
+          description: Distribution channel ref.
+          examples:
+          - ENT:DistributionChannel:App
+        facilitySetRef:
+          type: string
+          description: facilitySetRef.
+        fareClasses:
+          type: array
+          description: 'FareClasses. Enum as string with the following values: FIRST_CLASS, SECOND_CLASS, THIRD_CLASS, ECONOMY_CLASS, BUSINESS_CLASS, TURISTA, PREFERENTE, STANDARD_CLASS, PREMIUM_CLASS, ANY, UNKNOWN'
+          items:
+            type: string
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareSectionRef:
+          type: string
+          description: Fare section ref.
+        fareZoneRef:
+          type: string
+          description: FareZoneRef.
+          examples:
+          - KOL:FareZone:250
+        genericParameterAssignmentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfLinesRef:
+          type: string
+          description: Group of Lines ref.
+          examples:
+          - ENT:GroupOfLines:AllLines
+        groupOfTariffZonesRef:
+          type: string
+          description: Group of Tariff Zones ref.
+          examples:
+          - ENT:GroupOfTariffZones:AllZones
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ScopingValidityParameter:OperatorNSB
+        lineRef:
+          type: string
+          description: LineRef.
+        lineType:
+          type: string
+          description: LineType.
+          enum:
+          - LOCAL
+          - URBAN
+          - LONG_DISTANCE
+          - EXPRESS
+          - SEASONAL
+          - REPLACEMENT
+          - FLEXIBLE
+          - CORRIDOR_SERVICE
+          - MAIN_ROUTE_WITH_FLEXIBLE_ENDS
+          - FLEXIBLE_AREAS_ONLY
+          - HAIL_AND_RIDE_SECTIONS
+          - FIXED_STOP_AREA_WIDE
+          - FREE_AREA_AREA_WIDE
+          - MIXED_FLEXIBLE
+          - MIXED_FLEXIBLE_AND_FIXED
+          - FIXED
+          - OTHER
+          examples:
+          - EXPRESS
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - ScopingValidityParameter
+        operatorRef:
+          type: string
+          description: Operator referance.
+        placeUse:
+          type: string
+          description: PlaceUse
+          enum:
+          - START_AT
+          - END_AT
+          - VIA
+          - RESTRICT_TO
+          - OTHER
+        scheduledStopPointRef:
+          type: string
+          description: Scheduled stop Point ref.
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        tariffZoneRef:
+          type: string
+          description: TariffZoneRef. This field is deprecated, please use the field FareZoneRef.
+          deprecated: true
+          examples:
+          - RUT:TariffZone:2S
+        topographicPlaceRef:
+          type: string
+          description: TopographicPlaceRef
+        transportSubmode:
+          type: string
+          description: TransportSubmode.
+          enum:
+          - unknown
+          - undefined
+          - internationalFlight
+          - domesticFlight
+          - intercontinentalFlight
+          - domesticScheduledFlight
+          - shuttleFlight
+          - intercontinentalCharterFlight
+          - internationalCharterFlight
+          - roundTripCharterFlight
+          - sightseeingFlight
+          - helicopterService
+          - domesticCharterFlight
+          - SchengenAreaFlight
+          - airshipService
+          - shortHaulInternationalFlight
+          - canalBarge
+          - localBus
+          - regionalBus
+          - expressBus
+          - nightBus
+          - postBus
+          - specialNeedsBus
+          - mobilityBus
+          - mobilityBusForRegisteredDisabled
+          - sightseeingBus
+          - shuttleBus
+          - highFrequencyBus
+          - dedicatedLaneBus
+          - schoolBus
+          - schoolAndPublicServiceBus
+          - railReplacementBus
+          - demandAndResponseBus
+          - airportLinkBus
+          - internationalCoach
+          - nationalCoach
+          - shuttleCoach
+          - regionalCoach
+          - specialCoach
+          - schoolCoach
+          - sightseeingCoach
+          - touristCoach
+          - commuterCoach
+          - funicular
+          - streetCableCar
+          - allFunicularServices
+          - undefinedFunicular
+          - metro
+          - tube
+          - urbanRailway
+          - cityTram
+          - localTram
+          - regionalTram
+          - sightseeingTram
+          - shuttleTram
+          - trainTram
+          - telecabin
+          - cableCar
+          - lift
+          - chairLift
+          - dragLift
+          - telecabinLink
+          - local
+          - highSpeedRail
+          - suburbanRailway
+          - regionalRail
+          - interregionalRail
+          - longDistance
+          - international
+          - sleeperRailService
+          - nightRail
+          - carTransportRailService
+          - touristRailway
+          - airportLinkRail
+          - railShuttle
+          - replacementRailService
+          - specialTrain
+          - crossCountryRail
+          - rackAndPinionRailway
+          - internationalCarFerry
+          - nationalCarFerry
+          - regionalCarFerry
+          - localCarFerry
+          - internationalPassengerFerry
+          - nationalPassengerFerry
+          - regionalPassengerFerry
+          - localPassengerFerry
+          - postBoat
+          - trainFerry
+          - roadFerryLink
+          - airportBoatLink
+          - highSpeedVehicleService
+          - highSpeedPassengerService
+          - sightseeingService
+          - schoolBoat
+          - cableFerry
+          - riverBus
+          - scheduledFerry
+          - shuttleFerryService
+          - communalTaxi
+          - charterTaxi
+          - waterTaxi
+          - railTaxi
+          - bikeTaxi
+          - blackCab
+          - miniCab
+          - allTaxiServices
+          - hireCar
+          - hireVan
+          - hireMotorbike
+          - hireCycle
+          - allHireVehicles
+          examples:
+          - expressBus
+        vehicleMode:
+          type: string
+          description: VehicleModeRef.
+          enum:
+          - AIR
+          - BUS
+          - COACH
+          - CABLE_WAY
+          - WATER
+          - FUNICULAR
+          - LIFT
+          - RAIL
+          - METRO
+          - TAXI
+          - TRAM
+          - UNKNOWN
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A ScopingValidityParameter
+    DistributionAssignment:
+      required:
+      - allDistributionChannelsRef
+      - changed
+      - created
+      - distributionRights
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - organisationRef
+      - paymentMethods
+      - salesPackageRef
+      - status
+      - version
+      type: object
+      properties:
+        allDistributionChannelsRef:
+          type: boolean
+          description: Flag for distribution in all channels.
+        allOrganisationRef:
+          type: boolean
+          description: Flag for all organisations.
+        allowedInChannel:
+          type: boolean
+          description: Flag for allowed in channel.
+        allowedInCountry:
+          type: boolean
+          description: Flag for allowed in country.
+        anyCountryRef:
+          type: boolean
+          description: Flag for allowed in any country.
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef.
+        countryRef:
+          type: string
+          description: Country reference.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        distributionChannelRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        distributionChannelType:
+          type: string
+          description: Type of distribution channel.
+          enum:
+          - AT_STOP
+          - ON_BOARD
+          - ONLINE
+          - TELEPHONE
+          - ELECTRONIC_PASS
+          - MOBILE_DEVICE
+          - AGENCY
+          - TOUR_OPERATOR
+          - OTHER
+        distributionRights:
+          type: string
+          description: Distribution rights.
+          enum:
+          - NONE
+          - SELL
+          - REFUND
+          - EXCHANGE
+          - INFROM
+          - PRIVATE
+          - OTHER
+          examples:
+          - SELL
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        finalCarrier:
+          type: boolean
+          description: Flag for final carrier.
+        fulfilmentMethodRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfDistributionChannelsRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfSalesPackagesRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:DistributionAssignment:Ordinary
+        initialCarrier:
+          type: boolean
+          description: Flag for initial carrier.
+        mandatoryProduct:
+          type: boolean
+          description: Flag for mandatory product.
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - DistributionAssignment
+        organisationRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        paymentMethods:
+          type: array
+          description: Payment methods.
+          items:
+            type: string
+        requiresRegistration:
+          type: boolean
+          description: Flag for requires registration.
+        responsibilitySetRef:
+          type: string
+          description: Responsibility set reference.
+        restrictedToChannel:
+          type: boolean
+          description: Flag for restricted to channel.
+        salesPackageRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        serviceAccessRightRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        ticketingServices:
+          type: array
+          description: Ticketing services.
+          items:
+            type: string
+        topographicPlaceRef:
+          type: string
+          description: Topographical place reference.
+        transitCarrier:
+          type: boolean
+          description: Flag for transit carrier.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A distributionAssignment
+    ValidityCondition:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        fromDate:
+          type: string
+          description: From Date.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ValidBetween:2018
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ValidBetween
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        toDate:
+          type: string
+          description: To Date.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A condition of the validity of the priceable object
+    SalesPackageInsert:
+      required:
+      - accessRightParameterAssignmentRefs
+      - distributionAssignments
+      - fareFrameRef
+      - id
+      - name
+      - version
+      type: object
+      properties:
+        accessRightParameterAssignmentRefs:
+          type: array
+          description: AccessRightParameterAssignments.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter is ignored.'
+          examples:
+          - E
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        distributionAssignments:
+          type: array
+          description: Distribution assignments.
+          items:
+            $ref: '#/components/schemas/DistributionAssignmentInsert'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id
+          examples:
+          - NSB:UserProfile:Child
+        name:
+          type: array
+          description: UserProfile Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        prices:
+          type: array
+          description: Fare prices.
+          items:
+            $ref: '#/components/schemas/FarePriceInsert'
+        salesPackageElements:
+          type: array
+          description: Sales package elements.
+          items:
+            $ref: '#/components/schemas/SalesPackageElementInsert'
+        vatGroupRegister:
+          type: string
+          description: VatGroupRegister is optional. No default
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: UserProfile version.
+          examples:
+          - NSB:Version:V1
+    RoundingInsert:
+      required:
+      - fareFrameRef
+      - id
+      - roundingMethod
+      - version
+      type: object
+      properties:
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: Rounding.
+      deprecated: true
+    FarePriceInsert:
+      required:
+      - fareFrameRef
+      - id
+      - name
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount.
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/RoundingInsert'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+    v2.DistributionAssignment:
+      required:
+      - allDistributionChannelsRef
+      - changed
+      - created
+      - distributionRights
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - organisationRef
+      - paymentMethods
+      - salesPackageRef
+      - status
+      - version
+      type: object
+      properties:
+        allDistributionChannelsRef:
+          type: boolean
+          description: Flag for distribution in all channels.
+        allOrganisationRef:
+          type: boolean
+          description: Flag for all organisations.
+        allowedInChannel:
+          type: boolean
+          description: Flag for allowed in channel.
+        allowedInCountry:
+          type: boolean
+          description: Flag for allowed in country.
+        anyCountryRef:
+          type: boolean
+          description: Flag for allowed in any country.
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        countryRef:
+          type: string
+          description: Country reference.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        distributionChannelRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        distributionChannelType:
+          type: string
+          description: Type of distribution channel.
+          enum:
+          - AT_STOP
+          - ON_BOARD
+          - ONLINE
+          - TELEPHONE
+          - ELECTRONIC_PASS
+          - MOBILE_DEVICE
+          - AGENCY
+          - TOUR_OPERATOR
+          - OTHER
+        distributionRights:
+          type: string
+          description: Distribution rights.
+          enum:
+          - NONE
+          - SELL
+          - REFUND
+          - EXCHANGE
+          - INFROM
+          - PRIVATE
+          - OTHER
+          examples:
+          - SELL
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        finalCarrier:
+          type: boolean
+          description: Flag for final carrier.
+        fulfilmentMethodRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfDistributionChannelsRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfSalesPackagesRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:DistributionAssignment:Ordinary
+        initialCarrier:
+          type: boolean
+          description: Flag for initial carrier.
+        mandatoryProduct:
+          type: boolean
+          description: Flag for mandatory product.
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: The name of the distribution assignment represented in different languages. Language codes are ISO-639
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - DistributionAssignment
+        organisationRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        paymentMethods:
+          type: array
+          description: Payment methods.
+          items:
+            type: string
+            enum:
+            - CASH
+            - CASH_AND_CARD
+            - COIN
+            - BANKNOTE
+            - CREDIT_CARD
+            - DEBIT_CARD
+            - CONTACTLESS_PAYMENT_CARD
+            - CARDS_ONLY
+            - TRAVEL_CARD
+            - CONTACTLESS_TRAVEL_CARD
+            - SMS
+            - MOBILE_PHONE
+            - CHEQUE
+            - COMPANY_CHEQUE
+            - TRAVELLERS_CHEQUE
+            - POSTAL_ORDER
+            - VOUCHER
+            - TOKEN
+            - WARRANT
+            - OTHER
+            examples:
+            - CREDIT_CARD
+        requiresRegistration:
+          type: boolean
+          description: Flag for requires registration.
+        responsibilitySetRef:
+          type: string
+          description: Responsibility set reference.
+        restrictedToChannel:
+          type: boolean
+          description: Flag for restricted to channel.
+        salesPackageRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        serviceAccessRightRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        ticketingServices:
+          type: array
+          description: Ticketing services.
+          items:
+            type: string
+            enum:
+            - TSF_PURCHASE
+            - COLLECTION
+            - CARD_TOP_UP
+            - RESERVATIONS
+        topographicPlaceRef:
+          type: string
+          description: Topographical place reference.
+        transitCarrier:
+          type: boolean
+          description: Flag for transit carrier.
+        version:
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+    v2.SalesPackage:
+      required:
+      - changed
+      - created
+      - distributionAssignments
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - validityParameterAssignments
+      - version
+      type: object
+      properties:
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        changed:
+          type: string
+          description: Changed datetime
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime
+          readOnly: true
+        description:
+          type: array
+          description: Description
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        distributionAssignments:
+          type: array
+          description: Distribution assignments.
+          items:
+            $ref: '#/components/schemas/v2.DistributionAssignment'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id
+          examples:
+          - NSB:SalesPackage:Ordinary
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        modification:
+          type: string
+          description: Modification status
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class
+          readOnly: true
+          examples:
+          - SalesPackage
+        organisationId:
+          type: string
+          description: Organisation related to the userProfile
+        prices:
+          type: array
+          description: Fare prices.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        salesPackageElements:
+          type: array
+          description: Sales package elements.
+          items:
+            $ref: '#/components/schemas/SalesPackageElement'
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validityParameterAssignments:
+          type: array
+          description: Validity Parameter assignments.
+          items:
+            $ref: '#/components/schemas/GenericParameterAssignment'
+        vatGroupRegister:
+          type: string
+          description: VatGroupRegister is optional. No default value
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: SalesPackage
+    FarePrice:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          maximum: 100
+          minimum: -100
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - FarePrice
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/Rounding'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+          description: Version.
+          readOnly: true
+          examples:
+          - NSB:Version:V1
+      description: A description of the price and factor for a set fare
+    SalesPackagePageWrapper:
+      required:
+      - items
+      - requestedPageNumber
+      - totalNumberOfItems
+      - totalNumberOfPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: SalesPackages for the given page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/v2.SalesPackage'
+        requestedPageNumber:
+          type: integer
+          description: Number of the requested page. In case state is lost
+          format: int32
+          readOnly: true
+          examples:
+          - 13
+        totalNumberOfItems:
+          type: integer
+          description: Total number of items.
+          format: int32
+          readOnly: true
+          examples:
+          - 369
+        totalNumberOfPages:
+          type: integer
+          description: Number of pages needed to traverse all items.
+          format: int32
+          readOnly: true
+          examples:
+          - 15
+      description: SalesPackagePageWrapper
+    TemporalValidityParameter:
+      required:
+      - changed
+      - created
+      - genericParameterAssignmentRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        dayType:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        genericParameterAssignmentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        groupOfTimeBands:
+          $ref: '#/components/schemas/GroupOfTimeBands'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:TemporalValidityParameter:OperatorNSB
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - TemporalValidityParameter
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validityCondition:
+          $ref: '#/components/schemas/ValidityCondition'
+        validityConditionRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A TemporalValidityParameter
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

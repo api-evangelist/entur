@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-dry-run-refund-response-schema.json",
+  "title": "DryRunRefundResponse",
+  "description": "A representation of a complete refundable option",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-refund-partner-openapi.yml#/components/schemas/DryRunRefundResponse",
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "The id of the order used"
+    },
+    "totalRefundAmount": {
+      "type": "string",
+      "description": "The total amount that will be refunded if refund is called with the provided input"
+    },
+    "fees": {
+      "type": "array",
+      "description": "The fees that will be added to the order if refund is called with the provided input",
+      "items": {
+        "$ref": "#/$defs/DryRunRefundFee"
+      }
+    },
+    "affectedPaymentTransactions": {
+      "type": "array",
+      "description": "A summary list of which payment and its transactions that will be affected if refund is run with the provided input",
+      "items": {
+        "$ref": "#/$defs/AffectedPaymentTransaction"
+      }
+    }
+  },
+  "required": [
+    "affectedPaymentTransactions",
+    "fees",
+    "orderId",
+    "totalRefundAmount"
+  ],
+  "$defs": {
+    "AffectedPaymentTransaction": {
+      "type": "object",
+      "description": "A composition of payment transaction data that is affected, including the amount that will be subtracted if used in a refund",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "The amount that will be subtracted from the transaction if used in a refund"
+        },
+        "generalType": {
+          "type": "string",
+          "description": "The general type of payment"
+        },
+        "import": {
+          "type": "boolean"
+        },
+        "paymentId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The id of a payment"
+        },
+        "rrn": {
+          "type": "string",
+          "description": "The Retrieval Reference Number for the affected transaction"
+        },
+        "specificType": {
+          "type": "string",
+          "description": "If available, a more specific payment type"
+        },
+        "transactionId": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The id of the payment transaction"
+        }
+      },
+      "required": [
+        "amount",
+        "generalType",
+        "import",
+        "paymentId",
+        "transactionId"
+      ],
+      "title": "AffectedPaymentTransaction"
+    },
+    "DryRunRefundFee": {
+      "type": "object",
+      "properties": {
+        "feeRef": {
+          "$ref": "#/$defs/ProductsElementWrapper"
+        },
+        "amount": {
+          "type": "string",
+          "description": "The amount of the fee"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of a Fee that will be added. REFUNDING or MANUAL"
+        }
+      },
+      "required": [
+        "amount",
+        "feeRef",
+        "type"
+      ],
+      "title": "DryRunRefundFee"
+    },
+    "ProductsElementWrapper": {
+      "type": "object",
+      "description": "A data-wrapper for a product type",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The id of the product type"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the product type"
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the product type"
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ],
+      "title": "ProductsElementWrapper"
+    }
+  }
+}

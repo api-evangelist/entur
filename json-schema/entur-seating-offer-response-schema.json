@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-seating-offer-response-schema.json",
+  "title": "SeatingOfferResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-seating-manager-openapi.yml#/components/schemas/SeatingOfferResponse",
+  "required": [
+    "createdAt",
+    "datedServiceJourneyId",
+    "datedServiceJourneyVersion",
+    "departureDateTime",
+    "elements",
+    "inactive",
+    "lineId",
+    "manualMaterial",
+    "operatingDate",
+    "organisationId",
+    "seatingOfferStatus",
+    "serviceJourneyId",
+    "transportType"
+  ],
+  "type": "object",
+  "properties": {
+    "datedServiceJourneyId": {
+      "type": "string",
+      "description": "The netex id of the `datedServiceJourney`"
+    },
+    "datedServiceJourneyVersion": {
+      "type": "integer",
+      "description": "The version of the `datedServiceJourney`",
+      "format": "int32"
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "The organisation id this seating offer is operated by.",
+      "format": "int64"
+    },
+    "replacesNetexId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Netex id for the previous material used for this seating offer. If `null` the material on this dated service journey has never been changed."
+    },
+    "seatingOfferStatus": {
+      "type": "string",
+      "description": "Describes the seating offer status",
+      "enum": [
+        "ACTIVE",
+        "CANCELLED",
+        "TO_BE_REPLACED",
+        "REPLACED_MATERIAL",
+        "REPLACED_DSJ",
+        "SEAT_USAGES_DELETED",
+        "REMOVED",
+        "DEPRECATED",
+        "REPLACED"
+      ]
+    },
+    "serviceJourneyId": {
+      "type": "string",
+      "description": "The netex id of the `serviceJourney`"
+    },
+    "operatingDate": {
+      "type": "string",
+      "description": "The date which the departure belongs to. Might differ from departureDateTime.",
+      "format": "date"
+    },
+    "departureDateTime": {
+      "type": "string",
+      "description": "The time of departure from the first station.",
+      "format": "date-time"
+    },
+    "lineId": {
+      "type": "string",
+      "description": "The netex id of the `line`"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "When this seating offer was initially created",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The last time this seating offer was updated. If `null` the seating offer has not been updated",
+      "format": "date-time"
+    },
+    "inactive": {
+      "type": "boolean",
+      "description": "Whether this seating offer is closed for sale or not"
+    },
+    "manualMaterial": {
+      "type": "boolean",
+      "description": "Whether the material for this seating offer was set manually."
+    },
+    "transportType": {
+      "type": "string",
+      "description": "The type of transport this seating offer is for.",
+      "enum": [
+        "BUS",
+        "REPLACEMENT_BUS",
+        "TRAIN",
+        "FERRY",
+        "OTHER"
+      ]
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SeatingOfferElementResponse"
+      }
+    }
+  },
+  "$defs": {
+    "ElementPartResponseV1": {
+      "required": [
+        "destinationStopPlace",
+        "direction",
+        "materialCompositionNetexId",
+        "originStopPlace",
+        "sequenceNumber"
+      ],
+      "type": "object",
+      "properties": {
+        "originStopPlace": {
+          "$ref": "#/$defs/StopPlaceWithTimesResponseV1"
+        },
+        "destinationStopPlace": {
+          "$ref": "#/$defs/StopPlaceWithTimesResponseV1"
+        },
+        "materialCompositionNetexId": {
+          "type": "string",
+          "description": "Netex id for corresponding material composition."
+        },
+        "sequenceNumber": {
+          "type": "integer",
+          "description": "Sequence number of the element in this material composition.",
+          "format": "int32"
+        },
+        "direction": {
+          "type": "string",
+          "description": "Direction of the element in this material composition.",
+          "enum": [
+            "FORWARDS",
+            "BACKWARDS",
+            "UNKNOWN"
+          ]
+        }
+      },
+      "description": "Information about one element in one material composition."
+    },
+    "SeatingOfferElementResponse": {
+      "required": [
+        "carriageIdentifier",
+        "carriageNumber",
+        "elementParts",
+        "netexId",
+        "series",
+        "seriesVersion"
+      ],
+      "type": "object",
+      "properties": {
+        "series": {
+          "type": "string",
+          "description": "Rolling stock series of the corresponding element."
+        },
+        "seriesVersion": {
+          "type": "integer",
+          "description": "Rolling stock version of the corresponding element.",
+          "format": "int32"
+        },
+        "carriageNumber": {
+          "type": "integer",
+          "description": "Carriage number for the element in the train.",
+          "format": "int32"
+        },
+        "carriageIdentifier": {
+          "type": "string",
+          "description": "Carriage identifier for the element in the train."
+        },
+        "netexId": {
+          "type": "string",
+          "description": "Netex id of the element."
+        },
+        "seatmapKey": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Seatmap key of the basic element. This can be used as a lookup in the seatmap service."
+        },
+        "elementParts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ElementPartResponseV1"
+          }
+        }
+      }
+    },
+    "StopPlaceWithTimesResponseV1": {
+      "required": [
+        "arrivalDateTime",
+        "departureDateTime",
+        "nsrCode",
+        "sequenceNr"
+      ],
+      "type": "object",
+      "properties": {
+        "nsrCode": {
+          "type": "string",
+          "description": "Stop Place id defined by National StopPlace registry."
+        },
+        "departureDateTime": {
+          "type": "string",
+          "description": "Time of departure from this stop. Set to time of arrival on last stop.",
+          "format": "date-time"
+        },
+        "arrivalDateTime": {
+          "type": "string",
+          "description": "Time of arrival on this stop. Set to time of departure on first stop.",
+          "format": "date-time"
+        },
+        "sequenceNr": {
+          "type": "integer",
+          "description": "The ordering of the station in the journey.",
+          "format": "int32"
+        }
+      },
+      "description": "Destination stop place for this element in this material composition."
+    }
+  }
+}

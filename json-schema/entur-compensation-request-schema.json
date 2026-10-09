@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-compensation-request-schema.json",
+  "title": "CompensationRequest",
+  "description": "A request performing compensation operations in batch",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-refund-partner-openapi.yml#/components/schemas/CompensationRequest",
+  "type": "object",
+  "properties": {
+    "compensationOperations": {
+      "type": "array",
+      "description": "A required list of one or more compensation operations",
+      "items": {
+        "$ref": "#/$defs/CompensationOperation"
+      }
+    }
+  },
+  "required": [
+    "compensationOperations"
+  ],
+  "$defs": {
+    "CompensationElement": {
+      "type": "object",
+      "description": "A element that wraps a sub operation on a given order. Typically when different",
+      "properties": {
+        "orderLineIds": {
+          "type": "array",
+          "description": "Optional list of order line ids that are to be compensated. If left empty the whole order is assumed to be compensated",
+          "items": {
+            "type": "string"
+          }
+        },
+        "compensationAmount": {
+          "type": "string",
+          "description": "The amount of compensation desired for this order"
+        },
+        "compensationReason": {
+          "type": "string",
+          "description": "Optional field describing the reason for the compensation"
+        }
+      },
+      "required": [
+        "compensationAmount"
+      ],
+      "title": "CompensationElement"
+    },
+    "CompensationOperation": {
+      "type": "object",
+      "description": "An entry describing a compensation operation",
+      "properties": {
+        "orderId": {
+          "type": "string",
+          "description": "The order id referencing the order to be compensated"
+        },
+        "elements": {
+          "type": "array",
+          "description": "A list of compensation elements",
+          "items": {
+            "$ref": "#/$defs/CompensationElement"
+          }
+        }
+      },
+      "required": [
+        "elements",
+        "orderId"
+      ],
+      "title": "CompensationOperation"
+    }
+  }
+}

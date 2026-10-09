@@ -1,0 +1,51 @@
+type: ToolCrosswalk
+name: Entur OpenTripPlanner MCP tool crosswalk
+provider: entur
+generated: '2026-10-09'
+method: derived
+source: https://github.com/entur/opentripplanner-mcp
+note: >-
+  Bound by name/semantics and by the backing URLs named in the MCP server README and source.
+  The live tools/list was not reachable (403), so input schemas come from the README.
+  Most tools call the Journey Planner v3 GraphQL API, which has no REST operation.
+surfaces:
+  openapi: openapi/entur-geocoder-openapi.yml
+  graphql:
+    - endpoint: https://api.entur.io/journey-planner/v3/graphql
+      schema: graphql/entur-journey-planner-v3.graphql
+    - schema: graphql/entur-mobility-v2.graphql
+  mcp:
+    url: https://opentripplanner-mcp.entur.io/mcp
+    gated: true
+    status: 403 on unauthenticated initialize (2026-10-09)
+crosswalk:
+  - tool: geocode
+    category: geocoding
+    rest: [autocomplete]
+    binding: Geocoder autocomplete search
+    confidence: medium
+    note: The MCP README points at /geocoder/v2/autocomplete; the saved spec is Geocoder v3 (/v3/autocomplete).
+mcp_only:
+  - tool: trip
+    reason: Calls Journey Planner v3 GraphQL (trip query); no REST operation.
+  - tool: departures
+    reason: Journey Planner v3 GraphQL (stop place estimated calls); no REST operation.
+  - tool: nearby-stops
+    reason: Journey Planner v3 GraphQL nearest-stops query; location text resolved via Geocoder.
+  - tool: alerts
+    reason: Journey Planner v3 GraphQL situations; no REST operation.
+  - tool: nearby-mobility
+    reason: Backed by MobilityService (Mobility v2 GraphQL); no REST operation.
+  - tool: poll-departures
+    reason: App-only tool called by the embedded departure-board UI.
+  - tool: poll-trip
+    reason: App-only tool called by the embedded trip-map UI.
+rest_only:
+  - reverse
+  - place
+coverage:
+  tools: 8
+  bound_to_rest: 1
+  mcp_only: 7
+  geocoder_operations: 3
+  geocoder_operations_without_tool: 2

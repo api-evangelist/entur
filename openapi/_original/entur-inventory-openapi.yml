@@ -1,0 +1,1780 @@
+# x-archived-from: entur-inventory-openapi.yml
+# x-archived-on: 2026-10-09
+openapi: 3.1.0
+info:
+  title: Inventory
+  description: API exposing services to handle stock
+  contact:
+    name: Entur Team Varelager
+  version: 2026.09.0
+servers:
+- url: https://api.entur.io/inventory
+security:
+- bearer-key: []
+tags:
+- name: Inventory Client
+- name: Inventory Admin
+- name: Inventory Admin repair endpoints
+- name: readiness-controller
+paths:
+  /v1/reservations/{reservationId}/reservation-lines:
+    put:
+      tags:
+      - Inventory Client
+      summary: Update all reservation lines
+      description: Update all reservation lines on a reservation
+      operationId: updateReservationLines
+      parameters:
+      - name: reservationId
+        in: path
+        description: Id of the reservation to update lines on
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of updated reservation line specifications
+              items:
+                $ref: '#/components/schemas/UpdatedReservationLine'
+            example:
+            - id: 1
+              productId: ENT:Product:1
+              amount: 2
+              status: CONFIRMED
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationLineResponseV1'
+              example:
+              - id: 1
+                productId: ENT:Product:1
+                amount: 2
+                created: '2024-01-01T10:00:00Z'
+                changed: '2024-01-01T10:00:00Z'
+                status: CONFIRMED
+    post:
+      tags:
+      - Inventory Client
+      summary: Add reservation line to reservation
+      description: Add a reservation line to an existing reservation.
+      operationId: addReservationLine
+      parameters:
+      - name: reservationId
+        in: path
+        description: Id of the reservation to add lines to
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationLine'
+            example:
+              productId: ENT:Product:1
+              amount: 2
+              status: CONFIRMED
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationLineResponseV1'
+              example:
+                id: 1
+                productId: ENT:Product:1
+                amount: 2
+                created: '2024-01-01T10:00:00Z'
+                changed: '2024-01-01T10:00:00Z'
+                status: CONFIRMED
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/{reservationId}/reservation-lines/{reservationLineId}:
+    put:
+      tags:
+      - Inventory Client
+      summary: Update reservation line
+      description: Update a single reservation line
+      operationId: updateReservationLine
+      parameters:
+      - name: reservationId
+        in: path
+        description: Id of the reservation to update a reservation line on.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: reservationLineId
+        in: path
+        description: Id of the reservation line to update.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationLine'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationLineResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/quotas:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get quota(s)
+      description: Retrieve quota(s) for a service journey
+      operationId: getQuotaOnDeparture
+      parameters:
+      - name: datedServiceJourney
+        in: query
+        description: Id for the dated service journey
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: product
+        in: query
+        description: Navn product
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: origin
+        in: query
+        description: Navn origin
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        description: Navn destination
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: quotaConfigId
+        in: query
+        description: Id for quotaconfig
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuotaResponseV1'
+    put:
+      tags:
+      - Inventory Admin
+      summary: Overwrite quota(s)
+      description: Overwrite quota(s) for a dated service journey
+      operationId: updateQuotasOnDeparture
+      parameters:
+      - name: datedServiceJourney
+        in: query
+        description: The departure ID (dated service journey) to overwrite quotas for
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of quotas to update for a dated service journey
+              items:
+                $ref: '#/components/schemas/UpdateQuotaRequestV1'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuotaResponseV1'
+    post:
+      tags:
+      - Inventory Admin
+      summary: Create quota(s)
+      description: Create quota(s) for a service journey
+      operationId: postQuotasOnDeparture
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List of quotas to create
+              items:
+                $ref: '#/components/schemas/QuotaRequestV1'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuotaResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/quotas/{quotaId}:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get quota
+      description: Retrieve quota by ID
+      operationId: getQuotaById
+      parameters:
+      - name: quotaId
+        in: path
+        description: Id for the quota
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaResponseV1'
+    put:
+      tags:
+      - Inventory Admin
+      summary: Update quota
+      description: Updates a quota for a service journey
+      operationId: putQuotaOnDeparture
+      parameters:
+      - name: quotaId
+        in: path
+        description: ID for the quota
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuotaRequestV1'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaResponseV1'
+    delete:
+      tags:
+      - Inventory Admin
+      summary: Delete quota
+      description: Delete quota by ID
+      operationId: deleteQuotaById
+      parameters:
+      - name: quotaId
+        in: path
+        description: Id for the quota
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/quota-templates:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get quota templates for a line
+      description: Retrieve all quota templates for a given line
+      operationId: getQuotaTemplates
+      parameters:
+      - name: lineId
+        in: query
+        description: Id of the line to get quota templates for
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QuotaTemplateResponseV1'
+    post:
+      tags:
+      - Inventory Admin
+      summary: Create quota template
+      description: Create a new quota template for a line
+      operationId: createQuotaTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaTemplateRequestV1'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaTemplateResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/quota-templates/{id}:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get quota template by id
+      description: Retrieve a quota template by its ID
+      operationId: getQuotaTemplate
+      parameters:
+      - name: id
+        in: path
+        description: Id of the quota template
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaTemplateResponseV1'
+    put:
+      tags:
+      - Inventory Admin
+      summary: Update quota template
+      description: Update an existing quota template
+      operationId: updateQuotaTemplate
+      parameters:
+      - name: id
+        in: path
+        description: Id of the quota template
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaTemplateUpdateRequestV1'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaTemplateResponseV1'
+    delete:
+      tags:
+      - Inventory Admin
+      summary: Delete quota template
+      description: Delete a quota template by its ID
+      operationId: deleteQuotaTemplate
+      parameters:
+      - name: id
+        in: path
+        description: Id of the quota template
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/quota-configurations/{id}:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get quota configuration
+      description: Retrieve quota configurations by ID
+      operationId: getQuotaConfiguration
+      parameters:
+      - name: id
+        in: path
+        description: Id for the quota configuration to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaConfigurationResponseV1'
+      security:
+      - bearer-key: []
+    put:
+      tags:
+      - Inventory Admin
+      summary: Update quota configuration
+      description: Update a quota configuration
+      operationId: putQuotaConfiguration
+      parameters:
+      - name: id
+        in: path
+        description: The id of the quota configuration to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaConfiguration'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaConfigurationResponseV1'
+      security:
+      - bearer-key: []
+    delete:
+      tags:
+      - Inventory Admin
+      summary: Delete quota configuration
+      description: Delete quota configuration
+      operationId: deleteQuotaConfiguration
+      parameters:
+      - name: id
+        in: path
+        description: The id of the quota configuration to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: No Content
+      security:
+      - bearer-key: []
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/stock/query:
+    post:
+      tags:
+      - Inventory Client
+      summary: Get available stock for a tripPattern
+      description: Calculates available stock between a set of stopPlaces on separate DatedServiceJourneys
+      operationId: multiStockQuery
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockQuery'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MultiStockResponse'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations:
+    get:
+      tags:
+      - Inventory Client
+      summary: Get reservations
+      description: Retrieves all registered reservations for an original dated service journey
+      operationId: getReservationsByDeparture
+      parameters:
+      - name: datedServiceJourney
+        in: query
+        description: The original dated service journey to find reservations for.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createdAfter
+        in: query
+        description: Created after
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: '2019-10-09T11:57:02Z'
+      - name: changedAfter
+        in: query
+        description: Changed after
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        example: '2019-10-09T11:57:02Z'
+      - name: origin
+        in: query
+        description: origin
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: Oslo
+      - name: destination
+        in: query
+        description: destination
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: Bergen
+      - name: product
+        in: query
+        description: product
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        example: Minipris:Shadow
+      - name: status
+        in: query
+        description: status
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - EXPIRED
+          - CANCELLED
+          - DRAFT_CANCELLATION
+          - CONFIRMED_CANCELLATION
+          - RELEASING
+        example: CONFIRMED
+      - name: excludeInactiveReservations
+        in: query
+        description: Exclude reservations that are not DRAFT nor CONFIRMED, defaults to false
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+        example: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponseV1'
+    post:
+      tags:
+      - Inventory Client
+      summary: Reserve stock
+      description: Reserves some amount of stock for use
+      operationId: createReservation
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: Not applicable for Partners/operators. Used to filter between operator organisations
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/batch:
+    post:
+      tags:
+      - Inventory Client
+      summary: Reserve stock for multiple legs
+      description: Reserves some amount of stock for use
+      operationId: createMultiReservation
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: Not applicable for Partners/operators. Used to filter between operator organisations
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Reservation'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{id}:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get a departure
+      description: Retrieves a departure for transportation.
+      operationId: getDeparture
+      parameters:
+      - name: id
+        in: path
+        description: Id for the departure
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartureResponseV1'
+    patch:
+      tags:
+      - Inventory Admin
+      summary: Update a departure
+      description: Updates inactive flag on departure
+      operationId: patchDeparture
+      parameters:
+      - name: id
+        in: path
+        description: Id for the departure
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepartureRequestV1'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartureResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/quota-configurations:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get quota configurations
+      description: Get all registered quota configurations
+      operationId: findAllQuotaConfigurations
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: Not applicable for Partners/operators. Used to filter between operator organisations
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        default:
+          description: default response
+          content:
+            application/json:
+              schema:
+                type: string
+      security:
+      - bearer-key: []
+    post:
+      tags:
+      - Inventory Admin
+      summary: Create quota configuration
+      description: Create a quota configuration
+      operationId: postQuotaConfiguration
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: Not applicable for Partners/operators. Used to filter between operator organisations
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuotaConfiguration'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuotaConfigurationResponseV1'
+      security:
+      - bearer-key: []
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/nesting-config-tree:
+    get:
+      tags:
+      - Inventory Admin
+      summary: Get nesting config trees
+      description: Retrieves all nesting config trees
+      operationId: getNestingTrees
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: Not applicable for Partners/operators. Used to filter between operator organisations
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NestingConfigTreeResponseV1'
+    post:
+      tags:
+      - Inventory Admin
+      summary: Create/Update a nesting config tree.
+      description: Create/Update a nesting config tree.
+      operationId: postQuotaConfiguration_1
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: Not applicable for Partners/operators. Used to filter between operator organisations
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NestingConfigTree'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NestingConfigTreeResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/dated-service-journeys/{departureId}/refresh:
+    post:
+      tags:
+      - Inventory Admin
+      summary: Refresh departure with live journey data
+      description: Refresh departure with journey data, which can possibly merge multiple existing departures
+      operationId: refreshDeparture
+      parameters:
+      - name: departureId
+        in: path
+        description: The datedServiceJourneyId to refresh
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: multiPrivateCodeOverride
+        in: query
+        description: If true, the refresh will merge departures event with different privateCodes
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepartureResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/stock:
+    get:
+      tags:
+      - Inventory Client
+      summary: Get available stock
+      description: Calculates available stock between two stops of a dated service journey
+      operationId: stockForJourney
+      parameters:
+      - name: datedServiceJourney
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/reservations/{id}:
+    get:
+      tags:
+      - Inventory Client
+      summary: Get reservation by id
+      description: Retrieves a registered reservation.
+      operationId: getReservation
+      parameters:
+      - name: id
+        in: path
+        description: Id of the reservation to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseV1'
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /ready:
+    get:
+      tags:
+      - readiness-controller
+      operationId: ready
+      responses:
+        '200':
+          description: OK
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+components:
+  schemas:
+    UpdatedReservationLine:
+      type: object
+      description: ' Updated reservation line specification'
+      properties:
+        id:
+          type: integer
+          format: int64
+        productId:
+          type: string
+        amount:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - EXPIRED
+          - CANCELLED
+          - DRAFT_CANCELLATION
+          - CONFIRMED_CANCELLATION
+          - RELEASING
+      required:
+      - amount
+      - id
+      - productId
+      - status
+    ReservationLineResponseV1:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productId:
+          type: string
+        amount:
+          type: integer
+          format: int32
+        created:
+          type: string
+          format: date-time
+        changed:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - EXPIRED
+          - CANCELLED
+          - DRAFT_CANCELLATION
+          - CONFIRMED_CANCELLATION
+          - RELEASING
+      required:
+      - amount
+      - changed
+      - created
+      - id
+      - productId
+      - status
+    ReservationLine:
+      type: object
+      description: Updated spec of reservation line
+      properties:
+        productId:
+          type: string
+        amount:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - EXPIRED
+          - CANCELLED
+          - DRAFT_CANCELLATION
+          - CONFIRMED_CANCELLATION
+          - RELEASING
+      required:
+      - amount
+      - productId
+      - status
+    OdRequestV1:
+      type: object
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+      required:
+      - destination
+      - origin
+    UpdateQuotaRequestV1:
+      type: object
+      description: Quota to update
+      properties:
+        quota:
+          type: integer
+          format: int32
+        products:
+          type: array
+          items:
+            type: string
+        ods:
+          type: array
+          items:
+            $ref: '#/components/schemas/OdRequestV1'
+        quotaConfigurationId:
+          type: integer
+          format: int32
+        purchaseWindowStart:
+          type: string
+          format: date-time
+        purchaseWindowStop:
+          type: string
+          format: date-time
+        useStoplist:
+          type: boolean
+      required:
+      - ods
+      - products
+      - quota
+      - useStoplist
+    OdResponse:
+      type: object
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+      required:
+      - destination
+      - origin
+    QuotaResponseV1:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        quota:
+          type: integer
+          format: int32
+        products:
+          type: array
+          items:
+            type: string
+        ods:
+          type: array
+          items:
+            $ref: '#/components/schemas/OdResponse'
+        quotaConfigurationId:
+          type: integer
+          format: int32
+        datedServiceJourneyId:
+          type: string
+        purchaseWindowStart:
+          type: string
+          format: date-time
+        purchaseWindowStop:
+          type: string
+          format: date-time
+        useStoplist:
+          type: boolean
+      required:
+      - datedServiceJourneyId
+      - id
+      - ods
+      - products
+      - quota
+      - useStoplist
+    QuotaConfiguration:
+      type: object
+      description: Updated quota configuration
+      properties:
+        name:
+          type: string
+        priority:
+          type: integer
+          format: int32
+        selectionRule:
+          type: string
+          enum:
+          - COMBINED
+          - SINGLE
+        consumptionRule:
+          type: string
+          enum:
+          - DIRECT
+          - BY_PRIORITY
+        directionRule:
+          type: string
+          enum:
+          - FROM_RIGHT
+          - FROM_LEFT
+        parent:
+          type: integer
+          format: int32
+        id:
+          type: integer
+          format: int32
+        closedBy:
+          type: array
+          items:
+            type: integer
+            format: int32
+      required:
+      - name
+      - priority
+    QuotaConfigurationResponseV1:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        organisationId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        priority:
+          type: integer
+          format: int32
+        selectionRule:
+          type: string
+          enum:
+          - COMBINED
+          - SINGLE
+        consumptionRule:
+          type: string
+          enum:
+          - DIRECT
+          - BY_PRIORITY
+        directionRule:
+          type: string
+          enum:
+          - FROM_RIGHT
+          - FROM_LEFT
+        parent:
+          type: integer
+          format: int32
+        closedBy:
+          type: array
+          items:
+            type: integer
+            format: int32
+      required:
+      - closedBy
+      - id
+      - name
+      - organisationId
+      - priority
+    StockQuery:
+      type: object
+      properties:
+        datedServiceJourney:
+          type: string
+        origin:
+          type: string
+        destination:
+          type: string
+      required:
+      - datedServiceJourney
+      - destination
+      - origin
+    MultiStockResponse:
+      type: object
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+        spannedDatedServiceJourneys:
+          type: array
+          items:
+            type: string
+        reservableStock:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/NestingComponentResponseV1'
+            - $ref: '#/components/schemas/SimpleProductResponseV1'
+            - $ref: '#/components/schemas/ProductCollectionResponseV1'
+            - $ref: '#/components/schemas/ProductResponseV1'
+      required:
+      - destination
+      - origin
+      - reservableStock
+      - spannedDatedServiceJourneys
+    NestingComponentResponseV1:
+      allOf:
+      - $ref: '#/components/schemas/StockComponentResponseV1'
+      - type: object
+        properties:
+          aggregatedAvailability:
+            type: integer
+            format: int32
+          nestingGroup:
+            type: string
+          priority:
+            type: integer
+            format: int32
+      required:
+      - aggregatedAvailability
+      - nestingGroup
+      - priority
+    ProductCollectionResponseV1:
+      allOf:
+      - $ref: '#/components/schemas/NestingComponentResponseV1'
+      - type: object
+        properties:
+          selectionRule:
+            type: string
+            enum:
+            - COMBINED
+            - SINGLE
+          consumptionRule:
+            type: string
+            enum:
+            - DIRECT
+            - BY_PRIORITY
+          directionRule:
+            type: string
+            enum:
+            - FROM_RIGHT
+            - FROM_LEFT
+          components:
+            type: array
+            items:
+              oneOf:
+              - $ref: '#/components/schemas/ProductCollectionResponseV1'
+              - $ref: '#/components/schemas/ProductResponseV1'
+      required:
+      - aggregatedAvailability
+      - components
+      - consumptionRule
+      - directionRule
+      - nestingGroup
+      - priority
+      - selectionRule
+    ProductResponseV1:
+      allOf:
+      - $ref: '#/components/schemas/NestingComponentResponseV1'
+      - type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+          products:
+            type: array
+            items:
+              type: string
+          leftInQuota:
+            type: integer
+            format: int32
+          purchaseWindowStart:
+            type: string
+            format: date-time
+          purchaseWindowStop:
+            type: string
+            format: date-time
+          closedBy:
+            type: array
+            items:
+              type: integer
+              format: int32
+      required:
+      - aggregatedAvailability
+      - closedBy
+      - id
+      - leftInQuota
+      - nestingGroup
+      - priority
+      - products
+    SimpleProductResponseV1:
+      allOf:
+      - $ref: '#/components/schemas/StockComponentResponseV1'
+      - type: object
+        properties:
+          products:
+            type: array
+            items:
+              type: string
+          leftInQuota:
+            type: integer
+            format: int32
+      required:
+      - leftInQuota
+      - products
+    StockComponentResponseV1: {}
+    Reservation:
+      type: object
+      description: Specifies what should be reserved, in what quantity, and across what distance
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+        datedServiceJourneyId:
+          type: string
+        orderId:
+          type: string
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLine'
+      required:
+      - datedServiceJourneyId
+      - destination
+      - origin
+      - reservationLines
+    ReservationResponseV1:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        origin:
+          type: string
+        destination:
+          type: string
+        datedServiceJourney:
+          type: string
+        created:
+          type: string
+          format: date-time
+        changed:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        orderId:
+          type: string
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLineResponseV1'
+      required:
+      - changed
+      - created
+      - createdBy
+      - datedServiceJourney
+      - destination
+      - id
+      - origin
+      - reservationLines
+    RepairRequestV1:
+      type: object
+      description: Specifies which departures we should try to repair
+      properties:
+        departureIds:
+          type: array
+          items:
+            type: string
+      required:
+      - departureIds
+    QuotaRequestV1:
+      type: object
+      description: One or more quotas for the service journey
+      properties:
+        quota:
+          type: integer
+          format: int32
+        products:
+          type: array
+          items:
+            type: string
+        ods:
+          type: array
+          items:
+            $ref: '#/components/schemas/OdRequestV1'
+        quotaConfigurationId:
+          type: integer
+          format: int32
+        datedServiceJourneyId:
+          type: string
+        purchaseWindowStart:
+          type: string
+          format: date-time
+        purchaseWindowStop:
+          type: string
+          format: date-time
+        useStoplist:
+          type: boolean
+      required:
+      - datedServiceJourneyId
+      - ods
+      - products
+      - quota
+      - useStoplist
+    NestingConfigTree:
+      type: object
+      description: A NestingConfigTree
+      properties:
+        root:
+          $ref: '#/components/schemas/NestingConfigTreeNodeRequestV1'
+        flattenTree:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotaConfiguration'
+      required:
+      - flattenTree
+      - root
+    NestingConfigTreeNodeRequestV1:
+      type: object
+      properties:
+        quotaConfigurationRequest:
+          $ref: '#/components/schemas/QuotaConfiguration'
+        children:
+          type: array
+          items:
+            required:
+            - quotaConfigurationRequest
+      required:
+      - children
+      - quotaConfigurationRequest
+    NestingConfigTreeNodeResponseV1:
+      type: object
+      properties:
+        quotaConfiguration:
+          $ref: '#/components/schemas/QuotaConfigurationResponseV1'
+        children:
+          type: array
+          items:
+            required:
+            - quotaConfiguration
+      required:
+      - children
+      - quotaConfiguration
+    NestingConfigTreeResponseV1:
+      type: object
+      properties:
+        root:
+          $ref: '#/components/schemas/NestingConfigTreeNodeResponseV1'
+      required:
+      - root
+    DepartureResponseV1:
+      type: object
+      properties:
+        id:
+          type: string
+        invertedDirection:
+          type: string
+        line:
+          $ref: '#/components/schemas/Line'
+        organisationId:
+          type: integer
+          format: int64
+        departureDate:
+          type: string
+          format: date
+        isClosed:
+          type: boolean
+      required:
+      - departureDate
+      - id
+      - invertedDirection
+      - isClosed
+      - line
+      - organisationId
+    Line:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          format: int32
+        organisationId:
+          type: integer
+          format: int64
+        created:
+          type: string
+          format: date-time
+        changed:
+          type: string
+          format: date-time
+        stops:
+          type: array
+          items:
+            type: string
+      required:
+      - changed
+      - created
+      - id
+      - organisationId
+      - stops
+      - version
+    StockResponseV1:
+      type: object
+      properties:
+        datedServiceJourney:
+          type: string
+        origin:
+          type: string
+        destination:
+          type: string
+        organisationId:
+          type: string
+        stock:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/NestingComponentResponseV1'
+            - $ref: '#/components/schemas/SimpleProductResponseV1'
+            - $ref: '#/components/schemas/ProductCollectionResponseV1'
+            - $ref: '#/components/schemas/ProductResponseV1'
+      required:
+      - datedServiceJourney
+      - destination
+      - organisationId
+      - origin
+      - stock
+    QuotaTemplateQuotaRequestV1:
+      type: object
+      properties:
+        quota:
+          type: integer
+          format: int32
+        productIds:
+          type: array
+          items:
+            type: string
+        quotaConfigurationId:
+          type: integer
+          format: int32
+          nullable: true
+      required:
+      - productIds
+      - quota
+    QuotaTemplateRequestV1:
+      type: object
+      description: Request to create a quota template
+      properties:
+        lineId:
+          type: string
+        privateCode:
+          type: string
+          nullable: true
+        quotas:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotaTemplateQuotaRequestV1'
+      required:
+      - lineId
+      - quotas
+    QuotaTemplateUpdateRequestV1:
+      type: object
+      description: Request to update a quota template
+      properties:
+        quotas:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotaTemplateQuotaRequestV1'
+      required:
+      - quotas
+    QuotaTemplateQuotaResponseV1:
+      type: object
+      properties:
+        quota:
+          type: integer
+          format: int32
+        productIds:
+          type: array
+          items:
+            type: string
+        quotaConfigurationId:
+          type: integer
+          format: int32
+          nullable: true
+      required:
+      - productIds
+      - quota
+    QuotaTemplateResponseV1:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        lineId:
+          type: string
+        privateCode:
+          type: string
+          nullable: true
+        quotas:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotaTemplateQuotaResponseV1'
+      required:
+      - id
+      - lineId
+      - quotas
+    UpdateDepartureRequestV1:
+      type: object
+      properties:
+        isClosed:
+          type:
+          - boolean
+          - 'null'
+    LineResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          format: int32
+        organisationId:
+          type: integer
+          format: int64
+        created:
+          type: string
+          format: date-time
+        changed:
+          type: string
+          format: date-time
+        stops:
+          type: array
+          items:
+            type: string
+      required:
+      - changed
+      - created
+      - id
+      - organisationId
+      - stops
+      - version
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt

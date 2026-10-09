@@ -1,0 +1,129 @@
+generated: '2026-10-09'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/entur-clearing-openapi.yml
+- openapi/entur-clearing-reports-openapi.yml
+- openapi/entur-consents-openapi.yml
+- openapi/entur-customers-openapi.yml
+- openapi/entur-geocoder-openapi.yml
+- openapi/entur-inventory-openapi.yml
+- openapi/entur-offers-partner-openapi.yml
+- openapi/entur-omsa-openapi.yml
+- openapi/entur-order-note-partner-openapi.yml
+- openapi/entur-order-partner-openapi.yml
+- openapi/entur-payment-partner-openapi.yml
+- openapi/entur-personalisation-client-openapi.yml
+format: rfc9457
+envelope:
+  media_type: application/problem+json
+  schema: ErrorMessage
+coverage:
+  operations: 895
+  statuses_declared: 13
+problems:
+- status: 400
+  title: Bad Request
+  description: Bad Request
+  operations: 632
+  media_types:
+  - application/problem+json
+  - application/json
+  - application/hal+json
+  schema: ErrorMessage
+- status: 401
+  title: Unauthorized
+  description: Unauthorized
+  operations: 570
+  media_types:
+  - application/problem+json
+  - application/json
+  - text/plain
+  schema: ErrorMessage
+- status: 402
+  title: Payment Required
+  description: Payment Required
+  operations: 3
+  media_types:
+  - application/problem+json
+  schema: ApiError
+- status: 403
+  title: Forbidden
+  description: Forbidden
+  operations: 613
+  media_types:
+  - application/problem+json
+  - application/json
+  - text/plain
+  schema: ErrorMessage
+- status: 404
+  title: Not Found
+  description: Resource not found
+  operations: 648
+  media_types:
+  - application/problem+json
+  - application/json
+  - application/hal+json
+  schema: ErrorMessage
+- status: 406
+  title: Not Acceptable
+  description: Not Acceptable - the media type requested in the `Accept` header cannot be produced. The dataset
+    is only served as `application/octet-stream
+  operations: 2
+  media_types: []
+  schema: null
+- status: 409
+  title: Conflict
+  description: Conflict
+  operations: 216
+  media_types:
+  - application/problem+json
+  - application/json
+  - application/hal+json
+  schema: ApiError
+- status: 410
+  title: Gone
+  description: Gone. The job has expired and should not be used to download content
+  operations: 2
+  media_types:
+  - '*/*'
+  schema: PartnerDatasetDownloadJobDto
+- status: 422
+  title: Unprocessable Content
+  description: Unprocessable Content
+  operations: 1
+  media_types:
+  - application/json
+  schema: NoPointsGivenResult
+- status: 500
+  title: Internal Server Error
+  description: Internal server error
+  operations: 672
+  media_types:
+  - application/problem+json
+  - application/json
+  - application/hal+json
+  schema: ErrorMessage
+- status: 501
+  title: Not Implemented
+  description: Not Implemented
+  operations: 4
+  media_types:
+  - application/hal+json
+  schema: PaymentError
+- status: 503
+  title: Service Unavailable
+  description: Service unavailable
+  operations: 29
+  media_types:
+  - application/json
+  - application/hal+json
+  schema: ApiError
+- status: default
+  title: null
+  description: Bad request.
+  operations: 41
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: error

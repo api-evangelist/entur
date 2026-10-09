@@ -1,0 +1,413 @@
+openapi: 3.2.0
+info:
+  title: Entur Programs API
+  version: 2026.09.0
+  contact:
+    name: Team Personalisering
+    email: team.personalisering@entur.org
+  description: 'Operations tagged Programs across 2 of this provider''s published API definitions: entur-personalisation-client-openapi.json, entur-personalisation-client-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/personalisation
+security:
+- jwt: []
+tags:
+- name: Programs
+  description: Get information about a program.
+paths:
+  /v1/programs/{programId}/reward-ladder:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Programs
+      summary: Get reward ladder for a potential member
+      description: 'Reward ladder for a potential member shows the levels available, what is required to achieve each level
+
+        and what rewards are given in each level with the specified member specification. For reis and skyss reiserabatt, no request body is required.
+
+        For other programs, the member specification should be provided in the body, and it should be a JSON object with keys and values matching the member metadata definitions configured for the program.
+
+        In these cases, request access to the programs custom generated spec.
+
+        The member specification is used to determine which levels are relevant for the potential member and what rewards they would get in each level.'
+      operationId: getRewardLadder
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: object
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberRewardLadder'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: personalisation.programs.program:les
+    servers:
+    - url: https://api.entur.io/personalisation
+  /v1/programs/{programId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Programs
+      summary: Get program
+      description: Get information about a program
+      operationId: getActiveProgram
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Program'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation.programs.program:les
+          - personalisation.admin.programs:les
+    servers:
+    - url: https://api.entur.io/personalisation
+components:
+  schemas:
+    MemberRewardLadder:
+      required:
+      - rewardLadder
+      type: object
+      properties:
+        rewardLadder:
+          type: array
+          description: Program level details, including the specific requirements and rewards for each level in the program
+          items:
+            $ref: '#/components/schemas/MemberLevelSummary'
+      description: Information about the current reward ladder for a program member
+      readOnly: true
+    Error:
+      required:
+      - correlationId
+      - message
+      - status
+      - title
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        title:
+          type: string
+          examples:
+          - An error occurred
+        detail:
+          type:
+          - string
+          - 'null'
+          description: The main error message.
+          examples:
+          - An error occurred
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - An error occurred
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type:
+          - array
+          - 'null'
+          description: Validation error on a specific field.
+          items:
+            $ref: '#/components/schemas/FieldError'
+    FieldError:
+      required:
+      - field
+      - message
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+      description: Validation error on a specific field.
+    RewardRequirement:
+      required:
+      - pointDefinitionId
+      - requiredAmount
+      type: object
+      properties:
+        requiredAmount:
+          type: number
+          description: Required amount to reach a program level
+        pointDefinitionId:
+          type: integer
+          description: Id of the point definition
+          format: int64
+        pointDefinitionReference:
+          type:
+          - string
+          - 'null'
+          description: Point definition reference
+      description: Requirements for reaching the level
+    MemberLevelSummary:
+      required:
+      - name
+      - requirementsNeeded
+      - rewardRequirements
+      - rewards
+      type: object
+      properties:
+        name:
+          type: string
+          description: Level name
+        rewardRequirements:
+          type: array
+          description: Requirements for reaching the level
+          items:
+            $ref: '#/components/schemas/RewardRequirement'
+        requirementsNeeded:
+          type: string
+          description: Whether any or all requirements need to be fulfilled
+          enum:
+          - ALL
+          - ANY
+          examples:
+          - ALL
+        rewards:
+          type: array
+          description: Rewards when the level is reached
+          items:
+            $ref: '#/components/schemas/MemberReward'
+      description: Requirements and rewards for each membership level of a specific program
+    Program:
+      required:
+      - active
+      - administratorOrganisations
+      - createdAt
+      - id
+      - name
+      - organisationId
+      - organisationsWithAccess
+      - preset
+      - programVersionId
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        organisationId:
+          type: integer
+          description: Id of organisation owning the program
+          format: int64
+          examples:
+          - 1
+        preset:
+          type: string
+          enum:
+          - CAMPAIGN_CODE_PROGRAM
+          - CUSTOM
+        name:
+          type: string
+          description: The name of the program
+          examples:
+          - Entur+
+        reference:
+          type:
+          - string
+          - 'null'
+          description: '
+
+            Unique reference for the program. Meant to be used to identify which program this is, across different environments
+
+            where the id might be different. This enables clients of the api to more easily identify the program, for example to
+
+            enrich the presentation, beyond what this api delivers (for example with an icon, or more descriptive text).
+
+            '
+          examples:
+          - reis
+        infoLink:
+          type:
+          - string
+          - 'null'
+          description: A link to information about the program
+          examples:
+          - https://selskap.test/theprogram/
+        organisationsWithAccess:
+          type: array
+          description: A list of organisations that can consume the program
+          items:
+            type: integer
+            description: A list of organisations that can consume the program
+            format: int64
+          examples:
+          - - 1
+            - 2
+        administratorOrganisations:
+          type: array
+          description: A list of organisations that can administrate the program
+          items:
+            type: integer
+            description: A list of organisations that can administrate the program
+            format: int64
+          examples:
+          - - 1
+            - 2
+            - 3
+        active:
+          type: boolean
+          description: '
+
+            If program is active. Inactive programs are excluded from triggering effects.
+
+            '
+          examples:
+          - true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        programVersionId:
+          type: integer
+          format: int64
+      description: Information about a program
+    MemberReward:
+      required:
+      - '@type'
+      - description
+      - rewardId
+      type: object
+      properties:
+        description:
+          type: string
+        rewardId:
+          type: integer
+          format: int64
+        '@type':
+          type: string
+      description: Rewards when the level is reached
+      discriminator:
+        propertyName: '@type'
+        mapping:
+          MemberPercentDiscountedProductReward: '#/components/schemas/MemberPercentDiscountedProductReward'
+          MemberFeatureReward: '#/components/schemas/MemberFeatureReward'
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+externalDocs:
+  description: Entur Developer Documentation
+  url: https://developer.entur.org/pages-personalisation-docs-personalisation-client-integration-guide
+x-refined-from:
+- entur-personalisation-client-openapi.json
+- entur-personalisation-client-openapi.yml

@@ -1,0 +1,100 @@
+openapi: 3.2.0
+info:
+  version: 2.2.2
+  title: BoB.participantMetadata. Participant Info API
+  description: The Participant Metadata API provides an interface for participants to manage metadata coordinated by an Administering Body (AB).
+servers:
+- url: /api/v2
+tags:
+- name: participantInfo
+  description: Manage participant info for a participant
+paths:
+  /participantMetadata/{pid}/participantInfo:
+    get:
+      tags:
+      - participantInfo
+      summary: Get a participants participant info by participant identifier
+      operationId: getParticipantInfo
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/participantInfo'
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+    put:
+      tags:
+      - participantInfo
+      summary: Add or replace ones own participant info
+      operationId: addParticipantInfo
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '201':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/participantInfo'
+        description: One participant info
+        required: true
+    delete:
+      tags:
+      - participantInfo
+      summary: Delete a participants participant info by participant identifier
+      operationId: deleteParticipantInfo
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '204':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid or participants participant info not found
+components:
+  schemas:
+    participantInfo:
+      description: Holds participant info. Specified in https://bitbucket.org/samtrafiken/bob-schema-participant-info/src/master/participant-info.json
+      type: object
+  securitySchemes:
+    Pop:
+      description: OAuth 2.0 Proof-of-possession (pop) Token
+      type: apiKey
+      name: Authorization
+      in: header

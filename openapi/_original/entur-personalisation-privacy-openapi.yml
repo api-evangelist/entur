@@ -1,0 +1,234 @@
+# x-archived-from: entur-personalisation-privacy-openapi.yml
+# x-archived-on: 2026-10-09
+openapi: 3.1.1
+info:
+  title: Personalisation Privacy
+  description: Retrieve privacy data from personalisation to ensure GDPR compliance.
+  contact:
+    name: Team Personalisering
+    email: team.personalisering@entur.org
+  version: 2026.09.0
+externalDocs:
+  description: Entur Developer Documentation
+  url: https://developer.entur.org/pages-personalisation-docs-personalisation-privacy-api
+servers:
+- url: https://api.entur.io/personalisation
+security:
+- jwt: []
+tags:
+- name: Members
+  description: '
+
+    Information and management of members in a program.
+
+    '
+- name: Privacy
+  description: '
+
+    Get all personal information stored about a customer.
+
+    '
+paths:
+  /v1/privacy:
+    get:
+      tags:
+      - Privacy
+      summary: Get all personal information stored about a customer
+      description: "\nGet all personal information stored about a customer, including which program memberships,\npoints earned and suspension periods.\n        "
+      operationId: getPrivacy
+      parameters:
+      - name: customerId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:les
+          - personalisation-customerdata-global:les
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/programs/{programId}/members/{memberId}:
+    delete:
+      tags:
+      - Members
+      summary: Delete member
+      description: Marks a member for deletion. The member will be permanently deleted after 72 hours
+      operationId: deleteMember
+      parameters:
+      - name: programId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: memberId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - personalisation-customerdata:slett
+          - personalisation-customerdata-global:slett
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+components:
+  schemas:
+    Error:
+      required:
+      - correlationId
+      - message
+      - status
+      - title
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        title:
+          type: string
+          examples:
+          - An error occurred
+        detail:
+          type:
+          - string
+          - 'null'
+          description: The main error message.
+          examples:
+          - An error occurred
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - An error occurred
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type:
+          - array
+          - 'null'
+          description: Validation error on a specific field.
+          items:
+            $ref: '#/components/schemas/FieldError'
+    FieldError:
+      required:
+      - field
+      - message
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+      description: Validation error on a specific field.
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

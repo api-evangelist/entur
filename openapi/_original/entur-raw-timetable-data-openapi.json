@@ -1,0 +1,572 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Raw Timetable Data",
+    "description": "Provide access to the original NeTEx datasets uploaded by data providers",
+    "version": "2026.09.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.entur.io/timetable/v1/timetable-data",
+      "description": "Production"
+    },
+    {
+      "url": "https://api.staging.entur.io/timetable/v1/timetable-data",
+      "description": "Staging"
+    },
+    {
+      "url": "https://api.dev.entur.io/timetable/v1/timetable-data",
+      "description": "Development"
+    }
+  ],
+  "security": [
+    {
+      "jwt": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Raw Timetable Data",
+      "description": "Give access to the original NeTEx datasets delivered by data providers"
+    }
+  ],
+  "paths": {
+    "/timetable-data/datasets/{codespace}/versions": {
+      "get": {
+        "tags": [
+          "Raw Timetable Data"
+        ],
+        "summary": "List dataset versions",
+        "description": "List the import keys for the latest imported datasets for a given codespace",
+        "operationId": "getDatasetVersions",
+        "parameters": [
+          {
+            "name": "codespace",
+            "in": "path",
+            "description": "The codespace identifier for the data provider",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list of dataset versions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NetexImport"
+                  }
+                },
+                "examples": {
+                  "example-1": {
+                    "summary": "Example response",
+                    "value": [
+                      {
+                        "importKey": "2024-01-15T10:30:00Z",
+                        "creationDate": "2024-01-15T10:30:00.000+00:00"
+                      },
+                      {
+                        "importKey": "2024-01-14T09:15:00Z",
+                        "creationDate": "2024-01-14T09:15:00.000+00:00"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid-codespace": {
+                    "summary": "Invalid codespace",
+                    "value": {
+                      "errorCode": "INVALID_CODESPACE",
+                      "message": "The provided codespace is invalid"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Missing or invalid JWT",
+                    "value": {
+                      "errorCode": "UNAUTHORIZED",
+                      "message": "Authentication required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "no-access": {
+                    "summary": "No access to codespace",
+                    "value": {
+                      "errorCode": "FORBIDDEN",
+                      "message": "No block viewer privileges"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "not-found": {
+                    "summary": "No datasets found",
+                    "value": {
+                      "errorCode": "NOT_FOUND",
+                      "message": "No datasets found for the specified codespace"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "server-error": {
+                    "summary": "Internal error",
+                    "value": {
+                      "errorCode": "INTERNAL_ERROR",
+                      "message": "Failed to download timetable data"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/timetable-data/datasets/{codespace}/version/{importKey}": {
+      "get": {
+        "tags": [
+          "Raw Timetable Data"
+        ],
+        "summary": "Get specific dataset version",
+        "description": "Return the dataset identified by the given codespace and import key",
+        "operationId": "getDataset",
+        "parameters": [
+          {
+            "name": "codespace",
+            "in": "path",
+            "description": "The codespace identifier for the data provider",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "importKey",
+            "in": "path",
+            "description": "The unique import key identifying the dataset version",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dsjcompatibility",
+            "in": "query",
+            "description": "Structure of DatedServiceJourney in the returned dataset, during the transition to NeTEx 1.16: `legacy` returns the NeTEx 1.15 copy of the dataset, `new` returns the NeTEx 1.16 dataset. If the parameter is omitted, the dataset is returned in the variant selected as default by the import pipeline. When the requested variant is not available for a given dataset - typically a dataset imported before the transition started - the default variant is returned instead.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "legacy",
+                "new"
+              ]
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "Media type acceptable for the response. The dataset is returned as a binary file, so this must be `application/octet-stream` (or a wildcard such as `*/*`). Any other value — for example `application/zip`, even though the payload is a ZIP archive — results in a `406 Not Acceptable` response. If the header is omitted it defaults to `application/octet-stream`.",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "default": "application/octet-stream",
+              "example": "application/octet-stream"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the dataset file",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid-params": {
+                    "summary": "Invalid parameters",
+                    "value": {
+                      "errorCode": "INVALID_PARAMETERS",
+                      "message": "Invalid codespace or import key"
+                    }
+                  },
+                  "invalid-dsjcompatibility": {
+                    "summary": "Invalid dsjcompatibility",
+                    "value": {
+                      "errorCode": "INVALID_PARAMETERS",
+                      "message": "Invalid value for parameter dsjcompatibility: 'old', expected legacy or new"
+                    }
+                  },
+                  "unknown-parameter": {
+                    "summary": "Unknown query parameter",
+                    "value": {
+                      "errorCode": "INVALID_PARAMETERS",
+                      "message": "Unknown query parameter: 'dsjCompatibility'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Missing or invalid JWT",
+                    "value": {
+                      "errorCode": "UNAUTHORIZED",
+                      "message": "Authentication required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "no-access": {
+                    "summary": "No access to codespace",
+                    "value": {
+                      "errorCode": "FORBIDDEN",
+                      "message": "No block viewer privileges"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "not-found": {
+                    "summary": "Dataset not found",
+                    "value": {
+                      "errorCode": "NOT_FOUND",
+                      "message": "Dataset not found for the specified codespace and import key"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not Acceptable - the media type requested in the `Accept` header cannot be produced. The dataset is only served as `application/octet-stream`; requesting another type such as `application/zip` triggers this response."
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "server-error": {
+                    "summary": "Internal error",
+                    "value": {
+                      "errorCode": "INTERNAL_ERROR",
+                      "message": "Failed to download timetable data"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/timetable-data/datasets/{codespace}/latest": {
+      "get": {
+        "tags": [
+          "Raw Timetable Data"
+        ],
+        "summary": "Get latest dataset",
+        "description": "Return the latest dataset for a given codespace",
+        "operationId": "getLatestDataset",
+        "parameters": [
+          {
+            "name": "codespace",
+            "in": "path",
+            "description": "The codespace identifier for the data provider",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "dsjcompatibility",
+            "in": "query",
+            "description": "Structure of DatedServiceJourney in the returned dataset, during the transition to NeTEx 1.16: `legacy` returns the NeTEx 1.15 copy of the dataset, `new` returns the NeTEx 1.16 dataset. If the parameter is omitted, the dataset is returned in the variant selected as default by the import pipeline. When the requested variant is not available for a given dataset - typically a dataset imported before the transition started - the default variant is returned instead.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "legacy",
+                "new"
+              ]
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "description": "Media type acceptable for the response. The dataset is returned as a binary file, so this must be `application/octet-stream` (or a wildcard such as `*/*`). Any other value — for example `application/zip`, even though the payload is a ZIP archive — results in a `406 Not Acceptable` response. If the header is omitted it defaults to `application/octet-stream`.",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "default": "application/octet-stream",
+              "example": "application/octet-stream"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved the latest dataset file",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid-codespace": {
+                    "summary": "Invalid codespace",
+                    "value": {
+                      "errorCode": "INVALID_CODESPACE",
+                      "message": "The provided codespace is invalid"
+                    }
+                  },
+                  "invalid-dsjcompatibility": {
+                    "summary": "Invalid dsjcompatibility",
+                    "value": {
+                      "errorCode": "INVALID_PARAMETERS",
+                      "message": "Invalid value for parameter dsjcompatibility: 'old', expected legacy or new"
+                    }
+                  },
+                  "unknown-parameter": {
+                    "summary": "Unknown query parameter",
+                    "value": {
+                      "errorCode": "INVALID_PARAMETERS",
+                      "message": "Unknown query parameter: 'dsjCompatibility'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Missing or invalid JWT",
+                    "value": {
+                      "errorCode": "UNAUTHORIZED",
+                      "message": "Authentication required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "no-access": {
+                    "summary": "No access to codespace",
+                    "value": {
+                      "errorCode": "FORBIDDEN",
+                      "message": "No block viewer privileges"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "not-found": {
+                    "summary": "No dataset found",
+                    "value": {
+                      "errorCode": "NOT_FOUND",
+                      "message": "No latest dataset found for the specified codespace"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Not Acceptable - the media type requested in the `Accept` header cannot be produced. The dataset is only served as `application/octet-stream`; requesting another type such as `application/zip` triggers this response."
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "server-error": {
+                    "summary": "Internal error",
+                    "value": {
+                      "errorCode": "INTERNAL_ERROR",
+                      "message": "Failed to download timetable data"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "NetexImport": {
+        "type": "object",
+        "properties": {
+          "importKey": {
+            "type": "string"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

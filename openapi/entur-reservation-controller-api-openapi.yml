@@ -1,0 +1,2445 @@
+openapi: 3.2.0
+info:
+  title: Entur Reservation Controller API
+  version: 2026.09.0
+  description: 'Operations tagged reservation-controller across 4 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seatingservices-openapi.json, entur-seating-manager-openapi.yml, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seating-manager
+- url: https://api.entur.io/seatingservices
+tags:
+- name: reservation-controller
+paths:
+  /v1-beta/reservations/{reference}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      operationId: getReservation
+      parameters:
+      - name: reference
+        in: path
+        description: The `reference` of the reservation that will be fetched
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          description: The `reference` of the reservation that will be fetched
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+      summary: Get reservation
+      x-summary-source: derived
+    put:
+      tags:
+      - reservation-controller
+      summary: Update a reservation with reservation lines
+      description: '# Update a reservation with reservation lines.
+
+        The draft reservation version containing only the requested reservation lines will be returned.
+
+
+        If reservationLineRequests (body) is empty, then the draft reservation will contain no reservation lines.'
+      operationId: fullUpdateReservation
+      parameters:
+      - name: reference
+        in: path
+        description: The `reference` of the reservation that will be updated.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          description: The `reference` of the reservation that will be updated.
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationLineRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    patch:
+      tags:
+      - reservation-controller
+      operationId: updateReservation
+      parameters:
+      - name: reference
+        in: path
+        description: The `reference` of the reservation that will be updated.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          description: The `reference` of the reservation that will be updated.
+          format: uuid
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/ReservationUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+      summary: Update reservation
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      operationId: getReservationsOnSeatingOffer
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        description: The `datedServiceJourney` of the reservation that will be fetched
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: VYG:DatedServiceJourney:61_21-12-02
+      - name: reservationStatus
+        in: query
+        description: The `reservation status` of the reservation that will be fetched. Defaults to DRAFT and CONFIRMED.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          description: The `reservation status` of the reservation that will be fetched. Defaults to DRAFT and CONFIRMED.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT,CONFIRMED
+        examples:
+          default:
+            value: DRAFT,CONFIRMED
+      - name: rebookingStatuses
+        in: query
+        description: The `rebooking statuses` of the reservation that will be fetched. Defaults to all.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ACCEPTED
+            - MANUAL
+            - SUGGESTED
+            - REBOOKED_DRAFT
+            - REJECTED
+            - NONE
+        examples:
+          default:
+            value: NONE
+      - name: updatedAfter
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: origin
+        in: query
+        description: NSR code of the origin stop place. When combined with destination, returns only reservations onboard the requested leg.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: NSR:StopPlace:337
+      - name: destination
+        in: query
+        description: NSR code of the destination stop place. When combined with origin, returns only reservations onboard the requested leg.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: NSR:StopPlace:669
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+      summary: Get reservations on seating offer
+      x-summary-source: derived
+    post:
+      tags:
+      - reservation-controller
+      summary: Create a reservation from origin to destination on a DatedServiceJourney
+      description: This endpoint can be used to create a reservation, optionally with the supplied reservation linesAn organisation id will be stored, this id determined by the authentication used by the client
+      operationId: createReservation
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: The organisation to be set as owner of the reservation. Only Entur may specify ownerOrganisation, otherwise the requesting organisation will be set as owner of the reservation.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          description: The organisation to be set as owner of the reservation. Only Entur may specify ownerOrganisation, otherwise the requesting organisation will be set as owner of the reservation.
+          format: int64
+          examples:
+          - 1
+        examples:
+          default:
+            value: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/{reference}/reservation-lines/replace:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      summary: Replace reservation lines
+      description: Replace existing reservation lines connected with new allocated reservation lines.
+      operationId: replaceOrderLines
+      parameters:
+      - name: reference
+        in: path
+        description: UUID for the reservation we want to replace reservationLines on.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplaceReservationLinesRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/{reference}/reservation-line:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      summary: Add reservation lines
+      description: 'Adds reservation lines connected to the given reservation.
+
+        The response is a list of all reservation lines that exists on the reservation after adding the ones in the request.'
+      operationId: addReservationLines
+      parameters:
+      - name: reference
+        in: path
+        description: UUID for the reservation we want to add reservation lines to.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      - name: groupOverride
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List with  reservation lines to add
+              items:
+                $ref: '#/components/schemas/CreateReservationLinesBySeatingPropertiesRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    delete:
+      tags:
+      - reservation-controller
+      summary: Remove reservation lines
+      description: 'Removes reservation lines connected to the given reservation.
+
+        The response is a list of UUIDs representing the reservation line references that got removed.'
+      operationId: removeReservationLines
+      parameters:
+      - name: reference
+        in: path
+        description: UUID for the reservation we want to remove reservation lines from.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: List with UUIDs of reservation lines to cancel
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/{reference}/rebooking-notification:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      summary: Notifies customer about rebooked seats
+      description: Triggers a notification to the customer about rebooked seats.
+      operationId: triggerRebookingMessage
+      parameters:
+      - name: reference
+        in: path
+        description: UUID for the reservation we want to trigger a notification for.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      responses:
+        '204':
+          description: No Content
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/allocate:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      summary: Create reservation and reserve seats by seating properties
+      description: Create reservation and reserve seats allocated by seating properties. If the optional orderLineId is provided for a set of seating properties, the reservation line(s) allocated by the seating properties will be associated to the orderLineId
+      operationId: allocateReservationBySeatingProperties
+      parameters:
+      - name: ownerOrganisationId
+        in: query
+        description: The organisation to be set as owner of the reservation. Only Entur may specify ownerOrganisation, otherwise the requesting organisation will be set as owner of the reservation.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          description: The organisation to be set as owner of the reservation. Only Entur may specify ownerOrganisation, otherwise the requesting organisation will be set as owner of the reservation.
+          format: int64
+          examples:
+          - 1
+        examples:
+          default:
+            value: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationBySeatingPropertiesRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/allocate/trip:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      summary: Create reservations for a sequence of legs and reserve seats by seating…
+      description: Create reservation and reserve seats allocated by seating properties. If the optional orderLineId is provided for a set of seating properties, the reservation line(s) allocated by the seating properties will be associated to the orderLineId
+      operationId: allocateReservationForTripBySeatingProperties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTripReservationBySeatingPropertiesRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/{reference}/reservation-lines/{reservationLineReference}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    patch:
+      tags:
+      - reservation-controller
+      summary: Update a reservation line in a reservation
+      description: '# Update a reservation line in a reservation.
+
+        The result will depend on the reservation status.
+
+        - **ReservationStatus:DRAFT** : The draft reservation version will contain the updated reservation line and existing lines.
+
+        - **ReservationStatus:CONFIRMED** : A new draft reservation version containing only the updated reservation line.
+
+        - **ReservationStatus:CANCELLED** : No operation.'
+      operationId: partialUpdateReservation
+      parameters:
+      - name: reference
+        in: path
+        description: The `reference` of the reservation the `reservation` that will be updated.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      - name: reservationLineReference
+        in: path
+        description: The `reference` of the `reservationLine` to be updated.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/PatchReservationLineRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationLineResponse'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/travel-intentions/{originalDatedServiceJourneyId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      summary: Fetch grouped reservations for a travel intention
+      description: 'Fetches all travel intentions connected to the given original dated service journey id, grouped by travel intention reference with their full rebooking history.
+
+        Each group contains all versions of the travel intention and the reservations belonging to each version. Filters on reservation status and rebooking status are
+
+        applied only to the latest version of each travel intention — groups where the latest version does not match are excluded entirely. The fullHistory parameter
+
+        controls how many versions are included per group: when true (default), all versions are returned; when false, only the two most recent versions are returned.'
+      operationId: getGroupedReservations
+      parameters:
+      - name: originalDatedServiceJourneyId
+        in: path
+        description: The ID of the original dated service journey — the departure the travel intentions were initially created for and that connects all related travel intentions and their reservations together.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: VYG:DatedServiceJourney:64_BRG-OSL_22-06-03
+      - name: reservationStatus
+        in: query
+        description: The `reservation status` to filter on. If not specified, all statuses are included.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - DRAFT
+            - CONFIRMED
+            - CANCELLED
+            - DEPRECATED
+        examples:
+          default:
+            value: DRAFT
+      - name: rebookingStatusFilter
+        in: query
+        description: The `rebooking statuses` to filter on. Defaults to all statuses if not specified.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ACCEPTED
+            - MANUAL
+            - SUGGESTED
+            - REBOOKED_DRAFT
+            - REJECTED
+            - NONE
+        examples:
+          default:
+            value: MANUAL
+      - name: fullHistory
+        in: query
+        description: Whether to return the full version history of each travel intention. If false, only the two most recent versions are returned. Defaults to full history.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: true
+        examples:
+          default:
+            value: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TravelIntentionResponseV1'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/reservation-line/{reservationLineReference}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      operationId: getReservationByReservationLineReference
+      parameters:
+      - name: reservationLineReference
+        in: path
+        description: The `reference` of the reservation line that will be fetched
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+      summary: Get reservation by reservation line reference
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/orderId/{orderId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      summary: Get reservations by orderId
+      description: Fetches the newest version of all reservations connected to the orderId
+      operationId: getReservationsByOrderId
+      parameters:
+      - name: orderId
+        in: path
+        description: The orderId of the reservations that will be fetched
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: CHRT56
+      - name: reservationStatuses
+        in: query
+        description: Optional reservation statuses to filter on. If not supplied, defaults to DRAFT, CONFIRMED and CANCELLED, falling back to DEPRECATED if no active reservations exist for the orderId
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - DRAFT
+            - CONFIRMED
+            - CANCELLED
+            - DEPRECATED
+        examples:
+          default:
+            value: CONFIRMED,DEPRECATED
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/debug/{reference}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      summary: Get all versions of reservation
+      description: Fetches all versions of reservation with given reference
+      operationId: getAllReservationVersions
+      parameters:
+      - name: reference
+        in: path
+        description: The `reference` of the reservation that will be fetched with all versions
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+        examples:
+          default:
+            value: c129cc9c-76e4-4f28-a4e2-5af96550627a
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/reservations/by-statuses:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      operationId: getReservationsOnSeatingOfferByStatuses
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        description: The `datedServiceJourney` of the reservation that will be fetched
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: VYG:DatedServiceJourney:61_21-12-02
+      - name: reservationStatus
+        in: query
+        description: The `reservation status` of the reservations that will be fetched. Defaults to DRAFT and CONFIRMED.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          description: The `reservation status` of the reservations that will be fetched. Defaults to DRAFT and CONFIRMED.
+          items:
+            type: string
+            description: The `reservation status` of the reservations that will be fetched. Defaults to DRAFT and CONFIRMED.
+            enum:
+            - DRAFT
+            - CONFIRMED
+            - CANCELLED
+            - DEPRECATED
+            examples:
+            - DRAFT,CONFIRMED
+          examples:
+          - DRAFT,CONFIRMED
+        examples:
+          default:
+            value: DRAFT,CONFIRMED
+      - name: rebookingStatuses
+        in: query
+        description: The `rebooking statuses` of the reservation that will be fetched. Defaults to all.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ACCEPTED
+            - MANUAL
+            - SUGGESTED
+            - REBOOKED_DRAFT
+            - REJECTED
+            - NONE
+        examples:
+          default:
+            value: NONE
+      - name: updatedAfter
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: origin
+        in: query
+        description: NSR code of the origin stop place. When combined with destination, returns only reservations onboard the requested stretch.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: NSR:StopPlace:337
+      - name: destination
+        in: query
+        description: NSR code of the destination stop place. When combined with origin, returns only reservations onboard the requested stretch.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: NSR:StopPlace:669
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReservationResponse'
+      security:
+      - bearer-key: []
+      summary: Get reservations on seating offer by statuses
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1/reservations/{reservationId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      operationId: getV1ReservationsByReservationId
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse_2'
+      summary: Get reservation
+      x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: getReservation
+    put:
+      tags:
+      - reservation-controller
+      operationId: updateSeatsReservation
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservationRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse_2'
+      summary: Update seats reservation
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/reservations/{reservationId}/products:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - reservation-controller
+      operationId: checkProductCombination
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqProductToCheckForSeatsRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationWithOrderLineIdAndSeatsMapping'
+      summary: Check product combination
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/reservations/specific-seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      operationId: reserveSpecificSeats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSpecificSeatsRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse_2'
+      summary: Reserve specific seats
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/reservations/by-seat-types:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      operationId: reserveSeatsByType
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatTypeRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponse_2'
+      deprecated: true
+      summary: Reserve seats by type
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/reservations/by-products:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller
+      operationId: reserveSeatsByProductWithOrderLineId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatsByProductRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationWithOrderLineIdAndSeatsMapping'
+      summary: Reserve seats by product with order line id
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/reservations/seats/{seatId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    patch:
+      tags:
+      - reservation-controller
+      operationId: updateSeatStatus
+      parameters:
+      - name: seatId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatResponse'
+      summary: Update seat status
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/reservations:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller
+      operationId: getAllReservationsWithCriteria
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createdAfter
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: changedAfter
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: reservationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: excludeInactiveReservations
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqReservationResponse'
+      summary: Get all reservations with criteria
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/reservations/seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    delete:
+      tags:
+      - reservation-controller
+      operationId: cancelSeats
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqCancelSeatRequest'
+        required: true
+      responses:
+        '204':
+          description: No Content
+      deprecated: true
+      summary: Cancel seats
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+components:
+  schemas:
+    CreateTripReservationLinesBySeatingPropertiesRequest:
+      required:
+      - numberOfTravellers
+      - seatingPropertiesToReserve
+      type: object
+      properties:
+        seatingPropertiesToReserve:
+          $ref: '#/components/schemas/SeatingPropertiesRequestV1'
+        numberOfTravellers:
+          type: integer
+          description: The number of travellers of this reservation line.
+          format: int32
+        mustReserveWholeCompartment:
+          type: boolean
+          description: Whether to reserve a whole compartment to this traveller. If not provided, or set to false, a single seat with the provided properties will be reserved instead.
+          default: false
+          examples:
+          - true
+        orderLineId:
+          type:
+          - string
+          - 'null'
+          description: OrderLine ID to reserve seats for
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+    TravelIntentionResponseV1:
+      required:
+      - travelIntentionReference
+      - versions
+      type: object
+      properties:
+        travelIntentionReference:
+          type: string
+          format: uuid
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TravelIntentionVersionResponseV1'
+    ReservationUpdateRequest:
+      required:
+      - checkOrderStatusHistory
+      type: object
+      properties:
+        status:
+          type:
+          - string
+          - 'null'
+          description: The new reservation status. Mutually exclusive with rebookingStatus.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - CONFIRMED
+        rebookingStatus:
+          type:
+          - string
+          - 'null'
+          description: The new rebooking status. Mutually exclusive with status.
+          enum:
+          - ACCEPTED
+          - MANUAL
+          - SUGGESTED
+          - REBOOKED_DRAFT
+          - REJECTED
+          examples:
+          - ACCEPTED
+        info:
+          type:
+          - string
+          - 'null'
+          description: Optional information that can be added when patching rebookingStatus to REJECTED.
+          examples:
+          - No seats available.
+        checkOrderStatusHistory:
+          type: boolean
+          description: A flag to be used by internal clients, if true, check if the order has ever been CONFIRMED, should not change reservation status to CONFIRMED if order has never been CONFIRMED
+          examples:
+          - true
+        sendNotification:
+          type:
+          - boolean
+          - 'null'
+          description: Whether to send rebooking/replaced notification messages on Kafka when confirming. Defaults to true.
+          examples:
+          - true
+    ReservationResponseV1:
+      required:
+      - createdAt
+      - createdBy
+      - datedServiceJourneyId
+      - destinationNsrCode
+      - organisationId
+      - originNsrCode
+      - reference
+      - reservationLines
+      - status
+      - updatedAt
+      - version
+      - versionedAt
+      - versionedAtDatedServiceJourneyVersion
+      type: object
+      properties:
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: The 'id' of the order the reservation belongs to
+          examples:
+          - A1B2C3D4
+        reference:
+          type: string
+          description: The reference for this reservation
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        version:
+          type: integer
+          description: The `version` of the reservation. Starts with `1`.
+          format: int32
+          examples:
+          - 1
+        datedServiceJourneyId:
+          type: string
+          description: Id of the dated service journey
+        versionedAtDatedServiceJourneyVersion:
+          type: integer
+          description: The `version` of the datedServiceJouney at the time the reservation was versioned
+          format: int32
+        originNsrCode:
+          type: string
+          description: Origin `NSR code` of the `reservation`
+        destinationNsrCode:
+          type: string
+          description: Destination `NSR code` of the `reservation`
+        organisationId:
+          type: integer
+          description: The organisation id of the order which the `reservation` belongs to.
+          format: int64
+          examples:
+          - 20
+        status:
+          type: string
+          description: Describes the `reservation` status.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        rebookingStatus:
+          type:
+          - string
+          - 'null'
+          description: Describes the `rebooking` status of the reservation.
+          enum:
+          - ACCEPTED
+          - MANUAL
+          - SUGGESTED
+          - REBOOKED_DRAFT
+          - REJECTED
+          examples:
+          - ACCEPTED
+        notificationRule:
+          type:
+          - string
+          - 'null'
+          description: Rule for what type of notification is sent to reservation owner on departure closures
+          enum:
+          - CANCELLED_WITHOUT_REPLACEMENT
+          - CANCELLED_WITH_REPLACEMENT
+          - REPLACED_TO_OTHER_SERVICE
+          examples:
+          - CANCELLED_WITHOUT_REPLACEMENT
+        info:
+          type:
+          - string
+          - 'null'
+          description: Additional free text information about the reservation.
+          examples:
+          - Unable to rebook this reservation due to no available seats.
+        createdAt:
+          type: string
+          description: When this reservation was initially created
+          format: date-time
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        createdBy:
+          type: integer
+          description: The organisation id this version of the `reservation` was created by.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        versionedAt:
+          type: string
+          description: When this version of this reservation was created
+          format: date-time
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        updatedAt:
+          type: string
+          description: When this was previously updated. This includes status changes, reservation line changes and so on.
+          format: date-time
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        updatedBy:
+          type:
+          - integer
+          - 'null'
+          description: The organisation id of the organisation that last updated this `reservation`.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLineResponseV1'
+    CreateTripReservationBySeatingPropertiesRequest:
+      required:
+      - legs
+      - originalDatedServiceJourneyId
+      - reservationLinesRequests
+      type: object
+      properties:
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: Order ID for the reservation.
+        originalDatedServiceJourneyId:
+          type: string
+          description: Original dated service journey ID.
+        status:
+          type: string
+          description: Initial status of the reservation.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegRequest'
+        reservationLinesRequests:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateTripReservationLinesBySeatingPropertiesRequest'
+      description: Request to create a trip reservation by seating properties.
+    CreateReservationRequest:
+      required:
+      - datedServiceJourneyId
+      - destinationNsrCode
+      - originNsrCode
+      - reservationLines
+      type: object
+      properties:
+        originNsrCode:
+          minLength: 1
+          type: string
+          description: The `nsrCode` of the origin stop place
+          examples:
+          - NSR:StopPlace:337
+        destinationNsrCode:
+          minLength: 1
+          type: string
+          description: The `nsrCode` of the destination stop place
+          examples:
+          - NSR:StopPlace:548
+        datedServiceJourneyId:
+          minLength: 1
+          type: string
+          description: The `id` of the dated service journey which the `reservation` belongs to.
+          examples:
+          - ENT:DatedServiceJourney:4788391
+        reference:
+          type:
+          - string
+          - 'null'
+          description: If supplied this id will be used as reference for this reservation. If not it will be generated automatically.
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: An orderId that can be used for lookup purposes
+          examples:
+          - A1B2C3D4
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLineRequest'
+        status:
+          type: string
+          description: The status to set for the reservation.
+          default: DRAFT
+          enum:
+          - DRAFT
+          - CONFIRMED
+          examples:
+          - DRAFT
+    ReservationLineRequest:
+      required:
+      - type
+      type: object
+      properties:
+        reference:
+          type: string
+          description: The reference of the reservation line if already existing. Leave blank for new reservation lines.
+          format: uuid
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line`
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        numberOfTravellers:
+          type: integer
+          description: Number of travellers on the reservation line.
+          format: int32
+          examples:
+          - 2
+        type:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+      description: '`reservationLine` details for the updated reservation. These reservationsLines will completely replace the existing reservationLines on the existing reservation.'
+      discriminator:
+        propertyName: type
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineRequest'
+          COMPARTMENT: '#/components/schemas/CompartmentReservationLineRequest'
+          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineRequest'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineRequest'
+    SeatingPropertiesRequestV1:
+      required:
+      - baggageType
+      - mobilityFacilities
+      - nuisanceFacilities
+      - passengerCommsFacilities
+      - sanitaryFacilities
+      type: object
+      properties:
+        fareClass:
+          type:
+          - string
+          - 'null'
+          description: Fare class of the seat. Netex enumeration.
+          enum:
+          - UNKNOWN
+          - FIRST_CLASS
+          - SECOND_CLASS
+          - THIRD_CLASS
+          - PREFERENTE
+          - PREMIUM_CLASS
+          - BUSINESS_CLASS
+          - STANDARD_CLASS
+          - TURISTA
+          - ECONOMY_CLASS
+          - ANY
+          examples:
+          - FIRST_CLASS
+        groupBooking:
+          type:
+          - string
+          - 'null'
+          description: Group booking permission of the seat. Netex enumeration.
+          enum:
+          - GROUPS_ALLOWED
+          - GROUPS_NOT_ALLOWED
+          - GROUPS_ALLOWED_WITH_RESERVATION
+          - GROUP_BOOKINGS_RESTRICTED
+          - UNKNOWN
+          examples:
+          - GROUPS_ALLOWED
+        accommodationFacility:
+          type:
+          - string
+          - 'null'
+          description: Accommodation property of the seat. Netex enumeration.
+          enum:
+          - UNKNOWN
+          - SEATING
+          - FOLDING_SEAT
+          - SLEEPER
+          - SINGLE_SLEEPER
+          - DOUBLE_SLEEPER
+          - SPECIAL_SLEEPER
+          - COUCHETTE
+          - SINGLE_COUCHETTE
+          - DOUBLE_COUCHETTE
+          - SPECIAL_SEATING
+          - RECLINING_SEATS
+          - BABY_COMPARTMENT
+          - FAMILY_CARRIAGE
+          - RECREATION_AREA
+          - PANORAMA_COACH
+          - PULLMAN_COACH
+          - PUSHCHAIR
+          - WHEELCHAIR
+          - STANDING
+          examples:
+          - SINGLE_SLEEPER
+        seatAttachment:
+          type:
+          - string
+          - 'null'
+          description: Attachment of the seat. Netex enumeration.
+          enum:
+          - REVERSIBLE
+          - FIXED
+          - FOLDING
+          - REMOVABLE
+          - OTHER
+          examples:
+          - REVERSIBLE
+        seatPosition:
+          type:
+          - string
+          - 'null'
+          description: Position of the seat. Netex enumeration.
+          enum:
+          - WINDOW
+          - AISLE
+          - MIDDLE
+          - UPPER_BERTH
+          - MIDDLE_BERTH
+          - LOWER_BERTH
+          - OTHER
+          examples:
+          - MIDDLE_BERTH
+        relativeDirection:
+          type:
+          - string
+          - 'null'
+          description: Relative direction of the seat. Netex enumeration.
+          enum:
+          - BOTH
+          - FORWARDS
+          - BACKWARDS
+          examples:
+          - BACKWARDS
+        nuisanceFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible nuisance factors of the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible nuisance factors of the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - SMOKING
+            - NO_SMOKING
+            - FAMILY_AREA
+            - CHILDFREE_AREA
+            - ANIMALS_ALLOWED
+            - NO_ANIMALS
+            - BREASTFEEDING_FRIENDLY
+            - MOBILE_PHONE_USE_ZONE
+            - MOBILE_PHONE_FREE_ZONE
+            examples:
+            - FAMILY_AREA,SMOKING
+          examples:
+          - FAMILY_AREA,SMOKING
+        passengerCommsFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible communication facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible communication facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - FREE_WIFI
+            - PUBLIC_WIFI
+            - POWER_SUPPLY_SOCKETS
+            - TELEPHONE
+            - AUDIO_ENTERTAINMENT
+            - VIDEO_ENTERTAINMENT
+            - BUSINESS_SERVICES
+            - INTERNET
+            - POST_OFFICE
+            - POST_BOX
+            examples:
+            - POWER_SUPPLY_SOCKETS,TELEPHONE
+          examples:
+          - POWER_SUPPLY_SOCKETS,TELEPHONE
+        sanitaryFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - NONE
+            - TOILET
+            - WHEELCHAIR_ACCESS_TOILET
+            - SHOWER
+            - WASHING_AND_CHANGE_FACILITIES
+            - BABY_CHANGE
+            - WHEELCHAIR_BABY_CHANGE
+            - SHOE_SHINER
+            - OTHER
+            examples:
+            - TOILET,SHOWER
+          examples:
+          - TOILET,SHOWER
+        mobilityFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible mobility facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible mobility facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - LOW_FLOOR
+            - STEP_FREE_ACCESS
+            - SUITABLE_FOR_PUSHCHAIRS
+            - SUITABLE_FOR_WHEELCHAIRS
+            - SUITABLE_FOR_HEAVILIY_DISABLED
+            - BOARDING_ASSISTANCE
+            - ONBOARD_ASSISTANCE
+            - UNACCOMPANIED_MINOR_ASSISTANCE
+            - TACTILE_PLATFORM_EDGES
+            - TACTILE_GUIDING_STRIPS
+            examples:
+            - SUITABLE_FOR_WHEELCHAIRS,LOW_FLOOR
+          examples:
+          - SUITABLE_FOR_WHEELCHAIRS,LOW_FLOOR
+        baggageType:
+          uniqueItems: true
+          type: array
+          description: Set of possible baggage types possible for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible baggage types possible for passenger in the seat. Netex enumerations.
+            enum:
+            - HANDBAG
+            - HAND_LUGGAGE
+            - SMALL_SUITCASE
+            - SUITCASE
+            - TRUNK
+            - OVERSIZE_ITEM
+            - BICYCLE
+            - MOTORCYCLE
+            - SPORTING_EQUIPMENT
+            - SKIS
+            - MUSICAL_INSTRUMENT
+            - PUSH_CHAIR
+            - WHEELCHAIR
+            - MOTORIZED_WHEELCHAIR
+            - LARGE_MOTORIZED_WHEELCHAIR
+            - SMALL_ANIMAL
+            - ANIMAL
+            - GAME
+            - OTHER
+            examples:
+            - HANDBAG,SUITCASE
+          examples:
+          - HANDBAG,SUITCASE
+      description: Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class.
+    ReservationLineResponse:
+      required:
+      - reference
+      - requestedProperties
+      - requestedSeatingProperties
+      - reservedProperties
+      - reservedSeatingProperties
+      - type
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference for this reservation line`
+          format: uuid
+        reservedProperties:
+          type: array
+          items:
+            minLength: 1
+            type: string
+            description: The properties reserved by the reservation line.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        reservedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        requestedProperties:
+          type: array
+          items:
+            minLength: 1
+            type: string
+            description: The properties required by the traveller.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        requestedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line.
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        numberOfTravellers:
+          type: integer
+          description: Number of travellers on the reservation line.
+          format: int32
+          examples:
+          - 2
+        type:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+      discriminator:
+        propertyName: type
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineResponse'
+          COMPARTMENT: '#/components/schemas/CompartmentReservationLineResponse'
+          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineResponse'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineResponse'
+    CreateReservationBySeatingPropertiesRequest:
+      required:
+      - datedServiceJourneyId
+      - destinationNsrCode
+      - originNsrCode
+      - seatingPropertiesRequests
+      - status
+      type: object
+      properties:
+        originNsrCode:
+          type: string
+          description: The `nsrCode` of the origin stop place
+          examples:
+          - NSR:StopPlace:337
+        destinationNsrCode:
+          type: string
+          description: The `nsrCode` of the destination stop place
+          examples:
+          - NSR:StopPlace:548
+        datedServiceJourneyId:
+          type: string
+          description: The `id` of the dated service journey which the `reservation` belongs to.
+          examples:
+          - ENT:DatedServiceJourney:4788391
+        status:
+          type: string
+          description: The status to set for the reservation.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          examples:
+          - DRAFT
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: The 'id' of the order the reservation belongs to
+          examples:
+          - A1B2C3D4
+        seatingPropertiesRequests:
+          type: array
+          description: List of traveler seating properties to reserve seats or compartments for, with optional associated orderLineId.
+          items:
+            $ref: '#/components/schemas/CreateReservationLinesBySeatingPropertiesRequest'
+    ReplaceReservationLinesRequest:
+      required:
+      - reservationLinesToAllocate
+      - reservationLinesToRemove
+      type: object
+      properties:
+        reservationLinesToAllocate:
+          type: array
+          description: List of SeatingProperties to allocate for.
+          items:
+            $ref: '#/components/schemas/CreateReservationLinesBySeatingPropertiesRequest'
+        reservationLinesToRemove:
+          type: array
+          description: List of reservationLine-references to remove.
+          items:
+            type: string
+            description: List of reservationLine-references to remove.
+            format: uuid
+      description: Request body detailing which reservation lines to remove and what should replace them
+    ReservationResponse:
+      required:
+      - createdAt
+      - createdBy
+      - datedServiceJourneyId
+      - destinationStopPlace
+      - organisationId
+      - originStopPlace
+      - reference
+      - reservationLines
+      - status
+      - updatedAt
+      - version
+      - versionedAt
+      type: object
+      properties:
+        version:
+          type: integer
+          description: The `version` of the reservation. Starts with `1`.
+          format: int32
+          examples:
+          - 1
+        originStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        destinationStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        datedServiceJourneyId:
+          minLength: 1
+          type: string
+          description: Id of the dated service journey
+        status:
+          minLength: 1
+          type: string
+          description: Describes the `reservation` status.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        reference:
+          minLength: 1
+          type: string
+          description: The reference for this reservation
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        organisationId:
+          type: integer
+          description: The organisation id of the order which the `reservation` belongs to.
+          format: int64
+          examples:
+          - 20
+        createdAt:
+          minLength: 1
+          type: string
+          description: When this reservation was initially created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        rebookingStatus:
+          type:
+          - string
+          - 'null'
+          description: Describes the `rebooking` status of the reservation.
+          enum:
+          - ACCEPTED
+          - MANUAL
+          - SUGGESTED
+          - REBOOKED_DRAFT
+          - REJECTED
+          examples:
+          - ACCEPTED
+        versionedAt:
+          minLength: 1
+          type: string
+          description: When this version of this reservation was created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        updatedAt:
+          minLength: 1
+          type: string
+          description: When this was previously updated. This includes status changes, reservation line changes and so on.
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLineResponse'
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: The 'id' of the order the reservation belongs to
+          examples:
+          - A1B2C3D4
+        createdBy:
+          type: integer
+          description: The organisation id this version of the `reservation` was created by.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        updatedBy:
+          type:
+          - integer
+          - 'null'
+          description: The organisation id of the organisation that last updated this `reservation`.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        info:
+          type:
+          - string
+          - 'null'
+          description: Additional free text information about the reservation.
+          examples:
+          - Unable to rebook this reservation due to no available seats.
+    ReservationLineResponseV1:
+      required:
+      - numberOfTravellers
+      - orderLineIds
+      - reference
+      - requestedSeatingProperties
+      - reservedSeatingProperties
+      - type
+      type: object
+      properties:
+        orderLineIds:
+          type: array
+          description: List of order line ids linked to this reservation line. Contains one ID for single seat or compartment, multiple IDs if it was several single seat rebooked to one compartment reservation.
+          items:
+            type: string
+            description: List of order line ids linked to this reservation line. Contains one ID for single seat or compartment, multiple IDs if it was several single seat rebooked to one compartment reservation.
+        reference:
+          type: string
+          description: Reference for this reservation line
+          format: uuid
+        requestedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        reservedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        numberOfTravellers:
+          type: integer
+          description: Number of travellers on the reservation line.
+          format: int32
+          examples:
+          - 2
+        type:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+      discriminator:
+        propertyName: type
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineResponseV1'
+          COMPARTMENT: '#/components/schemas/CompartmentReservationLineResponseV1'
+          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineResponseV1'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineResponseV1'
+    StopPlaceResponseV1:
+      required:
+      - nsrCode
+      - sequenceNr
+      type: object
+      properties:
+        nsrCode:
+          type: string
+          description: Stop Place id defined by National StopPlace registry.
+          examples:
+          - NSR:StopPlace:337
+        sequenceNr:
+          type: integer
+          description: The ordering of the station in the journey.
+          format: int32
+          examples:
+          - 0
+      description: Destination `StopPlace` of the `reservation`
+    CreateReservationLinesBySeatingPropertiesRequest:
+      required:
+      - seatingPropertiesToReserve
+      type: object
+      properties:
+        seatingPropertiesToReserve:
+          $ref: '#/components/schemas/SeatingPropertiesRequestV1'
+        numberOfTravellers:
+          type:
+          - integer
+          - 'null'
+          description: The properties required by the traveller(s).
+          format: int32
+        mustReserveWholeCompartment:
+          type: boolean
+          description: Whether to reserve a whole compartment to this traveller. If not provided, or set to false, a single seat with the provided properties will be reserved instead.
+          default: false
+          examples:
+          - true
+        orderLineId:
+          type:
+          - string
+          - 'null'
+          description: OrderLine ID to reserve seats for
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+      description: List of SeatingProperties to allocate for.
+    LegRequest:
+      required:
+      - datedServiceJourneyId
+      - destinationNsrCode
+      - originNsrCode
+      type: object
+      properties:
+        datedServiceJourneyId:
+          type: string
+          description: Dated service journey ID for the leg.
+        originNsrCode:
+          type: string
+          description: NSR code where the traveller leg starts.
+        destinationNsrCode:
+          type: string
+          description: NSR code where the traveller leg ends.
+      description: Leg of a trip. Each leg results in a new reservation.
+    SeatingPropertiesResponseV1:
+      type: object
+      properties:
+        fareClass:
+          type:
+          - string
+          - 'null'
+          description: Fare class of the seat. Netex enumeration.
+          enum:
+          - UNKNOWN
+          - FIRST_CLASS
+          - SECOND_CLASS
+          - THIRD_CLASS
+          - PREFERENTE
+          - PREMIUM_CLASS
+          - BUSINESS_CLASS
+          - STANDARD_CLASS
+          - TURISTA
+          - ECONOMY_CLASS
+          - ANY
+          examples:
+          - FIRST_CLASS
+        groupBooking:
+          type:
+          - string
+          - 'null'
+          description: Group booking permission of the seat. Netex enumeration.
+          enum:
+          - GROUPS_ALLOWED
+          - GROUPS_NOT_ALLOWED
+          - GROUPS_ALLOWED_WITH_RESERVATION
+          - GROUP_BOOKINGS_RESTRICTED
+          - UNKNOWN
+          examples:
+          - GROUPS_ALLOWED
+        accommodationFacility:
+          type:
+          - string
+          - 'null'
+          description: Accommodation property of the seat. Netex enumeration.
+          enum:
+          - UNKNOWN
+          - SEATING
+          - FOLDING_SEAT
+          - SLEEPER
+          - SINGLE_SLEEPER
+          - DOUBLE_SLEEPER
+          - SPECIAL_SLEEPER
+          - COUCHETTE
+          - SINGLE_COUCHETTE
+          - DOUBLE_COUCHETTE
+          - SPECIAL_SEATING
+          - RECLINING_SEATS
+          - BABY_COMPARTMENT
+          - FAMILY_CARRIAGE
+          - RECREATION_AREA
+          - PANORAMA_COACH
+          - PULLMAN_COACH
+          - PUSHCHAIR
+          - WHEELCHAIR
+          - STANDING
+          examples:
+          - SINGLE_SLEEPER
+        seatAttachment:
+          type:
+          - string
+          - 'null'
+          description: Attachment of the seat. Netex enumeration.
+          enum:
+          - REVERSIBLE
+          - FIXED
+          - FOLDING
+          - REMOVABLE
+          - OTHER
+          examples:
+          - REVERSIBLE
+        seatPosition:
+          type:
+          - string
+          - 'null'
+          description: Position of the seat. Netex enumeration.
+          enum:
+          - WINDOW
+          - AISLE
+          - MIDDLE
+          - UPPER_BERTH
+          - MIDDLE_BERTH
+          - LOWER_BERTH
+          - OTHER
+          examples:
+          - MIDDLE_BERTH
+        relativeDirection:
+          type:
+          - string
+          - 'null'
+          description: Relative direction of the seat. Netex enumeration.
+          enum:
+          - BOTH
+          - FORWARDS
+          - BACKWARDS
+          examples:
+          - BACKWARDS
+        nuisanceFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible nuisance factors of the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible nuisance factors of the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - SMOKING
+            - NO_SMOKING
+            - FAMILY_AREA
+            - CHILDFREE_AREA
+            - ANIMALS_ALLOWED
+            - NO_ANIMALS
+            - BREASTFEEDING_FRIENDLY
+            - MOBILE_PHONE_USE_ZONE
+            - MOBILE_PHONE_FREE_ZONE
+            examples:
+            - FAMILY_AREA,SMOKING
+          examples:
+          - FAMILY_AREA,SMOKING
+        passengerCommsFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible communication facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible communication facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - FREE_WIFI
+            - PUBLIC_WIFI
+            - POWER_SUPPLY_SOCKETS
+            - TELEPHONE
+            - AUDIO_ENTERTAINMENT
+            - VIDEO_ENTERTAINMENT
+            - BUSINESS_SERVICES
+            - INTERNET
+            - POST_OFFICE
+            - POST_BOX
+            examples:
+            - POWER_SUPPLY_SOCKETS,TELEPHONE
+          examples:
+          - POWER_SUPPLY_SOCKETS,TELEPHONE
+        sanitaryFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - NONE
+            - TOILET
+            - WHEELCHAIR_ACCESS_TOILET
+            - SHOWER
+            - WASHING_AND_CHANGE_FACILITIES
+            - BABY_CHANGE
+            - WHEELCHAIR_BABY_CHANGE
+            - SHOE_SHINER
+            - OTHER
+            examples:
+            - TOILET,SHOWER
+          examples:
+          - TOILET,SHOWER
+        mobilityFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible mobility facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible mobility facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - LOW_FLOOR
+            - STEP_FREE_ACCESS
+            - SUITABLE_FOR_PUSHCHAIRS
+            - SUITABLE_FOR_WHEELCHAIRS
+            - SUITABLE_FOR_HEAVILIY_DISABLED
+            - BOARDING_ASSISTANCE
+            - ONBOARD_ASSISTANCE
+            - UNACCOMPANIED_MINOR_ASSISTANCE
+            - TACTILE_PLATFORM_EDGES
+            - TACTILE_GUIDING_STRIPS
+            examples:
+            - SUITABLE_FOR_WHEELCHAIRS,LOW_FLOOR
+          examples:
+          - SUITABLE_FOR_WHEELCHAIRS,LOW_FLOOR
+        baggageType:
+          uniqueItems: true
+          type: array
+          description: Set of possible baggage types possible for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible baggage types possible for passenger in the seat. Netex enumerations.
+            enum:
+            - HANDBAG
+            - HAND_LUGGAGE
+            - SMALL_SUITCASE
+            - SUITCASE
+            - TRUNK
+            - OVERSIZE_ITEM
+            - BICYCLE
+            - MOTORCYCLE
+            - SPORTING_EQUIPMENT
+            - SKIS
+            - MUSICAL_INSTRUMENT
+            - PUSH_CHAIR
+            - WHEELCHAIR
+            - MOTORIZED_WHEELCHAIR
+            - LARGE_MOTORIZED_WHEELCHAIR
+            - SMALL_ANIMAL
+            - ANIMAL
+            - GAME
+            - OTHER
+            examples:
+            - HANDBAG,SUITCASE
+          examples:
+          - HANDBAG,SUITCASE
+      description: Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class.
+    TravelIntentionVersionResponseV1:
+      required:
+      - destinationNsrCode
+      - originNsrCode
+      - originalDatedServiceJourneyId
+      - reservations
+      - snoozed
+      - status
+      - travelIntentionVersion
+      - versionedAt
+      type: object
+      properties:
+        travelIntentionVersion:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - SUCCESS
+          - NO_JOURNEY
+          - REJECTED
+          - NO_SEATS
+        snoozed:
+          type: boolean
+        originalDatedServiceJourneyId:
+          type: string
+        originNsrCode:
+          type: string
+        destinationNsrCode:
+          type: string
+        versionedAt:
+          type: string
+          format: date-time
+        info:
+          type:
+          - string
+          - 'null'
+        reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationResponseV1'
+    PatchReservationLineRequest:
+      required:
+      - type
+      type: object
+      properties:
+        elementCarriageNumber:
+          type: integer
+          description: The `carriage number` of the element of the seat being reserved on this `reservationLine`.
+          format: int32
+          examples:
+          - 1
+        elementCarriageIdentifier:
+          type: string
+          description: The `carriage identifier` of the element of the seat being reserved on this `reservationLine`.
+          examples:
+          - '1'
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line`
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        type:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+      discriminator:
+        propertyName: type
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/PatchSingleSeatReservationLineRequest'
+          COMPARTMENT: '#/components/schemas/PatchCompartmentReservationLineRequest'
+          FREE_SEATING: '#/components/schemas/PatchFreeSeatingReservationLineRequest'
+    ReserveSpecificSeatsRequest:
+      type: object
+      properties:
+        hasSeatBehaviors:
+          $ref: '#/components/schemas/SeqHasSeatBehavior'
+    ReserveSeatTypeRequest: {}
+    SeatResponse: {}
+    SeqHasSeatBehavior:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqCancelSeatRequest:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    ReservationWithOrderLineIdAndSeatsMapping: {}
+    UpdateReservationRequest: {}
+    ReserveSeatsByProductRequest: {}
+    ReservationResponse_2: {}
+    SeqProductToCheckForSeatsRequest:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqReservationResponse:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    ReservationResponse_3: {}
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seating-manager-openapi.json
+- entur-seatingservices-openapi.json
+- entur-seating-manager-openapi.yml
+- entur-seatingservices-openapi.yml

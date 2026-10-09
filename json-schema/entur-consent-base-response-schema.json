@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-consent-base-response-schema.json",
+  "title": "ConsentBaseResponse",
+  "description": "Consent base",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-consents-openapi.yml#/components/schemas/ConsentBaseResponse",
+  "required": [
+    "changedAt",
+    "consentCode",
+    "createdAt",
+    "terms",
+    "version"
+  ],
+  "type": "object",
+  "properties": {
+    "changedAt": {
+      "type": "string",
+      "description": "When the consent base was last changed. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "consentCode": {
+      "type": "string",
+      "description": "Consent code used to identify the consent base"
+    },
+    "consentOwnerOrgId": {
+      "type": "integer",
+      "description": "The organisation that owns the consent base. If not set, the consent base can be used by all organisations.",
+      "format": "int64"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "When the consent base was created. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "internalDescription": {
+      "type": "array",
+      "description": "Internal description, describing the use cases for the consent base",
+      "items": {
+        "$ref": "#/$defs/InternalDescriptionResponse"
+      }
+    },
+    "orgNameSubstitutionPattern": {
+      "type": "string",
+      "description": "The pattern on which to perform substitution within terms. Facilitates reusable consent basess across organisations"
+    },
+    "terms": {
+      "type": "array",
+      "description": "Consent terms with long and short description in multiple languages. The descriptions can contain MarkDown",
+      "items": {
+        "$ref": "#/$defs/ConsentTermsResponse"
+      }
+    },
+    "validFrom": {
+      "type": "string",
+      "description": "If set, the date the consent base is valid from. It is not possible to change the consent terms after this date without creating a new version. If not set, the consent base is in draft mode.",
+      "format": "date-time"
+    },
+    "validTo": {
+      "type": "string",
+      "description": "If set, the date the consent base is valid to. If this date is in the past, the consent base is deactivated. If not set, the consent is active from validFrom and onwards.",
+      "format": "date-time"
+    },
+    "version": {
+      "type": "integer",
+      "description": "The consent base version",
+      "format": "int32"
+    }
+  },
+  "$defs": {
+    "ConsentTermsResponse": {
+      "required": [
+        "fullDescription",
+        "languageCode",
+        "shortDescription"
+      ],
+      "type": "object",
+      "properties": {
+        "fullDescription": {
+          "type": "string",
+          "description": "Text describing the terms in detail. The text can contain MarkDown"
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "ISO-639-3 language code. 3 characters"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short text explaining the terms. The text can contain MarkDown"
+        }
+      },
+      "description": "Text for terms in a specific language"
+    },
+    "InternalDescriptionResponse": {
+      "required": [
+        "description",
+        "languageCode"
+      ],
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A description for the partner administrating consents"
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "ISO-639-3 language code. 3 characters"
+        }
+      },
+      "description": "Contains internal description for a consent. Will not be shown to customer"
+    }
+  }
+}

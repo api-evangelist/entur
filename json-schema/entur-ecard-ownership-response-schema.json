@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-ecard-ownership-response-schema.json",
+  "title": "EcardOwnershipResponse",
+  "description": "Ecards connected to a customer",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-customers-openapi.yml#/components/schemas/EcardOwnershipResponse",
+  "required": [
+    "changedAt",
+    "createdAt",
+    "customerId",
+    "ecardNumber",
+    "ecardNumber16digits",
+    "ecardOperator",
+    "id",
+    "startOfOwnership"
+  ],
+  "type": "object",
+  "properties": {
+    "bookingDate": {
+      "type": "string",
+      "description": "When the physical ecard was booked. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "changedAt": {
+      "type": "string",
+      "description": "When the ecard was last changed. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "When the ecard was created. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "customerId": {
+      "type": "integer",
+      "description": "The customer connected to the ecard. Deprecated",
+      "format": "int64",
+      "deprecated": true
+    },
+    "ecardName": {
+      "maxLength": 100,
+      "type": "string",
+      "description": "Customer defined ecard alias."
+    },
+    "ecardNumber": {
+      "type": "integer",
+      "description": "Ecard number.",
+      "format": "int64"
+    },
+    "ecardNumber16digits": {
+      "maxLength": 16,
+      "minLength": 16,
+      "type": "string",
+      "description": "The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit."
+    },
+    "ecardOperator": {
+      "type": "integer",
+      "description": "Ecard operator.",
+      "format": "int32"
+    },
+    "endOfOwnership": {
+      "type": "string",
+      "description": "When the customer removed the ecard connection. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "expirationDate": {
+      "type": "string",
+      "description": "When the physical ecard expires. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "id": {
+      "type": "integer",
+      "description": "Ecard id.",
+      "format": "int64"
+    },
+    "shippingDate": {
+      "type": "string",
+      "description": "When the physical ecard was shipped to the customer. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "startOfOwnership": {
+      "type": "string",
+      "description": "When the ecard was first connected to the customer. ISO 8601 date format",
+      "format": "date-time"
+    }
+  }
+}

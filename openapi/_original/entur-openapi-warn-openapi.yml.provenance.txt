@@ -1,0 +1,9 @@
+generated: '2026-10-09'
+method: probed
+generator: harvest-sibling-contracts.py
+source: https://raw.githubusercontent.com/entur/gha-api/main/fixture/openapi-warn.yaml
+found_on: https://github.com/entur/gha-api
+operations: gh:openapi-warn.yaml
+version: 3.1.0
+ownership: sibling of a contract the pass accepted on the same host; URL names the
+  provider

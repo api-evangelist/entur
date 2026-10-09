@@ -1,0 +1,630 @@
+# harvested from https://github.com/entur/api-guidelines/blob/f92bec1065e08092b8c5ee62677ff9345ed1a174/.spectral.yml on 2026-10-09 — a Spectral ruleset published in the provider's own GitHub repository (entur/api-guidelines); found by GitHub code search, fetched verbatim
+x-method: harvested
+x-stamped: 2026-10-09
+x-source-url: https://github.com/entur/api-guidelines/blob/f92bec1065e08092b8c5ee62677ff9345ed1a174/.spectral.yml
+# API Guidelines Ruleset
+# This ruleset enforces the API design standards described in our API Guidelines document.
+# Structure follows the same organization as the main guidelines document for easy reference.
+
+# OpenAPI Specification version 3.x
+extends: [spectral:oas]
+
+functions:
+  - date
+  - conditionallyDefined
+  - requireExampleOrRef
+  - requireRequestBodyDescription
+  - xEnturPermissions
+
+rules:
+  # =============================================================================
+  # 1. Introduction - Not lintable
+  # =============================================================================
+
+  # =============================================================================
+  # 2. Core Principles
+  # =============================================================================
+
+  # -------------------------------------------------------------------------
+  # 2.1 General Design Principles
+  # -------------------------------------------------------------------------
+
+  entur-info-title:
+    message: "The OpenAPI info section MUST include a non-empty \"title\"."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: error
+    given: $
+    then:
+      field: info.title
+      function: truthy
+
+  entur-info-title-no-api:
+    message: "API titles SHOULD NOT contain the word 'api'."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    given: $.info.title
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "/\\bapi\\b/i"
+
+  info-description: error
+  info-contact: off
+
+  # HTTP Methods
+  entur-operation-standard-methods:
+    message: "Operations SHOULD use standard HTTP methods (`get`, `post`, `put`, `patch`, `delete`). Invalid operation: {{property}}."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    given: $.paths[*]
+    severity: warn
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        notMatch: "^(options|head|trace)$"
+
+  # Documentation with examples
+  entur-example-parameter:
+    message: "Parameters SHOULD have example values."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    recommended: false
+    given: $.paths.*.*.parameters.*
+    then:
+      field: example
+      function: defined
+
+  entur-parameter-description:
+    message: "Parameters SHOULD have a description."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    given: $.paths.*.*.parameters.*
+    then:
+      field: description
+      function: truthy
+
+  entur-example-schema-property:
+    message: "Properties in components schema SHOULD have example values."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    recommended: false
+    #For schema properties where type is not array, or items is not a ref. (Array with ref to other schema does not need an example)
+    given: $.components.schemas.*.properties[?(@.type != 'array' || !@.items.$ref)]
+    then:
+      field: example
+      function: defined
+
+  entur-request-body-examples:
+    message: "Request bodies SHOULD include at least one example."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    given: $.paths.*.*.requestBody.content.*
+    then:
+      function: requireExampleOrRef
+
+  entur-request-body-description:
+    message: "Request bodies SHOULD have a description, either directly or on the referenced schema."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    given: $.paths.*.*.requestBody
+    then:
+      function: requireRequestBodyDescription
+
+  entur-response-body-examples:
+    message: "Response bodies SHOULD include at least one example."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    given: $.paths.*.*.responses.*.content.*
+    then:
+      function: requireExampleOrRef
+
+
+  entur-operation-summary:
+    message: "Operations SHOULD have a non-empty summary field."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    given: $.paths.*[get,post,put,patch,delete,options,head,trace]
+    then:
+      field: summary
+      function: truthy
+
+  # openapi spec version 3
+  entur-openapi-version-3:
+    message: "OpenAPI specification must use version 3.x"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: error
+    given: "$"
+    then:
+      - field: openapi
+        function: pattern
+        functionOptions:
+          match: "^3\\.\\d+\\.\\d+$"
+      - field: swagger
+        function: falsy
+
+  # Security - HTTPS requirement
+  entur-hosts-https-only:
+    message: "Servers MUST use HTTPS. Invalid URL: {{value}}"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: error
+    given: $.servers[*].url
+    then:
+      function: pattern
+      functionOptions:
+        match: ^(https:)
+
+  entur-hosts-not-localhost:
+    message: "Server URLs SHOULD NOT use localhost or 127.0.0.1 as hostname. Invalid URL: {{value}}"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#21-general-design-principles"
+    severity: warn
+    given: $.servers[*].url
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "https?://(localhost|127\\.0\\.0\\.1)(/|$)"
+      invert: true
+  
+  # -------------------------------------------------------------------------
+  # 2.3 Authentication and authorization
+  # -------------------------------------------------------------------------
+
+  entur-permissions:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#233-documenting-permissions-for-partner-endpoints"
+    severity: error
+    given: $.paths.*[get,post,put,patch,delete,options,head,trace].x-entur-permissions
+    then:
+      function: xEnturPermissions
+
+  # -------------------------------------------------------------------------
+  # 2.4 Entur Metadata
+  # -------------------------------------------------------------------------
+
+  entur-info-metadata-id:
+    message: "The OpenAPI info section MUST include \"x-entur-metadata.id\"."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#241-identifying-a-specification"
+    severity: error
+    given: $
+    then:
+      field: info.x-entur-metadata.id
+      function: truthy
+
+  entur-info-metadata-id-kebab-case:
+    message: "The \"x-entur-metadata.id\" MUST be in lower-kebab-case format. Invalid value: {{value}}"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#241-identifying-a-specification"
+    severity: error
+    given: $.info.x-entur-metadata.id
+    then:
+      function: pattern
+      functionOptions:
+        match: ^[a-z0-9]+(-[a-z0-9]+)*$
+
+  entur-info-metadata-audience:
+    message: "The OpenAPI info section MUST include \"x-entur-metadata.audience\"."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#24-entur-metadata"
+    severity: error
+    given: $
+    then:
+      field: info.x-entur-metadata.audience
+      function: truthy
+
+  entur-info-metadata-audience-valid:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#24-entur-metadata"
+    severity: error
+    given: $.info.x-entur-metadata.audience
+    then:
+      function: enumeration
+      functionOptions:
+        values:
+          - open
+          - partner
+          - internal
+          - private
+
+  entur-info-metadata-owner:
+    message: "The OpenAPI info section MUST include \"x-entur-metadata.owner\"."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#242-specification-owner"
+    severity: error
+    given: $
+    then:
+      field: info.x-entur-metadata.owner
+      function: truthy
+
+  entur-info-metadata-owner-valid:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#242-specification-owner"
+    severity: error
+    given: $.info.x-entur-metadata.owner
+    then:
+      function: pattern
+      functionOptions:
+        match: ^team-[a-z0-9]+(-[a-z0-9]+)*$
+
+  entur-info-metadata-parent-id-kebab-case:
+    message: "The \"x-entur-metadata.parentId\" MUST be in lower-kebab-case format. Invalid value: {{value}}"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#243-merging-specifications"
+    severity: error
+    given: $.info.x-entur-metadata.parentId
+    then:
+      function: pattern
+      functionOptions:
+        match: ^[a-z0-9]+(-[a-z0-9]+)*$
+
+  entur-info-metadata-devExtensions:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#244-development-only-openapi-extensions"
+    severity: error
+    given: $.info.x-entur-metadata.devExtensions
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: array
+          items:
+            type: string
+            pattern: ^x-.*$
+
+  # -------------------------------------------------------------------------
+  # 2.5 Lifecycle
+  # -------------------------------------------------------------------------
+
+  ## On API level
+  entur-stability-level-api:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#25-lifecycle"
+    severity: error
+    given: $.info.x-stability-level
+    then:
+      function: enumeration
+      functionOptions:
+        values: [draft, beta, stable]
+
+  entur-deprecation-api:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#254-deprecation"
+    severity: error
+    given: $.info.x-deprecated
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: boolean
+
+  entur-sunset-api:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#254-deprecation"
+    severity: error
+    given: $.info
+    then:
+      function: conditionallyDefined
+      functionOptions:
+        field: x-sunset
+        conditionalField: x-deprecated
+        havingValue: true
+
+  entur-sunset-format-api:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#254-deprecation"
+    severity: error
+    given: $.info.x-sunset
+    then:
+      function: date
+
+  # On individual operation level
+  entur-stability-level-operation:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#25-lifecycle"
+    severity: error
+    given: $.paths.*[get,post,put,patch,delete,options,head,trace].x-stability-level
+    then:
+      function: enumeration
+      functionOptions:
+        values: [draft, beta, stable]
+
+  entur-sunset-operation:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#254-deprecation"
+    severity: info # This one should be an error, but for an introduction period, make it just info.
+    given: $.paths.*[get,post,put,patch,delete,options,head,trace]
+    then:
+      function: conditionallyDefined
+      functionOptions:
+        field: x-sunset
+        conditionalField: deprecated
+        havingValue: true
+
+  entur-sunset-format-operation:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#254-deprecation"
+    severity: error
+    given: $.paths.*[get,post,put,patch,delete,options,head,trace].x-sunset
+    then:
+      function: date
+
+
+  # =============================================================================
+  # 3. Naming & Structure Conventions
+  # =============================================================================
+
+  # -------------------------------------------------------------------------
+  # 3.1 Resource Naming
+  # -------------------------------------------------------------------------
+
+  # URL format requirements
+  entur-paths-format:
+    message: "Paths MUST be in kebab-case (lower case and separated with hyphens), with single slashes, and no trailing slash at end of path. Invalid path: {{property}}."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#31-resource-naming"
+    severity: error
+    given: $.paths.*~
+    then:
+      function: pattern
+      functionOptions:
+        #Match leading slash followed by kebab casing, and then optional trailing kebab with url params allowed. No trailing slash.
+        #Double slashes now allowed.
+        #Custom functions not allowed in path for now (e.g. /ecards/{mediaSerialNumberId}:block)
+        match: ^(\/[a-z0-9]+(-[a-z0-9]+)*)(\/[a-z0-9]+(-[a-z0-9]+)*|\/{.+})*$
+
+  # Field naming conventions
+  entur-query-parameters-lower-camel-case:
+    message: "Query parameter names MUST be lowerCamelCase. Invalid name: {{value}}"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#31-resource-naming"
+    severity: error
+    given: $.paths.*.*.parameters[?(@.in=='query')].name
+    then:
+      function: pattern
+      functionOptions:
+        match: ^[a-z][a-zA-Z0-9]*$
+
+  entur-path-parameters-camelCase-alphanumeric:
+    message: "Path parameter names MUST be lowerCamelCase. Invalid name: {{value}}"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#31-resource-naming"
+    severity: error
+    given: $..parameters[?(@.in == 'path')].name
+    then:
+      function: pattern
+      functionOptions:
+        match: ^[a-z][a-zA-Z0-9]*$
+
+  entur-body-fields-lower-camel-case:
+    message: "Request and Response body field names MUST be lowerCamelCase."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#31-resource-naming"
+    severity: error
+    given: $..[?(@property === 'properties')]
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        match: ^[a-z][a-zA-Z0-9]*$
+
+# Server URL case requirements
+  entur-server-urls-lowercase:
+    message: "Server URLs MUST be in lowercase. Invalid URL: {{value}}"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#31-resource-naming"
+    severity: error
+    given: $.servers[*].url
+    then:
+      function: pattern
+      functionOptions:
+        match: ^[^A-Z]*$
+
+  # Avoid 'api' in paths
+  entur-paths-with-api:
+    message: "Paths SHOULD NOT contain 'api'."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#31-resource-naming"
+    severity: warn
+    given: $.paths.*~
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "^(?!\/api-docs$).*\\bapi\\b.*$"
+
+  # -------------------------------------------------------------------------
+  # 3.2 Versioning
+  # -------------------------------------------------------------------------
+
+  # =============================================================================
+  # 4. Communication Standards
+  # =============================================================================
+
+
+  # -------------------------------------------------------------------------
+  # 4.1 HTTP Status Codes
+  # -------------------------------------------------------------------------
+
+  # Request body allowed methods
+  entur-request-body-allowed-methods:
+    message: "Request body is allowed only for PUT, POST, and PATCH."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#41-http-status-codes"
+    severity: error
+    given:
+      - "$.paths[*].get.requestBody"
+      - "$.paths[*].delete.requestBody"
+      - "$.paths[*].options.requestBody"
+      - "$.paths[*].head.requestBody"
+      - "$.paths[*].trace.requestBody"
+    then:
+      function: falsy
+
+  # HTTP method responses validation
+  entur-get-responses-validation:
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#41-http-status-codes"
+    severity: error
+    given: $.paths.*.get.responses
+    then:
+      field: "@key"
+      function: enumeration
+      functionOptions:
+        values: ["200", "302", "304", "400", "401", "403", "404", "500", "503", "default"]
+
+  entur-delete-responses-validation:
+    message: "Invalid response code: {{value}}. DELETE responses MUST use one of these response codes: 200, 204, 400, 401, 403, 404, 409, 500, 503"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#41-http-status-codes"
+    severity: error
+    given: $.paths.*.delete.responses
+    then:
+      field: "@key"
+      function: enumeration
+      functionOptions:
+        values: ["200", "204", "400", "401", "403", "404", "409", "500", "503", "default"]
+
+  entur-post-responses-validation:
+    message: "Invalid response code: {{value}}. POST responses MUST use one of these response codes: 200, 201, 202, 204, 303, 400, 401, 403, 404, 409, 500, 503"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#41-http-status-codes"
+    severity: error
+    given: $.paths.*.post.responses
+    then:
+      field: "@key"
+      function: enumeration
+      functionOptions:
+        values: ["200", "201", "202", "204", "303", "400", "401", "403", "404", "409", "500", "503", "default"]
+
+  entur-put-responses-validation:
+    message: "Invalid response code: {{value}}. PUT responses MUST use one of these response codes: 200, 204, 400, 401, 403, 404, 409, 500, 503"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#41-http-status-codes"
+    severity: error
+    given: $.paths.*.put.responses
+    then:
+      field: "@key"
+      function: enumeration
+      functionOptions:
+        values: ["200", "201", "204", "400", "401", "403", "404", "409", "500", "503", "default"]
+
+  entur-patch-responses-validation:
+    message: "Invalid response code: {{value}}. PATCH responses MUST use one of these response codes: 200, 204, 400, 401, 403, 404, 409, 500, 503"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#41-http-status-codes"
+    severity: error
+    given: $.paths.*.patch.responses
+    then:
+      field: "@key"
+      function: enumeration
+      functionOptions:
+        values: ["200", "204", "400", "401", "403", "404", "409", "500", "503", "default"]
+
+
+  # -------------------------------------------------------------------------
+  # 4.2 Error Handling - RFC 9457 compliance
+  # -------------------------------------------------------------------------
+
+  # Error response format validation
+  entur-rfc-9457-content-type:
+    message: "Error responses MUST have content type application/problem+json or application/problem+xml"
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#42-error-handling"
+    severity: warn
+    given: $.paths.*.*.responses[?(@property.match(/^(4|5)/))]
+    then:
+      - field: content
+        function: truthy
+      - field: content
+        function: schema
+        functionOptions:
+          # JSON Schema to require either the JSON or XML problem media-type
+          schema:
+            type: object
+            anyOf:
+              - required: ["application/problem+json"]
+              - required: ["application/problem+xml"]
+
+  entur-rfc-9457-body-title:
+    message: "Error responses MUST have property 'title'."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#42-error-handling"
+    severity: error
+    given: $.paths.*.*.responses[?(@property.match(/^(4|5)/))].content.*.schema.properties
+    then:
+      field: title
+      function: defined
+
+  entur-rfc-9457-body-status:
+    message: "Error responses MUST have property 'status'."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#42-error-handling"
+    severity: error
+    given: $.paths.*.*.responses[?(@property.match(/^(4|5)/))].content.*.schema.properties
+    then:
+      field: status
+      function: defined
+
+  entur-rfc-9457-body-detail:
+    message: "Error responses SHOULD have property 'detail' to provide additional context."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#42-error-handling"
+    severity: warn
+    given: $.paths.*.*.responses[?(@property.match(/^(4|5)/))].content.*.schema.properties
+    then:
+      field: detail
+      function: defined
+
+
+  # =============================================================================
+  # 5. Data Formatting Standards
+  # =============================================================================
+
+
+  # -------------------------------------------------------------------------
+  # 5.1 Language & Spelling
+  # -------------------------------------------------------------------------
+
+  entur-language-headers:
+    message: "Accept-Language and Content-Language should follow IETF BCP 47. And macrolanguages like 'no' should not be used - use 'nb' or 'nn'."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#51-language--spelling"
+    severity: error
+    given:
+      - $..parameters[?(@.in=='header' && @.name=='Accept-Language')].example
+      - $..parameters[?(@.in=='header' && @.name=='Accept-Language')].schema.example
+      - $..parameters[?(@.in=='header' && @.name=='Accept-Language')].schema.default
+      - $..parameters[?(@.in=='header' && @.name=='Content-Language')].example
+      - $..parameters[?(@.in=='header' && @.name=='Content-Language')].schema.example
+      - $..parameters[?(@.in=='header' && @.name=='Content-Language')].schema.default
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "^(nob|nno|eng|nor|no)\\b"
+
+  # -------------------------------------------------------------------------
+  # 5.2 Date & Time - Requires runtime validation
+  # -------------------------------------------------------------------------
+
+
+  # -------------------------------------------------------------------------
+  # 5.3 Currency Representation - Requires runtime validation
+  # -------------------------------------------------------------------------
+
+
+  # -------------------------------------------------------------------------
+  # 5.4 Character Encoding - Not directly lintable for UTF-8
+  # -------------------------------------------------------------------------
+
+
+  # -------------------------------------------------------------------------
+  # 5.5 HTTP Headers
+  # -------------------------------------------------------------------------
+
+  # ET-Client-Name header not necessary
+  entur-not-et-client-name-header:
+    message: "Declaring header \"ET-Client-Name\" is not necessary."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#55-http-headers"
+    severity: warn
+    given: "$.paths[*]..parameters[?(@.in == 'header' && @.name == 'ET-Client-Name')].name"
+    then:
+      function: falsy
+
+  # Header naming conventions
+  entur-headers-hyphenated-pascal-case:
+    message: "HTTP header names MUST be in Hyphenated-Pascal-Case. Invalid name: \"{{value}}\"."
+    documentationUrl: "https://github.com/entur/api-guidelines/blob/main/guidelines.md#55-http-headers"
+    severity: error
+    given: "$..parameters[?(@.in == 'header' && @.name != 'ET-Client-Name' && @.name != 'Entur-POS')].name"
+    then:
+      function: pattern
+      functionOptions:
+        match: ^([A-Z][a-z0-9]*)(-[A-Z][a-z0-9]*)*$
+
+
+  # =============================================================================
+  # 6. Advanced Design Patterns
+  # =============================================================================
+
+  # Most advanced design patterns require runtime validation or manual review
+  # The rules here focus on aspects that can be statically verified
+
+
+  # -------------------------------------------------------------------------
+  # 6.5 Import & Export Formats - Accept header validation handled at runtime
+  # -------------------------------------------------------------------------
+
+
+  # -------------------------------------------------------------------------
+  # 6.6 Validation - Error response format covered in section 4.2
+  # -------------------------------------------------------------------------
+
+
+  # -------------------------------------------------------------------------
+  # 6.7 HATEOAS - Not directly lintable, requires manual review
+  # -------------------------------------------------------------------------

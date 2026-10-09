@@ -1,0 +1,73 @@
+name: Entur Conventions
+generated: '2026-10-09'
+method: searched
+source: https://developer.entur.no/llms-full.txt
+docs:
+- https://developer.entur.no/docs/getting-started
+- https://developer.entur.no/docs/authentication
+- https://developer.entur.no/terms-of-service
+auth:
+  client_identification: Every Entur API — open and partner — requires your application to identify itself using the `ET-Client-Name` header.
+  client_name_format: '<company>-<application> (lowercase, no spaces), e.g. forsen_utvikling-infoplakat'
+  partner: 'OAuth2 client credentials; JWT sent as Authorization: Bearer <ACCESS_TOKEN>; tokens valid 24 hours'
+  see: authentication/entur-authentication.yml
+idempotency:
+  coverage: partial
+  mechanism: No Idempotency-Key header. Specific operations are documented as idempotent by design.
+  scope:
+  - confirmPackageProcessHandler (OMSA confirm-package)
+  - stopPaymentAgreement
+  evidence:
+  - Send the paid package ID to the `confirm-package` process. The process is idempotent. If a request times out, retry with the same package ID without creating a duplicate purchase. (https://developer.entur.no/guides — Make your first purchase)
+  - 'idempotent: stopping an already STOPPED agreement (openapi/entur-payment-partner-openapi.yml)'
+request_tracing:
+  header: X-Correlation-ID
+  evidence: If a request fails unexpectedly, include the `X-Correlation-ID` response header when contacting Entur support.
+localization:
+  header: Accept-Language
+  values: nb/nn/en per Entur api guidelines
+versioning:
+  style: major version in the URL path
+  see: lifecycle/entur-lifecycle.yml
+rate_limit_signaling:
+  status: 429
+  headers: [Rate-Limit-Allowed, Rate-Limit-Available, Rate-Limit-Expiry-Time, Rate-Limit-Range, Rate-Limit-Used, Spike-Allowed, Spike-Range]
+  see: rate-limits/entur-rate-limits.yml
+errors:
+  documented_statuses:
+  - 401 Unauthorized – Missing/invalid `client_secret`, missing token, or expired token.
+  - 403 Forbidden – The token is valid, but lacks required permissions for the endpoint.
+  - 408 Session timeout – The token expired during processing; obtain a new token.
+  note: There is no published error-code reference. Response schemas are in the OpenAPI files.
+style_guide: rules/entur-api-guidelines-spectral-rules.yml
+dry_run:
+  available: partial
+  operations:
+  - operationId: dryRun
+    spec: openapi/entur-refund-partner-openapi.yml
+    description: Perform a 'dry-run' of a refund
+reversibility:
+  state: documented
+  surfaces:
+  - surface: Ticket orders / refunds
+    reversal: refundOrder (PUT /v1/refunds/{orderId}), cancelOrderLines, cancelOrderLine (order-partner), cancelPackageProcessHandler, claimRefundProcessHandler (omsa)
+    window: null
+    note: The docs state no refund or cancellation window.
+  - surface: Payment transactions
+    reversal: cancelTransaction (before CAPTURED), createCredit + executeCredit (credit captured transactions)
+    window: Cancel a transaction which is already CREATED/INITIATED.
+    irreversible: Any previous successful credit operation cannot be undone
+    source: openapi/entur-payment-partner-openapi.yml
+  - surface: Recurring payment agreements
+    reversal: none. "Stopping is not a refund. Charges that were already captured are untouched; credit those transactions separately if the customer should have their money back."
+    source: https://developer.entur.no/llms-full.txt (Payment agreement guide)
+  - surface: Customer profiles
+    reversal: restoreDeactivatedCustomerByCustomerNumber (PUT /profiles/{customerNumber}/restore)
+    window: The profile cannot be used after the deactivation is done, but it is recoverable until deletion. (the client sets the deletion date; Entur recommends 2-3 days in the future)
+    state: verified
+    source: https://developer.entur.no/llms-full.txt (Customers — Deleting profiles)
+  - surface: Clearing settlements
+    reversal: a new settlement with `cancel` = true on the root annex, optionally with correctionForSmntId
+    window: null
+    evidence: Once a settlement is cleared, it cannot be modified or deleted — any correction or refund is submitted as a new settlement.
+    source: https://developer.entur.no/llms-full.txt (Submit a correction or refund)

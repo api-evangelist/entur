@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-given-consent-response-schema.json",
+  "title": "GivenConsentResponse",
+  "description": "A consent given for a customer",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-consents-openapi.yml#/components/schemas/GivenConsentResponse",
+  "required": [
+    "changedAt",
+    "consent",
+    "consentChoice",
+    "consentId",
+    "createdAt",
+    "createdByOrgId",
+    "customerNumber",
+    "distributionChannel",
+    "expirationDate",
+    "id"
+  ],
+  "type": "object",
+  "properties": {
+    "changedAt": {
+      "type": "string",
+      "description": "When the consent was last changed. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "consent": {
+      "$ref": "#/$defs/ConsentResponse"
+    },
+    "consentChoice": {
+      "type": "boolean",
+      "description": "Whether this consent has been approved or rejected."
+    },
+    "consentId": {
+      "type": "integer",
+      "description": "The id of the consent defining what the customer has consented.",
+      "format": "int64"
+    },
+    "countryCode": {
+      "type": "string",
+      "description": "The telephone number country code provided with the consent"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "When the consent was given. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "createdByOrgId": {
+      "type": "integer",
+      "description": "The organisation through which the consent was given",
+      "format": "int64"
+    },
+    "customerNumber": {
+      "type": "integer",
+      "description": "Customer number. Entur number unique across organisations",
+      "format": "int64"
+    },
+    "customerRef": {
+      "type": "string",
+      "description": "Customer reference. External reference, unique within an organisation"
+    },
+    "distributionChannel": {
+      "type": "string",
+      "description": "Distribution channel through which the consent was given."
+    },
+    "email": {
+      "type": "string",
+      "description": "The contact email provided with the consent."
+    },
+    "expirationDate": {
+      "type": "string",
+      "description": "When the consent expires. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "fromStopPlace": {
+      "type": "string",
+      "description": "The stop place where the customer’s journey started, in NeTEx format."
+    },
+    "id": {
+      "type": "integer",
+      "description": "Unique id for the given consent.",
+      "format": "int64"
+    },
+    "lineRef": {
+      "type": "string",
+      "description": "Reference to the customers journey line, in NeTEx format"
+    },
+    "originalDatedServiceJourneyId": {
+      "type": "string",
+      "description": "Unique Id for a specific Service Journey, in NeTEx format"
+    },
+    "telephoneNumber": {
+      "type": "string",
+      "description": "The telephone number provided with the consent"
+    },
+    "toStopPlace": {
+      "type": "string",
+      "description": "The stop place where the customer’s journey ended, in NeTEx format."
+    }
+  },
+  "$defs": {
+    "ConsentBaseResponse": {
+      "required": [
+        "changedAt",
+        "consentCode",
+        "createdAt",
+        "terms",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changedAt": {
+          "type": "string",
+          "description": "When the consent base was last changed. ISO 8601 date format",
+          "format": "date-time"
+        },
+        "consentCode": {
+          "type": "string",
+          "description": "Consent code used to identify the consent base"
+        },
+        "consentOwnerOrgId": {
+          "type": "integer",
+          "description": "The organisation that owns the consent base. If not set, the consent base can be used by all organisations.",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the consent base was created. ISO 8601 date format",
+          "format": "date-time"
+        },
+        "internalDescription": {
+          "type": "array",
+          "description": "Internal description, describing the use cases for the consent base",
+          "items": {
+            "$ref": "#/$defs/InternalDescriptionResponse"
+          }
+        },
+        "orgNameSubstitutionPattern": {
+          "type": "string",
+          "description": "The pattern on which to perform substitution within terms. Facilitates reusable consent basess across organisations"
+        },
+        "terms": {
+          "type": "array",
+          "description": "Consent terms with long and short description in multiple languages. The descriptions can contain MarkDown",
+          "items": {
+            "$ref": "#/$defs/ConsentTermsResponse"
+          }
+        },
+        "validFrom": {
+          "type": "string",
+          "description": "If set, the date the consent base is valid from. It is not possible to change the consent terms after this date without creating a new version. If not set, the consent base is in draft mode.",
+          "format": "date-time"
+        },
+        "validTo": {
+          "type": "string",
+          "description": "If set, the date the consent base is valid to. If this date is in the past, the consent base is deactivated. If not set, the consent is active from validFrom and onwards.",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "description": "The consent base version",
+          "format": "int32"
+        }
+      },
+      "description": "Consent base"
+    },
+    "ConsentResponse": {
+      "required": [
+        "changedAt",
+        "consentBase",
+        "consentCode",
+        "createdAt",
+        "id",
+        "isEmailSupported",
+        "isSmsSupported",
+        "organisationId"
+      ],
+      "type": "object",
+      "properties": {
+        "changedAt": {
+          "type": "string",
+          "description": "When the consent was last changed. ISO 8601 date format",
+          "format": "date-time"
+        },
+        "consentBase": {
+          "$ref": "#/$defs/ConsentBaseResponse"
+        },
+        "consentCode": {
+          "type": "string",
+          "description": "Code  of the consent base"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the consent was created. ISO 8601 date format",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "integer",
+          "description": "Consent ID.",
+          "format": "int64"
+        },
+        "isEmailSupported": {
+          "type": "boolean",
+          "description": "Whether the organisation supports email as a contact method"
+        },
+        "isSmsSupported": {
+          "type": "boolean",
+          "description": "Whether the organisation supports SMS as a contact method"
+        },
+        "organisationId": {
+          "type": "integer",
+          "description": "The organisation the consent is valid for.",
+          "format": "int64"
+        },
+        "validFrom": {
+          "type": "string",
+          "description": "If set, the date the consent is valid from. Can only be set to a date after consent base validFrom. If not set, the consent base is in draft mode.",
+          "format": "date-time"
+        },
+        "validTo": {
+          "type": "string",
+          "description": "If set, the date the consent is valid to. Set the date to deactivate the consent. Can only be set to a date before the consent base validTo. If not set the consent is active from validFrom and forever after.",
+          "format": "date-time"
+        }
+      },
+      "description": "Consent response, includes the consent base"
+    },
+    "ConsentTermsResponse": {
+      "required": [
+        "fullDescription",
+        "languageCode",
+        "shortDescription"
+      ],
+      "type": "object",
+      "properties": {
+        "fullDescription": {
+          "type": "string",
+          "description": "Text describing the terms in detail. The text can contain MarkDown"
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "ISO-639-3 language code. 3 characters"
+        },
+        "shortDescription": {
+          "type": "string",
+          "description": "Short text explaining the terms. The text can contain MarkDown"
+        }
+      },
+      "description": "Text for terms in a specific language"
+    },
+    "InternalDescriptionResponse": {
+      "required": [
+        "description",
+        "languageCode"
+      ],
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "A description for the partner administrating consents"
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "ISO-639-3 language code. 3 characters"
+        }
+      },
+      "description": "Contains internal description for a consent. Will not be shown to customer"
+    }
+  }
+}

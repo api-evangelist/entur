@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-fare-zone-distance-response-schema.json",
+  "title": "FareZoneDistanceResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-prdudisapi-openapi.yml#/components/schemas/FareZoneDistanceResponse",
+  "type": "object",
+  "properties": {
+    "fromZoneId": {
+      "type": "string"
+    },
+    "toZoneId": {
+      "type": "string"
+    },
+    "organisationId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "distance": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "zones": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Zones"
+      }
+    },
+    "directPath": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "This field only gets populated if the direct path from-to is shorter than the via path",
+      "items": {
+        "$ref": "#/$defs/Zones"
+      }
+    }
+  },
+  "$defs": {
+    "Zones": {
+      "type": "object",
+      "properties": {
+        "requiredZones": {
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "path": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

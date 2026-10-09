@@ -1,0 +1,1388 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-search-offer-input-schema.json",
+  "title": "searchOfferInput",
+  "description": "A package planning request, resulting in package options",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-omsa-openapi.yml#/components/schemas/searchOfferInput",
+  "required": [
+    "type"
+  ],
+  "type": "object",
+  "properties": {
+    "type": {
+      "pattern": "^(search_offer)",
+      "type": "string"
+    },
+    "specification": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/travelSpecification"
+        },
+        {
+          "$ref": "#/$defs/placeDefinitions"
+        }
+      ]
+    },
+    "filters": {
+      "type": "array",
+      "description": "Request-wide predicates that every returned offer must satisfy.",
+      "items": {
+        "$ref": "#/$defs/searchOfferFilter"
+      }
+    },
+    "pattern": {
+      "$ref": "#/$defs/tripPattern"
+    },
+    "packageToExchange": {
+      "$ref": "#/$defs/packageReference"
+    },
+    "travellers": {
+      "maxItems": 10,
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/individualTraveller"
+      }
+    },
+    "profiles": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/userProfile"
+      }
+    },
+    "travellingAssets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/travellingAsset"
+      }
+    },
+    "entur": {
+      "$ref": "#/$defs/enturSearchOfferInput"
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "travellers"
+      ]
+    },
+    {
+      "required": [
+        "profiles"
+      ]
+    }
+  ],
+  "$defs": {
+    "accommodation": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(accommodation)$",
+          "type": "string"
+        },
+        "description": {
+          "$ref": "#/$defs/longString"
+        },
+        "classOfUse": {
+          "$ref": "#/$defs/classOfUse"
+        },
+        "name": {
+          "$ref": "#/$defs/shortString"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "M",
+            "F",
+            "X",
+            "U"
+          ]
+        },
+        "berthType": {
+          "$ref": "#/$defs/berthType"
+        },
+        "nuisanceFacility": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/shortString"
+          }
+        }
+      },
+      "description": "A combination of accommodation characteristics available on a service, e.g. \"First Class Couchette with shower and 2 bunks\".",
+      "x-tm": "ACCOMODATION"
+    },
+    "amountOfMoney": {
+      "required": [
+        "amount"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "description": "This should be in the base unit as defined by the ISO 4217 currency code with the appropriate number of decimal places and omitting the currency symbol. e.g. if the price is in US Dollars the price would be 9.95. This is inclusive VAT",
+          "format": "float"
+        },
+        "taxPercentageUsed": {
+          "$ref": "#/$defs/float"
+        },
+        "currencyCode": {
+          "$ref": "#/$defs/currencyCode"
+        },
+        "vatCountryCode": {
+          "$ref": "#/$defs/country"
+        }
+      },
+      "description": "an amount of money, usable in fares, fare calculations or in extra costs.",
+      "x-tm": [
+        {
+          "concept": "FARE PRICE"
+        }
+      ]
+    },
+    "assetReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "berthType": {
+      "type": "string",
+      "enum": [
+        "SLEEPER",
+        "COUCHETTE",
+        "SEAT",
+        "OTHER"
+      ]
+    },
+    "cancellationParameter": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(cancel)$",
+          "type": "string"
+        },
+        "cancellationAllowed": {
+          "type": "boolean",
+          "description": "is it possible to cancel this package?"
+        },
+        "cancellationFee": {
+          "$ref": "#/$defs/amountOfMoney"
+        },
+        "cancellationFeePercentage": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number",
+          "description": "percentage of the offered price you have to pay when you cancel this purchased package"
+        }
+      },
+      "description": "conditions regarding cancellation of a purchased package",
+      "x-tm": [
+        {
+          "concept": "CANCELLING"
+        },
+        {
+          "cancellationFee": "lacking"
+        },
+        {
+          "cancellationAllowed": "cancellationAllowed"
+        },
+        {
+          "cancellationFeePercentage": "lacking"
+        }
+      ]
+    },
+    "card": {
+      "required": [
+        "cardNumber",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(card)$",
+          "type": "string"
+        },
+        "cardType": {
+          "$ref": "#/$defs/cardType"
+        },
+        "cardNumber": {
+          "$ref": "#/$defs/shortString"
+        },
+        "description": {
+          "$ref": "#/$defs/shortString"
+        },
+        "additionalNumber": {
+          "$ref": "#/$defs/shortString"
+        },
+        "endValidity": {
+          "$ref": "#/$defs/date"
+        },
+        "country": {
+          "$ref": "#/$defs/country"
+        }
+      },
+      "description": "Any kind of card that isn't a license, only provide the cards that are required",
+      "x-tm": "CUSTOMER PAYMENT MEANS, MEDIUM APPLICATION INSTANCE"
+    },
+    "cardType": {
+      "required": [
+        "id",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/shortString"
+        },
+        "type": {
+          "pattern": "^(card_type)$",
+          "type": "string"
+        },
+        "cardCategory": {
+          "type": "string",
+          "description": "The category of card<br> DISCOUNT - discount card, can be applied in the purchase process to get rebate<br> TRAVEL - (external) travel card, possibly paid for in other context, but also monthly, weekly or day-cards<br> BANK - bank card<br> CREDIT - credit card<br> ID - identification card, like an ID card<br> PASSPORT - passport to identify yourself<br> OTHER - unspecified, use 'subCategory' to specify the category of card",
+          "enum": [
+            "DISCOUNT",
+            "TRAVEL",
+            "BANK",
+            "CREDIT",
+            "ID",
+            "PASSPORT",
+            "OTHER"
+          ]
+        },
+        "subCategory": {
+          "$ref": "#/$defs/shortString"
+        },
+        "relatedProduct": {
+          "$ref": "#/$defs/productReference"
+        },
+        "transportOrganisations": {
+          "maxItems": 15,
+          "type": "array",
+          "description": "references to accepting parties, only if applicable",
+          "items": {
+            "$ref": "#/$defs/organisationReference"
+          }
+        },
+        "customFields": {
+          "$ref": "#/$defs/customProperties"
+        }
+      },
+      "description": "A generic description of a CARD",
+      "x-tm": "TYPE OF PAYMENT METHOD, MEDIUM ACCESS DEVICE"
+    },
+    "classOfUse": {
+      "type": "string",
+      "description": "A classification of fare and other service classes by category of user entitled to use them. Use ECONOMY_CLASS for standard class products.",
+      "enum": [
+        "FIRST_CLASS",
+        "SECOND_CLASS",
+        "THIRD_CLASS",
+        "ECONOMY_CLASS",
+        "BUSINESS_CLASS",
+        "TURISTA",
+        "PREFERENTE",
+        "PREMIUM_CLASS",
+        "ANY",
+        "UNKNOWN"
+      ],
+      "x-tm": "CLASS OF USE"
+    },
+    "commercialProfile": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/shortString"
+        },
+        "type": {
+          "pattern": "^(commercial_profile)$",
+          "type": "string"
+        },
+        "code": {
+          "$ref": "#/$defs/shortString"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      },
+      "x-tm": "COMMERCIAL PROFILE"
+    },
+    "country": {
+      "maxLength": 2,
+      "minLength": 2,
+      "pattern": "[A-Z]{2}",
+      "type": "string",
+      "description": "two-letter country codes according to ISO 3166-1"
+    },
+    "currencyCode": {
+      "maxLength": 3,
+      "minLength": 3,
+      "pattern": "[a-zA-Z]{3}",
+      "type": "string",
+      "description": "ISO 4217 currency code"
+    },
+    "customProperties": {
+      "maxProperties": 20,
+      "type": "object",
+      "additionalProperties": true,
+      "description": "dictionary for extra fields (bilatural agreements)"
+    },
+    "customerReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "date": {
+      "type": "string",
+      "description": "https://www.rfc-editor.org/rfc/rfc3339#section-5.6, full-date (2019-10-12)",
+      "format": "full-date",
+      "x-pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "dateTime": {
+      "type": "string",
+      "description": "https://www.rfc-editor.org/rfc/rfc3339#section-5.6, date-time (2019-10-12T07:20:50.52Z)",
+      "format": "date-time",
+      "x-pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "day": {
+      "type": "string",
+      "enum": [
+        "MON",
+        "TUE",
+        "WED",
+        "THU",
+        "FRI",
+        "SAT",
+        "SUN"
+      ],
+      "x-tm": "DAY OF WEEK"
+    },
+    "distributionParameter": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(distribution)$",
+          "type": "string"
+        },
+        "fulfilmentMethod": {
+          "$ref": "#/$defs/normalString"
+        },
+        "distributionChannel": {
+          "$ref": "#/$defs/normalString"
+        }
+      },
+      "x-tm": "DISTRIBUTION VALIDITY PARAMETERS"
+    },
+    "entitlementGiven": {
+      "required": [
+        "entitlementType",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/shortString"
+        },
+        "type": {
+          "pattern": "^(entitlement)$",
+          "type": "string"
+        },
+        "entitlementType": {
+          "$ref": "#/$defs/normalString"
+        }
+      },
+      "x-tm": "ENTITLEMENT GIVEN"
+    },
+    "enturRecommendationControl": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable recommendation-driven bundling based on Offers `recommendations` and `offersToBuy`.",
+          "default": false
+        },
+        "types": {
+          "minItems": 1,
+          "type": "array",
+          "description": "Entur recommendation categories to request when `enabled` is true.\nIf omitted, the API defaults to `[\"CHEAPEST\", \"NON_FLEXIBLE\", \"SEMI_FLEXIBLE\", \"FLEXIBLE\"]`.\n",
+          "items": {
+            "$ref": "#/$defs/enturRecommendationType"
+          }
+        },
+        "stripDuplicates": {
+          "type": "boolean",
+          "description": "Deduplicate recommendation-driven plans by provider offer + traveller groups + ancillary selections + quantity.\n",
+          "default": false
+        }
+      },
+      "description": "Entur recommendation behavior control for Offers.\nIf omitted, the API defaults to raw mode (recommendation-driven bundling disabled).\n"
+    },
+    "enturRecommendationType": {
+      "type": "string",
+      "description": "Entur Offers recommendation category.",
+      "enum": [
+        "FLEXIBLE",
+        "SEMI_FLEXIBLE",
+        "NON_FLEXIBLE",
+        "CHEAPEST"
+      ]
+    },
+    "enturSearchOfferInput": {
+      "type": "object",
+      "properties": {
+        "recommendationControl": {
+          "$ref": "#/$defs/enturRecommendationControl"
+        }
+      },
+      "description": "Entur-specific OMSA extensions for search-offers input."
+    },
+    "equipmentParameter": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(equipment)$",
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/$defs/equipmentReference"
+        },
+        "name": {
+          "$ref": "#/$defs/shortString"
+        },
+        "description": {
+          "$ref": "#/$defs/longString"
+        },
+        "infoLink": {
+          "$ref": "#/$defs/url"
+        },
+        "image": {
+          "$ref": "#/$defs/url"
+        }
+      },
+      "x-tm": "EQUIPMENT VALIDITY PARAMETERS"
+    },
+    "equipmentReference": {
+      "required": [
+        "equipmentId"
+      ],
+      "type": "object",
+      "properties": {
+        "equipmentId": {
+          "$ref": "#/$defs/normalString"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      }
+    },
+    "externalReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "float": {
+      "minimum": 0,
+      "type": "number",
+      "description": "the travelled distance. Only if applicable.",
+      "format": "float"
+    },
+    "individualTraveller": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/travelParty"
+        },
+        {
+          "required": [
+            "id",
+            "type"
+          ],
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/travellerReference"
+            },
+            "type": {
+              "pattern": "^(individual_traveller)$",
+              "type": "string"
+            },
+            "isValidated": {
+              "type": "boolean",
+              "description": "Whether this traveler's identity and properties have been verified by the MaaS provider"
+            },
+            "age": {
+              "$ref": "#/$defs/shortInt"
+            },
+            "gender": {
+              "type": "string",
+              "enum": [
+                "M",
+                "F",
+                "X",
+                "U"
+              ]
+            },
+            "fullName": {
+              "$ref": "#/$defs/normalString"
+            },
+            "customerReference": {
+              "$ref": "#/$defs/customerReference"
+            },
+            "customFields": {
+              "$ref": "#/$defs/customProperties"
+            }
+          },
+          "description": "A generic description of a traveler, not including any identifying information",
+          "x-tm": "INDIVIDUAL TRAVELLER"
+        }
+      ]
+    },
+    "license": {
+      "required": [
+        "number",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(license)$",
+          "type": "string"
+        },
+        "licenseType": {
+          "$ref": "#/$defs/licenseType"
+        },
+        "licenseNumber": {
+          "$ref": "#/$defs/shortString"
+        },
+        "endValidity": {
+          "$ref": "#/$defs/date"
+        }
+      },
+      "description": "driver or usage license for a specific user. Contains the number and the assetType you're allowed to operate (e.g. driver license for CAR)",
+      "x-tm": "ACCEPTED DRIVER PERMIT"
+    },
+    "licenseType": {
+      "required": [
+        "mode",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(license_type)$",
+          "type": "string"
+        },
+        "modes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mode"
+          }
+        },
+        "licenseCode": {
+          "$ref": "#/$defs/shortString"
+        },
+        "issuingCountry": {
+          "$ref": "#/$defs/country"
+        },
+        "customFields": {
+          "$ref": "#/$defs/customProperties"
+        }
+      },
+      "description": "A category of license to use a certain asset class",
+      "x-tm": "TYPE OF DRIVER PERMIT"
+    },
+    "lineReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "longInt": {
+      "minimum": 0,
+      "type": "integer",
+      "description": "long number, for distances etc. (>1.000)",
+      "default": 0
+    },
+    "longString": {
+      "maxLength": 10000,
+      "type": "string",
+      "description": "long string, memos etc (length 0-10.000)"
+    },
+    "mode": {
+      "type": "string",
+      "description": "These classes are taken from the NeTeX standard, but ALL and UNKNOWN are removed. On the other hand OTHER and PARKING are added.",
+      "enum": [
+        "AIR",
+        "BUS",
+        "TROLLEYBUS",
+        "TRAM",
+        "COACH",
+        "RAIL",
+        "INTERCITYRAIL",
+        "URBANRAIL",
+        "METRO",
+        "WATER",
+        "CABLEWAY",
+        "FUNICULAR",
+        "TAXI",
+        "SELFDRIVE",
+        "FOOT",
+        "BICYCLE",
+        "MOTORCYCLE",
+        "CAR",
+        "SHUTTLE",
+        "OTHER",
+        "PARKING",
+        "MOPED",
+        "STEP",
+        "FERRY"
+      ],
+      "x-tm": [
+        {
+          "concept": "MODE"
+        }
+      ]
+    },
+    "networkParameter": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(network)$",
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/$defs/placeReference"
+        },
+        "line": {
+          "$ref": "#/$defs/lineReference"
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/zoneReference"
+          }
+        }
+      },
+      "x-tm": "NETWORK VALIDITY PARAMETERS"
+    },
+    "normalInt": {
+      "maximum": 1000,
+      "minimum": 0,
+      "type": "integer",
+      "description": "default length for an integer (0-1000)",
+      "default": 0
+    },
+    "normalString": {
+      "maxLength": 200,
+      "type": "string",
+      "description": "default string, full names etc (length 0-200)"
+    },
+    "onboardStay": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(onboard_stay)$",
+          "type": "string"
+        },
+        "description": {
+          "$ref": "#/$defs/longString"
+        },
+        "classOfUse": {
+          "$ref": "#/$defs/classOfUse"
+        },
+        "permission": {
+          "type": "boolean"
+        },
+        "duration": {
+          "$ref": "#/$defs/shortString"
+        }
+      },
+      "description": "Permission to board early before the journey or stay on board after the journey.",
+      "x-tm": "ONBOARD STAY"
+    },
+    "organisationReference": {
+      "required": [
+        "organisationId"
+      ],
+      "type": "object",
+      "properties": {
+        "organisationId": {
+          "$ref": "#/$defs/normalString"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      }
+    },
+    "organisationalFilter": {
+      "required": [
+        "organisationId",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(organisational)$",
+          "type": "string"
+        },
+        "organisationId": {
+          "$ref": "#/$defs/normalString"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Organisation or operator that every returned offer must reference."
+    },
+    "organisationalParameter": {
+      "required": [
+        "id",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/shortString"
+        },
+        "type": {
+          "pattern": "^(organisational)$",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        },
+        "legalName": {
+          "$ref": "#/$defs/normalString"
+        }
+      },
+      "x-tm": "ORGANISATIONAL VALIDITY PARAMETERS"
+    },
+    "packageReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "placeDefinitions": {
+      "type": "object",
+      "properties": {
+        "placeDefinitions": {
+          "maxItems": 3,
+          "minItems": 0,
+          "type": "array",
+          "description": "Places that are not specified in an external data source (like a home address)",
+          "items": {
+            "$ref": "#/$defs/postalAddress"
+          }
+        }
+      }
+    },
+    "placeReference": {
+      "required": [
+        "placeId"
+      ],
+      "type": "object",
+      "properties": {
+        "placeId": {
+          "maxLength": 200,
+          "pattern": "^(GPS:|NSR:StopPlace:|P:)",
+          "type": "string",
+          "description": "this string references to information that can be found in the `data sources`. Enlist all prefixes (=rel) from the /collections/datasources/items that apply to a place/location. Default it matches already with 'GPS' (no entry required in the datasources). In case of a custom place (like home address), you can use the 'P:' prefix and add the address to the **placeDefinitions** list of the request.",
+          "x-example-format": "^(GPS:|GBFS:stations:)"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      }
+    },
+    "postalAddress": {
+      "required": [
+        "addressLine1",
+        "addressLine2"
+      ],
+      "type": "object",
+      "properties": {
+        "placeId": {
+          "$ref": "#/$defs/placeReference"
+        },
+        "addressLine1": {
+          "$ref": "#/$defs/longString"
+        },
+        "addressLine2": {
+          "$ref": "#/$defs/longString"
+        },
+        "street": {
+          "$ref": "#/$defs/normalString"
+        },
+        "houseNumber": {
+          "$ref": "#/$defs/normalInt"
+        },
+        "houseNumberAddition": {
+          "$ref": "#/$defs/tinyString"
+        },
+        "postalCode": {
+          "$ref": "#/$defs/shortString"
+        },
+        "city": {
+          "$ref": "#/$defs/shortString"
+        },
+        "province": {
+          "$ref": "#/$defs/shortString"
+        },
+        "state": {
+          "$ref": "#/$defs/shortString"
+        },
+        "country": {
+          "$ref": "#/$defs/country"
+        },
+        "additionalInfo": {
+          "$ref": "#/$defs/longString"
+        }
+      },
+      "additionalProperties": false,
+      "description": "address parts, where addressLine1 and 2 should contain the complete address, matches Content-Language",
+      "x-tm": "POSTAL ADDRESS"
+    },
+    "productReference": {
+      "required": [
+        "name",
+        "productId"
+      ],
+      "type": "object",
+      "properties": {
+        "productId": {
+          "$ref": "#/$defs/normalString"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      }
+    },
+    "purchaseParameter": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(purchase)$",
+          "type": "string"
+        },
+        "maximumPeriodBeforeDeparture": {
+          "$ref": "#/$defs/longInt"
+        },
+        "requiredLicenseTypes": {
+          "maxItems": 5,
+          "type": "array",
+          "description": "ONE of these licenses is required to operate the asset",
+          "items": {
+            "$ref": "#/$defs/licenseType"
+          }
+        }
+      },
+      "description": "specify required information to complete a purchase",
+      "x-tm": [
+        {
+          "concept": "PURCHASE WINDOW"
+        },
+        {
+          "maximumPeriodBeforeDeparture": "MaximumPeriodBeforeDeparture"
+        },
+        {
+          "requiredLicenseTypes": "ENTITLEMENT REQUIRED"
+        }
+      ]
+    },
+    "routingParameter": {
+      "required": [
+        "journeyPattern",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(routing)$",
+          "type": "string"
+        },
+        "journeyPattern": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/externalReference"
+          }
+        }
+      },
+      "x-tm": "ROUTING VALIDITY PARAMETERS"
+    },
+    "searchOfferFilter": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/serviceFilter"
+        },
+        {
+          "$ref": "#/$defs/organisationalFilter"
+        }
+      ]
+    },
+    "serviceFilter": {
+      "minProperties": 2,
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(service)$",
+          "type": "string"
+        },
+        "productId": {
+          "$ref": "#/$defs/normalString"
+        },
+        "serviceJourney": {
+          "$ref": "#/$defs/serviceJourneyReference"
+        },
+        "class": {
+          "$ref": "#/$defs/classOfUse"
+        },
+        "berthTypes": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/berthType"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Service characteristics that every returned offer must satisfy."
+    },
+    "serviceJourneyReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "serviceParameter": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(service)$",
+          "type": "string"
+        },
+        "product": {
+          "$ref": "#/$defs/productReference"
+        },
+        "asset": {
+          "$ref": "#/$defs/assetReference"
+        },
+        "serviceJourney": {
+          "$ref": "#/$defs/serviceJourneyReference"
+        },
+        "userNeeds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/userNeedReference"
+          }
+        },
+        "class": {
+          "$ref": "#/$defs/classOfUse"
+        },
+        "onboardStay": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/onboardStay"
+          }
+        },
+        "accommodations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/accommodation"
+          }
+        }
+      },
+      "x-tm": "SERVICE VALIDITY PARAMETERS"
+    },
+    "shortInt": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "integer",
+      "description": "a bit short integer (0-100)",
+      "default": 0
+    },
+    "shortString": {
+      "maxLength": 75,
+      "type": "string",
+      "description": "short string, display names (length 0-75)"
+    },
+    "spotReservationParameter": {
+      "required": [
+        "spot",
+        "spotType",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(spot_reservation)$",
+          "type": "string"
+        },
+        "spotType": {
+          "type": "string",
+          "enum": [
+            "VEHICLE_SPOT",
+            "PASSENGER_SPOT",
+            "LUGGAGE_SPOT"
+          ]
+        },
+        "deck": {
+          "$ref": "#/$defs/externalReference"
+        },
+        "space": {
+          "$ref": "#/$defs/externalReference"
+        },
+        "spot": {
+          "description": "For LUGGAGE_SPOT and VEHICLE_SPOT, supported values are: HANDBAG, HAND_LUGGAGE, SMALL_SUITCASE, SUITCASE, TRUNK, OVERSIZE_ITEM, BICYCLE, SPORTING_EQUIPMENT, SKIS, MUSICAL_INSTRUMENT, PUSH_CHAIR, MOTORIZED_WHEELCHAIR, LARGE_MOTORIZED_WHEELCHAIR, WHEELCHAIR, SMALL_ANIMAL, ANIMAL, GAME, MOTORCYCLE, OTHER, GUIDE_DOG. Unknown values are ignored. Use VEHICLE_SPOT for vehicles transported as cargo (e.g. motorcycle on a ferry). For PASSENGER_SPOT, the value is an operator-specific seat identifier and is not used for requirement mapping.\n",
+          "allOf": [
+            {
+              "$ref": "#/$defs/externalReference"
+            }
+          ]
+        },
+        "width": {
+          "type": "number"
+        },
+        "length": {
+          "type": "number"
+        },
+        "height": {
+          "type": "number"
+        },
+        "fuel": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/mode"
+        }
+      },
+      "x-tm": "SEATING VALIDITY PARAMETERS"
+    },
+    "temporalParameter": {
+      "required": [
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(temporal)$",
+          "type": "string"
+        },
+        "startTime": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "endTime": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "duration": {
+          "$ref": "#/$defs/normalInt"
+        },
+        "dayType": {
+          "$ref": "#/$defs/day"
+        }
+      },
+      "x-tm": "TEMPORAL VALIDITY PARAMETERS"
+    },
+    "tinyString": {
+      "maxLength": 10,
+      "type": "string",
+      "description": "real short string, codes (length 0-10)"
+    },
+    "travelParty": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "entitlements": {
+          "type": "object",
+          "properties": {
+            "commercialProfiles": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/commercialProfile"
+              }
+            },
+            "entitlementsGiven": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/entitlementGiven"
+              }
+            },
+            "cardTypes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/cardType"
+              }
+            },
+            "cards": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/card"
+              }
+            },
+            "licenseTypes": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/licenseType"
+              }
+            },
+            "licenses": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/license"
+              }
+            }
+          }
+        },
+        "requirements": {
+          "$ref": "#/$defs/travelPartyRequirements"
+        }
+      },
+      "x-tm": "ACCESS RIGHT PARAMETER ASSIGNMENT"
+    },
+    "travelPartyRequirements": {
+      "type": "object",
+      "properties": {
+        "organisational": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/organisationalParameter"
+          }
+        },
+        "spotReservations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/spotReservationParameter"
+          }
+        },
+        "distribution": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/distributionParameter"
+          }
+        },
+        "network": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/networkParameter"
+          }
+        },
+        "routing": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/routingParameter"
+          }
+        },
+        "service": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/serviceParameter"
+          }
+        },
+        "temporal": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/temporalParameter"
+          }
+        },
+        "equipment": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/equipmentParameter"
+          }
+        },
+        "cancellation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/cancellationParameter"
+          }
+        },
+        "purchase": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/purchaseParameter"
+          }
+        }
+      }
+    },
+    "travelSpecification": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/placeReference"
+        },
+        "via": {
+          "maxItems": 3,
+          "minItems": 0,
+          "type": "array",
+          "description": "use an ID contained in the **placeDefinitions** field, or from an external source, when using coordinates, please use the prefix 'gps:'",
+          "items": {
+            "$ref": "#/$defs/placeReference"
+          }
+        },
+        "to": {
+          "$ref": "#/$defs/placeReference"
+        },
+        "startTime": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "endTime": {
+          "$ref": "#/$defs/dateTime"
+        }
+      },
+      "x-tm": "TRAVEL SPECIFICATION"
+    },
+    "travellerReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "travellingAsset": {
+      "required": [
+        "id",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "pattern": "^(asset)$",
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/$defs/assetReference"
+        }
+      }
+    },
+    "tripPattern": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "serviceJourney": {
+            "$ref": "#/$defs/serviceJourneyReference"
+          },
+          "date": {
+            "$ref": "#/$defs/date"
+          },
+          "from": {
+            "$ref": "#/$defs/placeReference"
+          },
+          "to": {
+            "$ref": "#/$defs/placeReference"
+          }
+        }
+      }
+    },
+    "url": {
+      "type": "string",
+      "description": "valid URL",
+      "format": "uri"
+    },
+    "userNeedReference": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/normalString"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      }
+    },
+    "userProfile": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/travelParty"
+        },
+        {
+          "required": [
+            "id",
+            "type"
+          ],
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/userProfileReference"
+            },
+            "type": {
+              "pattern": "^(user_profile)$",
+              "type": "string"
+            },
+            "count": {
+              "$ref": "#/$defs/shortInt"
+            },
+            "minimumAge": {
+              "$ref": "#/$defs/shortInt"
+            },
+            "maximumAge": {
+              "$ref": "#/$defs/shortInt"
+            },
+            "monthDayOnWhichAgeApplies": {
+              "$ref": "#/$defs/shortInt"
+            },
+            "ageGroup": {
+              "type": "string",
+              "enum": [
+                "ANYONE",
+                "INFANT",
+                "CHILD",
+                "YOUTH",
+                "ADULT",
+                "SENIOR"
+              ]
+            },
+            "minimumHeight": {
+              "$ref": "#/$defs/shortInt"
+            },
+            "maximumHeight": {
+              "$ref": "#/$defs/shortInt"
+            },
+            "localResident": {
+              "type": "boolean"
+            },
+            "genderLimitation": {
+              "type": "boolean"
+            }
+          },
+          "x-tm": "USER PROFILE"
+        }
+      ]
+    },
+    "userProfileReference": {
+      "$ref": "#/$defs/normalString"
+    },
+    "zoneReference": {
+      "required": [
+        "zoneId"
+      ],
+      "type": "object",
+      "properties": {
+        "zoneId": {
+          "$ref": "#/$defs/normalString"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      }
+    }
+  }
+}

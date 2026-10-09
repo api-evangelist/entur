@@ -1,0 +1,839 @@
+openapi: 3.2.0
+info:
+  title: Entur Reports API
+  version: 2026.08.0
+  contact:
+    name: Entur Team Personalisering
+    email: team.personalisering@entur.org
+  termsOfService: http://entur.org
+  description: 'Operations tagged Reports across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io
+security:
+- jwt: []
+tags:
+- name: Reports
+  description: Api for getting tax and FIP reports
+paths:
+  /personnelticket/v2/reports/tax-savings:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Reports
+      summary: Get a tax savings report for a given month and year for requested company
+      description: Get a tax savings report for a given month and year for requested company.Parameters fromDate and toDate are deprecated, use month and year
+      operationId: getTaxSavingsReportAsCsvFile
+      parameters:
+      - name: companyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          exclusiveMinimum: 0
+          type: integer
+          format: int64
+      - name: fromDate
+        in: query
+        description: Deprecated. Use year and month
+        required: false
+        deprecated: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: toDate
+        in: query
+        description: Deprecated. Use year and month
+        required: false
+        deprecated: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: year
+        in: query
+        description: Year from 2021. Default current year
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 2099
+          minimum: 2021
+          type: integer
+          format: int32
+      - name: month
+        in: query
+        description: Month, from 1 to 12. Default current month
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 12
+          minimum: 1
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - Personalbillett-Rapporter-Selskap.companyId:les
+          - Personalbillett-Rapporter.companyId:les
+    post:
+      tags:
+      - Reports
+      description: Start the progress or get status for generating a tax savings report for a given month and year for requested company.
+      operationId: createTaxSavingsReport
+      parameters:
+      - name: companyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          exclusiveMinimum: 0
+          type: integer
+          format: int64
+      - name: year
+        in: query
+        description: Year from 2021. Default current year
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 2099
+          minimum: 2021
+          type: integer
+          format: int32
+      - name: month
+        in: query
+        description: Month, from 1 to 12. Default current month
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 12
+          minimum: 1
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TaxSavingReportGenerationResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - Personalbillett-Rapporter-Selskap.companyId:les
+          - Personalbillett-Rapporter.companyId:opprett
+      summary: Create tax savings report
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/reports/tax-savings-reconciliation:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Reports
+      summary: Get total saving value for tax savings report for specified month
+      operationId: getTaxSavingsReportReconciliation
+      parameters:
+      - name: companyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          exclusiveMinimum: 0
+          type: integer
+          format: int64
+      - name: year
+        in: query
+        description: Year from 2021
+        required: true
+        style: form
+        explode: true
+        schema:
+          maximum: 2099
+          minimum: 2021
+          type: integer
+          format: int32
+      - name: month
+        in: query
+        description: Month, from 1 to 12
+        required: true
+        style: form
+        explode: true
+        schema:
+          maximum: 12
+          minimum: 1
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - Personalbillett-Rapporter-Selskap.companyId:les
+          - Personalbillett-Rapporter.companyId:les
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/reports/stop-place-ticket-rights:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Reports
+      summary: Get a CSV report of stop place ticket rights for a year
+      operationId: getStopPlaceRightsReportForYear
+      parameters:
+      - name: year
+        in: query
+        description: Year from 2021.
+        required: true
+        style: form
+        explode: true
+        schema:
+          maximum: 2099
+          minimum: 2021
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/csv;charset=windows-1252:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rapporter:les
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/reports/fip/coupons:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Reports
+      summary: Get a CSV report containing all FIP coupons and travel discount certificates…
+      operationId: getFipCouponReportAsCSV
+      parameters:
+      - name: companyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          exclusiveMinimum: 0
+          type: integer
+          format: int64
+      - name: year
+        in: query
+        description: Year from 2021.
+        required: true
+        style: form
+        explode: true
+        schema:
+          maximum: 2099
+          minimum: 2021
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - Personalbillett-Rapporter-Selskap.companyId:les
+          - Personalbillett-Rapporter.companyId:les
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/reports/fip-monthly:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Reports
+      summary: Get a report from FIP as a CSV-file, between fromDate and toDate by setting…
+      operationId: getFipMonthlyReportAsCsvFile
+      parameters:
+      - name: fromDate
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: toDate
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: useCreatedAt
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: companyId
+        in: query
+        description: Filter report by company. If null all companies are reported
+        required: false
+        style: form
+        explode: true
+        schema:
+          exclusiveMinimum: 0
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FipMonthlyTicketReport'
+            text/csv;charset=windows-1252:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rapporter:les
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/reports/apprentice-ticket-rights:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Reports
+      summary: Get a CSV report of apprentice ticket rights for a year
+      operationId: getApprenticeRightsReportForYear
+      parameters:
+      - name: year
+        in: query
+        description: Year from 2021.
+        required: true
+        style: form
+        explode: true
+        schema:
+          maximum: 2099
+          minimum: 2021
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/csv;charset=windows-1252:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rapporter:les
+    servers:
+    - url: https://api.entur.io
+  /personnelticket/v2/reports/active-ticket-rights-holders:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Reports
+      summary: Get list of active ticket right holders for a company as a CSV
+      operationId: getActiveTicketRightHoldersAsCsv
+      parameters:
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: companyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: ticketRightType
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - SILVER
+          - BRONZE
+      - name: ticketRightHolderType
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - EMPLOYEE
+          - PENSIONER
+      - name: includeFamily
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageActiveTicketRightsHolderResponse'
+            text/csv;charset=windows-1252:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - Personalbillett-Rapporter-Selskap.companyId:les
+          - Personalbillett-Rapporter.companyId:les
+    servers:
+    - url: https://api.entur.io
+components:
+  schemas:
+    FipTicketTypeSimple:
+      required:
+      - code
+      - description
+      - id
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The FIP ticket type id
+          format: int64
+        code:
+          type: string
+          description: The FIP ticket type code
+        description:
+          type: string
+          description: Description of the ticket type
+      description: FIP ticket type
+    TaxSavingReportGenerationResponse:
+      required:
+      - progress
+      - started
+      type: object
+      properties:
+        progress:
+          type: integer
+          description: How far the generation has progressed in percent from 0 to 100
+          format: int32
+          readOnly: true
+        started:
+          type: string
+          description: When the report generation started
+          format: date-time
+          readOnly: true
+        finished:
+          type: string
+          description: When the report generation finished
+          format: date-time
+          readOnly: true
+        error:
+          type: string
+          description: Error if the report generation fails
+          readOnly: true
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    PageActiveTicketRightsHolderResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          items:
+            $ref: '#/components/schemas/ActiveTicketRightsHolderResponse'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int64
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int64
+          examples:
+          - 1
+      description: Paged content
+    ActiveTicketRightsHolderResponse:
+      required:
+      - companyId
+      - employeeId
+      - firstName
+      - grantedAt
+      - isEmployee
+      - surname
+      - ticketRightType
+      - type
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: The first name of the ticket holder
+          examples:
+          - Ola
+        surname:
+          type: string
+          description: The surname of the ticket holder
+          examples:
+          - Hansen
+        employeeId:
+          type: string
+          description: The employee number
+          examples:
+          - '123456'
+        companyId:
+          type: integer
+          description: The id of the company
+          format: int64
+          examples:
+          - 1
+        isEmployee:
+          type: boolean
+          description: If the ticket holder is an employee or a family member
+          examples:
+          - true
+        hireEndDate:
+          type: string
+          description: The hire end date for pensioners
+          format: date
+          examples:
+          - '2022-12-31'
+        addressLine:
+          type: string
+          description: Postal address line
+          examples:
+          - Karl Johans gate 1
+        postalCode:
+          type: string
+          description: Postal code
+          examples:
+          - '1234'
+        city:
+          type: string
+          description: City in postal address
+          examples:
+          - Oslo
+        ticketRightType:
+          type: string
+          description: Type of the ticket right, possible values are 'bronse' and 'sølv'
+          examples:
+          - sølv
+        grantedAt:
+          type: string
+          description: When the ticket right was granted
+          format: date-time
+        type:
+          type: string
+          description: Type of the ticket holder, possible values are 'Ansatt', 'Pensjonist' and 'Familie'
+          examples:
+          - Ansatt
+      description: All items for this page
+    FipMonthlyTicketReport:
+      required:
+      - employeeNo
+      type: object
+      properties:
+        fipTicketTypeSimple:
+          $ref: '#/components/schemas/FipTicketTypeSimple'
+        issueDate:
+          type: string
+          description: Issued date
+          format: date
+          examples:
+          - '2023-01-01'
+        ticketNo:
+          type: integer
+          description: Ticket number
+          format: int64
+        validFrom:
+          type: string
+          description: The date the ticket is valid from
+          format: date
+          examples:
+          - '2023-01-01'
+        validUntil:
+          type: string
+          description: The date the ticket is valid to
+          format: date
+          examples:
+          - '2023-01-01'
+        travelType:
+          $ref: '#/components/schemas/TravelType'
+        company:
+          type: integer
+          description: Company id
+          format: int64
+        employeeNo:
+          type: string
+          description: Employee number
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
+    TravelType:
+      required:
+      - code
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: The travel type id
+        code:
+          type: string
+          description: The travel type code
+        description:
+          type: string
+          description: The travel type description
+      description: Travel type
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-personnel-tickets-openapi.json
+- entur-personnel-tickets-openapi.yml

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-partner-dataset-download-job-dto-schema.json",
+  "title": "PartnerDatasetDownloadJobDto",
+  "description": "DTO for an asynchronous dataset download job. The formatted report itself can be downloaded by the client using the provided signed bucket URL. A formatted report is considered transient, and is identified by the download job that formats it. Note that a signed bucket URL will expire after a fixed period of time, typically 24 hours.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-clearing-reports-openapi.yml#/components/schemas/PartnerDatasetDownloadJobDto",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID of this download job. The job will automatically expire after a fixed period of time after completion."
+    },
+    "status": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Current status of the job: 0=Ordered, 1=COMPLETED, 2=Failed, 3=Expired, 5=Processing."
+    },
+    "description": {
+      "type": "string",
+      "description": "Best effort explanation for the status."
+    },
+    "reportName": {
+      "type": "string",
+      "description": "Suggested report filename for the formatted dataset."
+    },
+    "contentType": {
+      "type": "string",
+      "description": "MIME Type of the formatted dataset."
+    },
+    "datasetIDs": {
+      "type": "array",
+      "description": "List of Dataset IDs that will be included in the download job. The API will always return a single ID since it does not support merging datasets.",
+      "items": {
+        "type": "integer",
+        "format": "int64"
+      }
+    },
+    "jobCreatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the download job was created."
+    },
+    "rows": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The number of rows in the formatted dataset when COMPLETED."
+    },
+    "signedBucketUrl": {
+      "type": "string",
+      "description": "The signed URL to download the formatted dataset when COMPLETED."
+    },
+    "crc32c": {
+      "type": "string",
+      "description": "Checksum of a formatted dataset when COMPLETED, this can be used by the client to verify the download. Not available for legacy reports."
+    }
+  }
+}

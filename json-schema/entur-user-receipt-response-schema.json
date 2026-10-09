@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-user-receipt-response-schema.json",
+  "title": "UserReceiptResponse",
+  "description": "Response from a accepted receipt request.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-receipt-partner-openapi.yml#/components/schemas/UserReceiptResponse",
+  "required": [
+    "reference"
+  ],
+  "type": "object",
+  "properties": {
+    "reference": {
+      "type": "string",
+      "description": "Reference to receipt"
+    }
+  }
+}

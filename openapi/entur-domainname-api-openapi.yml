@@ -1,0 +1,99 @@
+openapi: 3.2.0
+info:
+  version: 2.2.2
+  title: BoB.participantMetadata. Domain Name API
+  description: The Participant Metadata API provides an interface for participants to manage metadata coordinated by an Administering Body (AB).
+servers:
+- url: /api/v2
+tags:
+- name: domainName
+  description: A single domain name can be associated with each participant. The domain name is submitted to the metadata register in the participant registration process. It is used for dynamic key fetching via DNS (MTS1 section 2.4).
+paths:
+  /participantMetadata/{pid}/domainName:
+    get:
+      tags:
+      - domainName
+      summary: Get participant domain name by participant identifier
+      operationId: getDomainName
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                description: Fully qualified domain name (FQDN)
+                type: string
+                example: sj.se
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+    put:
+      tags:
+      - domainName
+      summary: Update participant domain name
+      operationId: updateDomainName
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '204':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+              example: sj.se
+        description: Fully qualified domain name (FQDN)
+        required: true
+    delete:
+      tags:
+      - domainName
+      summary: Delete participant domain name
+      operationId: deleteDomainName
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '204':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+components:
+  securitySchemes:
+    Pop:
+      description: OAuth 2.0 Proof-of-possession (pop) Token
+      type: apiKey
+      name: Authorization
+      in: header

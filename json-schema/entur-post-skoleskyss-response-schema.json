@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-post-skoleskyss-response-schema.json",
+  "title": "PostSkoleskyssResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-skoleskyss-openapi.yml#/components/schemas/PostSkoleskyssResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "recipient": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "externalRef": {
+          "type": "string"
+        },
+        "customerAccountId": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "customerAccountId",
+        "externalRef"
+      ]
+    },
+    "fareContract": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "externalRef": {
+          "type": "string"
+        },
+        "fareContractId": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/TravelRightOutcome"
+        }
+      },
+      "required": [
+        "externalRef",
+        "fareContractId",
+        "status"
+      ]
+    },
+    "transferDetails": {
+      "$ref": "#/$defs/TransferDetails"
+    }
+  },
+  "required": [
+    "fareContract",
+    "recipient"
+  ],
+  "$defs": {
+    "TransferDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pickupCode": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "pickupCode"
+      ]
+    },
+    "TravelRightOutcome": {
+      "type": "string",
+      "description": "\"created\" = ny skyssrett. \"replaced\" = eksisterende skyssrett ble erstattet fordi noe var endret. \"unchanged\" = skyssretten var allerede lik forespørselen og ble beholdt; kun mottakeropplysninger ble oppdatert.",
+      "enum": [
+        "created",
+        "replaced",
+        "unchanged"
+      ]
+    }
+  }
+}

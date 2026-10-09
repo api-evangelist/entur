@@ -1,0 +1,1201 @@
+openapi: 3.2.0
+info:
+  title: Product Parameters Purchase window API
+  description: '**This API specification is a draft and is not yet implemented. Endpoints, schemas, and
+
+    behavior are subject to change without notice.**
+
+
+    This API provides services to read and maintain the parameters that apply to public transport
+
+    products — for example when a product can be purchased (purchase window).'
+  contact:
+    name: Team Produkt
+    email: teamprodukt@entur.org
+  version: 2026.10.0
+  x-stability-level: draft
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: Purchase window
+  description: 'A purchase window defines when a product can be purchased relative
+
+    to the time of travel — for example up to 90 days before and at least one hour before
+
+    departure, or only until the day before travel. Products reference it through
+
+    `purchaseWindowRef`.'
+paths:
+  /v3/parameters/purchase-windows:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Purchase window
+      summary: List purchase windows with their current versions
+      description: 'Returns a paginated list of purchase windows, ordered by id. Each entry is a light summary
+
+        (`VersionedElementSummary`, shared with other element types) with the purchase window id
+
+        and the versions that are relevant today:
+
+
+        - VERSIONED versions valid today or in the future (no end date, or an end date after today)
+
+        - DRAFT and PROPOSED versions, regardless of date
+
+        - with `includeDeprecated=true`, also the most recent DEPRECATED version (latest start date)
+
+
+        Versions are ordered by status (DRAFT, PROPOSED, VERSIONED, DEPRECATED) and then by start date,
+
+        newest first. Purchase windows without any such version are left out. Paging is per purchase
+
+        window, so the versions of one purchase window are never split across pages.
+
+
+        All versions of a single purchase window are available through
+
+        `GET /v3/parameters/purchase-windows/{id}/versions`, and the full content of a version through
+
+        `GET /v3/parameters/purchase-windows/{id}/{version}`.'
+      operationId: listPurchaseWindows
+      parameters:
+      - $ref: '#/components/parameters/page'
+      - $ref: '#/components/parameters/size'
+      - name: includeDeprecated
+        in: query
+        description: Also include the most recent DEPRECATED version of each purchase window.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+        examples:
+          default:
+            value: false
+      - name: ownerOrganisationId
+        in: query
+        description: Only return purchase windows owned by this internal organisation id.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 1
+      responses:
+        '200':
+          description: Paginated list of purchase window summaries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseWindowListResponse'
+              examples:
+                withDeprecated:
+                  $ref: '#/components/examples/withDeprecated'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - Purchase window
+      summary: Create a new purchase window
+      description: Create a new purchase window. A new version is created together with it.
+      operationId: createPurchaseWindow
+      requestBody:
+        description: Purchase window to be created.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseWindowRequest'
+            examples:
+              advance:
+                $ref: '#/components/examples/advance'
+              untilPreviousDay:
+                $ref: '#/components/examples/untilPreviousDay'
+        required: true
+      responses:
+        '201':
+          description: Purchase window created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseWindowResponse'
+              examples:
+                advance:
+                  $ref: '#/components/examples/advance-2'
+        '400':
+          description: 'The request is invalid — either a schema violation, or a well-formed request that
+
+            cannot be processed, such as an invalid ISO 8601 duration or a
+
+            `maximumPeriodBeforeDeparture` shorter than `minimumPeriodBeforeDeparture`.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'startDate' is required.
+                minAfterMax:
+                  summary: Minimum period exceeds maximum period
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: maximumPeriodBeforeDeparture (PT1H) must not be shorter than minimumPeriodBeforeDeparture (P1D).
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/parameters/purchase-windows/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Purchase window
+      summary: Get the active version of a purchase window
+      description: 'Retrieve the version of the purchase window that is active on the given date.
+
+        Defaults to the version active today when no date is given.'
+      operationId: getPurchaseWindow
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/validOnDate'
+      responses:
+        '200':
+          description: The purchase window version active on the given date.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseWindowResponse'
+              examples:
+                advance:
+                  $ref: '#/components/examples/advance-2'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Purchase window not found, or no version is active on the given date
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Purchase window not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: PurchaseWindow 'ENT:PurchaseWindow:90days' not found.
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - Purchase window
+      summary: Create a new version of an existing purchase window
+      description: 'Create a new version of an existing purchase window. Products referencing the
+
+        purchase window are not modified: they point at its id, and the effective version
+
+        is resolved by validity period.'
+      operationId: createPurchaseWindowVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: The new purchase window version.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseWindowRequest'
+            examples:
+              advance:
+                $ref: '#/components/examples/advance'
+        required: true
+      responses:
+        '201':
+          description: Purchase window version created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseWindowResponse'
+              examples:
+                advance:
+                  $ref: '#/components/examples/advance-2'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/parameters/purchase-windows/{id}/versions:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Purchase window
+      summary: List versions of a purchase window
+      description: 'Retrieve all versions of a purchase window by its NeTEx ID, including drafts and
+
+        proposals.'
+      operationId: getPurchaseWindowVersions
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: List of purchase window versions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionResponse'
+              examples:
+                versionHistory:
+                  $ref: '#/components/examples/versionHistory'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Purchase window not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Purchase window not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: PurchaseWindow 'ENT:PurchaseWindow:90days' not found.
+      x-entur-permissions:
+        value: product-api-access:les
+  /v3/parameters/purchase-windows/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Purchase window
+      summary: Get a specific purchase window version
+      description: 'Retrieve a specific version of a purchase window, identified by NeTEx version id or
+
+        version number.'
+      operationId: getPurchaseWindowVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/version'
+      responses:
+        '200':
+          description: The purchase window version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseWindowResponse'
+              examples:
+                advance:
+                  $ref: '#/components/examples/advance-2'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Purchase window or version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Purchase window version not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: 'PurchaseWindow version not found: ENT:PurchaseWindow:90days (ENT:Version:8f1b2c3d)'
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - Purchase window
+      summary: Update an existing purchase window version
+      description: Update a purchase window version in place. Only DRAFT versions can be updated.
+      operationId: updatePurchaseWindowVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/version'
+      requestBody:
+        description: The updated purchase window version. The existing data in the version is replaced by this one.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseWindowRequest'
+            examples:
+              advance:
+                $ref: '#/components/examples/advance'
+        required: true
+      responses:
+        '200':
+          description: Purchase window version updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseWindowResponse'
+              examples:
+                advance:
+                  $ref: '#/components/examples/advance-2'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Purchase window or version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Purchase window version not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: 'PurchaseWindow version not found: ENT:PurchaseWindow:90days (ENT:Version:8f1b2c3d)'
+        '409':
+          description: The version is not a DRAFT and cannot be updated
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notDraft:
+                  summary: Version is not a DRAFT
+                  value:
+                    type: https://developer.entur.org/errors/conflict
+                    title: Conflict
+                    status: 409
+                    detail: PurchaseWindow 'ENT:PurchaseWindow:90days' cannot be modified because version 'ENT:Version:8f1b2c3d' has status VERSIONED; only DRAFT versions may be modified. Create a new version to update.
+      x-entur-permissions:
+        value: product-api-access:endre
+    delete:
+      tags:
+      - Purchase window
+      summary: Delete a purchase window version
+      description: Delete a purchase window version. Only DRAFT versions can be deleted.
+      operationId: deletePurchaseWindowVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/version'
+      responses:
+        '204':
+          description: Purchase window version deleted
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Purchase window or version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Purchase window version not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: 'PurchaseWindow version not found: ENT:PurchaseWindow:90days (ENT:Version:8f1b2c3d)'
+        '409':
+          description: The version is not a DRAFT and cannot be deleted
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notDraft:
+                  summary: Version is not a DRAFT
+                  value:
+                    type: https://developer.entur.org/errors/conflict
+                    title: Conflict
+                    status: 409
+                    detail: PurchaseWindow 'ENT:PurchaseWindow:90days' cannot be deleted because version 'ENT:Version:8f1b2c3d' has status VERSIONED; only DRAFT versions may be deleted.
+      x-entur-permissions:
+        value: product-api-access:endre
+components:
+  examples:
+    advance-2:
+      summary: Purchase up to 90 days before, at least 1 hour before departure
+      value:
+        id: ENT:PurchaseWindow:90days
+        versionId: ENT:Version:8f1b2c3d
+        versionNumber: 1
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Inntil 90 dager før avgang
+        startDate: '2026-08-01'
+        status: VERSIONED
+        purchaseWhen: ADVANCE_AND_DAY_OF_TRAVEL
+        minimumPeriodBeforeDeparture: PT1H
+        maximumPeriodBeforeDeparture: P90D
+        purchaseMoments: []
+    withDeprecated:
+      summary: List with includeDeprecated=true
+      value:
+        purchaseWindows:
+        - id: ENT:PurchaseWindow:48H
+          ownerOrganisationId: 1
+          versions:
+          - versionId: ENT:Version:PW-48H-3
+            names:
+            - lang: nb-NO
+              value: Kjøpsvindu 48 timer
+            startDate: '2023-01-01'
+            status: DRAFT
+          - versionId: ENT:Version:PW-48H-2
+            versionNumber: 2
+            names:
+            - lang: nb-NO
+              value: Kjøpsvindu 48 timer
+            startDate: '2024-04-05'
+            status: VERSIONED
+          - versionId: ENT:Version:PW-48H-1
+            versionNumber: 1
+            names:
+            - lang: nb-NO
+              value: Kjøpsvindu 48 timer
+            startDate: '2019-04-01'
+            endDate: '2024-03-14'
+            status: DEPRECATED
+        - id: ENT:PurchaseWindow:c5d7e80d
+          ownerOrganisationId: 1
+          versions:
+          - versionId: ENT:Version:c5d7e80d-1
+            versionNumber: 1
+            names:
+            - lang: nb-NO
+              value: 120 dager
+            startDate: '2024-09-25'
+            status: VERSIONED
+        - id: MAL:PurchaseWindow:80d9a2c3
+          ownerOrganisationId: 2
+          versions:
+          - versionId: MAL:Version:80d9a2c3-1
+            versionNumber: 1
+            names:
+            - lang: nb-NO
+              value: 90 dager før avgang
+            startDate: '2022-01-10'
+            endDate: '2022-02-06'
+            status: DEPRECATED
+        totalCount: 3
+        page: 0
+        size: 100
+    advance:
+      summary: Purchase up to 90 days before, at least 1 hour before departure
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Inntil 90 dager før avgang
+        startDate: '2026-08-01'
+        status: DRAFT
+        purchaseWhen: ADVANCE_AND_DAY_OF_TRAVEL
+        minimumPeriodBeforeDeparture: PT1H
+        maximumPeriodBeforeDeparture: P90D
+    versionHistory:
+      summary: Example version history
+      value:
+      - id: EXA:Version:853a7d14-794e-4af5-b569-301711a26e26
+        status: VERSIONED
+        startDate: '2025-01-01'
+        endDate: '2025-12-31'
+        created: '2024-12-01T10:00:00Z'
+        changed: '2024-12-01T10:00:00Z'
+        published: '2024-12-30T10:00:00Z'
+        number: 1
+      - id: EXA:Version:e7104d26-16a5-4db5-aa42-b32ae0a3f684
+        status: VERSIONED
+        startDate: '2026-01-01'
+        created: '2025-12-01T10:00:00Z'
+        changed: '2025-12-01T10:00:00Z'
+        published: '2025-12-01T13:00:00Z'
+        number: 2
+      - id: EXA:Version:6be856a5-dd98-496b-b3f2-ad9939270ec3
+        status: PROPOSED
+        startDate: '2026-07-01'
+        created: '2026-06-01T10:00:00Z'
+        changed: '2026-06-01T10:00:00Z'
+    untilPreviousDay:
+      summary: Purchase until the day before travel
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Opp til en dag før reisen
+        startDate: '2026-08-01'
+        status: DRAFT
+        purchaseWhen: UNTIL_PREVIOUS_DAY
+        latestTime: '23:59:59'
+  parameters:
+    version:
+      name: version
+      in: path
+      description: The netex ID or sequence number of the version to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^(([A-Z]{3}):Version:([0-9A-Za-z_\-]*)|[1-9][0-9]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:Version:001
+    page:
+      name: page
+      in: query
+      description: Zero-based page number. Defaults to 0.
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        default: 0
+      examples:
+        default:
+          value: 0
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    validOnDate:
+      name: validOnDate
+      in: query
+      description: 'The date that the element should be valid for, e.g. the travel date.
+
+        Defaults to the current date.
+
+        '
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date
+      examples:
+        default:
+          value: '2026-12-01'
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    size:
+      name: size
+      in: query
+      description: Number of instances per page. Defaults to 100.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 1000
+        minimum: 1
+        type: integer
+        default: 100
+      examples:
+        default:
+          value: 100
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+  responses:
+    BadRequestError:
+      description: Bad request - Invalid data or schema violation
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            schemaViolation:
+              summary: Request does not match schema
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: Field 'name' is required.
+            purchaseWindowNotFound:
+              summary: Referenced purchase window not found
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+  schemas:
+    PurchaseWhen:
+      type: string
+      description: 'When a purchase can be made relative to the time of travel.
+
+
+        - **ADVANCE_ONLY** - Only in advance of the day of travel.
+
+        - **UNTIL_PREVIOUS_DAY** - Until the end of the day before travel.
+
+        - **DAY_OF_TRAVEL_ONLY** - Only on the day of travel.
+
+        - **ADVANCE_AND_DAY_OF_TRAVEL** - In advance or on the day of travel.
+
+        - **TIME_OF_TRAVEL_ONLY** - Only at the time of travel.
+
+        - **SUBSCRIPTION_CHARGE_MOMENT** - At the charge moment of a subscription.
+
+        - **OTHER** - Other rule.
+
+        '
+      enum:
+      - ADVANCE_ONLY
+      - UNTIL_PREVIOUS_DAY
+      - DAY_OF_TRAVEL_ONLY
+      - ADVANCE_AND_DAY_OF_TRAVEL
+      - TIME_OF_TRAVEL_ONLY
+      - SUBSCRIPTION_CHARGE_MOMENT
+      - OTHER
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+    VersionedElementSummary:
+      required:
+      - id
+      - ownerOrganisationId
+      - versions
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):([A-Za-z]+):([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx id of the element.
+          examples:
+          - ENT:PurchaseWindow:90days
+        ownerOrganisationId:
+          type: integer
+          description: Internal organisation id owning the element.
+          format: int64
+          examples:
+          - 1
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/VersionSummary'
+      description: 'A versioned element with the versions relevant today, as shown in lists. Shared by the list
+
+        endpoints of all element types. The versions are:
+
+
+        - VERSIONED versions valid today or in the future (no end date, or an end date after today)
+
+        - DRAFT and PROPOSED versions, regardless of date
+
+        - when deprecated versions are requested, the most recent DEPRECATED version (latest start date)
+
+
+        ordered by status (DRAFT, PROPOSED, VERSIONED, DEPRECATED) and then by start date, newest first.
+
+        '
+    VersionSummary:
+      required:
+      - names
+      - startDate
+      - status
+      - versionId
+      type: object
+      properties:
+        versionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx id of the version.
+          examples:
+          - ENT:Version:8f1b2c3d
+        versionNumber:
+          type: integer
+          description: Sequence number of the version, when assigned.
+          format: int64
+          examples:
+          - 1
+        names:
+          $ref: '#/components/schemas/LocalizedString'
+        startDate:
+          type: string
+          description: First day the version is valid.
+          format: date
+          examples:
+          - '2026-08-01'
+        endDate:
+          type: string
+          description: First day the version is no longer valid (optional).
+          format: date
+          examples:
+          - '2026-12-31'
+        status:
+          $ref: '#/components/schemas/VersionStatus'
+      description: 'A light summary of one version of a versioned element, as shown in lists. Shared by the list
+
+        endpoints of all element types.
+
+        '
+    PurchaseWindowResponse:
+      required:
+      - id
+      - names
+      - ownerOrganisationId
+      - startDate
+      - status
+      - versionId
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):PurchaseWindow:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx id of the purchase window.
+          examples:
+          - ENT:PurchaseWindow:90days
+        versionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx id of this purchase window version.
+          examples:
+          - ENT:Version:8f1b2c3d
+        versionNumber:
+          type: integer
+          description: Sequence number of this version, when assigned.
+          format: int64
+          examples:
+          - 1
+        ownerOrganisationId:
+          type: integer
+          description: Internal organisation id owning this purchase window.
+          format: int64
+          examples:
+          - 1
+        names:
+          $ref: '#/components/schemas/LocalizedString'
+        descriptions:
+          $ref: '#/components/schemas/LocalizedString'
+        startDate:
+          type: string
+          description: First day this purchase window version is valid.
+          format: date
+          examples:
+          - '2026-08-01'
+        endDate:
+          type: string
+          description: Last day this purchase window version is valid (optional).
+          format: date
+          examples:
+          - '2026-12-31'
+        status:
+          $ref: '#/components/schemas/VersionStatus'
+        purchaseWhen:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseWhen'
+          - description: 'When a purchase can be made relative to the time of travel. Absent when the purchase
+
+              window sets no restriction on when the purchase can be made.
+
+              '
+        latestTime:
+          type: string
+          description: Latest time of day a purchase can be made (NeTEx `LatestTime`), formatted `HH:mm:ss`.
+          examples:
+          - '23:59:59'
+        minimumPeriodBeforeDeparture:
+          type: string
+          description: Minimum period before departure (NeTEx `MinimumPeriodBeforeDeparture`). ISO 8601 duration.
+          examples:
+          - PT1H
+        maximumPeriodBeforeDeparture:
+          type: string
+          description: Maximum period before departure (NeTEx `MaximumPeriodBeforeDeparture`). ISO 8601 duration.
+          examples:
+          - P90D
+        purchaseAction:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseAction'
+          - description: 'The purchase action this window applies to (NeTEx `PurchaseAction`).
+
+              '
+        purchaseMoments:
+          type: array
+          description: 'The moments at which a purchase can be made (NeTEx `PurchaseMoment`).
+
+            '
+          items:
+            $ref: '#/components/schemas/PurchaseMoment'
+          default: []
+    PageInfo:
+      required:
+      - page
+      - size
+      - totalCount
+      type: object
+      properties:
+        totalCount:
+          type: integer
+          description: Total number of elements matching the query.
+          examples:
+          - 5
+        page:
+          type: integer
+          description: Current zero-based page number.
+          examples:
+          - 0
+        size:
+          type: integer
+          description: Requested page size.
+          examples:
+          - 100
+      description: Paging information shared by all paginated list responses.
+    PurchaseMoment:
+      type: string
+      description: 'A moment at which a purchase can be made.
+
+        '
+      enum:
+      - ON_RESERVATION
+      - IN_ADVANCE
+      - IN_ADVANCE_ONLY
+      - BEFORE_BOARDING
+      - BEFORE_BOARDING_ONLY
+      - ON_BOARDING
+      - ON_BOARDING_ONLY
+      - AFTER_BOARDING
+      - ON_CHECK_IN
+      - ON_CHECK_OUT
+      - SUBSCRIPTION_ONLY
+      - NO_TICKET_REQUIRED
+      - OTHER
+    VersionResponse:
+      required:
+      - changed
+      - created
+      - id
+      - startDate
+      - status
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+          examples:
+          - EXA:Version:001
+        number:
+          type: integer
+          description: Version number of the version. Only present when versionStatus is VERSIONED. Starts at 1 for a new product and is incremented by 1 for each new version.
+          format: int64
+          examples:
+          - 1
+        status:
+          $ref: '#/components/schemas/VersionStatus'
+        startDate:
+          type: string
+          description: The start date of the version.
+          format: date
+        endDate:
+          type: string
+          description: The end date of the version.
+          format: date
+        published:
+          type: string
+          description: Timestamp for when the version was published (set to status VERSIONED).
+          format: date-time
+        created:
+          type: string
+          description: Created datetime
+          format: date-time
+        changed:
+          type: string
+          description: Changed datetime
+          format: date-time
+    PurchaseWindowListResponse:
+      description: A page of purchase windows, each with the versions relevant today.
+      allOf:
+      - $ref: '#/components/schemas/PageInfo'
+      - required:
+        - purchaseWindows
+        type: object
+        properties:
+          purchaseWindows:
+            type: array
+            description: The purchase windows on this page, ordered by id.
+            items:
+              $ref: '#/components/schemas/VersionedElementSummary'
+    PurchaseWindowRequest:
+      required:
+      - names
+      - startDate
+      - status
+      type: object
+      properties:
+        ownerOrganisationId:
+          minimum: 1
+          type: integer
+          description: Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.
+          format: int64
+          examples:
+          - 1
+        names:
+          $ref: '#/components/schemas/LocalizedString'
+        descriptions:
+          $ref: '#/components/schemas/LocalizedString'
+        startDate:
+          type: string
+          description: First day this purchase window version is valid.
+          format: date
+          examples:
+          - '2026-08-01'
+        endDate:
+          type: string
+          description: Last day this purchase window version is valid (optional). Omit for an open-ended version.
+          format: date
+          examples:
+          - '2026-12-31'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Status of the purchase window version. Required; on create only DRAFT or
+
+              PROPOSED is accepted — a new version cannot be published directly.
+
+              '
+            examples:
+            - DRAFT
+        purchaseWhen:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseWhen'
+          - description: 'When a purchase can be made relative to the time of travel. Optional: when omitted, the
+
+              purchase window sets no restriction on when the purchase can be made, only the periods
+
+              before departure (if set) apply.
+
+              '
+        latestTime:
+          pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$
+          type: string
+          description: Latest time of day a purchase can be made (NeTEx `LatestTime`), formatted `HH:mm:ss`.
+          examples:
+          - '23:59:59'
+        minimumPeriodBeforeDeparture:
+          type: string
+          description: 'Minimum period before departure that a purchase must be made (NeTEx
+
+            `MinimumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.
+
+            '
+          examples:
+          - PT1H
+        maximumPeriodBeforeDeparture:
+          type: string
+          description: 'Maximum period before departure that a purchase can be made (NeTEx
+
+            `MaximumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.
+
+            Must not be shorter than `minimumPeriodBeforeDeparture`.
+
+            '
+          examples:
+          - P90D
+        purchaseAction:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseAction'
+          - description: 'The purchase action this window applies to (NeTEx `PurchaseAction`).
+
+              '
+        purchaseMoments:
+          uniqueItems: true
+          type: array
+          description: 'The moments at which a purchase can be made (NeTEx `PurchaseMoment`, a list).
+
+            '
+          items:
+            $ref: '#/components/schemas/PurchaseMoment'
+      description: 'A purchase window (NeTEx `PurchaseWindow`, a `UsageParameter`) defines when a product can be
+
+        purchased relative to the time of travel. Products reference it through `purchaseWindowRef`;
+
+        the underlying NeTEx `GenericParameterAssignment` is managed by the backend.
+
+        '
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
+    PurchaseAction:
+      type: string
+      description: 'The type of purchase action the window applies to.
+
+        '
+      enum:
+      - PURCHASE
+      - ORDER_WITHOUT_PAYMENT
+      - RESERVE
+      - PAY_FOR_PREVIOUS_ORDER
+      - SUBSCRIBE
+      - PAY_INSTALLMENT
+      - OTHER
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

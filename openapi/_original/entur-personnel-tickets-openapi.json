@@ -1,0 +1,6323 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Personnel tickets",
+    "description": "Personnel tickets are a Norwegian railway discount scheme providing reduced fares for employees, pensioners, and eligible family members in participating companies. The scheme is owned by the Norwegian Railway Directorate and managed by Entur, requiring companies to enter an agreement to participate. This API supports managing employee eligibility, connecting user profiles to ticket rights, and applying those rights in ticket sales. It also enables reporting of personnel ticket usage for administrative and tax purposes.",
+    "termsOfService": "http://entur.org",
+    "contact": {
+      "name": "Entur Team Personalisering",
+      "email": "team.personalisering@entur.org"
+    },
+    "version": "2026.08.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.entur.io"
+    }
+  ],
+  "security": [
+    {
+      "jwt": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Ticket rights",
+      "description": "List generated ticket rights"
+    },
+    {
+      "name": "Family members",
+      "description": "Administration of family members. Each family member must be connected to an employee"
+    },
+    {
+      "name": "Codes",
+      "description": "Updated lists of valid codes to use for different properties"
+    },
+    {
+      "name": "Companies",
+      "description": "Administer companies and workplaces within the personnel ticket system"
+    },
+    {
+      "name": "Employee import",
+      "description": "Import employees from an external system to be added to the personnel ticket system"
+    },
+    {
+      "name": "Ticket right holders",
+      "description": "List generated ticket right holders"
+    },
+    {
+      "name": "Reports",
+      "description": "Api for getting tax and FIP reports"
+    },
+    {
+      "name": "Employee",
+      "description": "API for fetching employees in the personnel ticket system. An employee is the main entity of the pbsys system. They are hired by a Company and work at a WorkPlace. Employees are created from ImportedEmployee"
+    },
+    {
+      "name": "Contracts client",
+      "description": "API for handling loyalty program contracts."
+    },
+    {
+      "name": "Entitlements",
+      "description": "API for handling personnel ticket entitlements."
+    }
+  ],
+  "paths": {
+    "/personnelticket/v2/reports/tax-savings": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get a tax savings report for a given month and year for requested company.",
+        "description": "Get a tax savings report for a given month and year for requested company.Parameters fromDate and toDate are deprecated, use month and year",
+        "operationId": "getTaxSavingsReportAsCsvFile",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "fromDate",
+            "in": "query",
+            "description": "Deprecated. Use year and month",
+            "required": false,
+            "deprecated": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "toDate",
+            "in": "query",
+            "description": "Deprecated. Use year and month",
+            "required": false,
+            "deprecated": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Year from 2021. Default current year",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 2099,
+              "minimum": 2021,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "Month, from 1 to 12. Default current month",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "Personalbillett-Rapporter-Selskap.companyId:les",
+              "Personalbillett-Rapporter.companyId:les"
+            ]
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Reports"
+        ],
+        "description": "Start the progress or get status for generating a tax savings report for a given month and year for requested company.",
+        "operationId": "createTaxSavingsReport",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Year from 2021. Default current year",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 2099,
+              "minimum": 2021,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "Month, from 1 to 12. Default current month",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaxSavingReportGenerationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "Personalbillett-Rapporter-Selskap.companyId:les",
+              "Personalbillett-Rapporter.companyId:opprett"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/imports/employees": {
+      "post": {
+        "tags": [
+          "Employee import"
+        ],
+        "summary": "Import a new employee",
+        "operationId": "importNewEmployee",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportedEmployeeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportedEmployeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rettighetshaver-Sensitiv.companyId:opprett"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/imports/employees/{employeeId}/years/{year}/yearly-fees": {
+      "post": {
+        "tags": [
+          "Employee import"
+        ],
+        "summary": "Set the status of the yearly fee",
+        "description": "Set the status of the yearly fee for the given employee for the given year. This endpoint will trigger generation of ticket rights.",
+        "operationId": "setYearlyFee",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "maximum": 2100,
+              "minimum": 1980,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeYearlyFeeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeYearlyFeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rettighetshaver.employeeId:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/imports/employees/{employeeId}/years/{year}/disability-proofs": {
+      "post": {
+        "tags": [
+          "Employee import"
+        ],
+        "summary": "Set registration status of the disability proof",
+        "description": "Set registration status of the disability proof for the given employee for the given year",
+        "operationId": "setDisabilityProof",
+        "parameters": [
+          {
+            "name": "employeeId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "year",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "maximum": 2100,
+              "minimum": 1980,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeDisabilityProofRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeDisabilityProofResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rettighetshaver-Sensitiv.employeeId:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/imports/employees/csv": {
+      "post": {
+        "tags": [
+          "Employee import"
+        ],
+        "summary": "Import multiple employees via csv",
+        "description": "Import multiple employees via csv. Will return a list of the actually changed elements. This list may be empty if all uploaded values were already in the database.If any birth date or ssn is invalid, nothing will be imported, and an error message listing invalid dates and ssn will be returned",
+        "operationId": "importMultipleEmployeesCsv",
+        "parameters": [
+          {
+            "name": "importForCompany",
+            "in": "query",
+            "description": "If provided, will parse the csv file based on the format provided by the company. Use employeeNoPrefix from the relevant company. The the company has no specific format registered, the standard format will be used.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "standard",
+                "BaneS",
+                "BNOR",
+                "SPOR",
+                "entur"
+              ]
+            },
+            "examples": {
+              "default": {
+                "value": "standard"
+              }
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "importFile": {
+                    "contentMediaType": "application/octet-stream",
+                    "description": "A csv formatted file with employees to import. Use the properties as described by the relevant format. Default is $ref: #/definitions/ImportedEmployeeRequest."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ImportedEmployeeResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rettighetshaver-Sensitiv:opprett"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/imports/employees/{importedEmployeeId}": {
+      "get": {
+        "tags": [
+          "Employee import"
+        ],
+        "summary": "Get imported employee",
+        "operationId": "getImportedEmployee",
+        "parameters": [
+          {
+            "name": "importedEmployeeId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportedEmployeeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "all": [
+              "Personalbillett-Rettighetshaver.employeeId:les",
+              "Personalbillett-Rettighetshaver-Sensitiv.employeeId:les"
+            ]
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Employee import"
+        ],
+        "summary": "Patch a previously imported employee",
+        "operationId": "patchImportedEmployee",
+        "parameters": [
+          {
+            "name": "importedEmployeeId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportedEmployeeMergePatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportedEmployeeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rettighetshaver-Sensitiv.employeeId:endre"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/ticketrightsholders": {
+      "get": {
+        "tags": [
+          "Ticket right holders"
+        ],
+        "summary": "Find ticket rights holders by params",
+        "operationId": "findTicketRightsHolders",
+        "parameters": [
+          {
+            "name": "employeeNo",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "fromDate",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageTicketRightsHolderResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rettighetshaver:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/ticketrights": {
+      "get": {
+        "tags": [
+          "Ticket rights"
+        ],
+        "summary": "Find ticket rights by params",
+        "operationId": "findTicketRights",
+        "parameters": [
+          {
+            "name": "employeeNo",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "fromDate",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "includeTicketRightsHolder",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageTicketRightResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Billettrettigheter:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/reports/tax-savings-reconciliation": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get total saving value for tax savings report for specified month",
+        "operationId": "getTaxSavingsReportReconciliation",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Year from 2021",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 2099,
+              "minimum": 2021,
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "month",
+            "in": "query",
+            "description": "Month, from 1 to 12",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 12,
+              "minimum": 1,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "Personalbillett-Rapporter-Selskap.companyId:les",
+              "Personalbillett-Rapporter.companyId:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/reports/stop-place-ticket-rights": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get a CSV report of stop place ticket rights for a year",
+        "operationId": "getStopPlaceRightsReportForYear",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Year from 2021.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 2099,
+              "minimum": 2021,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv;charset=windows-1252": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rapporter:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/reports/fip/coupons": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get a CSV report containing all FIP coupons and travel discount certificates created in specified year.",
+        "operationId": "getFipCouponReportAsCSV",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Year from 2021.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 2099,
+              "minimum": 2021,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "Personalbillett-Rapporter-Selskap.companyId:les",
+              "Personalbillett-Rapporter.companyId:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/reports/fip-monthly": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get a report from FIP as a CSV-file, between fromDate and toDate by setting ?format=csv",
+        "operationId": "getFipMonthlyReportAsCsvFile",
+        "parameters": [
+          {
+            "name": "fromDate",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "toDate",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "useCreatedAt",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "description": "Filter report by company. If null all companies are reported",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+              "format": "int64"
+            },
+            "examples": {
+              "default": {
+                "value": 1
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FipMonthlyTicketReport"
+                  }
+                }
+              },
+              "text/csv;charset=windows-1252": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rapporter:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/reports/apprentice-ticket-rights": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get a CSV report of apprentice ticket rights for a year",
+        "operationId": "getApprenticeRightsReportForYear",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Year from 2021.",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 2099,
+              "minimum": 2021,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/csv;charset=windows-1252": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rapporter:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/reports/active-ticket-rights-holders": {
+      "get": {
+        "tags": [
+          "Reports"
+        ],
+        "summary": "Get list of active ticket right holders for a company as a CSV",
+        "operationId": "getActiveTicketRightHoldersAsCsv",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "ticketRightType",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SILVER",
+                "BRONZE"
+              ]
+            }
+          },
+          {
+            "name": "ticketRightHolderType",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "EMPLOYEE",
+                "PENSIONER"
+              ]
+            }
+          },
+          {
+            "name": "includeFamily",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageActiveTicketRightsHolderResponse"
+                }
+              },
+              "text/csv;charset=windows-1252": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "Personalbillett-Rapporter-Selskap.companyId:les",
+              "Personalbillett-Rapporter.companyId:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/family-members": {
+      "get": {
+        "tags": [
+          "Family members"
+        ],
+        "summary": "Fetches the full list of family members",
+        "description": "Get all family members",
+        "operationId": "getAllFamilyMembers",
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageFamilyMemberResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": "Personalbillett-Rettighetshaver:les"
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/employees": {
+      "get": {
+        "tags": [
+          "Employee"
+        ],
+        "summary": "Find employees",
+        "operationId": "findEmployees",
+        "parameters": [
+          {
+            "name": "employeeNo",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "companyId",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "dateOfBirth",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "ssn",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeFamilyMembers",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeTicketRights",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageEmployeeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "all": [
+              "Personalbillett-Rettighetshaver:les",
+              "Personalbillett-Rettighetshaver-Sensitiv:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/employees/{id}": {
+      "get": {
+        "tags": [
+          "Employee"
+        ],
+        "summary": "Attempts to look up a single given employee",
+        "operationId": "findEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeFamilyMembers",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeTicketRights",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmployeeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "all": [
+              "Personalbillett-Rettighetshaver.employeeId:les",
+              "Personalbillett-Rettighetshaver-Sensitiv.employeeId:les",
+              "Personalbillett-Billettrettigheter.employeeId:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/companies": {
+      "get": {
+        "tags": [
+          "Companies"
+        ],
+        "summary": "Get companies by params",
+        "operationId": "findCompanies",
+        "parameters": [
+          {
+            "name": "employeeNoPrefix",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "includeDeleted",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageCompanyResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "Personalbillett-Administrasjon:les",
+              "Personalbillett-Administrasjon-Selskap:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/code-pages/ticket-types": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get available ticket types",
+        "description": "Get available ticket types. The ticket type informs of which country it is valid in and what train class it covers.",
+        "operationId": "getTicketTypes",
+        "parameters": [
+          {
+            "name": "includeDeleted",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "generatesTicketRights",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageTicketTypeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/code-pages/products": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get available personnel ticket products",
+        "operationId": "getProducts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/code-pages/pay-types": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get types of pay an employee can have",
+        "operationId": "getPayType",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayType"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/code-pages/family-relations": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get family relations available",
+        "description": "Get family relations available. A family relation is between an employee and their family member(s)",
+        "operationId": "getFamilyRelation",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FamilyRelation"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/code-pages/employment-types": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get types of employment",
+        "operationId": "getEmploymentType",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmploymentType"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/personnelticket/v2/code-pages/employment-end-causes": {
+      "get": {
+        "tags": [
+          "Codes"
+        ],
+        "summary": "Get causes for end of employment",
+        "operationId": "getEmploymentEndCauses",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EmploymentEndCause"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "404": {
+            "$ref": "#/components/responses/Error404"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/customers/v2/benefits/contracts/claim-personnel-ticket": {
+      "post": {
+        "tags": [
+          "Contracts client"
+        ],
+        "summary": "Claims a personnel ticket directly.",
+        "description": " Claim a personnel ticket for the given customer profile. A personnel ticket may correspond to more than one contract in benefits, and this method will attempt to claim them all.",
+        "operationId": "claimPersonnelTicket",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimPersonnelTicketRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimContractResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/customers/v2/benefits/entitlements/{customerNumber}/by-customer-number": {
+      "get": {
+        "tags": [
+          "Entitlements"
+        ],
+        "summary": "Gets entitlements for a customer",
+        "description": "Gets entitlements for a customer by customer number, including information about the product, contract and contract holder.",
+        "operationId": "getEntitlementsByCustomerNumber",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "customerNumber",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "travelDate",
+            "in": "query",
+            "description": "Get valid entitlements for travel date",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "excludeSubContracts",
+            "in": "query",
+            "description": "Exclude day trip entitlements. Default is false",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EntitlementResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/customers/v2/benefits/contracts/validate-consumptions": {
+      "post": {
+        "tags": [
+          "Contracts client"
+        ],
+        "summary": "Validate contract consumption",
+        "description": "Validate that the customer can consume given contracts",
+        "operationId": "validateContractUse",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateContractConsumptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateContractConsumptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/Error400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "benefits-contract-consumer:les",
+              "benefits-contract-consumer-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/customers/v2/benefits/contracts": {
+      "get": {
+        "tags": [
+          "Contracts client"
+        ],
+        "summary": "Return all contracts with possible filtering",
+        "description": "Return all contracts with possible filtering",
+        "operationId": "getAllContractsByParameters",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "query",
+            "description": "Get the contract matching the uuid",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "customerNumber",
+            "in": "query",
+            "description": "Get all contracts where a customer is a contractConsumer using Unique Entur id",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "customerRef",
+            "in": "query",
+            "description": "Get all contracts where a customer is a contractConsumer using external customer id unique within an organisation",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "loyaltyProgramId",
+            "in": "query",
+            "description": "Get all contracts for a specific loyaltyProgram",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "contractHolder",
+            "in": "query",
+            "description": "Get all contracts for a specific contract holder. Use customerNumber as value",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "consumableAfter",
+            "in": "query",
+            "description": "Get all contracts which can be consumed after this date. Supports ISO 8601 date format",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "consumableBefore",
+            "in": "query",
+            "description": "Get all contracts which can be consumed before this date. Supports ISO 8601 date format",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expirationDateAfter",
+            "in": "query",
+            "description": "Get all contracts with expiration date after this date. Supports ISO 8601 date format",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "expirationDateBefore",
+            "in": "query",
+            "description": "Get all contracts with expiration date before this date. Supports ISO 8601 date format",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "externalRef",
+            "in": "query",
+            "description": "Get all contracts by external reference. This is, for example, the personnel ticket code",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organisationId",
+            "in": "query",
+            "description": "The organisation the contracts belong to. You must have an Internal token to use this.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "examples": {
+              "default": {
+                "value": 3
+              }
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Properties to sort the response by. Multiple values can be specified",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "customerNumber",
+                  "loyaltyProgramId",
+                  "uuid",
+                  "consumableFrom"
+                ],
+                "examples": [
+                  "loyaltyProgramId"
+                ]
+              }
+            }
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "description": "The sort direction if sortBy is specified",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ],
+              "examples": [
+                "asc"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "The page to be retrieved. Starts at 1",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1,
+              "examples": [
+                5
+              ]
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Number of items per page",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "default": 30,
+              "examples": [
+                50
+              ]
+            }
+          },
+          {
+            "name": "includeOrderLineEvents",
+            "in": "query",
+            "description": "Whether to include order line events in the response. Note: setting this to true may impact performance. Default false.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeConsumers",
+            "in": "query",
+            "description": "Whether to include contract consumers in the response. Supported formats are 'all', 'none' and 'contract-holder'. Note: setting this to ALL may impact performance. Default is 'contract-holder'",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "pattern": "all|none|contract-holder",
+              "type": "string",
+              "enum": [
+                "all",
+                "none",
+                "contract-holder"
+              ],
+              "examples": [
+                "none"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageOfContractResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "benefits-contract:les",
+              "benefits-contract-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/customers/v2/benefits/contracts/{externalRef}/by-external-ref": {
+      "get": {
+        "tags": [
+          "Contracts client"
+        ],
+        "summary": "Get contracts by external ref",
+        "description": "Finds contracts by external reference.",
+        "operationId": "getContractsByExternalRef",
+        "parameters": [
+          {
+            "name": "externalRef",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "organisationId",
+            "in": "query",
+            "description": "The organisation the contracts belong to, left empty will use orgID from token.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "examples": {
+              "default": {
+                "value": 3
+              }
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Selects a specific page in the collection",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 1,
+              "examples": [
+                1
+              ]
+            }
+          },
+          {
+            "name": "perPage",
+            "in": "query",
+            "description": "Selects the number of elements per page",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "default": 30,
+              "examples": [
+                5
+              ]
+            }
+          },
+          {
+            "name": "includeOrderLineEvents",
+            "in": "query",
+            "description": "Whether to include order line events in the response. Note: setting this to true may impact performance. Default false.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeConsumers",
+            "in": "query",
+            "description": "Whether to include contract consumers in the response. Supported formats are 'all', 'none' and 'contract-holder'. Note: setting this to ALL may impact performance. Default is 'contract-holder'",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "pattern": "all|none|contract-holder",
+              "type": "string",
+              "enum": [
+                "all",
+                "none",
+                "contract-holder"
+              ],
+              "examples": [
+                "none"
+              ]
+            }
+          },
+          {
+            "name": "Entur-Customer-Number",
+            "in": "header",
+            "description": "To identify logged in user and limit access per user",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageOfContractResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "benefits-contract:les",
+              "benefits-contract-jdir:les",
+              "benefits-contract-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/customers/v2/benefits/contract-consumers/{customerNumber}/contracts": {
+      "get": {
+        "tags": [
+          "Contracts client"
+        ],
+        "description": "Return all valid contracts by customer number. Returns only contracts with status VALID within timeframe. ",
+        "operationId": "getAllValidContractsByCustomerNumber",
+        "parameters": [
+          {
+            "name": "customerNumber",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "exclusiveMinimum": 0,
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "travelDate",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "organisationId",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "includeExpiredContracts",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeOrderLineEvents",
+            "in": "query",
+            "description": "Whether to include order line events in the response. Note: setting this to true may impact performance. Default false.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "includeConsumers",
+            "in": "query",
+            "description": "Whether to include contract consumers in the response. Supported formats are 'all', 'none' and 'contract-holder'. Note: setting this to ALL may impact performance. Default is 'contract-holder'",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "pattern": "all|none|contract-holder",
+              "type": "string",
+              "enum": [
+                "all",
+                "none",
+                "contract-holder"
+              ],
+              "examples": [
+                "none"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContractResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Error401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Error403"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error500"
+          }
+        },
+        "x-entur-permissions": {
+          "value": {
+            "any": [
+              "benefits-contract-consumer:les",
+              "benefits-contract-consumer-jdir:les",
+              "benefits-contract-consumer-global:les"
+            ]
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "ContractConsumerResponse": {
+        "required": [
+          "createdAt",
+          "createdBy",
+          "customerNumber",
+          "customerOrganisationId",
+          "isBlocked",
+          "isContractHolder",
+          "lastChangedAt",
+          "lastChangedBy"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the contract consumer was created",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Which client created the contract consumer",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426655440000"
+            ]
+          },
+          "customerNumber": {
+            "type": "integer",
+            "description": "The customer entitled to use the contract. Unique Entur specific number",
+            "format": "int64",
+            "examples": [
+              122334
+            ]
+          },
+          "customerOrganisationId": {
+            "type": "integer",
+            "description": "The organisation ID the customer belongs to",
+            "format": "int64",
+            "examples": [
+              42
+            ]
+          },
+          "customerRef": {
+            "type": "string",
+            "description": "The customer entitled to use the contract. External reference unique to organisation",
+            "examples": [
+              "073R41D4R"
+            ]
+          },
+          "isBlocked": {
+            "type": "boolean",
+            "description": "Marks that this specific user has been disallowed from using this contract by the contract owner",
+            "examples": [
+              true
+            ]
+          },
+          "isContractHolder": {
+            "type": "boolean",
+            "description": "Marks that this specific user's organisation is the owner of the contract"
+          },
+          "lastChangedAt": {
+            "type": "string",
+            "description": "When the contract consumer was last changed",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "lastChangedBy": {
+            "type": "string",
+            "description": "Which client changed the contract consumer last",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426655440000"
+            ]
+          }
+        },
+        "description": "A description of the customer that's allowed to use the contract"
+      },
+      "ContractConsumption": {
+        "required": [
+          "contractUuid",
+          "customerNumber",
+          "entitlementProductId",
+          "firstTravelDate"
+        ],
+        "type": "object",
+        "properties": {
+          "contractUuid": {
+            "type": "string",
+            "description": "The id of the contract consumed",
+            "format": "uuid",
+            "examples": [
+              "cae8853a-583e-49af-be61-cf10875a541d"
+            ]
+          },
+          "coupons": {
+            "type": "integer",
+            "description": "The number of coupons consumed. Has no effect if the contract does not specify a number of available coupons. Defaults to 1.",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "customerNumber": {
+            "type": "integer",
+            "description": "The customer attempting to consume the contract",
+            "format": "int64",
+            "examples": [
+              123415
+            ]
+          },
+          "entitlementProductId": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The id of the product consumed. This is on NetEX format and must match the product in use by the supplied contract.",
+            "examples": [
+              "ENT:TravelRebate:A2"
+            ]
+          },
+          "entitlementProductVersion": {
+            "type": "string",
+            "description": "The version of the product consumed. This is on NetEX format and if supplied must match the product version in use by the supplied contract.",
+            "examples": [
+              "ENT:Version:V1"
+            ]
+          },
+          "firstTravelDate": {
+            "type": "string",
+            "description": "The start date and time of travel.",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "lastTravelDate": {
+            "type": "string",
+            "description": "The end date and time of travel. Defaults to firstTravelDate if not provided.",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "orderLineReference": {
+            "$ref": "#/components/schemas/OrderLineReference"
+          }
+        },
+        "description": "Contract consumption details"
+      },
+      "ContractResponse": {
+        "required": [
+          "consumableFrom",
+          "createdAt",
+          "createdBy",
+          "lastChangedAt",
+          "lastChangedBy",
+          "loyaltyProgram",
+          "organisationId",
+          "status",
+          "uuid"
+        ],
+        "type": "object",
+        "properties": {
+          "acceptanceDate": {
+            "type": "string",
+            "description": "When the contract was accepted by the customer",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "consumableFrom": {
+            "type": "string",
+            "description": "From when the contract can be consumed",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "contractConsumers": {
+            "type": "array",
+            "description": "The list of customers allowed to use the contract",
+            "items": {
+              "$ref": "#/components/schemas/ContractConsumerResponse"
+            }
+          },
+          "couponsLimit": {
+            "type": "integer",
+            "description": "How many coupons the contract has. Default is cascaded from Loyalty Program Version. If set, the contract will be blocked for usage when all coupons are used. Coupons are registered via an OrderLineEvent.",
+            "format": "int64",
+            "examples": [
+              10
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the contract was created",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Which client created the contract",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426655440000"
+            ]
+          },
+          "currentTotal": {
+            "$ref": "#/components/schemas/TotalAmount"
+          },
+          "expirationDate": {
+            "type": "string",
+            "description": "When the contract expires",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "externalRef": {
+            "type": "string",
+            "description": "Optional external reference. Examples are membership number and employee number",
+            "examples": [
+              "123415A"
+            ]
+          },
+          "lastChangedAt": {
+            "type": "string",
+            "description": "When the contract was last changed",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "lastChangedBy": {
+            "type": "string",
+            "description": "Which client changed the contract last",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426655440000"
+            ]
+          },
+          "loyaltyProgram": {
+            "$ref": "#/components/schemas/LoyaltyProgramFlatResponse"
+          },
+          "orderLineEvents": {
+            "type": "array",
+            "description": "A list of order line events related to this contract",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineEventResponse"
+            }
+          },
+          "organisationId": {
+            "type": "integer",
+            "description": "Which organisation the contract concerns",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "parent": {
+            "type": "string",
+            "description": "If present, contract UUID of the parent contract. This field is usually set if the contract is created by a coupon usage, whereas this contract has a time constraint and the parent has a coupon constraint.",
+            "examples": [
+              "fd29908d-a2ae-4fe0-8e10-7f0db437c554"
+            ]
+          },
+          "policies": {
+            "type": "array",
+            "description": "The list of keys validated against the customer claiming the contract",
+            "items": {
+              "$ref": "#/components/schemas/PolicyResponse"
+            }
+          },
+          "remainingCoupons": {
+            "type": "integer",
+            "description": "The remaining coupons for coupon based contracts. Derived from couponsLimit and orderLineEvents. The amount of remaining coupons are counted yearly and based of the earliest travel date.",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "description": "The contract status. A normal contract has status valid. It can be expired, refunded, cancelled, misused and valid ",
+            "examples": [
+              "Refunded"
+            ]
+          },
+          "subContracts": {
+            "type": "array",
+            "description": "If present, contains timed contracts that are dependent on this contract. See Contract response",
+            "items": {
+              "type": "object"
+            }
+          },
+          "transactions": {
+            "type": "array",
+            "description": "The list of transactions for this contract (earn/burn or giftcard)",
+            "items": {
+              "$ref": "#/components/schemas/TransactionResponse"
+            }
+          },
+          "uuid": {
+            "type": "string",
+            "description": "Unique contract identifier",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426655440000"
+            ]
+          }
+        },
+        "description": "A contract between a customer and an organisation"
+      },
+      "CouponConfigResponse": {
+        "required": [
+          "defaultQuantity",
+          "loyaltyProgramId"
+        ],
+        "type": "object",
+        "properties": {
+          "defaultQuantity": {
+            "type": "integer",
+            "description": "Default number of how many coupons can be used. May be overridden by contract coupon limit",
+            "format": "int64"
+          },
+          "defaultStartTime": {
+            "type": "string",
+            "description": "The default start time of the contract created by a coupon usage. If set, the contract created by a coupon usage will start on the specified time of the travel date or when created",
+            "format": "time"
+          },
+          "loyaltyProgramId": {
+            "type": "integer",
+            "description": "The loyalty program the contract created by the coupon is connected to",
+            "format": "int64"
+          },
+          "usageValidityPeriod": {
+            "type": "string",
+            "description": "The duration of the of the contract created by a coupon usage. If set, the contract created by a coupon usage will set expiration date to the end of the duration. It will override loyalty program usageValidityPeriod",
+            "format": "duration",
+            "examples": [
+              "P3DT12H30M5S"
+            ]
+          }
+        },
+        "description": "Configuration for coupons. This is only set for loyalty program type COUPONS"
+      },
+      "ErrorResponse": {
+        "required": [
+          "correlationId",
+          "error",
+          "message",
+          "path",
+          "status",
+          "timestamp"
+        ],
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "description": "When the error occurred.",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "description": "The http status code.",
+            "format": "int32",
+            "examples": [
+              400
+            ]
+          },
+          "errorCode": {
+            "type": "string",
+            "description": "Application specific error code",
+            "examples": [
+              "1033"
+            ]
+          },
+          "error": {
+            "type": "string",
+            "description": "The http status reason.",
+            "examples": [
+              "Bad request"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "description": "The request URI.",
+            "examples": [
+              "/loyaltyPrograms"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "description": "The main error message.",
+            "examples": [
+              "Validation failed for ..."
+            ]
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "The unique correlation id for the request.",
+            "examples": [
+              "b5d4960d-7ab2-43d6-a8f3-113da042a288"
+            ]
+          },
+          "errors": {
+            "type": "array",
+            "description": "Optional list of error specifications.",
+            "items": {
+              "$ref": "#/components/schemas/ErrorSpecification"
+            }
+          }
+        },
+        "description": "Response object for errors occurring in the customers API"
+      },
+      "ErrorSpecification": {
+        "required": [
+          "defaultMessage",
+          "field"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "The field of the associated object in the request related to the error."
+          },
+          "defaultMessage": {
+            "type": "string",
+            "description": "The message explaining why the error occurred."
+          },
+          "rejectedValues": {
+            "type": "object",
+            "description": "A list of rejected values."
+          }
+        },
+        "description": "Optional list of error specifications."
+      },
+      "LoyaltyProgramDescriptionResponse": {
+        "required": [
+          "createdAt",
+          "createdBy",
+          "description",
+          "languageCode",
+          "lastChangedAt",
+          "lastChangedBy"
+        ],
+        "type": "object",
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the loyalty program was created",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "Which client created the loyalty program",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426655440000"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Loyalty program description. Supports any kind of text",
+            "examples": [
+              "Reis Kundekort gir deg 20% rabatt på alle kjøp"
+            ]
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name for loyalty program",
+            "examples": [
+              "Reis Kundekort"
+            ]
+          },
+          "languageCode": {
+            "type": "string",
+            "description": "What language the description is written in, ISO639-3",
+            "examples": [
+              "NOB"
+            ]
+          },
+          "lastChangedAt": {
+            "type": "string",
+            "description": "When the loyalty program was last changed",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "lastChangedBy": {
+            "type": "string",
+            "description": "Which client changed the loyalty program last",
+            "examples": [
+              "123e4567-e89b-12d3-a456-426655440000"
+            ]
+          }
+        },
+        "description": "Description of a loyalty program version"
+      },
+      "LoyaltyProgramFlatResponse": {
+        "required": [
+          "descriptions",
+          "endDate",
+          "id",
+          "internalDescription",
+          "loyaltyProgramType",
+          "organisationId",
+          "productId",
+          "productVersion",
+          "startDate",
+          "status",
+          "versionNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "couponConfig": {
+            "$ref": "#/components/schemas/CouponConfigResponse"
+          },
+          "defaultCouponsLimit": {
+            "type": "integer",
+            "description": "Deprecated. See couponConfig instead. How many coupons (eg. the maximum amount of usages) the underlying contracts of the loyalty program has.",
+            "format": "int64",
+            "examples": [
+              10
+            ]
+          },
+          "descriptions": {
+            "type": "array",
+            "description": "A list of human readable descriptions in different languages. Only one language per description is allowed.",
+            "items": {
+              "$ref": "#/components/schemas/LoyaltyProgramDescriptionResponse"
+            }
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date of the loyaltyprogram. All contracts will expire when the loyaltyprogram expires. Supports ISO 8601 date format.",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "integer",
+            "description": "The id of the loyalty program",
+            "format": "int64"
+          },
+          "internalDescription": {
+            "type": "string",
+            "description": "A human readable internal description of the loyalty program.",
+            "examples": [
+              "Customer card with 15 % discount"
+            ]
+          },
+          "loyaltyProgramCode": {
+            "type": "string",
+            "description": "A word or code the customer can use to activate a loyalty program for themselves, set by the creator of the loyalty program"
+          },
+          "loyaltyProgramType": {
+            "type": "string",
+            "description": "The type of loyalty program. Types include COUPONS, TIMED and POINTS. A time-based loyalty program specifies a duration a connected contract is valid. A point-based loyalty program has contracts keeping track of earning and burning of points. This also includes gift cards. A coupon-based loyalty programs specifies how many times a contract can be consumed. For compatibility reasons, UNMAPPED is also available for loyalty programs that has not yet been classified.",
+            "enum": [
+              "TIMED",
+              "POINTS",
+              "COUPONS",
+              "UNMAPPED"
+            ],
+            "examples": [
+              "TIMED"
+            ]
+          },
+          "organisationId": {
+            "type": "integer",
+            "description": "The organisation that owns this loyalty program.",
+            "format": "int64",
+            "examples": [
+              20
+            ]
+          },
+          "productId": {
+            "type": "string",
+            "description": "The id of the product associated with this loyalty program."
+          },
+          "productVersion": {
+            "type": "string",
+            "description": "The version of the product associated with this loyalty program."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date of the loyaltyprogram. If specified ahead in time, the loyaltyprogram will get status = draft. Supports ISO 8601 date format.",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "The current status of this loyalty program. Can be DRAFT, CURRENT, DEPRECATED",
+            "enum": [
+              "DRAFT",
+              "CURRENT",
+              "DEPRECATED"
+            ]
+          },
+          "usageValidityPeriod": {
+            "type": "string",
+            "description": "The duration of a contract associated with this loyaltyprogram. This is set for loyalty program types TIMED and POINTS. The default value is null, which means the contract has an unlimited duration. This field uses the ISO 8601 duration format and accept the units: Days and Time. For example; 'P3DT12H30M5S' represents a duration of three days, twelve hours, thirty minutes, and five seconds.",
+            "examples": [
+              "P3DT12H30M5S"
+            ]
+          },
+          "versionNumber": {
+            "type": "integer",
+            "description": "The version of this loyalty program.",
+            "format": "int64"
+          }
+        },
+        "description": "The current values for a loyalty program"
+      },
+      "OrderLineEventResponse": {
+        "required": [
+          "eventType",
+          "isCancelled",
+          "isPurchased",
+          "orderId",
+          "orderLineId",
+          "orderLineVersion",
+          "organisationId",
+          "price",
+          "timestamp"
+        ],
+        "type": "object",
+        "properties": {
+          "codespace": {
+            "type": "string",
+            "description": "Codespace",
+            "examples": [
+              "ABC"
+            ]
+          },
+          "couponsUsed": {
+            "type": "integer",
+            "description": "How many coupons (usages) this event is using. This defaults to 1, but will be ignored if the contract in question does not use coupons.",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "effectiveCancellationDate": {
+            "type": "string",
+            "description": "If set, the effective date for cancellation.",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "eventType": {
+            "type": "string",
+            "description": "The order line event type. Can be one of 'PURCHASE' or 'CANCELLATION'. PURCHASE is used when the order line event describe purchase of a travel using a contract (not the same as isPurchased). CANCELLATION is when the order line event is a cancellation (can be the same as isCancelled)"
+          },
+          "isCancelled": {
+            "type": "boolean",
+            "description": "Whether the order line event is a cancellation"
+          },
+          "isPurchased": {
+            "type": "boolean",
+            "description": "Whether the order line event describes the purchase of a contract, or contract consumer"
+          },
+          "lastTravelDate": {
+            "type": "string",
+            "description": "The last date of travel, related to entitlement usage. Defaults to equal travelDate. Relevant for period tickets only.",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "manualTransactionComment": {
+            "type": "string",
+            "description": "If the order line is added manually, this field will have an explanation",
+            "examples": [
+              "Refund because the order was cancelled too late"
+            ]
+          },
+          "orderId": {
+            "type": "string",
+            "description": "The order ID",
+            "examples": [
+              "ABC"
+            ]
+          },
+          "orderLineId": {
+            "type": "string",
+            "description": "The order line ID",
+            "examples": [
+              "KFN"
+            ]
+          },
+          "orderLineText": {
+            "type": "string",
+            "description": "The name of the product that this usage refers to. This should be supplied by the caller to indicate which item has been bought. This is displayed to the user in reports.",
+            "examples": [
+              "1 x Voksen, Oslo S - OSL"
+            ]
+          },
+          "orderLineVersion": {
+            "type": "string",
+            "description": "The order line version",
+            "examples": [
+              "132"
+            ]
+          },
+          "organisationId": {
+            "type": "integer",
+            "description": "The organisation through which the order was placed",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "originalPrice": {
+            "type": "string",
+            "description": "The original price for this item, i.e.  i.e the original price without the travellers discount.",
+            "examples": [
+              "3.77"
+            ]
+          },
+          "price": {
+            "type": "string",
+            "description": "The actual paid price for this item, i.e. what did the user actually pay after rebate. Negative if this was a cancellation",
+            "examples": [
+              "3.77"
+            ]
+          },
+          "taxDistributions": {
+            "type": "array",
+            "description": "Tax savings for this order line",
+            "items": {
+              "$ref": "#/components/schemas/TaxDistributionResponse"
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "When the order line event was saved",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          },
+          "travelDate": {
+            "type": "string",
+            "description": "The first date of travel on this ticket. Will be used to decide when to report this usage to the Norwegian tax administration, if applicable. Defaults to the current date and time.",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          }
+        },
+        "description": "An order line event on a contract"
+      },
+      "OrderLineReference": {
+        "required": [
+          "orderId",
+          "orderLineId"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "maxLength": 90,
+            "minLength": 0,
+            "type": "string",
+            "description": "The Order id, used for lookup when trying to find the order in Enturs systems.",
+            "examples": [
+              "ABCD"
+            ]
+          },
+          "orderLineId": {
+            "maxLength": 100,
+            "minLength": 0,
+            "type": "string",
+            "description": "The order line Id for Entur orders.",
+            "examples": [
+              "ABCD"
+            ]
+          }
+        },
+        "description": "The order line reference. This is used to check if consumption has already been validated."
+      },
+      "PageOfContractResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/ContractResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PolicyResponse": {
+        "required": [
+          "id",
+          "key"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id of the policy",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "key": {
+            "type": "string",
+            "description": "Key for which field that should be matching",
+            "examples": [
+              "surname"
+            ]
+          }
+        },
+        "description": "Policy, returns keys that have to match"
+      },
+      "TaxDistributionResponse": {
+        "required": [
+          "isUnknown",
+          "taxMonth",
+          "taxSaving",
+          "taxYear"
+        ],
+        "type": "object",
+        "properties": {
+          "isUnknown": {
+            "type": "boolean",
+            "description": "If set, the tax distribution saving for that month is unknown. This is the case for all period tickets before may 2021. They need to be calculated manually"
+          },
+          "taxMonth": {
+            "type": "integer",
+            "description": "The month of the tax saving",
+            "format": "int32"
+          },
+          "taxSaving": {
+            "type": "string",
+            "description": "The value of tax saved"
+          },
+          "taxYear": {
+            "type": "integer",
+            "description": "The year of the tax saving",
+            "format": "int32"
+          }
+        },
+        "description": "Tax distribution for an order line"
+      },
+      "TotalAmount": {
+        "required": [
+          "amount",
+          "calculatedAt",
+          "currency"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "minimum": 0.01,
+            "pattern": "-?\\d*\\.\\d\\d",
+            "type": "string",
+            "description": "Amount amount. Format: -?\\d*\\.\\d\\d  Examples: 123.34  1.00  34000.00"
+          },
+          "calculatedAt": {
+            "type": "string",
+            "description": "When the amount was calculated",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency of the amount",
+            "examples": [
+              "NOK"
+            ]
+          }
+        },
+        "description": "The current total for this contract (earn/burn or giftcard)"
+      },
+      "TransactionResponse": {
+        "required": [
+          "amount",
+          "currency",
+          "timestamp"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "-?\\d*\\.\\d\\d",
+            "type": "string",
+            "description": "How much was the amount changed by this transaction? Positive value means deposit onto the card, negative withdrawal. Example: -130.00"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency used in this transaction. Only one currency is allowed for all transactions on a single contract.",
+            "examples": [
+              "NOK"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "description": "Identifying sellers email for this transaction.",
+            "examples": [
+              "test@test.no"
+            ]
+          },
+          "externalTransactionId": {
+            "type": "string",
+            "description": "External transaction id for the ongoing transaction.",
+            "examples": [
+              "9087a885782a819f95816d88da8d78"
+            ]
+          },
+          "internalTransactionId": {
+            "type": "string",
+            "description": "Internal unique identifier for this transaction.",
+            "examples": [
+              "1927bd54-4cc4-4ea1-8431-599231f39797"
+            ]
+          },
+          "posId": {
+            "type": "integer",
+            "description": "Identifying point of sale for this transaction.",
+            "format": "int64",
+            "examples": [
+              317001944
+            ]
+          },
+          "rrn": {
+            "type": "string",
+            "description": "External RRN for the payment.",
+            "examples": [
+              "22ceb5c3acaf78a54f3af5de2050f0"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "description": "Timestamp for this transaction.",
+            "format": "date-time",
+            "examples": [
+              "2007-12-03T10:15:30+01:00"
+            ]
+          }
+        },
+        "description": "The list of transactions for this contract (earn/burn or giftcard)"
+      },
+      "ValidateContractConsumptionRequest": {
+        "required": [
+          "consumptions"
+        ],
+        "type": "object",
+        "properties": {
+          "consumptions": {
+            "minItems": 1,
+            "type": "array",
+            "description": "A list of consumptions to verify",
+            "items": {
+              "$ref": "#/components/schemas/ContractConsumption"
+            }
+          }
+        },
+        "description": "A request to validate the consumption of one or more product entitlements in an order"
+      },
+      "ValidateContractConsumptionResponse": {
+        "required": [
+          "code",
+          "isValid",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "A code pertaining to the reason for rejection, if any. Code 3101 = OK.",
+            "examples": [
+              "3101"
+            ]
+          },
+          "isValid": {
+            "type": "boolean",
+            "description": "True if all consumptions were valid, otherwise false"
+          },
+          "reason": {
+            "type": "string",
+            "description": "A short message detailing the reasoning behind the status.",
+            "examples": [
+              "ok"
+            ]
+          }
+        },
+        "description": "The result of a contract consumption validations"
+      },
+      "ClaimContractResponse": {
+        "required": [
+          "customerNumber",
+          "success"
+        ],
+        "type": "object",
+        "properties": {
+          "customerNumber": {
+            "type": "integer",
+            "description": "The customerNumber for the customer now claiming the personnel ticket",
+            "format": "int64",
+            "examples": [
+              1234567
+            ]
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Whether the claim was successful"
+          }
+        },
+        "description": "The response after claiming a contract"
+      },
+      "ClaimPersonnelTicketRequest": {
+        "required": [
+          "customerNumber",
+          "externalReference"
+        ],
+        "type": "object",
+        "properties": {
+          "externalReference": {
+            "pattern": "\\w+-(\\w+)+-\\w+",
+            "type": "string",
+            "description": "The code of the personnel ticket to claim",
+            "examples": [
+              "ABCD-EF12-3456-GH45"
+            ]
+          },
+          "customerNumber": {
+            "type": "integer",
+            "description": "The customerNumber referring to the customer who claims the personnel ticket",
+            "format": "int64",
+            "examples": [
+              1234567
+            ]
+          }
+        },
+        "description": "A request for claiming a personnel ticket"
+      },
+      "EntitlementResponse": {
+        "required": [
+          "contractOwnerCustomerNumber",
+          "contractOwnerDisplayName",
+          "contractUUID",
+          "contractValidFrom",
+          "isSeniorCitizen",
+          "passengerCategory",
+          "productId",
+          "productVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string",
+            "description": "Id of the product connected to the contracts loyalty program"
+          },
+          "displayName": {
+            "type": "array",
+            "description": "Display name for loyalty program",
+            "items": {
+              "$ref": "#/components/schemas/LocalizedText"
+            }
+          },
+          "productVersion": {
+            "type": "string",
+            "description": "Version of the product connected to the contracts loyalty program"
+          },
+          "contractUUID": {
+            "type": "string",
+            "description": "Contract UUID, used to identify a contract"
+          },
+          "contractExternalRef": {
+            "type": "string",
+            "description": "External contract reference if set."
+          },
+          "contractOwnerCustomerNumber": {
+            "type": "integer",
+            "description": "Contract owner customer number",
+            "format": "int64"
+          },
+          "contractOwnerDisplayName": {
+            "type": "string",
+            "description": "Contract owners first and last name"
+          },
+          "contractOwnerBirthDate": {
+            "$ref": "#/components/schemas/LocalDateResponse"
+          },
+          "contractValidFrom": {
+            "type": "string",
+            "description": "Contract consumable from date"
+          },
+          "contractValidTo": {
+            "type": "string",
+            "description": "Contract expiration date"
+          },
+          "contractParent": {
+            "type": "string",
+            "description": "If present, contract UUID of the parent contract. This field is usually set if the contract is created by a coupon usage, whereas this contract has a time constraint and the parent has a coupon constraint.",
+            "examples": [
+              "fd29908d-a2ae-4fe0-8e10-7f0db437c554"
+            ]
+          },
+          "remainingCoupons": {
+            "type": "integer",
+            "description": "Remaining coupons connected to the contract",
+            "format": "int64"
+          },
+          "couponsLimit": {
+            "type": "integer",
+            "description": "How many coupons the contract has. Default is cascaded from Loyalty Program Version. If set, the contract will be blocked for usage when all coupons are used. Coupons are registered via an OrderLineEvent.",
+            "format": "int64",
+            "examples": [
+              10
+            ]
+          },
+          "ticketOrderId": {
+            "type": "string",
+            "description": "If present, a ticket is included in this right. It may be distributed or redistributed to this device."
+          },
+          "isSeniorCitizen": {
+            "type": "boolean",
+            "description": "Whether the contract owner is considered a senior citizen",
+            "deprecated": true
+          },
+          "passengerCategory": {
+            "type": "string",
+            "description": "Passenger category.",
+            "enum": [
+              "STUDENT",
+              "SENIOR_CITIZEN",
+              "ADULT"
+            ]
+          }
+        },
+        "description": "Entitlement containing information about contract, product, contract holder and ticker order"
+      },
+      "LocalDateResponse": {
+        "required": [
+          "day",
+          "month",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "month": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "year": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "description": "Contract owners birth day"
+      },
+      "LocalizedText": {
+        "required": [
+          "description",
+          "languageCode",
+          "text"
+        ],
+        "type": "object",
+        "properties": {
+          "languageCode": {
+            "type": "string",
+            "description": "Language code according to ISO 639-3",
+            "examples": [
+              "NOB"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "description": "Text localized to the language given in languageCode"
+          },
+          "description": {
+            "type": "string",
+            "description": "Loyalty program description. Supports any kind of text"
+          }
+        },
+        "description": "Localized text with language code"
+      },
+      "ActiveTicketRightsHolderResponse": {
+        "required": [
+          "companyId",
+          "employeeId",
+          "firstName",
+          "grantedAt",
+          "isEmployee",
+          "surname",
+          "ticketRightType",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "The first name of the ticket holder",
+            "examples": [
+              "Ola"
+            ]
+          },
+          "surname": {
+            "type": "string",
+            "description": "The surname of the ticket holder",
+            "examples": [
+              "Hansen"
+            ]
+          },
+          "employeeId": {
+            "type": "string",
+            "description": "The employee number",
+            "examples": [
+              "123456"
+            ]
+          },
+          "companyId": {
+            "type": "integer",
+            "description": "The id of the company",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "isEmployee": {
+            "type": "boolean",
+            "description": "If the ticket holder is an employee or a family member",
+            "examples": [
+              true
+            ]
+          },
+          "hireEndDate": {
+            "type": "string",
+            "description": "The hire end date for pensioners",
+            "format": "date",
+            "examples": [
+              "2022-12-31"
+            ]
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "Postal address line",
+            "examples": [
+              "Karl Johans gate 1"
+            ]
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code",
+            "examples": [
+              "1234"
+            ]
+          },
+          "city": {
+            "type": "string",
+            "description": "City in postal address",
+            "examples": [
+              "Oslo"
+            ]
+          },
+          "ticketRightType": {
+            "type": "string",
+            "description": "Type of the ticket right, possible values are 'bronse' and 'sølv'",
+            "examples": [
+              "sølv"
+            ]
+          },
+          "grantedAt": {
+            "type": "string",
+            "description": "When the ticket right was granted",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the ticket holder, possible values are 'Ansatt', 'Pensjonist' and 'Familie'",
+            "examples": [
+              "Ansatt"
+            ]
+          }
+        },
+        "description": "All items for this page"
+      },
+      "CompanyResponse": {
+        "required": [
+          "addressLine",
+          "allowETickets",
+          "allowLocalEmployees",
+          "companyId",
+          "employeeNoPrefix",
+          "isDeleted",
+          "name",
+          "postalCode",
+          "reportSeparator"
+        ],
+        "type": "object",
+        "properties": {
+          "companyId": {
+            "type": "integer",
+            "description": "The company ID",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string",
+            "description": "The company name"
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "The company postal address"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The company postal code"
+          },
+          "employeeNoPrefix": {
+            "type": "string",
+            "description": "A prefix to be prepended to all employee numbers connected to this company"
+          },
+          "allowLocalEmployees": {
+            "type": "boolean",
+            "description": "Whether local employees are allowed"
+          },
+          "allowETickets": {
+            "type": "boolean",
+            "description": "Whether the company allows the usage of e-tickets for its personnel tickets"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether the company is deleted"
+          },
+          "reportSeparator": {
+            "type": "string",
+            "description": "Which character to separate elements within tax report: ','(default) or ';'"
+          },
+          "deleted": {
+            "type": "boolean",
+            "writeOnly": true
+          }
+        },
+        "description": "Companies are where employees are hired"
+      },
+      "EmployeeCategoryResponse": {
+        "required": [
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "description": "The year this category is valid",
+            "format": "int32",
+            "examples": [
+              2
+            ]
+          },
+          "category": {
+            "$ref": "#/components/schemas/Product"
+          }
+        },
+        "description": "Category information"
+      },
+      "EmployeeDisabilityProofRequest": {
+        "required": [
+          "isRegistered"
+        ],
+        "type": "object",
+        "properties": {
+          "isRegistered": {
+            "type": "boolean",
+            "description": "Whether proof of disability has been registered",
+            "examples": [
+              true
+            ]
+          }
+        },
+        "description": "Yearly disability proof information"
+      },
+      "EmployeeDisabilityProofResponse": {
+        "required": [
+          "isRegistered",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "description": "The year this information is valid for",
+            "format": "int32",
+            "examples": [
+              2020
+            ]
+          },
+          "isRegistered": {
+            "type": "boolean",
+            "description": "Whether a disability proof has been registered this year",
+            "examples": [
+              true
+            ]
+          }
+        },
+        "description": "Yearly disability proof information"
+      },
+      "EmployeeResponse": {
+        "required": [
+          "employeeNo",
+          "firstName",
+          "id",
+          "isDeleted",
+          "postalCode",
+          "surname",
+          "ticketHolderCode"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The id of the employee",
+            "format": "int64"
+          },
+          "employeeNo": {
+            "type": "string",
+            "description": "Employee number"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyResponse"
+          },
+          "employmentType": {
+            "$ref": "#/components/schemas/EmploymentType"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "When the employee was born",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "ssn": {
+            "type": "string",
+            "description": "The employee's social security number"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "The employee's first name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "The employee's surname"
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "The employee's postal address"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The employee's postal code"
+          },
+          "preferredProduct": {
+            "$ref": "#/components/schemas/Product"
+          },
+          "abstainFromTicket": {
+            "type": "boolean",
+            "description": "Whether a ticket should be created"
+          },
+          "sendTicketToPrivateAddress": {
+            "type": "boolean",
+            "description": "Unused",
+            "deprecated": true
+          },
+          "jobDescription": {
+            "type": "string",
+            "description": "Unused",
+            "deprecated": true
+          },
+          "hireStartDate": {
+            "type": "string",
+            "description": "When the employee was hired",
+            "format": "date",
+            "examples": [
+              "2019-04-12"
+            ]
+          },
+          "payType": {
+            "type": "string",
+            "description": "Pay type - see the codes in the API documentation",
+            "examples": [
+              "A"
+            ]
+          },
+          "hireEndDate": {
+            "type": "string",
+            "description": "When the employee left the company",
+            "format": "date",
+            "examples": [
+              "2019-04-17"
+            ]
+          },
+          "hireEndCause": {
+            "type": "string",
+            "description": "Why the employee left the company"
+          },
+          "disabilityGrade": {
+            "type": "integer",
+            "description": "The employee's degree of disability. Default 0.",
+            "format": "int32",
+            "examples": [
+              20
+            ]
+          },
+          "disabilityFromDate": {
+            "type": "string",
+            "description": "Unused",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "disabilityProofRegistered": {
+            "type": "boolean",
+            "description": "Deprecated. Use disability proofs.",
+            "deprecated": true
+          },
+          "disabilityProofRegisteredDate": {
+            "type": "string",
+            "description": "Unused",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "employmentPercentage": {
+            "type": "integer",
+            "description": "Employment percentage",
+            "format": "int32",
+            "examples": [
+              80
+            ]
+          },
+          "employmentPercentageDate": {
+            "type": "string",
+            "description": "Date for registered employment percentage",
+            "format": "date",
+            "examples": [
+              "2019-07-13"
+            ]
+          },
+          "paidPercentage": {
+            "type": "integer",
+            "description": "The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply",
+            "format": "int32"
+          },
+          "paidPercentageDate": {
+            "type": "string",
+            "description": "Date for last change to paidPercentage",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "leaveFromDate": {
+            "type": "string",
+            "description": "When the employee starts a leave",
+            "format": "date",
+            "examples": [
+              "2019-05-12"
+            ]
+          },
+          "isOnWaitPay": {
+            "type": "boolean",
+            "description": "Unused",
+            "deprecated": true
+          },
+          "waitPayDate": {
+            "type": "string",
+            "description": "Unused",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "isFeePaid": {
+            "type": "boolean",
+            "description": "Deprecated. Use yearlyFees",
+            "deprecated": true
+          },
+          "note": {
+            "type": "string",
+            "description": "Any additional information"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether the employee has been marked for deletion"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "description": "When the imported employee was last updated",
+            "format": "date-time"
+          },
+          "sourceLastUpdate": {
+            "type": "string",
+            "description": "The source for the last update"
+          },
+          "familyMembers": {
+            "type": "array",
+            "description": "The employee's family members",
+            "items": {
+              "$ref": "#/components/schemas/FamilyMemberResponse"
+            }
+          },
+          "ticketRights": {
+            "type": "array",
+            "description": "The employee's ticket rights",
+            "items": {
+              "$ref": "#/components/schemas/TicketRightResponse"
+            }
+          },
+          "ticketHolderCode": {
+            "type": "string",
+            "description": "The employee's ticket holder code"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date of creation.",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "The source for the first creation"
+          },
+          "categories": {
+            "type": "array",
+            "description": "The registered categories on this employee",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeCategoryResponse"
+            }
+          },
+          "yearlyFees": {
+            "type": "array",
+            "description": "The status of yearly fees for the current and the next year",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeYearlyFeeResponse"
+            }
+          },
+          "disabilityProofs": {
+            "type": "array",
+            "description": "The status of disability proofs for the current and the next year",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeDisabilityProofResponse"
+            }
+          },
+          "customerNumber": {
+            "type": "integer",
+            "description": "The employees customer number in ESS. Note this profile is owned by JBD and is the profile connected to the ticket right. A 'null'-value here may indicate that the ticket right is not yet synced to ESS.",
+            "format": "int64",
+            "examples": [
+              1337370
+            ]
+          }
+        },
+        "description": "All items for this page"
+      },
+      "EmployeeYearlyFeeRequest": {
+        "required": [
+          "isPaid"
+        ],
+        "type": "object",
+        "properties": {
+          "isPaid": {
+            "type": "boolean",
+            "description": "Whether this yearly fee has been paid",
+            "examples": [
+              true
+            ]
+          }
+        },
+        "description": "Yearly fee information"
+      },
+      "EmployeeYearlyFeeResponse": {
+        "required": [
+          "isPaid",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "description": "The year this fee is valid",
+            "format": "int32",
+            "examples": [
+              2020
+            ]
+          },
+          "isPaid": {
+            "type": "boolean",
+            "description": "Whether this yearly fee has been paid",
+            "examples": [
+              true
+            ]
+          }
+        },
+        "description": "Yearly fee information"
+      },
+      "EmploymentEndCause": {
+        "required": [
+          "code",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The code used for input",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the particular code's meaning",
+            "readOnly": true
+          }
+        },
+        "description": "The reason for an employment to end"
+      },
+      "EmploymentType": {
+        "required": [
+          "code",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The code used for input",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the particular code's meaning",
+            "readOnly": true
+          }
+        },
+        "description": "Employment type. Examples include Employee, Part time, Temp"
+      },
+      "FamilyMemberLowIncomeResponse": {
+        "required": [
+          "isRegistered",
+          "year"
+        ],
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "integer",
+            "description": "Year of registered low income",
+            "format": "int32",
+            "examples": [
+              2015
+            ]
+          },
+          "isRegistered": {
+            "type": "boolean",
+            "description": "Whether low income is registered",
+            "examples": [
+              true
+            ]
+          }
+        },
+        "description": "Low income information"
+      },
+      "FamilyMemberResponse": {
+        "required": [
+          "employeeId",
+          "firstName",
+          "id",
+          "isDeleted",
+          "relation",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The ID of the family member",
+            "format": "int64"
+          },
+          "employeeId": {
+            "type": "integer",
+            "description": "The ID of the employee",
+            "format": "int64"
+          },
+          "relation": {
+            "$ref": "#/components/schemas/FamilyRelation"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "When the family member was born",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "ssn": {
+            "type": "string",
+            "description": "The family members social security number",
+            "examples": [
+              "12345"
+            ]
+          },
+          "firstName": {
+            "type": "string",
+            "description": "The family member's first name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "The family member's surname"
+          },
+          "abstainFromTicket": {
+            "type": "boolean",
+            "description": "Whether a ticket should be created"
+          },
+          "note": {
+            "type": "string",
+            "description": "Any additional information"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether the family member has been marked for deletion"
+          },
+          "ticketRights": {
+            "type": "array",
+            "description": "A list of the family member's ticket rights",
+            "items": {
+              "$ref": "#/components/schemas/TicketRightResponse"
+            }
+          },
+          "ticketHolderCode": {
+            "type": "string",
+            "description": "The family members ticket holder code",
+            "examples": [
+              "JDSF-DGJE-SHU4"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date of creation.",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "The source for the first creation"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "The date the last time the family member was updated",
+            "format": "date-time"
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "The source for the last update"
+          },
+          "lowIncomes": {
+            "type": "array",
+            "description": "The low income registrations for the current and the next year",
+            "items": {
+              "$ref": "#/components/schemas/FamilyMemberLowIncomeResponse"
+            }
+          },
+          "customerNumber": {
+            "type": "integer",
+            "description": "The employees customer number in ESS. Note this profile is owned by JBD and is the profile connected to the ticket right. A 'null'-value here may indicate that the ticket right is not yet synced to ESS.",
+            "format": "int64",
+            "examples": [
+              1337370
+            ]
+          }
+        },
+        "description": "A family member must be connected to an employee"
+      },
+      "FamilyRelation": {
+        "required": [
+          "code",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The code used for input",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the particular code's meaning",
+            "readOnly": true
+          }
+        },
+        "description": "The relation a family member has to an employee"
+      },
+      "FipMonthlyTicketReport": {
+        "required": [
+          "employeeNo"
+        ],
+        "type": "object",
+        "properties": {
+          "fipTicketTypeSimple": {
+            "$ref": "#/components/schemas/FipTicketTypeSimple"
+          },
+          "issueDate": {
+            "type": "string",
+            "description": "Issued date",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "ticketNo": {
+            "type": "integer",
+            "description": "Ticket number",
+            "format": "int64"
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "The date the ticket is valid from",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "validUntil": {
+            "type": "string",
+            "description": "The date the ticket is valid to",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "travelType": {
+            "$ref": "#/components/schemas/TravelType"
+          },
+          "company": {
+            "type": "integer",
+            "description": "Company id",
+            "format": "int64"
+          },
+          "employeeNo": {
+            "type": "string",
+            "description": "Employee number"
+          }
+        }
+      },
+      "FipTicketTypeSimple": {
+        "required": [
+          "code",
+          "description",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The FIP ticket type id",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string",
+            "description": "The FIP ticket type code"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of the ticket type"
+          }
+        },
+        "description": "FIP ticket type"
+      },
+      "ImportedEmployeeMergePatchRequest": {
+        "required": [
+          "companyId",
+          "employeeNo",
+          "employmentPercentage",
+          "employmentTypeId",
+          "isDeleted"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeNo": {
+            "type": "string",
+            "description": "Employee number"
+          },
+          "companyId": {
+            "type": "string",
+            "description": "Company Id"
+          },
+          "employmentTypeId": {
+            "type": "string",
+            "description": "Type of employment",
+            "examples": [
+              "full-time (F), part-time (M), extra (T), unknown (U)"
+            ]
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "When the employee was born",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "ssn": {
+            "type": "string",
+            "description": "Birthdate-number og D-number, 5 digits"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "The employee's first name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "The employee's surname"
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "The employee's address line"
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "The postal code for the employee's address"
+          },
+          "preferredProductId": {
+            "type": "integer",
+            "description": "The employee's product",
+            "format": "int64"
+          },
+          "abstainFromTicket": {
+            "type": "boolean",
+            "description": "Whether a ticket should be created"
+          },
+          "hireStartDate": {
+            "type": "string",
+            "description": "When the employee was hired",
+            "format": "date",
+            "examples": [
+              "2019-04-12"
+            ]
+          },
+          "payType": {
+            "type": "string",
+            "description": "Pay type - see the codes in the API documentation",
+            "examples": [
+              "A"
+            ]
+          },
+          "hireEndDate": {
+            "type": "string",
+            "description": "When the employee left the company",
+            "format": "date",
+            "examples": [
+              "2019-04-17"
+            ]
+          },
+          "hireEndCause": {
+            "type": "string",
+            "description": "Why the employee left the company",
+            "examples": [
+              "pensioner (A), quitting (E), ..."
+            ]
+          },
+          "disabilityGrade": {
+            "type": "integer",
+            "description": "The employee's degree of disability. Default 0.",
+            "format": "int32",
+            "examples": [
+              20
+            ]
+          },
+          "disabilityFromDate": {
+            "type": "string",
+            "description": "When the employee's disability was granted",
+            "format": "date",
+            "examples": [
+              "2017-12-31"
+            ]
+          },
+          "employmentPercentage": {
+            "type": "integer",
+            "description": "Employment percentage",
+            "format": "int32",
+            "examples": [
+              80
+            ]
+          },
+          "employmentPercentageDate": {
+            "type": "string",
+            "description": "Date for registered employment percentage",
+            "format": "date",
+            "examples": [
+              "2019-07-13"
+            ]
+          },
+          "paidPercentage": {
+            "type": "integer",
+            "description": "The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply",
+            "format": "int32"
+          },
+          "leaveFromDate": {
+            "type": "string",
+            "description": "When the employee starts a leave",
+            "format": "date",
+            "examples": [
+              "2019-05-12"
+            ]
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether the employee has been marked for deletion. Default false"
+          }
+        },
+        "description": "Merge patch request for an Employee"
+      },
+      "ImportedEmployeeRequest": {
+        "required": [
+          "addressLine",
+          "companyId",
+          "dateOfBirth",
+          "employeeNo",
+          "employmentPercentage",
+          "employmentTypeId",
+          "firstName",
+          "hireStartDate",
+          "isDeleted",
+          "postalCode",
+          "ssn",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "employeeNo": {
+            "minLength": 1,
+            "type": "string",
+            "description": "Employee number"
+          },
+          "companyId": {
+            "type": "integer",
+            "description": "The company the employee is employed by",
+            "format": "int64"
+          },
+          "workPlaceId": {
+            "type": "integer",
+            "description": "Workplace id",
+            "format": "int64",
+            "deprecated": true
+          },
+          "employmentTypeId": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The type of employment"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "When the employee was born",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "ssn": {
+            "maxLength": 5,
+            "minLength": 5,
+            "type": "string",
+            "description": "The employee's social security number. 5 digits.",
+            "examples": [
+              "44554"
+            ]
+          },
+          "firstName": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The employee's first name"
+          },
+          "surname": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The employee's surname"
+          },
+          "addressLine": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The employee's postal address"
+          },
+          "postalCode": {
+            "minLength": 1,
+            "type": "string",
+            "description": "The postal code for the employee's address"
+          },
+          "preferredProductId": {
+            "type": "integer",
+            "description": "Deprecated. Use separate endpoint categories.",
+            "format": "int64",
+            "deprecated": true
+          },
+          "abstainFromTicket": {
+            "type": "boolean",
+            "description": "Whether a ticket should be created. Default false"
+          },
+          "sendTicketToPrivateAddress": {
+            "type": "boolean",
+            "description": "Not used. Won't be saved.",
+            "deprecated": true
+          },
+          "jobDescription": {
+            "type": "string",
+            "description": "Not used. Won't be saved.",
+            "deprecated": true
+          },
+          "hireStartDate": {
+            "type": "string",
+            "description": "When the employee was hired",
+            "format": "date",
+            "examples": [
+              "2019-04-12"
+            ]
+          },
+          "payType": {
+            "type": "string",
+            "description": "Pay type - see the codes in the API documentation",
+            "examples": [
+              "A"
+            ]
+          },
+          "hireEndDate": {
+            "type": "string",
+            "description": "When the employee left the company",
+            "format": "date",
+            "examples": [
+              "2019-04-17"
+            ]
+          },
+          "hireEndCause": {
+            "type": "string",
+            "description": "Why the employee left the company"
+          },
+          "disabilityGrade": {
+            "type": "integer",
+            "description": "The employee's degree of disability. Default 0.",
+            "format": "int32",
+            "examples": [
+              20
+            ]
+          },
+          "disabilityFromDate": {
+            "type": "string",
+            "description": "When the employee's disability was granted",
+            "format": "date",
+            "examples": [
+              "2017-12-31"
+            ]
+          },
+          "disabilityProofRegistered": {
+            "type": "boolean",
+            "description": "Deprecated. Use separate endpoint for disability proofs.",
+            "deprecated": true
+          },
+          "disabilityProofRegisteredDate": {
+            "type": "string",
+            "description": "Use separate endpoint for disability proofs",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "employmentPercentage": {
+            "type": "integer",
+            "description": "Employment percentage",
+            "format": "int32",
+            "examples": [
+              80
+            ]
+          },
+          "employmentPercentageDate": {
+            "type": "string",
+            "description": "Date for registered employment percentage",
+            "format": "date",
+            "examples": [
+              "2019-07-13"
+            ]
+          },
+          "paidPercentage": {
+            "type": "integer",
+            "description": "The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply",
+            "format": "int32"
+          },
+          "paidPercentageDate": {
+            "type": "string",
+            "description": "Not used. Won't be saved.",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "leaveFromDate": {
+            "type": "string",
+            "description": "When the employee starts a leave",
+            "format": "date",
+            "examples": [
+              "2019-05-12"
+            ]
+          },
+          "isOnWaitPay": {
+            "type": "boolean",
+            "description": "Not used. Won't be saved.",
+            "deprecated": true
+          },
+          "waitPayDate": {
+            "type": "string",
+            "description": "Not used. Won't be saved.",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "isFeePaid": {
+            "type": "boolean",
+            "description": "Deprecated. Use separate endpoint for yearlyFees.",
+            "deprecated": true
+          },
+          "note": {
+            "type": "string",
+            "description": "Deprecated. Not used.",
+            "deprecated": true
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether the employee has been marked for deletion. Default false"
+          },
+          "id": {
+            "type": "integer",
+            "description": "If present, this will perform an update of the employee",
+            "format": "int64"
+          }
+        }
+      },
+      "ImportedEmployeeResponse": {
+        "required": [
+          "companyId",
+          "employeeNo",
+          "firstName",
+          "id",
+          "surname"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The id of the imported employee",
+            "format": "int64"
+          },
+          "employeeNo": {
+            "type": "string",
+            "description": "Employee number"
+          },
+          "companyId": {
+            "type": "integer",
+            "description": "The company the employee is employed by",
+            "format": "int64"
+          },
+          "workPlaceId": {
+            "type": "integer",
+            "description": "Unused",
+            "format": "int64",
+            "deprecated": true
+          },
+          "employmentTypeId": {
+            "type": "string",
+            "description": "The type of employment"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "When the employee was born",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "ssn": {
+            "type": "string",
+            "description": "The employee's social security number"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "The employee's first name"
+          },
+          "surname": {
+            "type": "string",
+            "description": "The employee's surname"
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "The employee's postal address"
+          },
+          "postalData": {
+            "$ref": "#/components/schemas/PostalPlaceResponse"
+          },
+          "preferredProductId": {
+            "type": "integer",
+            "description": "Deprecated. Use separate endpoint categories.",
+            "format": "int64",
+            "deprecated": true
+          },
+          "abstainFromTicket": {
+            "type": "boolean",
+            "description": "Whether a ticket should be created"
+          },
+          "sendTicketToPrivateAddress": {
+            "type": "boolean",
+            "description": "Unused",
+            "deprecated": true
+          },
+          "jobDescription": {
+            "type": "string",
+            "description": "Unused",
+            "deprecated": true
+          },
+          "hireStartDate": {
+            "type": "string",
+            "description": "When the employee was hired",
+            "format": "date",
+            "examples": [
+              "2019-04-12"
+            ]
+          },
+          "payType": {
+            "type": "string",
+            "description": "Pay type - see the codes in the API documentation",
+            "examples": [
+              "A"
+            ]
+          },
+          "hireEndDate": {
+            "type": "string",
+            "description": "When the employee left the company",
+            "format": "date",
+            "examples": [
+              "2019-04-17"
+            ]
+          },
+          "hireEndCause": {
+            "type": "string",
+            "description": "Why the employee left the company"
+          },
+          "disabilityGrade": {
+            "type": "integer",
+            "description": "The employee's degree of disability. Default 0.",
+            "format": "int32",
+            "examples": [
+              20
+            ]
+          },
+          "disabilityFromDate": {
+            "type": "string",
+            "description": "When the employee's disability was granted",
+            "format": "date",
+            "examples": [
+              "2017-12-31"
+            ]
+          },
+          "disabilityProofRegistered": {
+            "type": "boolean",
+            "description": "Deprecated. Use separate endpoint for disability proofs.",
+            "deprecated": true
+          },
+          "disabilityProofRegisteredDate": {
+            "type": "string",
+            "description": "Unused",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "employmentPercentage": {
+            "type": "integer",
+            "description": "Employment percentage",
+            "format": "int32",
+            "examples": [
+              80
+            ]
+          },
+          "employmentPercentageDate": {
+            "type": "string",
+            "description": "Date for registered employment percentage",
+            "format": "date",
+            "examples": [
+              "2019-07-13"
+            ]
+          },
+          "paidPercentage": {
+            "type": "integer",
+            "description": "The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply",
+            "format": "int32"
+          },
+          "paidPercentageDate": {
+            "type": "string",
+            "description": "Unused",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "leaveFromDate": {
+            "type": "string",
+            "description": "When the employee starts a leave",
+            "format": "date",
+            "examples": [
+              "2019-05-12"
+            ]
+          },
+          "isOnWaitPay": {
+            "type": "boolean",
+            "description": "Unused",
+            "deprecated": true
+          },
+          "waitPayDate": {
+            "type": "string",
+            "description": "Unused",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2019-04-13"
+            ]
+          },
+          "isFeePaid": {
+            "type": "boolean",
+            "description": "Deprecated. Use separate endpoint for yearlyFees. Whether the ticket fee has been paid, if applicable",
+            "deprecated": true
+          },
+          "note": {
+            "type": "string",
+            "description": "Any additional information"
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether the employee has been marked for deletion"
+          },
+          "lastUpdate": {
+            "type": "string",
+            "description": "When the imported employee was last updated",
+            "format": "date-time"
+          },
+          "sourceLastUpdate": {
+            "type": "string",
+            "description": "The source for the last update"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "The date of creation.",
+            "format": "date-time"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "The source for the first creation"
+          }
+        }
+      },
+      "ManualOrderResponse": {
+        "required": [
+          "fromDate",
+          "id",
+          "isDeleted",
+          "issueDate",
+          "ticketType",
+          "toDate"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id of this manual order.",
+            "format": "int64"
+          },
+          "ticketType": {
+            "$ref": "#/components/schemas/TicketTypeResponse"
+          },
+          "issueDate": {
+            "type": "string",
+            "description": "When this manual order was first issued.",
+            "format": "date-time"
+          },
+          "fromDate": {
+            "type": "string",
+            "description": "First date the ticket right should be available.",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "toDate": {
+            "type": "string",
+            "description": "Last date the ticket right should be available.",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "stations": {
+            "uniqueItems": true,
+            "type": "array",
+            "description": "Any station pairs for this manual order.",
+            "items": {
+              "$ref": "#/components/schemas/StationPairResponse"
+            }
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether this manual order is deleted or not."
+          }
+        },
+        "description": "A manual order. This may contain a list of station pairs."
+      },
+      "PageActiveTicketRightsHolderResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/ActiveTicketRightsHolderResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageCompanyResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/CompanyResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageEmployeeResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/EmployeeResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageFamilyMemberResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/FamilyMemberResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageTicketRightResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/TicketRightResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageTicketRightsHolderResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/TicketRightsHolderResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PageTicketTypeResponse": {
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "All items for this page",
+            "items": {
+              "$ref": "#/components/schemas/TicketTypeResponse"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total items which could be returned",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        },
+        "description": "Paged content"
+      },
+      "PayType": {
+        "required": [
+          "code",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The code used for input",
+            "readOnly": true
+          },
+          "description": {
+            "type": "string",
+            "description": "A description of the particular code's meaning",
+            "readOnly": true
+          }
+        },
+        "description": "Pay type - see the codes in the API documentation"
+      },
+      "PostalPlaceResponse": {
+        "required": [
+          "code",
+          "country",
+          "isDeleted",
+          "place"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Postal code",
+            "examples": [
+              "0238"
+            ]
+          },
+          "place": {
+            "type": "string",
+            "description": "Postal place",
+            "examples": [
+              "OSLO"
+            ]
+          },
+          "country": {
+            "type": "string",
+            "description": "Country, format ISO 3166-1 alpha-3",
+            "examples": [
+              "NOR"
+            ]
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "If the postal place has been deleted"
+          }
+        },
+        "description": "The postal data for the employee's address"
+      },
+      "Product": {
+        "required": [
+          "id",
+          "name",
+          "validFrom",
+          "validUntil"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The product id",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human readable product name"
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "When the product is valid from",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          },
+          "validUntil": {
+            "type": "string",
+            "description": "When the product is valid to",
+            "format": "date",
+            "examples": [
+              "2023-01-01"
+            ]
+          }
+        },
+        "description": "A personnel ticket product"
+      },
+      "SimpleRule": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Rule id",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string",
+            "description": "Rule name"
+          }
+        },
+        "description": "Rule describing who are eligible for what ticket right"
+      },
+      "StationPairResponse": {
+        "required": [
+          "fromStation",
+          "id",
+          "toStation"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Id of this station pair",
+            "format": "int64"
+          },
+          "fromStation": {
+            "$ref": "#/components/schemas/StationResponse"
+          },
+          "toStation": {
+            "$ref": "#/components/schemas/StationResponse"
+          }
+        },
+        "description": "A set of stations on NetEX format."
+      },
+      "StationResponse": {
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Station in NetEX format."
+          },
+          "name": {
+            "type": "string",
+            "description": "Station name"
+          }
+        },
+        "description": "Station with NetEX and name"
+      },
+      "SyncStatus": {
+        "type": "object",
+        "properties": {
+          "isReadyToSync": {
+            "type": "boolean",
+            "description": "Whether the ticket right is ready to be sent to the ticketing system"
+          },
+          "syncTimestamp": {
+            "type": "string",
+            "description": "When the ticket right was sync'ed",
+            "format": "date-time",
+            "examples": [
+              "2019-06-13T12:34:56+01:00"
+            ]
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "If the system has failed in sending the ticket right to the ticketing system, this will hold the error message. Default is null"
+          }
+        },
+        "description": "Status fields related to synchronization with other services"
+      },
+      "TaxSavingReportGenerationResponse": {
+        "required": [
+          "progress",
+          "started"
+        ],
+        "type": "object",
+        "properties": {
+          "progress": {
+            "type": "integer",
+            "description": "How far the generation has progressed in percent from 0 to 100",
+            "format": "int32",
+            "readOnly": true
+          },
+          "started": {
+            "type": "string",
+            "description": "When the report generation started",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "finished": {
+            "type": "string",
+            "description": "When the report generation finished",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "error": {
+            "type": "string",
+            "description": "Error if the report generation fails",
+            "readOnly": true
+          }
+        }
+      },
+      "TicketRightResponse": {
+        "required": [
+          "calculationTimestamp",
+          "employeeId",
+          "ticketHolderId",
+          "ticketType",
+          "ticketrightId",
+          "validFrom",
+          "validUntil"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketrightId": {
+            "type": "integer",
+            "description": "The ticket right id",
+            "format": "int64"
+          },
+          "ticketHolderId": {
+            "type": "integer",
+            "description": "The id of the ticket holder, either an employee or a family member",
+            "format": "int64"
+          },
+          "employeeId": {
+            "type": "integer",
+            "description": "The id of the employee who is responsible",
+            "format": "int64"
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "The date from when the ticket right is valid",
+            "format": "date",
+            "examples": [
+              "2019-03-13"
+            ]
+          },
+          "validUntil": {
+            "type": "string",
+            "description": "The date from when the ticket right stops being valid",
+            "format": "date",
+            "examples": [
+              "2019-06-13"
+            ]
+          },
+          "ticketType": {
+            "$ref": "#/components/schemas/TicketTypeResponse"
+          },
+          "note": {
+            "type": "string",
+            "description": "Any additional information"
+          },
+          "canSendTicket": {
+            "type": "boolean",
+            "description": "This field will be discontinued in the next vesion of the API.",
+            "deprecated": true
+          },
+          "ticketCreated": {
+            "type": "string",
+            "description": "This field will be discontinued in the next vesion of the API.",
+            "format": "date-time",
+            "deprecated": true
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "This field will be discontinued in the next vesion of the API.",
+            "deprecated": true
+          },
+          "createdByRule": {
+            "$ref": "#/components/schemas/SimpleRule"
+          },
+          "calculationTimestamp": {
+            "type": "string",
+            "description": "When the ticketright was calculated",
+            "format": "date-time"
+          },
+          "ticketRightsHolder": {
+            "$ref": "#/components/schemas/TicketRightsHolderResponse"
+          },
+          "legacySyncStatus": {
+            "$ref": "#/components/schemas/SyncStatus"
+          },
+          "essSyncStatus": {
+            "$ref": "#/components/schemas/SyncStatus"
+          },
+          "manualOrder": {
+            "$ref": "#/components/schemas/ManualOrderResponse"
+          }
+        },
+        "description": "A ticket right granted to an employee or a family member"
+      },
+      "TicketRightsHolderResponse": {
+        "required": [
+          "id",
+          "ticketHolderCode"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The ticket right holder id",
+            "format": "int64"
+          },
+          "ticketHolderCode": {
+            "type": "string",
+            "description": "The personnel ticket code for the ticket rights holder"
+          },
+          "ticketRight": {
+            "$ref": "#/components/schemas/TicketRightResponse"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "Unused. This field is populated by employee / family member data and will be removed in future versions.",
+            "deprecated": true
+          },
+          "surname": {
+            "type": "string",
+            "description": "Unused. This field is populated by employee / family member data and will be removed in future versions.",
+            "deprecated": true
+          },
+          "addressLine": {
+            "type": "string",
+            "description": "Unused. This field is populated by employee / family member data and will be removed in future versions.",
+            "deprecated": true
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Unused. This field is populated by employee / family member data and will be removed in future versions.",
+            "deprecated": true
+          },
+          "postalPlace": {
+            "type": "string",
+            "description": "Unused. This field is populated by employee / family member data and will be removed in future versions.",
+            "deprecated": true
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Unused. This field is populated by employee / family member data and will be removed in future versions.",
+            "deprecated": true
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Unused. This field is populated by employee / family member data and will be removed in future versions.",
+            "format": "date",
+            "deprecated": true,
+            "examples": [
+              "2023-01-01"
+            ]
+          }
+        },
+        "description": "All items for this page"
+      },
+      "TicketTypeResponse": {
+        "required": [
+          "canHaveStationPairs",
+          "code",
+          "countryCode",
+          "description",
+          "generatesTicketRights",
+          "id",
+          "isDeleted"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Ticket type id",
+            "format": "int64"
+          },
+          "code": {
+            "type": "string",
+            "description": "Ticket type"
+          },
+          "description": {
+            "type": "string",
+            "description": "Ticket type description"
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "Country code"
+          },
+          "generatesTicketRights": {
+            "type": "boolean",
+            "description": "Whether or not this this ticket type is relevant for sending as input to a Manual order. If this = false (the default), it will not generate new tickets rights by manual order."
+          },
+          "canHaveStationPairs": {
+            "type": "boolean",
+            "description": "Whether or not this ticket type is compatible with station pairs when placing a manual order. The default = false. "
+          },
+          "isDeleted": {
+            "type": "boolean",
+            "description": "Whether the ticket type is deleted."
+          }
+        },
+        "description": "The Ticket type informs of which country it is valid in and what train class it covers."
+      },
+      "TravelType": {
+        "required": [
+          "code",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The travel type id"
+          },
+          "code": {
+            "type": "string",
+            "description": "The travel type code"
+          },
+          "description": {
+            "type": "string",
+            "description": "The travel type description"
+          }
+        },
+        "description": "Travel type"
+      }
+    },
+    "responses": {
+      "Error400": {
+        "description": "Bad request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Error401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Error403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Error500": {
+        "description": "Internal server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Error404_benefits-personnel-ticket": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Error404_customers-orchestrator-personnel-ticket": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Error404": {
+        "description": "Not found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

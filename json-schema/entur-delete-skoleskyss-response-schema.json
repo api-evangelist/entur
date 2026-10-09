@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-delete-skoleskyss-response-schema.json",
+  "title": "DeleteSkoleskyssResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-skoleskyss-openapi.yml#/components/schemas/DeleteSkoleskyssResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "customerAccountId": {
+      "type": "string"
+    },
+    "fareContractIds": {
+      "type": "array",
+      "deprecated": true,
+      "description": "Bruk fareContractId i stedet. Beholdes for bakoverkompatibilitet; inneholder 0 eller 1 element.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "fareContractId": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "customerAccountId",
+    "fareContractIds"
+  ]
+}

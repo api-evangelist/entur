@@ -1,0 +1,52 @@
+overlay: 1.0.0
+info:
+  title: Entur Entur shared mobility API overlay
+  version: 1.0.0
+extends: ../openapi/_original/entur-shared-mobility-openapi.yml
+x-generated: '2026-10-09'
+x-method: generated
+actions:
+- target: $.info
+  description: API Evangelist provider metadata.
+  update:
+    x-provider: entur
+    x-provider-name: Entur
+    x-apievangelist-operation-count: 11
+    x-apievangelist-generated: '2026-10-09'
+    x-apievangelist-source: openapi/entur-shared-mobility-openapi.yml
+- target: $.paths['/bookings/{bookingId}/retry-failed-payment/{recurringPaymentId}'].put
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Retry failed payment
+- target: $.paths['/bookings/{transportOperatorBookingId}/notification'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Send notification
+- target: $.paths['/bookings/{bookingId}/one-stop/event'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: One stop event
+- target: $.paths['/bookings/one-stop'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Create one stop booking
+- target: $.paths['/bookings/leg/{transportOperatorLegId}/event'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update booking with legs id events post
+- target: $.paths['/qr-code'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get qr code info
+- target: $.paths['/bookings'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get bookings
+- target: $.paths['/bookings/{customerNumber}/active'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get active bookings
+- target: $.paths['/bookings/{bookingId}'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get booking

@@ -1,0 +1,579 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-contract-response-schema.json",
+  "title": "ContractResponse",
+  "description": "A contract between a customer and an organisation",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personnel-tickets-openapi.yml#/components/schemas/ContractResponse",
+  "required": [
+    "consumableFrom",
+    "createdAt",
+    "createdBy",
+    "lastChangedAt",
+    "lastChangedBy",
+    "loyaltyProgram",
+    "organisationId",
+    "status",
+    "uuid"
+  ],
+  "type": "object",
+  "properties": {
+    "acceptanceDate": {
+      "type": "string",
+      "description": "When the contract was accepted by the customer",
+      "format": "date-time"
+    },
+    "consumableFrom": {
+      "type": "string",
+      "description": "From when the contract can be consumed",
+      "format": "date-time"
+    },
+    "contractConsumers": {
+      "type": "array",
+      "description": "The list of customers allowed to use the contract",
+      "items": {
+        "$ref": "#/$defs/ContractConsumerResponse"
+      }
+    },
+    "couponsLimit": {
+      "type": "integer",
+      "description": "How many coupons the contract has. Default is cascaded from Loyalty Program Version. If set, the contract will be blocked for usage when all coupons are used. Coupons are registered via an OrderLineEvent.",
+      "format": "int64"
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "When the contract was created",
+      "format": "date-time"
+    },
+    "createdBy": {
+      "type": "string",
+      "description": "Which client created the contract"
+    },
+    "currentTotal": {
+      "$ref": "#/$defs/TotalAmount"
+    },
+    "expirationDate": {
+      "type": "string",
+      "description": "When the contract expires",
+      "format": "date-time"
+    },
+    "externalRef": {
+      "type": "string",
+      "description": "Optional external reference. Examples are membership number and employee number"
+    },
+    "lastChangedAt": {
+      "type": "string",
+      "description": "When the contract was last changed",
+      "format": "date-time"
+    },
+    "lastChangedBy": {
+      "type": "string",
+      "description": "Which client changed the contract last"
+    },
+    "loyaltyProgram": {
+      "$ref": "#/$defs/LoyaltyProgramFlatResponse"
+    },
+    "orderLineEvents": {
+      "type": "array",
+      "description": "A list of order line events related to this contract",
+      "items": {
+        "$ref": "#/$defs/OrderLineEventResponse"
+      }
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "Which organisation the contract concerns",
+      "format": "int64"
+    },
+    "parent": {
+      "type": "string",
+      "description": "If present, contract UUID of the parent contract. This field is usually set if the contract is created by a coupon usage, whereas this contract has a time constraint and the parent has a coupon constraint."
+    },
+    "policies": {
+      "type": "array",
+      "description": "The list of keys validated against the customer claiming the contract",
+      "items": {
+        "$ref": "#/$defs/PolicyResponse"
+      }
+    },
+    "remainingCoupons": {
+      "type": "integer",
+      "description": "The remaining coupons for coupon based contracts. Derived from couponsLimit and orderLineEvents. The amount of remaining coupons are counted yearly and based of the earliest travel date.",
+      "format": "int64"
+    },
+    "status": {
+      "type": "string",
+      "description": "The contract status. A normal contract has status valid. It can be expired, refunded, cancelled, misused and valid "
+    },
+    "subContracts": {
+      "type": "array",
+      "description": "If present, contains timed contracts that are dependent on this contract. See Contract response",
+      "items": {
+        "type": "object"
+      }
+    },
+    "transactions": {
+      "type": "array",
+      "description": "The list of transactions for this contract (earn/burn or giftcard)",
+      "items": {
+        "$ref": "#/$defs/TransactionResponse"
+      }
+    },
+    "uuid": {
+      "type": "string",
+      "description": "Unique contract identifier"
+    }
+  },
+  "$defs": {
+    "ContractConsumerResponse": {
+      "required": [
+        "createdAt",
+        "createdBy",
+        "customerNumber",
+        "customerOrganisationId",
+        "isBlocked",
+        "isContractHolder",
+        "lastChangedAt",
+        "lastChangedBy"
+      ],
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "When the contract consumer was created",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Which client created the contract consumer"
+        },
+        "customerNumber": {
+          "type": "integer",
+          "description": "The customer entitled to use the contract. Unique Entur specific number",
+          "format": "int64"
+        },
+        "customerOrganisationId": {
+          "type": "integer",
+          "description": "The organisation ID the customer belongs to",
+          "format": "int64"
+        },
+        "customerRef": {
+          "type": "string",
+          "description": "The customer entitled to use the contract. External reference unique to organisation"
+        },
+        "isBlocked": {
+          "type": "boolean",
+          "description": "Marks that this specific user has been disallowed from using this contract by the contract owner"
+        },
+        "isContractHolder": {
+          "type": "boolean",
+          "description": "Marks that this specific user's organisation is the owner of the contract"
+        },
+        "lastChangedAt": {
+          "type": "string",
+          "description": "When the contract consumer was last changed",
+          "format": "date-time"
+        },
+        "lastChangedBy": {
+          "type": "string",
+          "description": "Which client changed the contract consumer last"
+        }
+      },
+      "description": "A description of the customer that's allowed to use the contract"
+    },
+    "CouponConfigResponse": {
+      "required": [
+        "defaultQuantity",
+        "loyaltyProgramId"
+      ],
+      "type": "object",
+      "properties": {
+        "defaultQuantity": {
+          "type": "integer",
+          "description": "Default number of how many coupons can be used. May be overridden by contract coupon limit",
+          "format": "int64"
+        },
+        "defaultStartTime": {
+          "type": "string",
+          "description": "The default start time of the contract created by a coupon usage. If set, the contract created by a coupon usage will start on the specified time of the travel date or when created",
+          "format": "time"
+        },
+        "loyaltyProgramId": {
+          "type": "integer",
+          "description": "The loyalty program the contract created by the coupon is connected to",
+          "format": "int64"
+        },
+        "usageValidityPeriod": {
+          "type": "string",
+          "description": "The duration of the of the contract created by a coupon usage. If set, the contract created by a coupon usage will set expiration date to the end of the duration. It will override loyalty program usageValidityPeriod",
+          "format": "duration"
+        }
+      },
+      "description": "Configuration for coupons. This is only set for loyalty program type COUPONS"
+    },
+    "LoyaltyProgramDescriptionResponse": {
+      "required": [
+        "createdAt",
+        "createdBy",
+        "description",
+        "languageCode",
+        "lastChangedAt",
+        "lastChangedBy"
+      ],
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "When the loyalty program was created",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Which client created the loyalty program"
+        },
+        "description": {
+          "type": "string",
+          "description": "Loyalty program description. Supports any kind of text"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name for loyalty program"
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "What language the description is written in, ISO639-3"
+        },
+        "lastChangedAt": {
+          "type": "string",
+          "description": "When the loyalty program was last changed",
+          "format": "date-time"
+        },
+        "lastChangedBy": {
+          "type": "string",
+          "description": "Which client changed the loyalty program last"
+        }
+      },
+      "description": "Description of a loyalty program version"
+    },
+    "LoyaltyProgramFlatResponse": {
+      "required": [
+        "descriptions",
+        "endDate",
+        "id",
+        "internalDescription",
+        "loyaltyProgramType",
+        "organisationId",
+        "productId",
+        "productVersion",
+        "startDate",
+        "status",
+        "versionNumber"
+      ],
+      "type": "object",
+      "properties": {
+        "couponConfig": {
+          "$ref": "#/$defs/CouponConfigResponse"
+        },
+        "defaultCouponsLimit": {
+          "type": "integer",
+          "description": "Deprecated. See couponConfig instead. How many coupons (eg. the maximum amount of usages) the underlying contracts of the loyalty program has.",
+          "format": "int64"
+        },
+        "descriptions": {
+          "type": "array",
+          "description": "A list of human readable descriptions in different languages. Only one language per description is allowed.",
+          "items": {
+            "$ref": "#/$defs/LoyaltyProgramDescriptionResponse"
+          }
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The end date of the loyaltyprogram. All contracts will expire when the loyaltyprogram expires. Supports ISO 8601 date format.",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "integer",
+          "description": "The id of the loyalty program",
+          "format": "int64"
+        },
+        "internalDescription": {
+          "type": "string",
+          "description": "A human readable internal description of the loyalty program."
+        },
+        "loyaltyProgramCode": {
+          "type": "string",
+          "description": "A word or code the customer can use to activate a loyalty program for themselves, set by the creator of the loyalty program"
+        },
+        "loyaltyProgramType": {
+          "type": "string",
+          "description": "The type of loyalty program. Types include COUPONS, TIMED and POINTS. A time-based loyalty program specifies a duration a connected contract is valid. A point-based loyalty program has contracts keeping track of earning and burning of points. This also includes gift cards. A coupon-based loyalty programs specifies how many times a contract can be consumed. For compatibility reasons, UNMAPPED is also available for loyalty programs that has not yet been classified.",
+          "enum": [
+            "TIMED",
+            "POINTS",
+            "COUPONS",
+            "UNMAPPED"
+          ]
+        },
+        "organisationId": {
+          "type": "integer",
+          "description": "The organisation that owns this loyalty program.",
+          "format": "int64"
+        },
+        "productId": {
+          "type": "string",
+          "description": "The id of the product associated with this loyalty program."
+        },
+        "productVersion": {
+          "type": "string",
+          "description": "The version of the product associated with this loyalty program."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The start date of the loyaltyprogram. If specified ahead in time, the loyaltyprogram will get status = draft. Supports ISO 8601 date format.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of this loyalty program. Can be DRAFT, CURRENT, DEPRECATED",
+          "enum": [
+            "DRAFT",
+            "CURRENT",
+            "DEPRECATED"
+          ]
+        },
+        "usageValidityPeriod": {
+          "type": "string",
+          "description": "The duration of a contract associated with this loyaltyprogram. This is set for loyalty program types TIMED and POINTS. The default value is null, which means the contract has an unlimited duration. This field uses the ISO 8601 duration format and accept the units: Days and Time. For example; 'P3DT12H30M5S' represents a duration of three days, twelve hours, thirty minutes, and five seconds."
+        },
+        "versionNumber": {
+          "type": "integer",
+          "description": "The version of this loyalty program.",
+          "format": "int64"
+        }
+      },
+      "description": "The current values for a loyalty program"
+    },
+    "OrderLineEventResponse": {
+      "required": [
+        "eventType",
+        "isCancelled",
+        "isPurchased",
+        "orderId",
+        "orderLineId",
+        "orderLineVersion",
+        "organisationId",
+        "price",
+        "timestamp"
+      ],
+      "type": "object",
+      "properties": {
+        "codespace": {
+          "type": "string",
+          "description": "Codespace"
+        },
+        "couponsUsed": {
+          "type": "integer",
+          "description": "How many coupons (usages) this event is using. This defaults to 1, but will be ignored if the contract in question does not use coupons.",
+          "format": "int64"
+        },
+        "effectiveCancellationDate": {
+          "type": "string",
+          "description": "If set, the effective date for cancellation.",
+          "format": "date-time"
+        },
+        "eventType": {
+          "type": "string",
+          "description": "The order line event type. Can be one of 'PURCHASE' or 'CANCELLATION'. PURCHASE is used when the order line event describe purchase of a travel using a contract (not the same as isPurchased). CANCELLATION is when the order line event is a cancellation (can be the same as isCancelled)"
+        },
+        "isCancelled": {
+          "type": "boolean",
+          "description": "Whether the order line event is a cancellation"
+        },
+        "isPurchased": {
+          "type": "boolean",
+          "description": "Whether the order line event describes the purchase of a contract, or contract consumer"
+        },
+        "lastTravelDate": {
+          "type": "string",
+          "description": "The last date of travel, related to entitlement usage. Defaults to equal travelDate. Relevant for period tickets only.",
+          "format": "date-time"
+        },
+        "manualTransactionComment": {
+          "type": "string",
+          "description": "If the order line is added manually, this field will have an explanation"
+        },
+        "orderId": {
+          "type": "string",
+          "description": "The order ID"
+        },
+        "orderLineId": {
+          "type": "string",
+          "description": "The order line ID"
+        },
+        "orderLineText": {
+          "type": "string",
+          "description": "The name of the product that this usage refers to. This should be supplied by the caller to indicate which item has been bought. This is displayed to the user in reports."
+        },
+        "orderLineVersion": {
+          "type": "string",
+          "description": "The order line version"
+        },
+        "organisationId": {
+          "type": "integer",
+          "description": "The organisation through which the order was placed",
+          "format": "int64"
+        },
+        "originalPrice": {
+          "type": "string",
+          "description": "The original price for this item, i.e.  i.e the original price without the travellers discount."
+        },
+        "price": {
+          "type": "string",
+          "description": "The actual paid price for this item, i.e. what did the user actually pay after rebate. Negative if this was a cancellation"
+        },
+        "taxDistributions": {
+          "type": "array",
+          "description": "Tax savings for this order line",
+          "items": {
+            "$ref": "#/$defs/TaxDistributionResponse"
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "When the order line event was saved",
+          "format": "date-time"
+        },
+        "travelDate": {
+          "type": "string",
+          "description": "The first date of travel on this ticket. Will be used to decide when to report this usage to the Norwegian tax administration, if applicable. Defaults to the current date and time.",
+          "format": "date-time"
+        }
+      },
+      "description": "An order line event on a contract"
+    },
+    "PolicyResponse": {
+      "required": [
+        "id",
+        "key"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "description": "Id of the policy",
+          "format": "int64"
+        },
+        "key": {
+          "type": "string",
+          "description": "Key for which field that should be matching"
+        }
+      },
+      "description": "Policy, returns keys that have to match"
+    },
+    "TaxDistributionResponse": {
+      "required": [
+        "isUnknown",
+        "taxMonth",
+        "taxSaving",
+        "taxYear"
+      ],
+      "type": "object",
+      "properties": {
+        "isUnknown": {
+          "type": "boolean",
+          "description": "If set, the tax distribution saving for that month is unknown. This is the case for all period tickets before may 2021. They need to be calculated manually"
+        },
+        "taxMonth": {
+          "type": "integer",
+          "description": "The month of the tax saving",
+          "format": "int32"
+        },
+        "taxSaving": {
+          "type": "string",
+          "description": "The value of tax saved"
+        },
+        "taxYear": {
+          "type": "integer",
+          "description": "The year of the tax saving",
+          "format": "int32"
+        }
+      },
+      "description": "Tax distribution for an order line"
+    },
+    "TotalAmount": {
+      "required": [
+        "amount",
+        "calculatedAt",
+        "currency"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "minimum": 0.01,
+          "pattern": "-?\\d*\\.\\d\\d",
+          "type": "string",
+          "description": "Amount amount. Format: -?\\d*\\.\\d\\d  Examples: 123.34  1.00  34000.00"
+        },
+        "calculatedAt": {
+          "type": "string",
+          "description": "When the amount was calculated",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency of the amount"
+        }
+      },
+      "description": "The current total for this contract (earn/burn or giftcard)"
+    },
+    "TransactionResponse": {
+      "required": [
+        "amount",
+        "currency",
+        "timestamp"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "pattern": "-?\\d*\\.\\d\\d",
+          "type": "string",
+          "description": "How much was the amount changed by this transaction? Positive value means deposit onto the card, negative withdrawal. Example: -130.00"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency used in this transaction. Only one currency is allowed for all transactions on a single contract."
+        },
+        "email": {
+          "type": "string",
+          "description": "Identifying sellers email for this transaction."
+        },
+        "externalTransactionId": {
+          "type": "string",
+          "description": "External transaction id for the ongoing transaction."
+        },
+        "internalTransactionId": {
+          "type": "string",
+          "description": "Internal unique identifier for this transaction."
+        },
+        "posId": {
+          "type": "integer",
+          "description": "Identifying point of sale for this transaction.",
+          "format": "int64"
+        },
+        "rrn": {
+          "type": "string",
+          "description": "External RRN for the payment."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp for this transaction.",
+          "format": "date-time"
+        }
+      },
+      "description": "The list of transactions for this contract (earn/burn or giftcard)"
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-sales-offer-package-response-schema.json",
+  "title": "SalesOfferPackageResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-products-api-openapi.yml#/components/schemas/SalesOfferPackageResponse",
+  "required": [
+    "id",
+    "name",
+    "status",
+    "versionId"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "NeTEx ID of the sales package."
+    },
+    "versionNumber": {
+      "type": "integer",
+      "description": "The version number. Only present for published versions."
+    },
+    "versionId": {
+      "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "NeTEx version ID."
+    },
+    "ownerOrganisationId": {
+      "type": "integer",
+      "description": "The ID of the organization that owns the sales package."
+    },
+    "name": {
+      "$ref": "#/$defs/LocalizedString"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/VersionStatus"
+        },
+        {
+          "description": "Status of this sales package version."
+        }
+      ]
+    },
+    "fareProducts": {
+      "type": "array",
+      "description": "List of fare product references included in this sales package.",
+      "items": {
+        "$ref": "#/$defs/FareProductRef"
+      }
+    },
+    "validFrom": {
+      "type": "string",
+      "description": "Start of the validity period (travel dates, not version date).",
+      "format": "date"
+    },
+    "validTo": {
+      "type": "string",
+      "description": "End of the validity period. No specified date means that the validity period has no end-date.",
+      "format": "date"
+    },
+    "publishedDate": {
+      "type": "string",
+      "description": "System-assigned timestamp of when the version was published. Only present for VERSIONED status.",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "FareProductRef": {
+      "required": [
+        "fareProductId",
+        "fareProductVersionId"
+      ],
+      "type": "object",
+      "properties": {
+        "fareProductId": {
+          "type": "string",
+          "description": "NeTEx ID of the fare product."
+        },
+        "fareProductVersionId": {
+          "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "NeTEx version ID of the fare product."
+        },
+        "fareProductVersionNumber": {
+          "type": "integer",
+          "description": "Sequence number of the fare product version. Optional — set at publication."
+        }
+      },
+      "description": "Reference to a specific version of a fare product (e.g. SupplementProduct, PreassignedFareProduct)."
+    },
+    "LocalizedString": {
+      "type": "array",
+      "items": {
+        "required": [
+          "lang",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "lang": {
+            "pattern": "^[a-z]{2}-[A-Z]{2}$",
+            "type": "string",
+            "description": "BCP-47 language tag (e.g., 'nb-NO', 'en-GB')."
+          },
+          "value": {
+            "type": "string",
+            "description": "The localized string value for the specified lang."
+          }
+        }
+      }
+    },
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    }
+  }
+}

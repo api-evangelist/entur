@@ -1,0 +1,162 @@
+openapi: 3.2.0
+info:
+  title: Entur Profile connections API
+  version: 2026.10.0
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Profile connections across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2
+security:
+- jwt: []
+tags:
+- name: Profile connections
+  description: 'API for managing profile connections. A profile connection is a connection between two customer profiles,
+
+    |where one profile is the main profile and the other profile is the connected profile. The main profile has access
+
+    |to everything on the connected profile.
+
+    |'
+paths:
+  /profile-connections/{mainCustomerNumber}/profiles:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profile connections
+      summary: Get profile connections
+      description: Returns list of customer numbers and organisation ids for all profiles connected to the given profile.
+      operationId: getProfileConnections
+      parameters:
+      - name: mainCustomerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+components:
+  schemas:
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: 'An Error message. '
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-customers-openapi.json
+- entur-customers-openapi.yml

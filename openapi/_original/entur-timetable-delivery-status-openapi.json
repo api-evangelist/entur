@@ -1,0 +1,145 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Timetable Delivery Status",
+    "description": "Status of a timetable data delivery",
+    "contact": {
+      "name": "Entur",
+      "url": "https://developer.entur.org"
+    },
+    "version": "2026.09.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.dev.entur.io/timetable/v1/timetable-events",
+      "description": "Development"
+    },
+    {
+      "url": "https://api.staging.entur.io/timetable/v1/timetable-events",
+      "description": "Staging"
+    },
+    {
+      "url": "https://api.entur.io/timetable/v1/timetable-events",
+      "description": "Production"
+    }
+  ],
+  "tags": [
+    {
+      "name": "timetable-delivery-status",
+      "description": "Status of a timetable data delivery"
+    }
+  ],
+  "paths": {
+    "/status/{codespace}/{correlationId}": {
+      "get": {
+        "tags": [
+          "timetable-delivery-status"
+        ],
+        "summary": "Get the status of a timetable data delivery",
+        "description": "Return the status of the delivery identified by its correlation id",
+        "operationId": "getDataDeliveryStatus",
+        "parameters": [
+          {
+            "name": "codespace",
+            "in": "path",
+            "description": "Codespace identifying the data provider (e.g. 'RUT').",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "correlationId",
+            "in": "path",
+            "description": "Correlation id assigned to the delivery when it was submitted.",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delivery status for the requested correlation id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataDeliveryStatus"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "state": "OK",
+                      "date": "2026-04-17T10:30:00Z",
+                      "fileName": "rut-netex_202604171030.zip"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "DataDeliveryStatus": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "IN_PROGRESS",
+              "FAILED",
+              "OK"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fileName": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "parameters": {
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

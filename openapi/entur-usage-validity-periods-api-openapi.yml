@@ -1,0 +1,1166 @@
+openapi: 3.2.0
+info:
+  title: Entur Usage Validity Periods API
+  version: 2026.10.0
+  description: 'Operations tagged usage-validity-periods across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: usage-validity-periods
+paths:
+  /usage-validity-periods:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - usage-validity-periods
+      summary: Retrieves usage validity periods by organisation id
+      operationId: usage-validity-periods_getAll
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify a organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify a fare frame
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsageValidityPeriod'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - usage-validity-periods
+      summary: Create a usage validity parameter
+      operationId: usage-validity-periods_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsageValidityPeriodInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity created successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /usage-validity-periods/batch:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - usage-validity-periods
+      summary: Update a list of uvps
+      operationId: usage-validity-periods_updateMany
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/SeqUsageValidityPeriodInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    post:
+      tags:
+      - usage-validity-periods
+      summary: Create a list of uvp
+      operationId: usage-validity-periods_createMany
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/SeqUsageValidityPeriodInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity created successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /usage-validity-periods/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - usage-validity-periods
+      summary: Retrives a usage validity period by id
+      operationId: usage-validity-periods_getById
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a usage validity period
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: query
+        description: The id for the version of the usage validity period
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageValidityPeriod'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /usage-validity-periods/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - usage-validity-periods
+      summary: Retrives a usage validity period by id
+      operationId: usage-validity-periods_getByIdAndVersion
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a usage validity period
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the usage validity period
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsageValidityPeriod'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - usage-validity-periods
+      summary: Update a usage validity period
+      operationId: usage-validity-periods_update
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a usage validity period
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the usage validity period
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsageValidityPeriodInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v1/usage-validity-periods/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - usage-validity-periods
+      summary: Retrieves a usage validity period by id
+      operationId: usage-validity-periods_getByIdV2
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a usage validity period
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: startDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: endDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: The version status of the usage validity period
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fromDate
+        in: query
+        description: The from date of the usage validity periods version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: toDate
+        in: query
+        description: The to date of the usage validity periods version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsageValidityPeriod'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    SeqUsageValidityPeriodInsert:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    SteppedDuration:
+      required:
+      - initialDuration
+      - stepUnit
+      - subsequentStepsDuration
+      type: object
+      properties:
+        initialDuration:
+          type: string
+          description: Initial duration. Represented as a string formatted according to ISO-8601
+          examples:
+          - PT1H
+        maximumDuration:
+          type: string
+          description: Maximum duration. Represented as a string formatted according to ISO-8601
+          examples:
+          - PT1H
+        stepUnit:
+          type: string
+          description: Step unit.
+          enum:
+          - STOPS
+          - STOPS_INCLUDING_PASS_THROUGH_STOPS
+          - SECTIONS
+          - ZONES
+          - NETWORKS
+          - OPERATORS
+          - COUNTRIES
+          examples:
+          - ZONES
+        subsequentStepsDuration:
+          type: string
+          description: Subsequent duration. Represented as a string formatted according to ISO-8601
+          examples:
+          - PT1H
+      description: Stepped duration.
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    UsageValidityPeriod:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - fareTableRefs
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        activationMeans:
+          type: array
+          description: Activation Means. Describes how a product can be activated.
+          items:
+            type: string
+        changed:
+          type: string
+          description: Changed datetime.
+          format: date-time
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          format: date-time
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to FareTable.
+          items:
+            $ref: '#/components/schemas/FareTableRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:UsageValidityPeriod:Child
+        limitingRuleRef:
+          $ref: '#/components/schemas/LimitingRule'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: UsageValidityPeriod Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - UsageValidityPeriod
+        standardDuration:
+          type: string
+          description: Standard duration. Represented as a string formatted according to ISO-8601
+          examples:
+          - PT1H
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        steppedDuration:
+          $ref: '#/components/schemas/SteppedDuration'
+        usageEnd:
+          type: string
+          description: Usage end.
+          enum:
+          - STANDARD_DURATION
+          - END_OF_CALENDAR_PERIOD
+          - END_OF_RIDE
+          - END_OF_TRIP
+          - END_OF_FARE_DAY
+          - END_OF_FARE_PERIOD
+          - PRODUCT_EXPIRY
+          - PROFILE_EXPIRY
+          - DEREGISTRATION
+          - UOTHER
+        usageEnds:
+          type: array
+          description: Usage ends. This field is deprecated, please use the field usageEnd
+          deprecated: true
+          items:
+            type: string
+        usageStartConstraintType:
+          type: string
+          description: Usage start constraint.
+          enum:
+          - VARIABLE
+          - FIXED
+          - FIXED_WINDOW
+        usageTrigger:
+          type: string
+          description: Usage trigger.
+          enum:
+          - START_OF_PERIOD
+          - START_OUT_BOUND_RIDE
+          - END_OUT_BOUND_RIDE
+          - START_RETURN_RIDE
+          - PURCHASE
+          - SPECIFIED_START_DATE
+          - FULFILMENT
+          - DAY_OFFSET_BEFORE_CALENDAR_PERIOD
+        usageValidityType:
+          type: string
+          description: Usage validity type.
+          enum:
+          - SINGLE_RIDE
+          - SINGLE_TRIP
+          - RETURN_TRIP
+          - CARNET
+          - DAY_PASS
+          - WEEKLY_PASS
+          - WEEKEND_PASS
+          - MONTHLY_PASS
+          - SEASON_TICKET
+          - PROFILE_MEMBERSHIP
+          - OPEN_ENDED
+          - OTHER
+        usageValidityTypes:
+          type: array
+          description: Usage validity type list.
+          items:
+            type: string
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: UsageValidityPeriod version.
+          examples:
+          - NSB:Version:V1
+      description: A UsageValidityPeriod response
+    FareTableRef:
+      type: object
+      properties:
+        nameOfRefClass:
+          type: string
+        ref:
+          type: string
+        version:
+          type: string
+    LimitingRule:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        canBeCumulative:
+          type: boolean
+          description: CanBeCumulative.
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountAsPercentage:
+          type: number
+          description: DiscountAsPercentage.
+          format: float
+        discountAsValue:
+          type: number
+          description: DiscountAsValue.
+          format: float
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        maximumPrice:
+          type: string
+          description: MaximumPrice.
+          examples:
+          - '164.0'
+        maximumPriceAsPercentage:
+          type: number
+          description: MaximumPriceAsPercentage.
+          format: double
+        minimumLimitPrice:
+          type: string
+          description: MinimumLimitPrice.
+          examples:
+          - '164.0'
+        minimumPrice:
+          type: string
+          description: MinimumPrice.
+          examples:
+          - '164.0'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - LimitingRule
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A LimitingRule
+    UsageValidityPeriodInsert:
+      required:
+      - fareFrameRef
+      - fareTableRefs
+      - id
+      - name
+      - version
+      type: object
+      properties:
+        activationMeans:
+          type: array
+          description: Activation Means. Describes how a product can be activated.
+          items:
+            type: string
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to FareTable.
+          items:
+            $ref: '#/components/schemas/FareTableRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - RUT:UsageValidityPeriod:30Days
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        standardDuration:
+          type: string
+          description: Standard duration. Represented as a string formatted according to ISO-8601
+          examples:
+          - PT1H
+        steppedDuration:
+          $ref: '#/components/schemas/SteppedDuration'
+        usageEnd:
+          type: string
+          description: Usage end.
+          enum:
+          - STANDARD_DURATION
+          - END_OF_CALENDAR_PERIOD
+          - END_OF_RIDE
+          - END_OF_TRIP
+          - END_OF_FARE_DAY
+          - END_OF_FARE_PERIOD
+          - PRODUCT_EXPIRY
+          - PROFILE_EXPIRY
+          - UOTHER
+        usageEnds:
+          type: array
+          description: Usage End list.
+          items:
+            type: string
+        usageStartConstraintType:
+          type: string
+          description: Usage start constraint.
+          enum:
+          - VARIABLE
+          - FIXED
+          - FIXED_WINDOW
+        usageTrigger:
+          type: string
+          description: Usage trigger.
+          enum:
+          - START_OF_PERIOD
+          - START_OUT_BOUND_RIDE
+          - END_OUT_BOUND_RIDE
+          - START_RETURN_RIDE
+          - PURCHASE
+          - SPECIFIED_START_DATE
+          - FULFILMENT
+          - DAY_OFFSET_BEFORE_CALENDAR_PERIOD
+        usageValidityTypes:
+          type: array
+          description: Usage validity type list.
+          items:
+            type: string
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: UsageValidityPeriod version.
+          examples:
+          - NSB:Version:V1
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

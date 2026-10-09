@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-reserve-offers-request-schema.json",
+  "title": "ReserveOffersRequest",
+  "description": "The input-holder for reserving offers and add them to an existing order.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-reserve-offers-partner-openapi.yml#/components/schemas/ReserveOffersRequest",
+  "required": [
+    "offerConfigurations"
+  ],
+  "type": "object",
+  "properties": {
+    "offerConfigurations": {
+      "type": "array",
+      "description": "A list of offer configurations selected for purchase",
+      "items": {
+        "$ref": "#/$defs/OfferConfiguration"
+      }
+    },
+    "orderId": {
+      "type": "string",
+      "description": "The offer to add the order to. If no orderId is specified, a new order is created"
+    }
+  },
+  "$defs": {
+    "Customer": {
+      "title": "Customer",
+      "required": [
+        "customerId",
+        "entitlements"
+      ],
+      "type": "object",
+      "properties": {
+        "customerId": {
+          "type": "string",
+          "description": "Customer id that will be linked to the order line created from the offer specified"
+        },
+        "entitlements": {
+          "type": "array",
+          "description": "The entitlement data for a customer; used if the the offer is created with entitlements",
+          "items": {
+            "$ref": "#/$defs/CustomerEntitlement"
+          },
+          "default": []
+        }
+      },
+      "description": "A holder for a customer and entitlements used by the customer for the offer"
+    },
+    "CustomerEntitlement": {
+      "title": "CustomerEntitlement",
+      "required": [
+        "entitlementProductRef"
+      ],
+      "type": "object",
+      "properties": {
+        "contractId": {
+          "type": "string",
+          "description": "The id of a benefit-contract that gives a customer an entitlement",
+          "format": "uuid"
+        },
+        "entitlementProductRef": {
+          "$ref": "#/$defs/IdAndVersionRef"
+        },
+        "externalEntitlementRef": {
+          "$ref": "#/$defs/IdAndVersionRef"
+        }
+      },
+      "description": "A holder for a customers entitlements"
+    },
+    "DistributionDetails": {
+      "title": "DistributionDetails",
+      "type": "object",
+      "properties": {
+        "fulfillmentMethodRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "typeOfTravelDocumentToIssueRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "customerAccountRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "distributionHolderCustomerId": {
+          "type": "string",
+          "description": "The Entur customer id that will be linked to the distribution of the order line created"
+        }
+      },
+      "description": "Wrapper for references connected to distribution of travel rights and/or tickets"
+    },
+    "IdAndVersionRef": {
+      "title": "IdAndVersionRef",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id reference to an external entity"
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional version reference to an external entity"
+        }
+      },
+      "description": "A holder for an id and version combination"
+    },
+    "OfferConfiguration": {
+      "title": "OfferConfiguration",
+      "required": [
+        "offerId"
+      ],
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "Deprecated: Please use either selectedTravellerIds or multiple offer configurations, depending on your use case. Old description: The number of instances of the salespackage(s), represented in the offer, and customer combination one would like to purchase. Default value = 1. If set to anything other than 1 when orderLineId is set, the endpoint will return 400 bad request.",
+          "format": "int32",
+          "deprecated": true,
+          "default": 1
+        },
+        "customerEntitlement": {
+          "$ref": "#/$defs/CustomerEntitlement"
+        },
+        "customerIds": {
+          "type": "array",
+          "description": "Deprecated: Use customers to supply customer ids",
+          "deprecated": true,
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "customers": {
+          "type": "array",
+          "description": "Customers with optional entitlement data; used to link travellers to order line and when offers are created with entitlements",
+          "items": {
+            "$ref": "#/$defs/Customer"
+          },
+          "default": []
+        },
+        "distributionDetails": {
+          "$ref": "#/$defs/DistributionDetails"
+        },
+        "externalReference": {
+          "type": "string",
+          "description": "External reference to an order line. Only used by external operators to identify order lines created by OfferConfigurations"
+        },
+        "offerId": {
+          "type": "string",
+          "description": "The id of the offer that is used",
+          "format": "uuid"
+        },
+        "orderLineId": {
+          "type": "string",
+          "description": "Please use /change-order-line instead. If replacing an order line, this is the id of the order line to replace",
+          "deprecated": true
+        },
+        "selectableProductIds": {
+          "type": "array",
+          "description": "A list of ids for selected products. Duplicates are only supported for SupplementProducts which does not modify seating assignments for the PreassignedFareProduct",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "selectedTravellerIds": {
+          "type": "array",
+          "description": "This field is used to specify which travellers will be included in the use of this offer. This field cannot be used in combination with count. It is validated against the travellers identified in the travellerMappings property of the selected Offer, as well as the legal number of UserProfiles per compartment when reserving a group product. When reserving a group product, validation is performed against the valid number of UserProfiles per compartment. When reserving regular products, a number of order lines will be made, corresponding to the number of selectedTravellerIds. Each order line will have one of the selectedTravellerIds.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "description": "The configuration-holder for an offer configuration"
+    },
+    "RefType": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Value to identify a given resource"
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional version for a given resource"
+        }
+      },
+      "description": "Versioned Reference to a resource"
+    }
+  }
+}

@@ -1,0 +1,144 @@
+openapi: 3.2.0
+info:
+  title: Entur Companion For Seat Controller API
+  version: 2026.09.0
+  description: 'Operations tagged companion-for-seat-controller across 2 of this provider''s published API definitions: entur-seatingservices-openapi.json, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seatingservices
+tags:
+- name: companion-for-seat-controller
+paths:
+  /v1/companion-for-seats/{companionMappingId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - companion-for-seat-controller
+      operationId: updateCompanionMapping
+      parameters:
+      - name: companionMappingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanionForSeatRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanionForSeatResponse'
+      summary: Update companion mapping
+      x-summary-source: derived
+    delete:
+      tags:
+      - companion-for-seat-controller
+      operationId: deleteCompanionMapping
+      parameters:
+      - name: companionMappingId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+      summary: Delete companion mapping
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /v1/companion-for-seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - companion-for-seat-controller
+      operationId: getCompanionForProducts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqCompanionForSeatResponse'
+      summary: Get companion for products
+      x-summary-source: derived
+    post:
+      tags:
+      - companion-for-seat-controller
+      operationId: createCompanionMapping
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompanionForSeatRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanionForSeatResponse'
+      summary: Create companion mapping
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+components:
+  schemas:
+    CompanionForSeatResponse: {}
+    SeqCompanionForSeatResponse:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    CompanionForSeatRequest: {}
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seatingservices-openapi.json
+- entur-seatingservices-openapi.yml

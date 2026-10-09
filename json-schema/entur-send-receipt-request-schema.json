@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-send-receipt-request-schema.json",
+  "title": "SendReceiptRequest",
+  "description": "Request for sending a sale receipt to a customer using one or more distribution methods",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-receipt-partner-openapi.yml#/components/schemas/SendReceiptRequest",
+  "required": [
+    "distribution",
+    "orderId",
+    "orderVersion"
+  ],
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "Order id to generate receipt"
+    },
+    "orderVersion": {
+      "type": "integer",
+      "description": "Which version of the order that should be used to generate a receipt",
+      "format": "int32"
+    },
+    "distribution": {
+      "$ref": "#/$defs/Distribution"
+    },
+    "receiptLanguage": {
+      "type": "string",
+      "description": "Desired language of the receipt. Currently only supporting 'nob' and 'eng'",
+      "default": "nob"
+    },
+    "serialNumber": {
+      "type": "string",
+      "description": "The desired serial number for the receipt"
+    },
+    "copyReceipt": {
+      "type": "boolean",
+      "description": "Set to true when the receipt is a copy."
+    }
+  },
+  "$defs": {
+    "Distribution": {
+      "title": "Distribution",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Email to receive receipt"
+        },
+        "telephone": {
+          "$ref": "#/$defs/Telephone"
+        }
+      },
+      "description": "Request for sending a receipt to a customer using one or more distribution methods. Will only send email if both email and telephone are provided. To send sms, leave email as null."
+    },
+    "Telephone": {
+      "title": "Telephone",
+      "required": [
+        "countryCode",
+        "number"
+      ],
+      "type": "object",
+      "properties": {
+        "countryCode": {
+          "type": "string",
+          "description": "Country code"
+        },
+        "number": {
+          "type": "string",
+          "description": "Phone number"
+        }
+      },
+      "description": "Telephone model for distribution"
+    }
+  }
+}

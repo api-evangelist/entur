@@ -1,0 +1,912 @@
+# x-archived-from: entur-refund-partner-openapi.yml
+# x-archived-on: 2026-10-09
+openapi: 3.1.2
+info:
+  title: Refunds
+  description: Check refundable options and perform refunds or compensations on customer orders. This API allows partners to preview refund outcomes, execute refunds, and apply price reductions when compensation is sufficient.
+  version: 2026.09.0
+servers:
+- url: https://api.entur.io/sales
+  description: production
+- url: https://api.staging.entur.io/sales
+  description: staging
+- url: https://api.dev.entur.io/sales
+  description: dev
+security:
+- jwt: []
+tags:
+- name: Refund
+  description: Check refundable options and perform refunds on customer orders.
+- name: Compensation
+  description: Reduce the price of one or more orders to compensate customers without performing a full refund. Used when a price adjustment is sufficient instead of cancelling or refunding order lines.
+paths:
+  /v1/compensations:
+    post:
+      tags:
+      - Compensation
+      summary: Reduce one or multiple orders' price and thus provide compensation for the paying customer
+      description: Leverages the possibility to compensate one or more orders in a batch operation
+      operationId: compensateOrders
+      requestBody:
+        description: A compensation request detailing which orders to compensate and by how much
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompensationRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompensationResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    parameters:
+    - $ref: '#/components/parameters/authHeader'
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/settlementHeader'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/compensations/{orderId}:
+    put:
+      tags:
+      - Compensation
+      summary: Reduce an single order price and thus provide compensation for the paying customer
+      description: Leverages the possibility to compensate one order
+      operationId: compensateOrder
+      requestBody:
+        description: The request body, detailing an single order to compensate and by how much
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompensationOperationRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompensationOperationResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+      deprecated: false
+    parameters:
+    - $ref: '#/components/parameters/authHeader'
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/settlementHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/refunds/options/{orderId}:
+    get:
+      tags:
+      - Refund
+      summary: Check refundable
+      description: By supplying a valid order id (and optional order line ids), this service will provide all existing refundable options that can be performed on that order's (and order line's) latest version
+      operationId: getAllPossibleRefundOptionsForOrder
+      parameters:
+      - name: orderLineIds
+        in: query
+        description: An optional list of comma separated order line ids
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        example:
+        - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+        - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+      - name: orderVersion
+        in: query
+        description: Get refund options for a specific Order version. The Order in this version must be in status CONFIRMED
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 3
+      - name: includeCancelled
+        in: query
+        description: Lets refund know that it can include already cancelled order lines when constructing refund options. Only usable from a Sørvis client
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundOptionResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    parameters:
+    - $ref: '#/components/parameters/authHeader'
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/refunds/{orderId}:
+    put:
+      tags:
+      - Refund
+      summary: Refund order
+      description: By supplying a valid order id and refund-operations, this service will perform a refund on the provided entries.
+      operationId: refundOrder
+      requestBody:
+        description: The request body, detailing elements per order line that should be refunded and the price for each operation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefundResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+      deprecated: false
+    parameters:
+    - $ref: '#/components/parameters/authHeader'
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/settlementHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+  /v1/refunds/{orderId}/dry-run:
+    put:
+      tags:
+      - Refund
+      summary: Perform a 'dry-run' of a refund
+      description: By supplying a valid order id and refund-operations, this service will perform a 'dry-run' of a refund and return the total refund amount, possible fees and affected transactions
+      operationId: dryRun
+      requestBody:
+        description: The request body, detailing elements per order line that should be refunded and the price for each operation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefundRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DryRunRefundResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+      deprecated: false
+    parameters:
+    - $ref: '#/components/parameters/authHeader'
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/settlementHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+components:
+  schemas:
+    CompensationElement:
+      type: object
+      description: A element that wraps a sub operation on a given order. Typically when different
+      properties:
+        orderLineIds:
+          type: array
+          description: Optional list of order line ids that are to be compensated. If left empty the whole order is assumed to be compensated
+          example:
+          - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+          - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+          items:
+            type: string
+        compensationAmount:
+          type: string
+          description: The amount of compensation desired for this order
+          example: '123.45'
+        compensationReason:
+          type: string
+          description: Optional field describing the reason for the compensation
+          example: The bus was late
+      required:
+      - compensationAmount
+      title: CompensationElement
+    CompensationOperation:
+      type: object
+      description: An entry describing a compensation operation
+      properties:
+        orderId:
+          type: string
+          description: The order id referencing the order to be compensated
+          example: NTA2JGR7
+        elements:
+          type: array
+          description: A list of compensation elements
+          items:
+            $ref: '#/components/schemas/CompensationElement'
+      required:
+      - elements
+      - orderId
+      title: CompensationOperation
+    CompensationRequest:
+      type: object
+      description: A request performing compensation operations in batch
+      properties:
+        compensationOperations:
+          type: array
+          description: A required list of one or more compensation operations
+          items:
+            $ref: '#/components/schemas/CompensationOperation'
+      required:
+      - compensationOperations
+      title: CompensationRequest
+    CompensationDetails:
+      type: object
+      description: The summary of a CompensationElement' outcome
+      properties:
+        orderLineIds:
+          type: array
+          description: Optional list of order line ids that have been compensated. If empty the whole order was compensated
+          example:
+          - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+          - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+          items:
+            type: string
+        feeId:
+          type: string
+          description: ID of the resulting REDUCTION fee for the compensation
+          example: fd894a04-bfa5-4e04-92e5-fd235449ea7d
+        involvedAuthorityIds:
+          type: array
+          description: A list of all the Authority ids associated with the compensated operation
+          example:
+          - ENT:Authority:Test
+          items:
+            type: string
+      required:
+      - feeId
+      - involvedAuthorityIds
+      title: CompensationDetails
+    CompensationResult:
+      type: object
+      description: The response from performing one or more compensation operations
+      properties:
+        orderId:
+          type: string
+          example: NTA2JGR7
+        details:
+          type: array
+          description: A collection of compensation details, corresponding to each CompensationElement in a CompensationOperation
+          items:
+            $ref: '#/components/schemas/CompensationDetails'
+        affectedPaymentAndPaymentTransactionIds:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: integer
+              format: int64
+          description: Map containing one or more payment ids, mapping to its transaction ids that have been affected by the credit operation
+          example:
+            '286535':
+            - 6784139
+            - 6784140
+          pattern: \\d+
+        creditId:
+          type: integer
+          format: int64
+          description: ID of the performed Credit
+          example: 123456
+      required:
+      - affectedPaymentAndPaymentTransactionIds
+      - creditId
+      - details
+      - orderId
+      title: CompensationResult
+    CompensationResponse:
+      type: object
+      description: The response from performing one or more compensation operations
+      properties:
+        operationResults:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompensationResult'
+      required:
+      - operationResults
+      title: CompensationResponse
+    RefundError:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Bad Request
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+          example: Validation Failed
+        path:
+          type: string
+          example: /v1/refunds/NTA2JGR7
+        status:
+          type: integer
+          format: int32
+          example: 400
+        timestamp:
+          type: string
+          format: date-time
+          example: '2020-07-21T17:32:28Z'
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      title: RefundError
+    TerminalRefundingData:
+      type: object
+      description: Holder for data that needs to be provided when performing a refund on an external terminal
+      properties:
+        additionalData:
+          type: object
+          additionalProperties:
+            type: string
+          description: Any extra transaction data which could be relevant can be specified as a key value map of strings. If there exists keys here that clash with specific types in this request, the fields in the request are prioritized
+        baxNumber:
+          type: string
+          description: When performing an offline refund to card terminal, the BAX-number is mandatory info
+          example: '123456'
+        obfuscatedCardNumber:
+          type: string
+          description: The obfuscated value of the card number the refund was performed against
+          example: '************1234'
+        paymentType:
+          type: string
+          description: The type of payment method that is provided to the terminal for refunding
+          example: MASTERCARD
+        rrn:
+          type: string
+          description: Reconciliation reference number used to track an order (transaction) through different economy systems. Generated by a terminal
+          example: '000000016575'
+        terminalId:
+          type: string
+          description: When performing an offline refund to card terminal, the terminal id is mandatory info
+          example: '84565479'
+        transactionConfirmedAt:
+          type: string
+          format: date-time
+          description: Datetime when credit transaction was completed externally by the client.
+          example: '2018-03-07T12:20:46Z'
+      required:
+      - baxNumber
+      - obfuscatedCardNumber
+      - paymentType
+      - rrn
+      - terminalId
+      - transactionConfirmedAt
+      title: TerminalRefundingData
+    CompensationOperationRequest:
+      type: object
+      description: A request performing an single compensation operation
+      properties:
+        elements:
+          type: array
+          description: A list of compensation elements
+          items:
+            $ref: '#/components/schemas/CompensationElement'
+        additionalTerminalData:
+          $ref: '#/components/schemas/TerminalRefundingData'
+        overrideReimbursementType:
+          type: string
+          description: 'Used to override the payment method that the refund operations will be registered as. All refund operations that will target a payment transaction that is imported, will be overridden. Available types: CASH'
+          example: CASH
+      required:
+      - compensationElements
+      title: CompensationOperationRequest
+    CompensationOperationResponse:
+      type: object
+      description: The response from performing a single compensation operation
+      properties:
+        operationResult:
+          $ref: '#/components/schemas/CompensationResult'
+      required:
+      - operationResult
+      title: CompensationOperationResponse
+    ProductLevel:
+      type: string
+      description: The level the element resides
+      enum:
+      - SALE_PACKAGE
+      - FARE_PRODUCT
+      - VALIDABLE_ELEMENT
+      - FARESTRUCTURE_ELEMENT
+    ProductElementIdentifier:
+      type: object
+      description: A type for depicting where an element resides in a sales package tree
+      properties:
+        fareStructureElementIndex:
+          type: integer
+          format: int32
+          description: The index of the element on the farestructure element level
+          example: 0
+        fareproductIndex:
+          type: integer
+          format: int32
+          description: The index of the element on the fareproduct level
+          example: 1
+        level:
+          $ref: '#/components/schemas/ProductLevel'
+        validableElementIndex:
+          type: integer
+          format: int32
+          description: The index of the element on the validable element level
+          example: 2
+      required:
+      - level
+      title: ProductElementIdentifier
+    AffectedPaymentTransaction:
+      type: object
+      description: A composition of payment transaction data that is affected, including the amount that will be subtracted if used in a refund
+      properties:
+        amount:
+          type: string
+          description: The amount that will be subtracted from the transaction if used in a refund
+          example: '123.45'
+        generalType:
+          type: string
+          description: The general type of payment
+          example: PAYMENTCARD
+        import:
+          type: boolean
+        paymentId:
+          type: integer
+          format: int64
+          description: The id of a payment
+          example: 286535
+        rrn:
+          type: string
+          description: The Retrieval Reference Number for the affected transaction
+          example: '000000016575'
+        specificType:
+          type: string
+          description: If available, a more specific payment type
+          example: VISA
+        transactionId:
+          type: integer
+          format: int64
+          description: The id of the payment transaction
+          example: 6784139
+      required:
+      - amount
+      - generalType
+      - import
+      - paymentId
+      - transactionId
+      title: AffectedPaymentTransaction
+    OrderReference:
+      type: object
+      description: Wrapper detailing a OrderReference to an instance
+      properties:
+        id:
+          type: string
+          description: The id of the instance
+          example: a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+        version:
+          type: integer
+          format: int32
+          description: The version of the instance
+          example: 3
+      required:
+      - id
+      - version
+      title: OrderReference
+    ProductsElementWrapper:
+      type: object
+      description: A data-wrapper for a product type
+      properties:
+        id:
+          type: string
+          description: The id of the product type
+          example: ENT:Refunding:Cancel4HoursAfterPurchase
+        name:
+          type: string
+          description: The name of the product type
+          example: Cancel up to 4 hours after purchase
+        version:
+          type: string
+          description: The version of the product type
+          example: '1'
+      required:
+      - id
+      - version
+      title: ProductsElementWrapper
+    RefundOption:
+      type: object
+      description: A representation of a complete refundable option
+      properties:
+        additionalAffectedElementsOnLevel:
+          type: array
+          default: []
+          description: An optional list of additional elements on the same product level that this option also will consume
+          items:
+            $ref: '#/components/schemas/ProductElementIdentifier'
+        affectedPaymentTransactions:
+          type: array
+          description: A summary list of which payment and its transactions that will be affected if this option is selected
+          items:
+            $ref: '#/components/schemas/AffectedPaymentTransaction'
+        expiresAt:
+          type: string
+          format: date-time
+          description: The datetime that this option will expire
+          example: '2023-10-12T07:20:50.52Z'
+        fee:
+          type: string
+          description: The fee this option will entail. This needs to be subtracted from refundAmount to get the final amount that will be refunded
+          example: '12.34'
+        orderLineRef:
+          $ref: '#/components/schemas/OrderReference'
+        product:
+          $ref: '#/components/schemas/ProductsElementWrapper'
+        productElementIdentifier:
+          $ref: '#/components/schemas/ProductElementIdentifier'
+        refundAmount:
+          type: string
+          description: The refundable amount that this option permits
+          example: '123.45'
+        refundRule:
+          $ref: '#/components/schemas/ProductsElementWrapper'
+        transientId:
+          type: string
+          format: uuid
+          description: An id for an option that is unique only in the context of a RefundOptionResponse
+          example: 26b02145-7dbf-4be9-8600-ff4a570d83d5
+      required:
+      - affectedPaymentTransactions
+      - expiresAt
+      - fee
+      - orderLineRef
+      - product
+      - productElementIdentifier
+      - refundAmount
+      - refundRule
+      - transientId
+      title: RefundOption
+    RefundOptionResponse:
+      type: object
+      description: A response detailing all refundable options for an order
+      properties:
+        optionIdsThatCanBePerformedTogether:
+          type: array
+          description: A set of option ids that are possible to refund together. If only one option is returned, this will be empty. Ids are only valid inside the scope of a RefundOptionResponse
+          items:
+            type: array
+            example:
+            - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+            - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+            items:
+              type: string
+              format: uuid
+            uniqueItems: true
+          uniqueItems: true
+        options:
+          type: array
+          default: []
+          description: All the refundable options for a given order, or options for requested order lines
+          items:
+            $ref: '#/components/schemas/RefundOption'
+        orderRef:
+          $ref: '#/components/schemas/OrderReference'
+      required:
+      - optionIdsThatCanBePerformedTogether
+      - options
+      - orderRef
+      title: RefundOptionResponse
+    PerformRefundEntry:
+      type: object
+      description: A refund 'operation' that describes which order line, and which elements in that order line product tree that is to be refunded
+      properties:
+        orderLineRef:
+          $ref: '#/components/schemas/OrderReference'
+        refundOperations:
+          type: array
+          description: A list of identifiers for which element(s) in the order lines product tree that is to be refunded
+          items:
+            $ref: '#/components/schemas/ProductElementIdentifier'
+        refundRule:
+          $ref: '#/components/schemas/ProductsElementWrapper'
+          description: The refund rule that is to be used with this entry.
+      required:
+      - orderLineRef
+      - refundOperations
+      title: PerformRefundEntry
+    RefundRequest:
+      type: object
+      description: A request for performing a refund
+      properties:
+        refundOperations:
+          type: array
+          description: A list of refund operations which will specify order line, optionally where in the product tree the change occurs, and how much money should be refunded with this change
+          items:
+            $ref: '#/components/schemas/PerformRefundEntry'
+        additionalTerminalData:
+          $ref: '#/components/schemas/TerminalRefundingData'
+        includesCancelledOrderLines:
+          type: boolean
+          description: Lets refund know that the request will include already cancelled order lines, and to handle them accordingly
+      required:
+      - refundOperations
+      title: RefundRequest
+    RefundResponse:
+      type: object
+      description: A summary about a performed refund.
+      properties:
+        orderId:
+          type: string
+          description: ID of the refunded order.
+          example: NTA2JGR7
+        affectedOrderLineIds:
+          type: array
+          default: []
+          description: List containing the IDs of the affected order lines.
+          example:
+          - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+          - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+          items:
+            type: string
+        creditId:
+          type: integer
+          format: int64
+          description: ID of the performed Credit
+          example: 123456
+        affectedPaymentAndPaymentTransactionIds:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: integer
+              format: int64
+          description: Map containing one or more payment ids, mapping to its transaction ids that have been affected by the credit operation
+          example:
+            '286535':
+            - 6784139
+            - 6784140
+          pattern: \\d+
+        disabledTicketIds:
+          type: array
+          default: []
+          description: List containing the IDs of the disabled tickets.
+          example:
+          - 987654321
+          - 123456789
+          items:
+            type: integer
+            format: int64
+      required:
+      - affectedOrderLineIds
+      - affectedPaymentAndPaymentTransactionIds
+      - creditId
+      - disabledTicketIds
+      - orderId
+      title: RefundResponse
+    DryRunRefundFee:
+      type: object
+      properties:
+        feeRef:
+          $ref: '#/components/schemas/ProductsElementWrapper'
+        amount:
+          type: string
+          description: The amount of the fee
+          example: '12.34'
+        type:
+          type: string
+          description: The type of a Fee that will be added. REFUNDING or MANUAL
+          example: REFUNDING
+      required:
+      - amount
+      - feeRef
+      - type
+      title: DryRunRefundFee
+    DryRunRefundResponse:
+      type: object
+      description: A representation of a complete refundable option
+      properties:
+        orderId:
+          type: string
+          description: The id of the order used
+          example: NTA2JGR7
+        totalRefundAmount:
+          type: string
+          description: The total amount that will be refunded if refund is called with the provided input
+          example: '123.45'
+        fees:
+          type: array
+          description: The fees that will be added to the order if refund is called with the provided input
+          items:
+            $ref: '#/components/schemas/DryRunRefundFee'
+        affectedPaymentTransactions:
+          type: array
+          description: A summary list of which payment and its transactions that will be affected if refund is run with the provided input
+          items:
+            $ref: '#/components/schemas/AffectedPaymentTransaction'
+      required:
+      - affectedPaymentTransactions
+      - fees
+      - orderId
+      - totalRefundAmount
+      title: DryRunRefundResponse
+  responses:
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 400
+            title: Bad Request
+            error: Bad Request
+            exception: BAD_REQUEST
+            message: Required parameter 'xx' is not present.
+            path: /v1/refunds
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 404
+            title: Not Found
+            error: Not Found
+            exception: NotFoundException
+            message: This orderId does not have any options
+            path: /v1/refunds/options/{orderId}
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 409
+            title: Conflict
+            error: Conflict
+            exception: ConflictException
+            message: Order with orderId 1 already refunded.
+            path: /v1/refunds/admin/{orderId}
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 500
+            title: Internal Server Error
+            error: Internal Server Error
+            exception: InternalServerException
+            message: Unexpected error while retrieving refunds
+            path: /v1/refunds/{orderId}
+  parameters:
+    authHeader:
+      name: Authorization
+      in: header
+      description: Authorization header
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: ENT:DistributionChannel:App
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 1000600-abc
+    settlementHeader:
+      name: Entur-Settlement-Id
+      in: header
+      description: An id for connecting a credit to a settlement
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: '12345'
+    orderIdPathParam:
+      name: orderId
+      in: path
+      description: The id of the order that one would like to get or perform refund operations on
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: NTA2JGR7
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string

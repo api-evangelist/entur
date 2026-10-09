@@ -1,0 +1,1933 @@
+openapi: 3.2.0
+info:
+  title: Entur Fare Tables API
+  version: 2026.10.0
+  description: 'Operations tagged fare-tables across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: fare-tables
+paths:
+  /fare-tables:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-tables
+      summary: Retrieves all faretables.
+      operationId: fare-tables_findByOrganisationIdOrFareFrameId
+      parameters:
+      - name: orgId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify data owned by organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        description: if set to true fare table cells will be omitted
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: statusFilter
+        in: query
+        description: 'Filter by status. Allowed values: DRAFT, PROPOSED, VERSIONED, DEPRECATED, ALL. Defaults to ALL if not specified. Mutually exclusive with validOnDate.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - DRAFT
+            - PROPOSED
+      - name: validOnDate
+        in: query
+        description: 'Return the FareTables valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED FareTables are returned. And in the staging environment, PROPOSED FareTables are preferred to VERSIONED ones. Mutually exclusive with statusFilter.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FareTable'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - fare-tables
+      summary: Create a fare table
+      operationId: fare-tables_create
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FareTableInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity created successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Already registered
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /fare-tables/count:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-tables
+      summary: Retrieves the number of fareTables.
+      operationId: fare-tables_getFareTableCount
+      parameters:
+      - name: orgId
+        in: query
+        description: The unique id to identify a organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to idetify data owned by organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: statusFilter
+        in: query
+        description: 'Filter by status. Allowed values: DRAFT, PROPOSED, VERSIONED, DEPRECATED, ALL. Defaults to ALL if not specified. Mutually exclusive with validOnDate.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - DRAFT
+            - PROPOSED
+      - name: validOnDate
+        in: query
+        description: 'Count FareTables valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED FareTables are counted. And in the staging environment, PROPOSED FareTables are preferred to VERSIONED ones. Mutually exclusive with statusFilter.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returs the info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Count'
+        '304':
+          description: Not Modified
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /fare-tables/pages:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-tables
+      summary: Retrieves fareTables for a given page.
+      operationId: fare-tables_findPageByOrganisationIdOrFareFrameId
+      parameters:
+      - name: orgId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fareFrameId
+        in: query
+        description: The unique id to identify data owned by organisation
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: pageSize
+        in: query
+        description: Size of page
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: pageNumber
+        in: query
+        description: Page number
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: minimizeDataLoad
+        in: query
+        description: if set to true fare table cells will be omitted
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: statusFilter
+        in: query
+        description: 'Filter by status. Allowed values: DRAFT, PROPOSED, VERSIONED, DEPRECATED, ALL. Defaults to ALL if not specified. Mutually exclusive with validOnDate.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - DRAFT
+            - PROPOSED
+      - name: validOnDate
+        in: query
+        description: 'Return the FareTables valid on this date, example: 2024-06-01T00:00:00Z. Note that, if called in the production environment, only VERSIONED FareTables are returned. And in the staging environment, PROPOSED FareTables are preferred to VERSIONED ones. Mutually exclusive with statusFilter.'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the info
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FareTablePageWrapper'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /fare-tables/products/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-tables
+      summary: Retrives a faretable by product id
+      operationId: fare-tables_getByFareProductId
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a product
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the resource
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FareTable'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /fare-tables/{ftId}/cells/{cellId}/fare-prices:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    patch:
+      tags:
+      - fare-tables
+      summary: Updates a FarePrice for FareTable
+      operationId: fare-tables_updateFarePriceForFareTable
+      parameters:
+      - name: ftId
+        in: path
+        description: The  id to identify a fare table
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: cellId
+        in: path
+        description: The  id to identify a cell
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: fareTableVersionId
+        in: query
+        description: The versjon of the fare table
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FarePriceUpdate'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /fare-tables/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-tables
+      summary: Retrieves a fare table by id
+      description: Note! Only fare tables with active versions will be fetched
+      operationId: fare-tables_getById
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a fare table
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: The id for the version of the fare table
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: languageCode
+        in: query
+        description: The language code from ISO-639-3
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        description: if set to true fare table cells will be omitted
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: validOnDate
+        in: query
+        description: Return the version valid on the given date (ISO-8601). Overrides 'version'. In prod returns the VERSIONED element; in staging/dev PROPOSED is preferred over VERSIONED.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the fare table
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareTable'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /fare-tables/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-tables
+      summary: Retrieves a fare table by id and version
+      operationId: fare-tables_getByIdAndVersion
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a fare table
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the fare table
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        description: if set to true fare table cells will be omitted
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the fare table
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareTable'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - fare-tables
+      summary: Update a faretable
+      operationId: fare-tables_update
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a fare table
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The id for the version of the fare table
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FareTableInsert'
+        required: true
+      responses:
+        '204':
+          description: Entity updated successfully
+        '400':
+          description: Validation errors
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Missing Authorization
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Authorization failed
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v1/fare-tables/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - fare-tables
+      summary: Retrieves a fare table by id
+      operationId: fare-tables_getByIdV2
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a fare table
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: startDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: endDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: The version status of the fare table
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code from ISO-639-3
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: minimizeDataLoad
+        in: query
+        description: if set to true fare table cells will be omitted
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: fromDate
+        in: query
+        description: The from date of the fare tables version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: toDate
+        in: query
+        description: The to date of the fare tables version
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the fare table
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FareTable'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    FareTablePageWrapper:
+      required:
+      - items
+      - requestedPageNumber
+      - totalNumberOfItems
+      - totalNumberOfPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Fare Tables for the given page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/FareTable'
+        requestedPageNumber:
+          type: integer
+          description: Number of the requested page. In case state is lost
+          format: int32
+          examples:
+          - 369
+        totalNumberOfItems:
+          type: integer
+          description: Total number of items.
+          format: int32
+          examples:
+          - 369
+        totalNumberOfPages:
+          type: integer
+          description: Number of pages needed to traverse all items.
+          format: int32
+          readOnly: true
+          examples:
+          - 15
+      description: FareTablePageWrapper
+    FareTable:
+      required:
+      - cells
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - prices
+      - status
+      - version
+      type: object
+      properties:
+        cells:
+          type: array
+          description: Cell
+          items:
+            $ref: '#/components/schemas/Cell'
+        changed:
+          type: string
+          description: Changed datetime.
+          format: date-time
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          format: date-time
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        endDate:
+          type: string
+          description: EndDate.
+          format: date
+          examples:
+          - '2017-11-11'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FareTable:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - FareTable
+        organisationId:
+          type: string
+          description: Organisation related to the fare table
+          readOnly: true
+        prices:
+          type: array
+          description: FarePrice.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        startDate:
+          type: string
+          description: StartDate.
+          format: date
+          examples:
+          - '2017-11-11'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A FareTable
+    Cell:
+      required:
+      - changed
+      - created
+      - farePrice
+      - id
+      - modification
+      - nameOfClass
+      - priceableObjectRefs
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+        channelGroupRef:
+          type: object
+          description: Channel group reference
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        farePrice:
+          $ref: '#/components/schemas/FarePrice'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - RUT:Cell:5zoneAdult
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - Cell
+        priceableObjectRefs:
+          type: array
+          description: References to for example geographical interval and UserProfile
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+    FarePrice:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          maximum: 100
+          minimum: -100
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - FarePrice
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/Rounding'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+          description: Version.
+          readOnly: true
+          examples:
+          - NSB:Version:V1
+      description: A description of the price and factor for a set fare
+    CellInsert:
+      required:
+      - fareFrameRef
+      - farePrice
+      - id
+      - name
+      type: object
+      properties:
+        channelGroupRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        farePrice:
+          $ref: '#/components/schemas/FarePriceInsert'
+        fareTableRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - RUT:Cell:5zoneAdult
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        priceableObjectRefs:
+          type: array
+          description: References to for example geographical interval and UserProfile
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          type: string
+    LimitingRule:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        canBeCumulative:
+          type: boolean
+          description: CanBeCumulative.
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountAsPercentage:
+          type: number
+          description: DiscountAsPercentage.
+          format: float
+        discountAsValue:
+          type: number
+          description: DiscountAsValue.
+          format: float
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        maximumPrice:
+          type: string
+          description: MaximumPrice.
+          examples:
+          - '164.0'
+        maximumPriceAsPercentage:
+          type: number
+          description: MaximumPriceAsPercentage.
+          format: double
+        minimumLimitPrice:
+          type: string
+          description: MinimumLimitPrice.
+          examples:
+          - '164.0'
+        minimumPrice:
+          type: string
+          description: MinimumPrice.
+          examples:
+          - '164.0'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - LimitingRule
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A LimitingRule
+    RoundingInsert:
+      required:
+      - fareFrameRef
+      - id
+      - roundingMethod
+      - version
+      type: object
+      properties:
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: Rounding.
+      deprecated: true
+    Count:
+      required:
+      - numberOfElements
+      type: object
+      properties:
+        numberOfElements:
+          type: integer
+          description: number of elements
+          format: int32
+          examples:
+          - 369
+      description: Count
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    FarePriceUpdate:
+      type: object
+      properties:
+        amount:
+          type: number
+          description: Amount in the currency selected at create operation
+          format: double
+          examples:
+          - 16.5
+        discountPercentageUsed:
+          type: integer
+          description: Discount in percentageUsed
+          format: int32
+          examples:
+          - 40
+    FarePriceInsert:
+      required:
+      - fareFrameRef
+      - id
+      - name
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount.
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/RoundingInsert'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+    FareTableInsert:
+      required:
+      - fareFrameRef
+      - id
+      - name
+      - version
+      type: object
+      properties:
+        cells:
+          type: array
+          description: Cell
+          items:
+            $ref: '#/components/schemas/CellInsert'
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        endDate:
+          type: string
+          description: EndDate.
+          format: date
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FareTable:Ordinary
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        prices:
+          type: array
+          description: FarePrice.
+          items:
+            $ref: '#/components/schemas/FarePriceInsert'
+        startDate:
+          type: string
+          description: StartDate.
+          format: date
+        tariffRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

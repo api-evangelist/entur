@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-booking-response-schema.json",
+  "title": "Booking",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-shared-mobility-openapi.yml#/components/schemas/BookingResponse",
+  "type": "object",
+  "properties": {
+    "bookingId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "transportOperatorBookingId": {
+      "type": "string"
+    },
+    "transportOperatorLegId": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "NOT_STARTED",
+        "IN_USE",
+        "PAUSED",
+        "FINISHING",
+        "FINISHED",
+        "CANCELLED",
+        "PREPARING"
+      ]
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "pricingPlan": {
+      "$ref": "#/$defs/PricingPlanDto"
+    },
+    "departureTime": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "arrivalTime": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "distanceTravelled": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32"
+    },
+    "pricing": {
+      "$ref": "#/$defs/PricingDto"
+    },
+    "asset": {
+      "$ref": "#/$defs/Asset"
+    },
+    "comment": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "asset",
+    "bookingId",
+    "orderId",
+    "pricing",
+    "pricingPlan",
+    "state",
+    "transportOperatorBookingId",
+    "transportOperatorLegId"
+  ],
+  "$defs": {
+    "Asset": {
+      "type": "object",
+      "properties": {
+        "operator": {
+          "$ref": "#/$defs/Operator"
+        },
+        "id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "systemId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stationId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "formFactor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "BICYCLE",
+            "CARGO_BICYCLE",
+            "CAR",
+            "MOPED",
+            "SCOOTER",
+            "SCOOTER_STANDING",
+            "SCOOTER_SEATED",
+            "OTHER"
+          ]
+        },
+        "licensePlate": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stateOfCharge": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32"
+        },
+        "currentRangeKm": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32"
+        },
+        "vehicleMaxRangeInMeters": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32"
+        },
+        "vehicleCode": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "vehicleTypeId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "coordinates": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/Coordinates"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "propulsionType": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "HUMAN",
+            "ELECTRIC_ASSIST",
+            "ELECTRIC",
+            "COMBUSTION",
+            "COMBUSTION_DIESEL",
+            "HYBRID",
+            "PLUG_IN_HYBRID",
+            "HYDROGEN_FUEL_CELL"
+          ]
+        },
+        "stationSlotName": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "operator"
+      ]
+    },
+    "Coordinates": {
+      "type": "object",
+      "properties": {
+        "longitude": {
+          "type": "number",
+          "format": "float"
+        },
+        "latitude": {
+          "type": "number",
+          "format": "float"
+        },
+        "altitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "float"
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude"
+      ]
+    },
+    "Operator": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "PriceAdjustmentDto": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "format": "double"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "description"
+      ],
+      "title": "PriceAdjustment"
+    },
+    "PricingDto": {
+      "type": "object",
+      "properties": {
+        "currentAmount": {
+          "type": "number",
+          "format": "double"
+        },
+        "originalAmount": {
+          "type": "number",
+          "format": "double"
+        },
+        "finalAmount": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "format": "double"
+        },
+        "priceAdjustments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PriceAdjustmentDto"
+          }
+        },
+        "paymentStatus": {
+          "type": "string",
+          "enum": [
+            "UNPAID",
+            "PAID",
+            "PAYMENT_FAILED"
+          ]
+        },
+        "surcharge": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "currentAmount",
+        "originalAmount",
+        "paymentStatus",
+        "priceAdjustments"
+      ],
+      "title": "Pricing"
+    },
+    "PricingPlanDto": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "format": "double"
+        },
+        "perMinPricing": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "$ref": "#/$defs/PricingSegmentDto"
+          }
+        }
+      },
+      "required": [
+        "currency",
+        "price"
+      ],
+      "title": "PricingPlan"
+    },
+    "PricingSegmentDto": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "end": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "format": "int32"
+        },
+        "interval": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rate": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "required": [
+        "interval",
+        "rate",
+        "start"
+      ],
+      "title": "PricingSegment"
+    }
+  }
+}

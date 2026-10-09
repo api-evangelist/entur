@@ -1,0 +1,827 @@
+openapi: 3.2.0
+info:
+  title: Pricing Fare table API
+  description: '**This API specification is a draft and is not yet implemented.'
+  contact:
+    name: Team Produkt
+    email: teamprodukt@entur.org
+  version: 2026.10.0
+  x-stability-level: draft
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: Fare table
+  description: 'A fare table holds the price(s) that a product references. A flat price is a
+
+    table with a single selector-less entry; per-zone or per-distance pricing use
+
+    the same shape with selector fields filled in. The table is versioned
+
+    independently of the products that reference it.'
+paths:
+  /v3/fare-tables:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Fare table
+      summary: Create a new fare table
+      description: 'Create a new fare table. A new version will be created with version number 1.
+
+
+        All prices in products-api are stored as a fare table — a flat price is a
+
+        table with a single selector-less entry. The table is versioned
+
+        independently of the products that reference it.
+
+
+        Only flat pricing is implemented: prices carry no zone or interval selectors, optionally
+
+        differentiated by `userProfile`. Zone-pair and interval selectors are documented on
+
+        `FarePriceEntry` and return 400 `PRICE_MODEL_NOT_IMPLEMENTED` until built.'
+      operationId: createFareTable
+      requestBody:
+        description: Fare table to be created.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FareTableRequest'
+            examples:
+              flat:
+                $ref: '#/components/examples/flat'
+        required: true
+      responses:
+        '201':
+          description: Fare table created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareTableResponse'
+              examples:
+                flat:
+                  $ref: '#/components/examples/flat-2'
+        '400':
+          description: 'The request is invalid — either a schema violation, or a well-formed
+
+            request that cannot be processed: an unsupported price `type` (only the
+
+            flat `FlatPrice` is implemented), an amount with too many decimals for the
+
+            currency, an unknown currency, or a violated fare-table invariant.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'prices' is required.
+                unsupportedPriceType:
+                  summary: Unsupported price type
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Only the flat 'FlatPrice' price type is supported.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Conflict - Fare table already exists
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                conflict:
+                  summary: Fare table already exists
+                  value:
+                    type: https://developer.entur.org/errors/conflict
+                    title: Conflict
+                    status: 409
+                    detail: Fare table with privateCode 'bike-supplement' already exists.
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/fare-tables/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Fare table
+      summary: Get the active version of a fare table
+      description: 'Retrieve the version of the fare table that is active on the given date.
+
+        Defaults to the version active today when no date is given.'
+      operationId: getFareTable
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/validOnDate'
+      responses:
+        '200':
+          description: The fare table version active on the given date.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareTableResponse'
+              examples:
+                flat:
+                  $ref: '#/components/examples/flat-2'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Fare table not found, or no version is active on the given date
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Fare table not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: FareTable 'EXA:FareTable:bike-supplement' not found.
+                noActiveVersion:
+                  summary: No version active on the given date
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: No version of FareTable 'EXA:FareTable:bike-supplement' is active on 2026-12-01.
+      x-entur-permissions:
+        value: product-api-access:les
+    post:
+      tags:
+      - Fare table
+      summary: Create a new version of an existing fare table
+      description: 'Create a new version of an existing fare table — this is how a price
+
+        changes. The referencing products are not modified: they point at the
+
+        table''s id, and the effective version is resolved by validity period.'
+      operationId: createFareTableVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: The new fare table version.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FareTableRequest'
+            examples:
+              flat:
+                $ref: '#/components/examples/flat'
+        required: true
+      responses:
+        '201':
+          description: Fare table version created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareTableResponse'
+              examples:
+                flat:
+                  $ref: '#/components/examples/flat-2'
+        '400':
+          description: 'The request is invalid — either a schema violation, or a well-formed
+
+            request that cannot be processed: an unsupported price `type` (only the
+
+            flat `FlatPrice` is implemented), an amount with too many decimals for the
+
+            currency, an unknown currency, or a violated fare-table invariant.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'prices' is required.
+                unsupportedPriceType:
+                  summary: Unsupported price type
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Only the flat 'FlatPrice' price type is supported.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Fare table not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Fare table not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: FareTable 'ENT:FareTable:bike-supplement' not found.
+        '409':
+          description: Conflict - Fare table already exists
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                conflict:
+                  summary: Fare table already exists
+                  value:
+                    type: https://developer.entur.org/errors/conflict
+                    title: Conflict
+                    status: 409
+                    detail: Fare table with privateCode 'bike-supplement' already exists.
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/fare-tables/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Fare table
+      summary: Get a specific fare table version
+      description: 'Retrieve the complete fare table for a specific version, identified by
+
+        NeTEx version id or version number.'
+      operationId: getFareTableVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/version'
+      responses:
+        '200':
+          description: The fare table version
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareTableResponse'
+              examples:
+                flat:
+                  $ref: '#/components/examples/flat-2'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Fare table or version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Fare table version not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: Version 'ENT:Version:8f1b2c3d' not found for FareTable 'ENT:FareTable:bike-supplement'.
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - Fare table
+      summary: Update an existing fare table version
+      description: 'Update the version of a fare table in place. The version will not be
+
+        active until a start date is set and the version is published.'
+      operationId: updateFareTableVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/version'
+      requestBody:
+        description: The updated version of the fare table. The existing data in the version will be replaced by this one.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FareTableRequest'
+            examples:
+              flat:
+                $ref: '#/components/examples/flat'
+        required: true
+      responses:
+        '200':
+          description: Fare table version updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FareTableResponse'
+              examples:
+                flat:
+                  $ref: '#/components/examples/flat-2'
+        '400':
+          description: 'The request is invalid — either a schema violation, or a well-formed
+
+            request that cannot be processed: an unsupported price `type` (only the
+
+            flat `FlatPrice` is implemented), an amount with too many decimals for the
+
+            currency, an unknown currency, or a violated fare-table invariant.
+
+            '
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                schemaViolation:
+                  summary: Request does not match schema
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Field 'prices' is required.
+                unsupportedPriceType:
+                  summary: Unsupported price type
+                  value:
+                    type: https://developer.entur.org/errors/bad-request
+                    title: Bad Request
+                    status: 400
+                    detail: Only the flat 'FlatPrice' price type is supported.
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Fare table or version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Fare table version not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: Version 'ENT:Version:8f1b2c3d' not found for FareTable 'ENT:FareTable:bike-supplement'.
+      x-entur-permissions:
+        value: product-api-access:endre
+components:
+  schemas:
+    FarePriceType:
+      type: string
+      description: 'Discriminator for a fare table price cell. Only the flat `FlatPrice` (a fixed amount with no
+
+        selectors, NeTEx `FarePrice`) is implemented today; `DistanceMatrixElementPrice` and
+
+        `GeographicalIntervalPrice` will be added as sibling types when the price model is extended
+
+        beyond flat prices.
+
+        '
+      enum:
+      - FlatPrice
+      examples:
+      - FlatPrice
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
+    FareTableRequest:
+      required:
+      - prices
+      - startDate
+      - status
+      type: object
+      properties:
+        ownerOrganisationId:
+          minimum: 1
+          type: integer
+          description: Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.
+          format: int64
+          examples:
+          - 1
+        names:
+          $ref: '#/components/schemas/LocalizedString'
+        descriptions:
+          $ref: '#/components/schemas/LocalizedString'
+        startDate:
+          type: string
+          description: First day this price version is valid.
+          format: date
+          examples:
+          - '2026-08-01'
+        endDate:
+          type: string
+          description: Last day this price version is valid (optional). Omit for an open-ended version.
+          format: date
+          examples:
+          - '2026-12-31'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Status of the fare table version. Required; on create only DRAFT or
+
+              PROPOSED is accepted — a new version cannot be published directly.
+
+
+              - **DRAFT** - Under construction and not ready for operational use.
+
+              - **PROPOSED** - Complete but pending review and approval.
+
+              - **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.
+
+              - **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.
+
+              '
+            examples:
+            - DRAFT
+        prices:
+          minItems: 1
+          type: array
+          description: 'The prices in this table. Each entry must be uniquely identified by its selector
+
+            combination, so a flat price with no passenger-type differentiation is a single
+
+            selector-less entry. Each entry carries its own optional `currency`, per NeTEx.
+
+            '
+          items:
+            $ref: '#/components/schemas/FarePriceEntry'
+    FarePriceEntry:
+      required:
+      - amount
+      - currency
+      - type
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/FarePriceType'
+        amount:
+          pattern: ^[0-9]+(\.[0-9]+)?$
+          type: string
+          description: 'The price in the major unit of this entry''s `currency`, as a decimal string (for example
+
+            "49.00"). The number of decimals must not exceed what that currency allows — 2 for NOK and
+
+            EUR, 0 for JPY, 3 for KWD.
+
+            '
+          examples:
+          - '49.00'
+        currency:
+          pattern: ^[A-Z]{3}$
+          type: string
+          description: 'ISO 4217 currency code for this individual price, per NeTEx `FarePrice.Currency`. Required:
+
+            the flat `amount` cannot be interpreted without knowing its currency (the number of decimals
+
+            depends on it). Different entries in the same fare table may declare different currencies.
+
+            '
+          examples:
+          - NOK
+      description: 'A single NeTEx-typed price, held as a cell of the fare table.
+
+
+        Each price is an explicit NeTEx price object identified by its `type` (the NeTEx class). Only
+
+        the flat `FlatPrice` is implemented today: a fixed amount with no origin/destination, interval
+
+        or passenger-type selectors. The richer NeTEx price types — `DistanceMatrixElementPrice` for an
+
+        origin/destination pair, `GeographicalIntervalPrice` for a counted interval, each optionally
+
+        carrying a `LimitingRule` for discounts and caps — will be added as sibling `type`s when the
+
+        model is extended, so clients can already branch on `type`.
+
+        '
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+    FareTableResponse:
+      required:
+      - id
+      - ownerOrganisationId
+      - prices
+      - startDate
+      - status
+      - versionId
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):FareTable:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx id of the fare table.
+          examples:
+          - ENT:FareTable:bike-supplement
+        versionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx id of this fare table version.
+          examples:
+          - ENT:Version:8f1b2c3d
+        ownerOrganisationId:
+          type: integer
+          description: Internal id of the organisation that owns this fare table.
+          format: int64
+          examples:
+          - 1
+        names:
+          $ref: '#/components/schemas/LocalizedString'
+        descriptions:
+          $ref: '#/components/schemas/LocalizedString'
+        startDate:
+          type: string
+          description: First day this price version is valid.
+          format: date
+          examples:
+          - '2026-08-01'
+        endDate:
+          type: string
+          description: Last day this price version is valid (optional). Omit for an open-ended version.
+          format: date
+          examples:
+          - '2026-12-31'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Status of the fare table version.
+
+
+              - **DRAFT** - Under construction and not ready for operational use.
+
+              - **PROPOSED** - Complete but pending review and approval.
+
+              - **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.
+
+              - **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.
+
+              '
+            examples:
+            - VERSIONED
+        prices:
+          type: array
+          description: 'The prices in this table. Each entry echoes its own `currency`, per NeTEx
+
+            `FarePrice.Currency`.
+
+            '
+          items:
+            $ref: '#/components/schemas/FarePriceEntry'
+        pricesFor:
+          type: array
+          description: 'NeTEx ids of the priceable objects (e.g. supplement products) this fare table prices —
+
+            NeTEx `FareTable.pricesFor`.
+
+
+            The FareTable → PriceableObject link is deliberately loose: a versioned fare table prices a
+
+            priceable object *by netex id only*, never pinned to a specific priceable object version.
+
+            Version resolution happens later, when the product tree is built.
+
+            '
+          readOnly: true
+          items:
+            pattern: ^([A-Z]{3}):([A-Za-z]+):([0-9A-Za-z_\-]*)$
+            type: string
+            description: NeTEx id of a priceable object this fare table prices.
+            examples:
+            - ENT:SupplementProduct:bike
+          default: []
+  responses:
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+    BadRequestError:
+      description: Bad request - Invalid data or schema violation
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            schemaViolation:
+              summary: Request does not match schema
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: Field 'name' is required.
+            purchaseWindowNotFound:
+              summary: Referenced purchase window not found
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    version:
+      name: version
+      in: path
+      description: The netex ID or sequence number of the version to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^(([A-Z]{3}):Version:([0-9A-Za-z_\-]*)|[1-9][0-9]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:Version:001
+    validOnDate:
+      name: validOnDate
+      in: query
+      description: 'The date that the element should be valid for, e.g. the travel date.
+
+        Defaults to the current date.
+
+        '
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date
+      examples:
+        default:
+          value: '2026-12-01'
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  examples:
+    flat-2:
+      summary: Flat price
+      value:
+        id: ENT:FareTable:bike-supplement
+        versionId: ENT:Version:8f1b2c3d
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Sykkeltillegg
+        startDate: '2026-08-01'
+        status: VERSIONED
+        prices:
+        - type: FlatPrice
+          amount: '49.00'
+          currency: NOK
+    flat:
+      summary: Flat price
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Sykkeltillegg
+        startDate: '2026-08-01'
+        status: DRAFT
+        prices:
+        - type: FlatPrice
+          amount: '49.00'
+          currency: NOK
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-fare-table-request-schema.json",
+  "title": "FareTableRequest",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-pricing-api-openapi.yml#/components/schemas/FareTableRequest",
+  "required": [
+    "prices",
+    "startDate",
+    "status"
+  ],
+  "type": "object",
+  "properties": {
+    "ownerOrganisationId": {
+      "minimum": 1,
+      "type": "integer",
+      "description": "Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.",
+      "format": "int64"
+    },
+    "names": {
+      "$ref": "#/$defs/LocalizedString"
+    },
+    "descriptions": {
+      "$ref": "#/$defs/LocalizedString"
+    },
+    "startDate": {
+      "type": "string",
+      "description": "First day this price version is valid.",
+      "format": "date"
+    },
+    "endDate": {
+      "type": "string",
+      "description": "Last day this price version is valid (optional). Omit for an open-ended version.",
+      "format": "date"
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/VersionStatus"
+        },
+        {
+          "description": "Status of the fare table version. Required; on create only DRAFT or\nPROPOSED is accepted — a new version cannot be published directly.\n\n- **DRAFT** - Under construction and not ready for operational use.\n- **PROPOSED** - Complete but pending review and approval.\n- **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.\n- **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.\n"
+        }
+      ]
+    },
+    "prices": {
+      "minItems": 1,
+      "type": "array",
+      "description": "The prices in this table. Each entry must be uniquely identified by its selector\ncombination, so a flat price with no passenger-type differentiation is a single\nselector-less entry. Each entry carries its own optional `currency`, per NeTEx.\n",
+      "items": {
+        "$ref": "#/$defs/FarePriceEntry"
+      }
+    }
+  },
+  "$defs": {
+    "FarePriceEntry": {
+      "required": [
+        "amount",
+        "currency",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/FarePriceType"
+        },
+        "amount": {
+          "pattern": "^[0-9]+(\\.[0-9]+)?$",
+          "type": "string",
+          "description": "The price in the major unit of this entry's `currency`, as a decimal string (for example\n\"49.00\"). The number of decimals must not exceed what that currency allows — 2 for NOK and\nEUR, 0 for JPY, 3 for KWD.\n"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "type": "string",
+          "description": "ISO 4217 currency code for this individual price, per NeTEx `FarePrice.Currency`. Required:\nthe flat `amount` cannot be interpreted without knowing its currency (the number of decimals\ndepends on it). Different entries in the same fare table may declare different currencies.\n"
+        }
+      },
+      "description": "A single NeTEx-typed price, held as a cell of the fare table.\n\nEach price is an explicit NeTEx price object identified by its `type` (the NeTEx class). Only\nthe flat `FlatPrice` is implemented today: a fixed amount with no origin/destination, interval\nor passenger-type selectors. The richer NeTEx price types — `DistanceMatrixElementPrice` for an\norigin/destination pair, `GeographicalIntervalPrice` for a counted interval, each optionally\ncarrying a `LimitingRule` for discounts and caps — will be added as sibling `type`s when the\nmodel is extended, so clients can already branch on `type`.\n"
+    },
+    "FarePriceType": {
+      "type": "string",
+      "description": "Discriminator for a fare table price cell. Only the flat `FlatPrice` (a fixed amount with no\nselectors, NeTEx `FarePrice`) is implemented today; `DistanceMatrixElementPrice` and\n`GeographicalIntervalPrice` will be added as sibling types when the price model is extended\nbeyond flat prices.\n",
+      "enum": [
+        "FlatPrice"
+      ]
+    },
+    "LocalizedString": {
+      "type": "array",
+      "items": {
+        "required": [
+          "lang",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "lang": {
+            "pattern": "^[a-z]{2}-[A-Z]{2}$",
+            "type": "string",
+            "description": "BCP-47 language tag (e.g., 'nb-NO', 'en-GB')."
+          },
+          "value": {
+            "type": "string",
+            "description": "The localized string value for the specified lang."
+          }
+        }
+      }
+    },
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    }
+  }
+}

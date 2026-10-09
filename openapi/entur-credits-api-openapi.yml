@@ -1,0 +1,1156 @@
+openapi: 3.2.0
+info:
+  title: Entur Credits API
+  version: 2026.10.2
+  contact:
+    name: Entur
+    url: https://developer.entur.org
+  description: 'Operations tagged Credits across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: Entur's Production environment
+- url: https://api.staging.entur.io/sales
+  description: Entur's Staging environment
+- url: https://api.dev.entur.io/sales
+  description: Entur's Development environment
+security:
+- jwt: []
+tags:
+- name: Credits
+  description: Create and update credits. Create and execute credit transactions.
+paths:
+  /v1/credits:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Credits
+      summary: Search credits
+      description: Returns matching credits with all its transactions. Query params are able to used expression like gt:1 for searching. Other expressions can contain eq, ne, gt, gte, lt, lte.
+      operationId: searchCredits
+      parameters:
+      - name: creditId
+        in: query
+        description: ID of Credit entity
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+      - name: customerNumber
+        in: query
+        description: Internal numeric ID of customer which Credit is linked to
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+      - name: orderId
+        in: query
+        description: ID of Order entity that Credit is linked to
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - ABCD1234
+          equals:
+            value:
+            - eq:ABCD1234
+          not equals:
+            value:
+            - ne:ABCD1234
+      - name: orderVersion
+        in: query
+        description: Version of Credit entity
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+          greater than:
+            value:
+            - gt:1
+          greater than or equal:
+            value:
+            - gte:1
+          less than:
+            value:
+            - lt:3
+          less than or equals:
+            value:
+            - lte:3
+      - name: organisationId
+        in: query
+        description: ID of organisation Credit entity is linked to
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+          greater than:
+            value:
+            - gt:1
+          greater than or equal:
+            value:
+            - gte:1
+          less than:
+            value:
+            - lt:3
+          less than or equals:
+            value:
+            - lte:3
+      - $ref: '#/components/parameters/paginationPageParam'
+      - $ref: '#/components/parameters/paginationPerPageParam'
+      - name: reimbursementMethod
+        in: query
+        description: Which specific payment transfer type is used for the CreditTransactions linked to the Credit. E.g. VIPPS, VISA, MASTERCARD
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - VIPPS
+          equals:
+            value:
+            - eq:VIPPS
+          not equals:
+            value:
+            - ne:VIPPS
+      - name: reimbursementTypeGroup
+        in: query
+        description: Which of the several groups of ways to transfer payment the CreditTransactions linked to the Credit entity is. E.g. MOBILE, PAYMENTCARD, CASH
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - MOBILE
+          equals:
+            value:
+            - eq:MOBILE
+          not equals:
+            value:
+            - ne:MOBILE
+      - name: rrn
+        in: query
+        description: Retrieval Reference Number of CreditTransaction linked to Credit entity
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - 00001234567890
+          equals:
+            value:
+            - eq:00001234567890
+          not equals:
+            value:
+            - ne:00001234567890
+      - name: settlementId
+        in: query
+        description: ID of settlement the transaction is linked to.
+        required: false
+        style: pipeDelimited
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1234'
+          equals:
+            value:
+            - eq:1234
+          not equals:
+            value:
+            - ne:1234
+      - name: status
+        in: query
+        description: Either CREATED or CREDITED depending on whether the actual credit action has been performed
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - CREDITED
+          equals:
+            value:
+            - eq:CREDITED
+          not equals:
+            value:
+            - ne:CREDITED
+      - name: totalCreditAmount
+        in: query
+        description: Total amount of credit, with one or more credit transactions
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '100'
+          equals:
+            value:
+            - eq:100
+          not equals:
+            value:
+            - ne:100
+          greater than:
+            value:
+            - gt:100
+          greater than or equal:
+            value:
+            - gte:100
+          less than:
+            value:
+            - lt:300
+          less than or equals:
+            value:
+            - lte:300
+      - name: transactionId
+        in: query
+        description: Id of (one of) the PaymentTransaction(s) performed as part of the credit
+        required: false
+        style: form
+        explode: true
+        allowReserved: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PageOfCredit'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+      - Credits
+      summary: Create credit transactions
+      description: Creates credit transactions for all the payment transactions specified. The total credit amount must match the sum of the individual transactions, and each transaction cannot be higher than the paid amount.
+      operationId: createCredit
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditRequest'
+        required: true
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/CreditResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/credits/{creditId}:
+    parameters:
+    - $ref: '#/components/parameters/creditIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Credits
+      summary: Find a credit
+      description: Returns the credit with all its credit transactions. The credit transactions have each backreferences to their corresponding payment transaction.
+      operationId: findCredit
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/CreditResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    patch:
+      tags:
+      - Credits
+      summary: Update the credit
+      description: The credit will be patched with specified fields. NULL values specifically set is considered as removing the field. In other words, only included fields will be modified. For more information about the PATCH endpoint and the merge-patch content-type, please refer to RFC7396.
+      operationId: mergePatchCredit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreditMergePatch'
+          application/merge-patch+json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/CreditMergePatch'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/CreditResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/credits/{creditId}/execute:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/creditIdPathParam'
+    - $ref: '#/components/parameters/initiatedByHeader'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Credits
+      summary: Execute credit
+      description: Executes a credit operation on all the payment transactions referenced in this credit. The operation will execute sequentially for all payment transactions. If one of the operations fails, this call responds with the specific error response for that payment transaction. Any previous successful credit operation cannot be undone, and for this reason it is highly recommended to check the status of each credit transaction after en error response is returned. More detail on the individual payment transaction can be found in the transaction summary by calling GET on the specific payment transaction. This call is idempotent, which means it is safe to repeatedly retry without any creditTransactions being executed more than once.
+      operationId: executeCredit
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/CreditResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+components:
+  parameters:
+    initiatedByHeader:
+      name: Entur-Initiated-By
+      in: header
+      description: Organisation identifier of the party that initiated the credit. Used to determine downstream side effects such as webhook delivery. A client may only supply an organisation it has credit access to (its own, or one it holds credit, on-behalf-of, or global access for); an unauthorised claim is rejected. Defaults to the calling client's organisation when omitted.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    creditIdPathParam:
+      name: creditId
+      in: path
+      description: creditId
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    paginationPageParam:
+      name: page
+      in: query
+      description: Selects a specific page in the collection
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    paginationPerPageParam:
+      name: perPage
+      in: query
+      description: Selects the number of elements per page
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 30
+    posHeader:
+      name: Entur-POS
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    TransactionImportRequest:
+      title: TransactionImportRequest
+      required:
+      - transactionConfirmedAt
+      type: object
+      properties:
+        companyId:
+          pattern: '[\d]{1,4}'
+          type: string
+          description: Id of the issuing organisation. The id is equal to the internal id in Enturs Organisation Register. Required for ECARD.
+          examples:
+          - '1'
+        envNetworkId:
+          pattern: '[\d]{6}'
+          type: string
+          description: County code for issuer
+          examples:
+          - '578000'
+        mediaSerialNumberId:
+          pattern: '[\d]{1,10}'
+          type: string
+          description: Numerical e-Card identifier. Required for ECARD.
+          examples:
+          - '0067340023'
+        paymentType:
+          type: string
+          description: Name of the specific payment type used. This further specifies the type of payment method used for this transaction. Often referred to as the name of the issuer for payment cards in the transaction data retrieved from payment terminals. Required for PAYMENTCARD.
+          examples:
+          - Coop Mastercard
+        rrn:
+          maxLength: 12
+          minLength: 1
+          type: string
+          description: Reconciliation reference number used to track a transaction through different economy systems. Required for PAYMENTCARD.
+          examples:
+          - 000012345678
+        terminalId:
+          type: string
+          description: Unique identifier for a physical terminal. Makes a transaction unique together with rrn. Required for PAYMENTCARD.
+          examples:
+          - 123-133-44
+        externalTransactionId:
+          type: string
+          description: Transaction ID from 3rd party payment provider.
+          examples:
+          - 7381cc2886b147198tuf257440c614fd
+        transactionConfirmedAt:
+          type: string
+          description: Time when payment transaction was completed by the client.
+          format: date-time
+          examples:
+          - '2018-03-07T12:20:46Z'
+        transactionData:
+          type: object
+          additionalProperties:
+            type: string
+          description: Any extra transaction data which could be relevant can be specified as a key value map of strings.
+          examples:
+          - someKey: someValue
+      description: Request body for importing an already completed transaction.
+      examples:
+      - companyId: '1'
+        envNetworkId: '578000'
+        mediaSerialNumberId: '0067340023'
+        paymentType: Coop Mastercard
+        rrn: '000123456123'
+        terminalId: 123-133-44
+        externalTransactionId: 7381cc2886b147198tuf257440c614fd
+        transactionConfirmedAt: '2025-01-12T16:13:13Z'
+        transactionData:
+          someKey: someValue
+    CreditTransactionRequest:
+      title: CreditTransactionRequest
+      required:
+      - amount
+      - paymentTransactionId
+      type: object
+      properties:
+        amount:
+          maxLength: 19
+          pattern: ^[1-9][0-9]{0,17}\.[0-9]{1,5}$|^([1-9])[0-9]{0,17}$|^[0]\.[1-9][0-9]{1,5}$
+          type: string
+          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+        currency:
+          pattern: '[A-Z]{3}'
+          type: string
+          description: 3-letter ISO 4217 currency code. Default is NOK.
+          default: NOK
+          examples:
+          - NOK
+        paymentTransactionId:
+          type: integer
+          description: Reference to the transaction to credit.
+          format: int64
+          examples:
+          - 1
+        reimbursementTypeGroup:
+          $ref: '#/components/schemas/PaymentTypeGroup'
+        transactionImportRequest:
+          description: Required data when importing transaction/overriding method of reimbursement. This only works when importing already credited transactions, and will only be considered when this is the case.
+          allOf:
+          - $ref: '#/components/schemas/TransactionImportRequest'
+      description: Single credit transaction referring to a single payment transaction.
+      examples:
+      - amount: '450.00'
+        currency: NOK
+        paymentTransactionId: 1
+        reimbursementTypeGroup: PAYMENTCARD
+    CreditRequest:
+      title: CreditRequest
+      required:
+      - creditTransactions
+      - orderId
+      - orderVersion
+      - totalCreditAmount
+      type: object
+      properties:
+        creditTransactions:
+          type: array
+          description: List of individual transactions to credit.
+          items:
+            $ref: '#/components/schemas/CreditTransactionRequest'
+        currency:
+          pattern: '[A-Z]{3}'
+          type: string
+          description: The currency used for this credit. Default value is 'NOK'
+          default: NOK
+          examples:
+          - NOK
+        customerNumber:
+          type: string
+          description: Customer who owns this credit. This value is only considered for privileged client (internal and partner tenants.
+          examples:
+          - '123456789'
+        orderId:
+          type: string
+          description: ID of the order this credit belongs to.
+          examples:
+          - HE8NDS7XY
+        orderVersion:
+          type: integer
+          description: Version of the order this credit belongs to.
+          format: int32
+          examples:
+          - 1
+        settlementId:
+          type: integer
+          description: Supplied to the client by an external system for handling settlements. For Internal Entur Clients this is Entur’s Electronic Journal.
+          format: int64
+          examples:
+          - 1873
+        totalCreditAmount:
+          maxLength: 19
+          pattern: ^[1-9][0-9]{0,17}\.[0-9]{1,5}$|^([1-9])[0-9]{0,17}$|^[0]\.[1-9][0-9]{1,5}$
+          type: string
+          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+      description: Information used to create a Credit.
+      examples:
+      - creditTransactions:
+        - amount: '450.00'
+          currency: NOK
+          paymentTransactionId: 1
+          reimbursementTypeGroup: PAYMENTCARD
+        currency: NOK
+        customerNumber: '123456789'
+        orderId: ABCD1234
+        orderVersion: 1
+        settlementId: 1723
+        totalCreditAmount: '450.00'
+    PageOfCredit:
+      title: PageOfCredit
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items on a specific page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/CreditResponse'
+          examples:
+          - - active: true
+              creditId: 1
+              creditTransactions:
+              - amount: '450.00'
+                createdAt: '2025-01-12T16:08:03Z'
+                creditedAt: '2025-01-12T16:13:13Z'
+                currency: NOK
+                newGiftCardId: 0068a450-066f-442d-8117-1543fe2b1e0e
+                paymentId: 1
+                paymentTransactionId: 10
+                reimbursementMethod: VISA
+                reimbursementTypeGroup: PAYMENTCARD
+                rrn: '000123456123'
+                status: CREATED
+                transactionData:
+                  extraData: any extra data you want to add
+                updatedAt: '2025-01-12T16:13:13Z'
+              currency: NOK
+              customerNumber: '123456789'
+              orderId: ABCD1234
+              orderVersion: 1
+              organisationId: 1
+              settlementId: 1245
+              totalCreditAmount: '450.00'
+        totalItems:
+          type: integer
+          description: Total number of items
+          format: int64
+          readOnly: true
+          examples:
+          - 72
+        totalPages:
+          type: integer
+          description: Total number of pages available to browse
+          format: int64
+          readOnly: true
+          examples:
+          - 9
+      description: Page displays a subset of a list of entities
+      examples:
+      - items:
+        - active: true
+          creditId: 1
+          creditTransactions:
+          - amount: '450.00'
+            createdAt: '2025-01-12T16:08:03Z'
+            creditedAt: '2025-01-12T16:13:13Z'
+            currency: NOK
+            newGiftCardId: 0068a450-066f-442d-8117-1543fe2b1e0e
+            paymentId: 1
+            paymentTransactionId: 10
+            reimbursementMethod: VISA
+            reimbursementTypeGroup: PAYMENTCARD
+            rrn: '000123456123'
+            status: CREATED
+            transactionData:
+              extraData: any extra data you want to add
+            updatedAt: '2025-01-12T16:13:13Z'
+          currency: NOK
+          customerNumber: '123456789'
+          orderId: ABCD1234
+          orderVersion: 1
+          organisationId: 1
+          settlementId: 1245
+          totalCreditAmount: '450.00'
+        totalItems: 1
+        totalPages: 1
+    CreditResponse:
+      title: Credit
+      required:
+      - creditId
+      - creditTransactions
+      - orderId
+      - orderVersion
+      - totalCreditAmount
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: 'If active is false, credit is considered uneditable. The only way to change this property is through an internal Admin endpoint or the mergePatch endpoint. Editable: true'
+          examples:
+          - false
+        creditId:
+          type: integer
+          description: Identification of this credit resource.
+          format: int64
+          examples:
+          - 1
+        creditTransactions:
+          type: array
+          description: List of individual transactions to credit.
+          items:
+            $ref: '#/components/schemas/CreditTransactionResponse'
+          examples:
+          - - amount: '450.00'
+              createdAt: '2025-01-12T16:08:03Z'
+              creditedAt: '2025-01-12T16:13:13Z'
+              currency: NOK
+              newGiftCardId: 0068a450-066f-442d-8117-1543fe2b1e0e
+              paymentId: 1
+              paymentTransactionId: 10
+              reimbursementMethod: VISA
+              reimbursementTypeGroup: PAYMENTCARD
+              rrn: '000123456123'
+              status: CREATED
+              transactionData:
+                extraData: any extra data you want to add
+              updatedAt: '2025-01-12T16:13:13Z'
+        currency:
+          type: string
+          description: The currency used for this credit.
+          examples:
+          - NOK
+        customerNumber:
+          type: string
+          description: ID of the customer who owns this credit.
+          examples:
+          - '123456789'
+        orderId:
+          type: string
+          description: ID of the order this payment belongs to.
+          examples:
+          - HE8NDS7XY
+        orderVersion:
+          type: integer
+          description: Version of the order this credit belongs to.
+          format: int32
+          examples:
+          - 1
+        organisationId:
+          type: integer
+          description: ID of the organisation who created this credit.
+          format: int64
+          examples:
+          - 1
+        settlementId:
+          type: integer
+          description: Supplied to the client by an external system for handling settlements. For Internal Entur Clients this is Entur’s Electronic Journal.
+          format: int64
+        totalCreditAmount:
+          type: string
+          description: 'Total amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+      description: Information about credits performed on an order.
+      examples:
+      - active: true
+        creditId: 1
+        creditTransactions:
+        - amount: '450.00'
+          createdAt: '2025-01-12T16:08:03Z'
+          creditedAt: '2025-01-12T16:13:13Z'
+          currency: NOK
+          newGiftCardId: 0068a450-066f-442d-8117-1543fe2b1e0e
+          paymentId: 1
+          paymentTransactionId: 10
+          reimbursementMethod: VISA
+          reimbursementTypeGroup: PAYMENTCARD
+          rrn: '000123456123'
+          status: CREATED
+          transactionData:
+            extraData: any extra data you want to add
+          updatedAt: '2025-01-12T16:13:13Z'
+        currency: NOK
+        customerNumber: '123456789'
+        orderId: ABCD1234
+        orderVersion: 1
+        organisationId: 1
+        settlementId: 1245
+        totalCreditAmount: '450.00'
+    PaymentError:
+      title: PaymentError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error that occurred.
+          examples:
+          - Internal Server Error
+        exception:
+          type: string
+          description: What exception caused the error.
+          examples:
+          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message:
+          type: string
+          description: A message detailing the error.
+          examples:
+          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path:
+          type: string
+          description: The url path that was accessed when the error happenened.
+          examples:
+          - /v1/payments/1/transactions/1/capture
+        status:
+          type: integer
+          description: The http status of the response.
+          format: int32
+          examples:
+          - 500
+        timestamp:
+          type: string
+          description: When the error occurred
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        errorReason:
+          type: string
+          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
+          examples:
+          - SOFT_DECLINE
+      x-examples: {}
+      examples:
+      - error: Internal Server Error
+        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path: /v1/payments/1/transactions/1/capture
+        status: 500
+        timestamp: '2025-08-24T14:15:22Z'
+    CreditTransactionResponse:
+      title: CreditTransaction
+      required:
+      - amount
+      - paymentId
+      - paymentTransactionId
+      - reimbursementTypeGroup
+      type: object
+      properties:
+        amount:
+          type: string
+          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+        createdAt:
+          type: string
+          description: Timestamp for when transaction was first created.
+          format: date-time
+          readOnly: true
+        creditedAt:
+          type: string
+          description: Time when credit was confirmed.
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        currency:
+          type: string
+          description: 3-letter ISO 4217 currency code. Default is NOK.
+          examples:
+          - NOK
+        newGiftCardId:
+          type: string
+          description: 'Reference to the gift card id (contract uuid) the credited payment transaction belongs to. Note: This field will be set if the transaction was credited to a gift card.'
+          readOnly: true
+          examples:
+          - 0068a450-066f-442d-8117-1543fe2b1e0e
+        paymentId:
+          type: integer
+          description: Reference to the payment the credited payment transaction belongs to.
+          format: int64
+          examples:
+          - 1
+        paymentTransactionId:
+          type: integer
+          description: Reference to the transaction this credit transaction credits.
+          format: int64
+          examples:
+          - 10
+        reimbursementMethod:
+          type: string
+          description: Specific type of reimbursement method.
+          examples:
+          - VISA
+        reimbursementTypeGroup:
+          type: string
+          description: General type of reimbursement method.
+          examples:
+          - PAYMENTCARD
+        rrn:
+          type: string
+          description: Reconciliation reference number used to track a transaction through different economy systems.
+          examples:
+          - 000012345678
+        status:
+          type: string
+          description: Status of this credit transaction.
+          enum:
+          - CREATED
+          - CREDITED
+          examples:
+          - CREATED
+        transactionData:
+          type: object
+          additionalProperties:
+            type: string
+          description: Extra transaction data from external client. Only relevant for clients using the import flow.
+          examples:
+          - extraData: any extra data you want to add
+        updatedAt:
+          type: string
+          description: Timestamp for when transaction was last updated.
+          format: date-time
+          readOnly: true
+          examples:
+          - '2025-01-12T16:13:13Z'
+      description: Represents a credit transaction referring to a payment transaction.
+      examples:
+      - amount: '450.00'
+        createdAt: '2025-01-12T16:08:03Z'
+        creditedAt: '2025-01-12T16:13:13Z'
+        currency: NOK
+        newGiftCardId: 0068a450-066f-442d-8117-1543fe2b1e0e
+        paymentId: 1
+        paymentTransactionId: 10
+        reimbursementMethod: VISA
+        reimbursementTypeGroup: PAYMENTCARD
+        rrn: '000123456123'
+        status: CREATED
+        transactionData:
+          extraData: any extra data you want to add
+        updatedAt: '2025-01-12T16:13:13Z'
+    PaymentTypeGroup:
+      type: string
+      description: A PaymentTypeGroup used to override which kind of method to use for reimbursement, instead of using same as used for the payment transaction.This will only take effect if the payment method on the payment transaction allows for overriding.
+      enum:
+      - AGENT
+      - CASH
+      - ECARD
+      - GIFTCARD
+      - INVOICE
+      - MOBILE
+      - PAYMENTCARD
+      - PAYPAL
+      - REMITTED
+      - REQUISITION
+      examples:
+      - CASH
+    CreditMergePatch:
+      title: CreditMergePatch
+      required:
+      - totalCreditAmount
+      properties:
+        totalCreditAmount:
+          type: string
+          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+        creditTransactions:
+          type: array
+          description: List of individual transactions to credit.
+          items:
+            $ref: '#/components/schemas/CreditTransactionRequest'
+          examples:
+          - - amount: '450.00'
+              currency: NOK
+              paymentTransactionId: 1
+              reimbursementTypeGroup: PAYMENTCARD
+        active:
+          type: boolean
+          description: Active is used during activation of credit
+          examples:
+          - true
+      description: Request body used to update a credit. The properties described here are the only properties that can be updated on a credit.
+      examples:
+      - totalCreditAmount: '450.00'
+        creditTransactions:
+        - amount: '450.00'
+          currency: NOK
+          paymentTransactionId: 1
+          reimbursementTypeGroup: PAYMENTCARD
+        active: true
+  responses:
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    serviceUnavailableError:
+      description: Service Unavailable Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-payment-partner-openapi.json
+- entur-payment-partner-openapi.yml

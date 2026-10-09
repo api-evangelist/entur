@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-partner-settlement-import-dto-schema.json",
+  "title": "PartnerSettlementImportDto",
+  "description": "Generic Settlement submitted by Partner. This is a subset of the CLEOS settlement structure intended for self-serviced clearing.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-clearing-openapi.yml#/components/schemas/PartnerSettlementImportDto",
+  "type": "object",
+  "properties": {
+    "msgSubjectId": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "posRef": {
+      "type": "string",
+      "description": "Reference to the PointOfSale (POS) for which the settlement is created.",
+      "maxLength": 100,
+      "minLength": 0
+    },
+    "distributionChannelRef": {
+      "type": "string",
+      "description": "Reference to the Distribution Channel for which the settlement is created.",
+      "maxLength": 100,
+      "minLength": 0
+    },
+    "settlementDate": {
+      "type": "string",
+      "format": "date",
+      "description": "Settlement Date for the settlement on the format YYYY.MM.DD"
+    },
+    "settlementNo": {
+      "type": "integer",
+      "format": "int64",
+      "description": "Settlement Sequence Number. This must be a continuous sequence for the settlement not to fail clearing. Negative sequences are typically used for corrections that are out of sequence. If not specified, the next number in a negative sequence will automatically be assigned based previous correction on the same POS. "
+    },
+    "correctionForSmntId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "If this settlement is a correction of a previous settlement, the internal CLEOS ID of the settlement being corrected must be provided."
+    },
+    "externalSettlementNo": {
+      "type": "integer",
+      "format": "int64",
+      "description": "External Settlement Number provided by the Partner. If not provided, the settlementNo will be used as external reference as well."
+    },
+    "comments": {
+      "type": "array",
+      "description": "Optional comments associated with the settlement. Used for audit trail and additional information relevant for clearing.",
+      "items": {
+        "$ref": "#/$defs/PartnerCommentDto"
+      }
+    },
+    "genericTransactions": {
+      "type": "array",
+      "description": "List of Generic Transactions associated with the settlement. The list is required but may be empty: a period with no sales still consumes its Settlement Number, and submitting the empty Settlement keeps the sequence unbroken for the next one.",
+      "items": {
+        "$ref": "#/$defs/PartnerTransactionImportDto"
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": {},
+      "description": "Context map containing additional key-value pairs relevant for the settlement. Only simple key-value pairs are supported (String, Number, Boolean) with a max length of 100 characters per value."
+    }
+  },
+  "required": [
+    "distributionChannelRef",
+    "genericTransactions",
+    "posRef",
+    "settlementDate"
+  ],
+  "$defs": {
+    "PartnerAnnexDto": {
+      "type": "object",
+      "description": "Generic representation of a node in a recursive transaction tree structure.",
+      "properties": {
+        "cancel": {
+          "type": "boolean",
+          "description": "If true, this annex root (and all sub-annexes) will be accounted with DEBED/CREDIT switched. Typically used for reversing older versions of the transaction. Default false."
+        },
+        "guid": {
+          "type": "string",
+          "maxLength": 38,
+          "minLength": 0
+        },
+        "annexRef": {
+          "type": "string",
+          "maxLength": 100,
+          "minLength": 0
+        },
+        "attributes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "price": {
+          "$ref": "#/$defs/PartnerMoneyDto",
+          "description": "PriceContribution may be provided if a custom weight on Price is needed. The Amount will always be recalculated as the sum of PriceContributions."
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PartnerMoneyDto"
+        },
+        "foreignAmount": {
+          "$ref": "#/$defs/PartnerMoneyDto"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500,
+          "minLength": 0
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": {}
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PartnerAnnexDto"
+          }
+        },
+        "subAnnexes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PartnerAnnexDto"
+          }
+        }
+      },
+      "required": [
+        "annexRef",
+        "priceContribution"
+      ]
+    },
+    "PartnerCommentDto": {
+      "type": "object",
+      "description": "Any external comments relevant for clearing the settlement. This will not be part of the reporting context. Useful for guiding potential corrections.",
+      "properties": {
+        "comment": {
+          "type": "string",
+          "maxLength": 500,
+          "minLength": 0
+        }
+      },
+      "required": [
+        "comment"
+      ]
+    },
+    "PartnerMoneyDto": {
+      "type": "object",
+      "description": "Representation of an amount with relevant metadata such as currency and tax information. The Annex will be considered without Price Contribution if amount is 0.00",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "The monetary amount in a 12.2 format (up to 12 digits before decimal, exactly 2 after). May be negative, for a discount or a refund.",
+          "pattern": "^-?\\d{1,12}\\.\\d{2}$"
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency of the amount in ISO 4217 format. Default NOK if not provided"
+        },
+        "taxCode": {
+          "type": "string",
+          "description": "The standard tax code applicable to the amount, if any"
+        },
+        "localTaxCode": {
+          "type": "string",
+          "description": "The local tax code applicable to the amount, if any. NOTE: This is normally not necessary to set but may be relevant in scenarios where the tax rate for a code changes"
+        },
+        "taxRate": {
+          "type": "string",
+          "description": "The tax rate applicable to the amount, if any. NOTE: This must be consistent with the CLEOS configuration for the Tax Code (SEGMENT7)",
+          "pattern": "^\\d{1,2}(\\.\\d{1,2})?$"
+        },
+        "weight": {
+          "type": "string",
+          "description": "The weight associated with the amount, if any, in a 12.4 format (up to 12 digits before decimal, optionally followed by 1-4 after). Thw weight is used for proportional clearing based a custom weight instead of PriceContributions. For example representing distance or time.",
+          "pattern": "^\\d{1,12}(\\.\\d{1,4})?$"
+        }
+      },
+      "required": [
+        "amount"
+      ]
+    },
+    "PartnerTransactionImportDto": {
+      "type": "object",
+      "description": "A transaction to be cleared, represented in a generic format suitable for various transaction types.",
+      "properties": {
+        "transactionType": {
+          "type": "string",
+          "description": "Type of the transaction being submitted for clearing. This type MUST be assigned to the relevant Chart Of Accounts by the Cleos Administrator first.",
+          "maxLength": 30,
+          "minLength": 0
+        },
+        "orderId": {
+          "type": "string",
+          "description": "OrderID is a unique identifier for the transaction within the Partner's system. It is used to track and manage the transaction throughout its lifecycle. Note that several transactions may refer to the same OrderID (eg both the sale and the payment transaction)",
+          "maxLength": 50,
+          "minLength": 0
+        },
+        "orderVersion": {
+          "type": "integer",
+          "format": "int32",
+          "description": "OrderVersion is a sequential version number for the transaction. It is used to track changes to the transaction over time."
+        },
+        "genericAnnexes": {
+          "type": "array",
+          "description": "The Annexes to be cleared. A transaction must carry at least one — a transaction with nothing to clear should be left out of the settlement entirely. A settlement covering a period with no sales is submitted with an empty genericTransactions list instead.",
+          "items": {
+            "$ref": "#/$defs/PartnerAnnexDto"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "genericAnnexes",
+        "transactionType"
+      ]
+    }
+  }
+}

@@ -1,0 +1,704 @@
+openapi: 3.2.0
+info:
+  title: Products V3 Sales package API
+  description: '**This API specification is a draft and is not yet implemented. Endpoints, schemas, and
+
+    behavior are subject to change without notice.**
+
+
+    This API provides services to read and maintain products and fare data for public transport in Norway.'
+  contact:
+    name: Team Produkt
+    email: teamprodukt@entur.org
+  version: 2026.10.1
+  x-stability-level: draft
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: Sales package
+  description: 'Fine-grained modification of sales packages. The client sends a full request body and
+
+    has full control over the sales package content.'
+paths:
+  /v3/sales-offer-packages/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Sales package
+      summary: Get a sales package by ID
+      description: Retrieve a sales package by its NeTEx ID.
+      operationId: getSalesOfferPackageById
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Sales package found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOfferPackageResponse'
+              examples:
+                withFareProducts:
+                  $ref: '#/components/examples/withFareProducts'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Sales package not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Sales package not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c' not found.
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - Sales package
+      summary: Update a sales package
+      description: 'Update a sales package with a full replacement of its content. The client should
+
+        first retrieve the current sales package, modify the desired fields, and send the
+
+        complete object back.
+
+
+        This creates a new version of the sales package. The status field controls whether
+
+        the version is auto-published (VERSIONED) or created as a draft.'
+      operationId: updateSalesOfferPackage
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Full sales package representation including all fare product references.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOfferPackageRequest'
+            examples:
+              updateWithFareProducts:
+                $ref: '#/components/examples/updateWithFareProducts'
+        required: true
+      responses:
+        '200':
+          description: Sales package updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOfferPackageResponse'
+              examples:
+                withFareProducts:
+                  $ref: '#/components/examples/withFareProducts'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Sales package not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Sales package not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c' not found.
+        '409':
+          description: Conflict - e.g. draft already in progress
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                draftInProgress:
+                  summary: Draft already in progress
+                  value:
+                    type: https://developer.entur.org/errors/conflict
+                    title: Conflict
+                    status: 409
+                    detail: 'Cannot create new version: a draft version is already in progress for VYG:SalesOfferPackage:07c4332c.'
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/sales-offer-packages/{id}/publication:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Sales package
+      summary: Publish or promote a sales package version
+      description: 'Change the status of a sales package version. Used to promote versions through the
+
+        publication workflow: DRAFT -> (PROPOSED ->) VERSIONED (-> DEPRECATED)
+
+        or send back: PROPOSED -> DRAFT.'
+      operationId: publishSalesOfferPackageVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: Version ID, target status, and validity period.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOfferPackagePublicationRequest'
+            examples:
+              publishVersion:
+                $ref: '#/components/examples/publishVersion'
+        required: true
+      responses:
+        '200':
+          description: Version status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOfferPackagePublicationResponse'
+              examples:
+                published:
+                  $ref: '#/components/examples/published'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Sales package or version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Version not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: Version 'VYG:Version:SP-905ec954-...' not found for SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c'.
+        '409':
+          description: Invalid status transition
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                invalidTransition:
+                  summary: Invalid status transition
+                  value:
+                    type: https://developer.entur.org/errors/conflict
+                    title: Conflict
+                    status: 409
+                    detail: Cannot transition from VERSIONED to DRAFT for VYG:SalesOfferPackage:07c4332c.
+      x-entur-permissions:
+        value: product-api-access:endre
+  /v3/sales-offer-packages/{id}/fare-products:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Sales package
+      summary: List fare products on a sales package
+      description: List all fare products currently assigned to a sales package.
+      operationId: listSalesOfferPackageFareProducts
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: List of fare products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FareProductListItem'
+              examples:
+                fareProducts:
+                  $ref: '#/components/examples/fareProducts'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Sales package not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Sales package not found
+                  value:
+                    type: https://developer.entur.org/errors/not-found
+                    title: Not Found
+                    status: 404
+                    detail: SalesOfferPackage 'VYG:SalesOfferPackage:07c4332c' not found.
+      x-entur-permissions:
+        value: product-api-access:les
+components:
+  responses:
+    BadRequestError:
+      description: Bad request - Invalid data or schema violation
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            schemaViolation:
+              summary: Request does not match schema
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: Field 'name' is required.
+            purchaseWindowNotFound:
+              summary: Referenced purchase window not found
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+  schemas:
+    SalesOfferPackagePublicationRequest:
+      required:
+      - status
+      - validFrom
+      - versionId
+      type: object
+      properties:
+        versionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID of the sales package version to publish.
+          examples:
+          - VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Target status. Valid transitions: DRAFT → PROPOSED → VERSIONED, PROPOSED → DRAFT.
+
+              '
+            examples:
+            - VERSIONED
+        validFrom:
+          type: string
+          description: Start of the validity period (travel dates).
+          format: date
+          examples:
+          - '2026-03-18'
+        validTo:
+          type: string
+          description: End of the validity period. No specified date means that the validity period has no end-date.
+          format: date
+          examples:
+          - '2026-12-31'
+    FareProductRef:
+      required:
+      - fareProductId
+      - fareProductVersionId
+      type: object
+      properties:
+        fareProductId:
+          type: string
+          description: NeTEx ID of the fare product.
+          examples:
+          - EXA:SupplementProduct:e006fb5c
+        fareProductVersionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID of the fare product.
+          examples:
+          - EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef
+        fareProductVersionNumber:
+          type: integer
+          description: Sequence number of the fare product version. Optional — set at publication.
+          examples:
+          - 5
+      description: Reference to a specific version of a fare product (e.g. SupplementProduct, PreassignedFareProduct).
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+    SalesOfferPackageResponse:
+      required:
+      - id
+      - name
+      - status
+      - versionId
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx ID of the sales package.
+          examples:
+          - VYG:SalesOfferPackage:07c4332c
+        versionNumber:
+          type: integer
+          description: The version number. Only present for published versions.
+          examples:
+          - 14
+        versionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID.
+          examples:
+          - VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef
+        ownerOrganisationId:
+          type: integer
+          description: The ID of the organization that owns the sales package.
+          examples:
+          - 1
+        name:
+          $ref: '#/components/schemas/LocalizedString'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: Status of this sales package version.
+            examples:
+            - VERSIONED
+        fareProducts:
+          type: array
+          description: List of fare product references included in this sales package.
+          items:
+            $ref: '#/components/schemas/FareProductRef'
+        validFrom:
+          type: string
+          description: Start of the validity period (travel dates, not version date).
+          format: date
+          examples:
+          - '2026-03-18'
+        validTo:
+          type: string
+          description: End of the validity period. No specified date means that the validity period has no end-date.
+          format: date
+          examples:
+          - '2026-12-31'
+        publishedDate:
+          type: string
+          description: System-assigned timestamp of when the version was published. Only present for VERSIONED status.
+          format: date-time
+          examples:
+          - '2026-03-18T10:30:00Z'
+    FareProductListItem:
+      required:
+      - id
+      - productType
+      - versionId
+      type: object
+      properties:
+        id:
+          type: string
+          description: NeTEx ID of the fare product.
+          examples:
+          - EXA:SupplementProduct:e006fb5c
+        productType:
+          type: string
+          description: Type of the fare product.
+          enum:
+          - SUPPLEMENT_PRODUCT
+          - PREASSIGNED_FARE_PRODUCT
+          examples:
+          - SUPPLEMENT_PRODUCT
+        versionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID of the fare product.
+          examples:
+          - EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef
+        name:
+          $ref: '#/components/schemas/LocalizedString'
+    SalesOfferPackagePublicationResponse:
+      required:
+      - salesOfferPackageId
+      - status
+      - validFrom
+      - versionId
+      type: object
+      properties:
+        salesOfferPackageId:
+          pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx ID of the sales package.
+          examples:
+          - VYG:SalesOfferPackage:07c4332c
+        versionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID.
+          examples:
+          - VYG:Version:SP-905ec954-abcd-1234-efgh-567890abcdef
+        versionNumber:
+          type: integer
+          description: Version number assigned at publication. Only present for VERSIONED status.
+          examples:
+          - 14
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: The resulting version status.
+            examples:
+            - VERSIONED
+        publishedDate:
+          type: string
+          description: System-assigned publication timestamp. Only present for VERSIONED status.
+          format: date-time
+          examples:
+          - '2026-03-18T10:30:00Z'
+        validFrom:
+          type: string
+          description: Start of the validity period.
+          format: date
+          examples:
+          - '2026-03-18'
+        validTo:
+          type: string
+          description: End of the validity period. No specified date means that the validity period has no end-date.
+          format: date
+          examples:
+          - '2026-12-31'
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
+    SalesOfferPackageRequest:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/LocalizedString'
+        fareProducts:
+          type: array
+          description: List of fare product references to include in this sales package.
+          items:
+            $ref: '#/components/schemas/FareProductRef'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Status of the created sales package version. Defaults to VERSIONED.
+
+
+              - **DRAFT** - Creates a draft version.
+
+              - **PROPOSED** - Creates a proposed version pending review.
+
+              - **VERSIONED** - Publishes the version immediately (default).
+
+              '
+            examples:
+            - VERSIONED
+  examples:
+    withFareProducts:
+      summary: Sales package with fare products
+      value:
+        id: TOG:SalesOfferPackage:a1b2c3d4
+        versionNumber: 14
+        versionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+        ownerOrganisationId: 1
+        name:
+        - lang: nb-NO
+          value: Salgspakke tog + parkering
+        status: VERSIONED
+        fareProducts:
+        - fareProductId: TOG:PreassignedFareProduct:trainTicket
+          fareProductVersionId: TOG:Version:FP-x1y-5678
+          fareProductVersionNumber: 3
+        - fareProductId: FJO:SupplementProduct:f9e8d7c6
+          fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+          fareProductVersionNumber: 7
+        validFrom: '2026-03-18'
+        publishedDate: '2026-03-18T10:30:00Z'
+    fareProducts:
+      summary: Fare products on a sales package
+      value:
+      - id: FJO:SupplementProduct:f9e8d7c6
+        productType: SUPPLEMENT_PRODUCT
+        versionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+        name:
+        - lang: nb-NO
+          value: Parkeringsreservasjon
+      - id: TOG:PreassignedFareProduct:trainTicket
+        productType: PREASSIGNED_FARE_PRODUCT
+        versionId: TOG:Version:FP-x1y-5678
+        name:
+        - lang: nb-NO
+          value: Togbillett Oslo-Bergen
+    published:
+      summary: Successfully published sales package version
+      value:
+        salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+        versionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+        versionNumber: 14
+        status: VERSIONED
+        publishedDate: '2026-03-18T10:30:00Z'
+        validFrom: '2026-03-18'
+    publishVersion:
+      summary: Publish a draft sales package version
+      value:
+        versionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+        status: VERSIONED
+        validFrom: '2026-03-18'
+    updateWithFareProducts:
+      summary: Update sales package with fare products
+      value:
+        name:
+        - lang: nb-NO
+          value: Salgspakke tog + parkering
+        fareProducts:
+        - fareProductId: TOG:PreassignedFareProduct:trainTicket
+          fareProductVersionId: TOG:Version:FP-x1y-5678
+        - fareProductId: FJO:SupplementProduct:f9e8d7c6
+          fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+        status: VERSIONED
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-customer-membership-schema.json",
+  "title": "CustomerMembership",
+  "description": "Information about a customers membership in a program",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personalisation-client-openapi.yml#/components/schemas/CustomerMembership",
+  "required": [
+    "memberId",
+    "programId"
+  ],
+  "type": "object",
+  "properties": {
+    "programId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "programReference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "\nUnique reference for the program.\n"
+    },
+    "memberId": {
+      "type": "integer",
+      "description": "The ID for the customer's membership in the program",
+      "format": "int64"
+    },
+    "memberMetadata": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "description": "Metadata about the member"
+      },
+      "description": "Metadata about the member"
+    }
+  }
+}

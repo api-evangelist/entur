@@ -1,0 +1,331 @@
+openapi: 3.2.0
+info:
+  title: Entur Reservation Controller Beta API
+  version: 2026.09.0
+  description: 'Operations tagged reservation-controller-beta across 2 of this provider''s published API definitions: entur-seatingservices-openapi.json, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seatingservices
+tags:
+- name: reservation-controller-beta
+paths:
+  /beta/reservations/{reservationId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller-beta
+      operationId: getReservation_1
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+      summary: Get reservation 1
+      x-summary-source: derived
+    put:
+      tags:
+      - reservation-controller-beta
+      operationId: updateSeatsReservation_1
+      parameters:
+      - name: reservationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservationRequestBeta'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+      summary: Update seats reservation 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/reservations:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - reservation-controller-beta
+      operationId: getAllReservationsBetaWithCriteria
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: reservationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqReservationResponseBeta'
+      deprecated: true
+      summary: Get all reservations beta with criteria
+      x-summary-source: derived
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: seatsReservation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeatReservationRequestBeta'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+      summary: Seats reservation
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/reservations/specific-seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: reserveSpecificSeats_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSpecificSeatsRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+      summary: Reserve specific seats 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/reservations/by-seat-types:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: reserveSeatsByType_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatTypeRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+      summary: Reserve seats by type 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/reservations/by-products:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - reservation-controller-beta
+      operationId: reserveSeatsByProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReserveSeatsByProductRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationResponseBeta'
+      deprecated: true
+      summary: Reserve seats by product
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/reservations/seats/{seatId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    patch:
+      tags:
+      - reservation-controller-beta
+      operationId: updateSeat
+      parameters:
+      - name: seatId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/MapStringString'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatResponseBeta'
+      deprecated: true
+      summary: Update seat
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/reservations/seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    delete:
+      tags:
+      - reservation-controller-beta
+      operationId: cancelSeats_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SeqCancelSeatRequest'
+        required: true
+      responses:
+        '204':
+          description: No Content
+      deprecated: true
+      summary: Cancel seats 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+components:
+  schemas:
+    ReserveSpecificSeatsRequest:
+      type: object
+      properties:
+        hasSeatBehaviors:
+          $ref: '#/components/schemas/SeqHasSeatBehavior'
+    ReserveSeatTypeRequest: {}
+    MapStringString:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeatResponseBeta: {}
+    SeqReservationResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqCancelSeatRequest:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    UpdateReservationRequestBeta: {}
+    SeqHasSeatBehavior:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    ReservationResponseBeta: {}
+    ReserveSeatsByProductRequest: {}
+    SeatReservationRequestBeta: {}
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seatingservices-openapi.json
+- entur-seatingservices-openapi.yml

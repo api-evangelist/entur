@@ -1,0 +1,276 @@
+openapi: 3.2.0
+info:
+  title: Entur Change Options API
+  version: 2026.07.0
+  description: 'Operations tagged Change Options across 2 of this provider''s published API definitions: entur-reserve-offers-partner-openapi.json, entur-reserve-offers-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.staging.entur.io/sales
+  description: Staging test environment
+- url: https://api.dev.entur.io/sales
+  description: Development test environment
+- url: https://api.entur.io/sales
+  description: Production environment
+security:
+- authHeader: []
+tags:
+- name: Change Options
+  description: Retrieve possible change options for an order.
+paths:
+  /v1beta/change-options:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Change Options
+      summary: Find available changes which are available to perform
+      description: Gives a list of change options for an order. Change options are options which either comes with a fee which have to be paid for, or free.
+      operationId: getChangeOptions
+      parameters:
+      - name: orderId
+        in: query
+        description: orderId
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ChangeOption'
+              examples:
+                default:
+                  value:
+                  - orderId: ABCD1234
+                    orderLineOptions:
+                    - orderLineId: fc93f175-5518-4a72-9618-43ae68804d4a
+                      options:
+                      - id: ABC:Exchanging:Any
+                        version: ABC:Version:Ex-1
+                        specifiedProducts:
+                        - ybe287
+                        types:
+                        - ANY_PRODUCT
+                        - DEPARTURE_ANY_DAY
+                        - SEAT_MAP
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '403':
+          $ref: '#/components/responses/forbidden'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.staging.entur.io/sales
+      description: Staging test environment
+    - url: https://api.dev.entur.io/sales
+      description: Development test environment
+    - url: https://api.entur.io/sales
+      description: Production environment
+components:
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    ChangeOption:
+      title: ChangeOption
+      required:
+      - orderId
+      - orderLineOptions
+      type: object
+      properties:
+        orderId:
+          type: string
+          examples:
+          - ABCD1234
+        orderLineOptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderLineOptions'
+    OrderLineOptions:
+      title: OrderLineOptions
+      required:
+      - options
+      - orderLineId
+      type: object
+      properties:
+        orderLineId:
+          type: string
+          examples:
+          - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
+        options:
+          type: array
+          items:
+            $ref: '#/components/schemas/Option'
+      description: Holder for possible change options for a given order line
+    ApiError:
+      title: ApiError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          examples:
+          - '2025-01-01T12:00:00Z'
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 500
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    Option:
+      title: Option
+      required:
+      - id
+      - specifiedProducts
+      - types
+      - version
+      type: object
+      properties:
+        fee:
+          $ref: '#/components/schemas/Fee'
+        id:
+          type: string
+        legIds:
+          type: array
+          items:
+            type: string
+        specifiedProducts:
+          type: array
+          items:
+            type: string
+          default: []
+        toFareClass:
+          type: string
+        types:
+          type: array
+          items:
+            type: string
+            enum:
+            - ANY_PRODUCT
+            - SAME_PRODUCT
+            - DEPARTURE_SAME_DAY
+            - DEPARTURE_ANY_DAY
+            - SPECIFIED_PRODUCT
+            - SPECIFIED_FARE_CLASS
+            - SEAT_MAP
+            - TRANSFER_TICKET
+          default: []
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
+        version:
+          type: string
+    Fee:
+      title: Fee
+      required:
+      - amount
+      - currency
+      type: object
+      properties:
+        amount:
+          type: string
+          examples:
+          - '100.00'
+        currency:
+          type: string
+          examples:
+          - NOK
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: A header containing the distribution channel ID.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+x-refined-from:
+- entur-reserve-offers-partner-openapi.json
+- entur-reserve-offers-partner-openapi.yml

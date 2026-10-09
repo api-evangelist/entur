@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-customer-input-schema.json",
+  "title": "customerInput",
+  "description": "Customer details supplied when creating or replacing a customer. The id is the Entur customer number, assigned by the Entur Customer Profiles service, and must not be set here.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-omsa-openapi.yml#/components/schemas/customerInput",
+  "required": [
+    "firstName",
+    "lastName"
+  ],
+  "type": "object",
+  "properties": {
+    "firstName": {
+      "$ref": "#/$defs/shortString"
+    },
+    "lastName": {
+      "$ref": "#/$defs/shortString"
+    },
+    "initials": {
+      "$ref": "#/$defs/tinyString"
+    },
+    "middleName": {
+      "$ref": "#/$defs/shortString"
+    },
+    "prefix": {
+      "$ref": "#/$defs/tinyString"
+    },
+    "postfix": {
+      "$ref": "#/$defs/tinyString"
+    },
+    "email": {
+      "$ref": "#/$defs/normalString"
+    },
+    "phoneNumber": {
+      "$ref": "#/$defs/normalString"
+    },
+    "address": {
+      "$ref": "#/$defs/postalAddress"
+    },
+    "dateOfBirth": {
+      "$ref": "#/$defs/date"
+    },
+    "placeOfBirth": {
+      "$ref": "#/$defs/shortString"
+    },
+    "countryOfBirth": {
+      "$ref": "#/$defs/country"
+    },
+    "customProperties": {
+      "$ref": "#/$defs/customProperties"
+    },
+    "externalReference": {
+      "maxLength": 40,
+      "minLength": 1,
+      "type": "string",
+      "description": "The client's own reference for this customer, unique within the organisation. Must not be blank. Leading and trailing whitespace is trimmed. Defaults to the customer number when not set. Can only be set when the customer is created. On replace it must be omitted or equal to the stored value. Use id, not this value, when referring to the customer elsewhere in the API."
+    }
+  },
+  "x-tm": "TRANSPORT CUSTOMER",
+  "$defs": {
+    "country": {
+      "maxLength": 2,
+      "minLength": 2,
+      "pattern": "[A-Z]{2}",
+      "type": "string",
+      "description": "two-letter country codes according to ISO 3166-1"
+    },
+    "customProperties": {
+      "maxProperties": 20,
+      "type": "object",
+      "additionalProperties": true,
+      "description": "dictionary for extra fields (bilatural agreements)"
+    },
+    "date": {
+      "type": "string",
+      "description": "https://www.rfc-editor.org/rfc/rfc3339#section-5.6, full-date (2019-10-12)",
+      "format": "full-date",
+      "x-pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "longString": {
+      "maxLength": 10000,
+      "type": "string",
+      "description": "long string, memos etc (length 0-10.000)"
+    },
+    "normalInt": {
+      "maximum": 1000,
+      "minimum": 0,
+      "type": "integer",
+      "description": "default length for an integer (0-1000)",
+      "default": 0
+    },
+    "normalString": {
+      "maxLength": 200,
+      "type": "string",
+      "description": "default string, full names etc (length 0-200)"
+    },
+    "placeReference": {
+      "required": [
+        "placeId"
+      ],
+      "type": "object",
+      "properties": {
+        "placeId": {
+          "maxLength": 200,
+          "pattern": "^(GPS:|NSR:StopPlace:|P:)",
+          "type": "string",
+          "description": "this string references to information that can be found in the `data sources`. Enlist all prefixes (=rel) from the /collections/datasources/items that apply to a place/location. Default it matches already with 'GPS' (no entry required in the datasources). In case of a custom place (like home address), you can use the 'P:' prefix and add the address to the **placeDefinitions** list of the request.",
+          "x-example-format": "^(GPS:|GBFS:stations:)"
+        },
+        "name": {
+          "$ref": "#/$defs/normalString"
+        }
+      }
+    },
+    "postalAddress": {
+      "required": [
+        "addressLine1",
+        "addressLine2"
+      ],
+      "type": "object",
+      "properties": {
+        "placeId": {
+          "$ref": "#/$defs/placeReference"
+        },
+        "addressLine1": {
+          "$ref": "#/$defs/longString"
+        },
+        "addressLine2": {
+          "$ref": "#/$defs/longString"
+        },
+        "street": {
+          "$ref": "#/$defs/normalString"
+        },
+        "houseNumber": {
+          "$ref": "#/$defs/normalInt"
+        },
+        "houseNumberAddition": {
+          "$ref": "#/$defs/tinyString"
+        },
+        "postalCode": {
+          "$ref": "#/$defs/shortString"
+        },
+        "city": {
+          "$ref": "#/$defs/shortString"
+        },
+        "province": {
+          "$ref": "#/$defs/shortString"
+        },
+        "state": {
+          "$ref": "#/$defs/shortString"
+        },
+        "country": {
+          "$ref": "#/$defs/country"
+        },
+        "additionalInfo": {
+          "$ref": "#/$defs/longString"
+        }
+      },
+      "additionalProperties": false,
+      "description": "address parts, where addressLine1 and 2 should contain the complete address, matches Content-Language",
+      "x-tm": "POSTAL ADDRESS"
+    },
+    "shortString": {
+      "maxLength": 75,
+      "type": "string",
+      "description": "short string, display names (length 0-75)"
+    },
+    "tinyString": {
+      "maxLength": 10,
+      "type": "string",
+      "description": "real short string, codes (length 0-10)"
+    }
+  }
+}

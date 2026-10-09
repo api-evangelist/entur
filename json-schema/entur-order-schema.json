@@ -1,0 +1,2014 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-order-schema.json",
+  "title": "Order",
+  "description": "A purchase Order for one or more Travellers",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-order-partner-openapi.yml#/components/schemas/Order",
+  "type": "object",
+  "allOf": [
+    {
+      "required": [
+        "balance",
+        "createdAt",
+        "currency",
+        "failed",
+        "fees",
+        "id",
+        "orderLines",
+        "organisationId",
+        "paymentRefs",
+        "reservations",
+        "status",
+        "totalAmount",
+        "totalTaxAmount",
+        "travellers",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of Order."
+        },
+        "version": {
+          "type": "integer",
+          "description": "The system increments an Order’s version number whenever some change occurs that causes the Order’s status to go from CONFIRMED to DRAFT.\nThe user has to perform an action that causes the status to go from DRAFT to CONFIRMED (such as paying for the Order) before the time given in expireAt. If the Order is not confirmed within this time, the system will scrap all changes (including the incremented version) and return the Order to its last confirmed version.",
+          "format": "int32",
+          "default": 1
+        },
+        "status": {
+          "$ref": "#/$defs/WorkflowStatus"
+        },
+        "totalAmount": {
+          "type": "string",
+          "description": "The total amount due for this Order.",
+          "default": "0.00"
+        },
+        "balance": {
+          "type": "string",
+          "description": "The balance amount for this Order.",
+          "default": "0.00"
+        },
+        "totalTaxAmount": {
+          "type": "string",
+          "description": "The total tax amount for this Order.",
+          "default": "0.00"
+        },
+        "currency": {
+          "type": "string",
+          "description": "The currency for this Order.",
+          "default": "NOK"
+        },
+        "orderLines": {
+          "type": "array",
+          "description": "OrderLines in the given Order.",
+          "items": {
+            "$ref": "#/$defs/OrderLine"
+          },
+          "default": []
+        },
+        "paymentRefs": {
+          "type": "array",
+          "description": "Payment references used on this Order.",
+          "items": {
+            "$ref": "#/$defs/PaymentRef"
+          },
+          "default": []
+        },
+        "reservations": {
+          "type": "array",
+          "description": "Seating Reservations connected to this Order.",
+          "items": {
+            "$ref": "#/$defs/PurchasedReservation"
+          },
+          "default": []
+        },
+        "travellers": {
+          "type": "array",
+          "description": "Unique Travellers in this Order.",
+          "items": {
+            "$ref": "#/$defs/Traveller"
+          },
+          "default": []
+        },
+        "organisationId": {
+          "type": "integer",
+          "description": "ID of the organisation which created/sold this Order.",
+          "format": "int64"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp for when Order was created.",
+          "format": "date-time"
+        },
+        "lastConfirmedAt": {
+          "type": "string",
+          "description": "Timestamp for when Order was last confirmed.",
+          "format": "date-time"
+        },
+        "fees": {
+          "type": "array",
+          "description": "Fees contained in the Order.",
+          "items": {
+            "$ref": "#/$defs/Fee"
+          },
+          "default": []
+        },
+        "pos": {
+          "type": "string",
+          "description": "Point-of-sale reference of request used when Order was created"
+        },
+        "distributionChannelId": {
+          "type": "string",
+          "description": "Distribution channel ID of request used when Order was created"
+        },
+        "failed": {
+          "type": "boolean",
+          "description": "Indicates that the order version has failed and needs to be credited.",
+          "default": false
+        }
+      }
+    },
+    {
+      "$ref": "#/$defs/OrderRequest"
+    }
+  ],
+  "$defs": {
+    "ActivationMeans": {
+      "title": "ActivationMeans",
+      "type": "string",
+      "enum": [
+        "AUTOMATIC_BY_TIME",
+        "CHECK_IN",
+        "NONE_REQUIRED",
+        "OTHER",
+        "USE_OF_MOBILE_DEVICE",
+        "USE_OF_VALIDATOR"
+      ]
+    },
+    "AddedBy": {
+      "type": "object",
+      "properties": {
+        "pos": {
+          "type": "string",
+          "description": "Point-of-sale reference of request used when OrderLine was added."
+        },
+        "distributionChannelId": {
+          "type": "string",
+          "description": "Distribution channel ID of request used when OrderLine was added."
+        }
+      },
+      "description": "Metadata about who or what added the OrderLine."
+    },
+    "CancellationReason": {
+      "title": "CancellationReason",
+      "type": "string",
+      "description": "Cancellation reason for an OrderLine. OrderLines with REPLACED have been replaced with a newer version.",
+      "enum": [
+        "CANCELLED",
+        "REPLACED"
+      ]
+    },
+    "CompanionProfile": {
+      "title": "CompanionProfile",
+      "required": [
+        "maximumNumberOfPersons",
+        "minimumNumberOfPersons"
+      ],
+      "type": "object",
+      "properties": {
+        "minimumNumberOfPersons": {
+          "type": "integer"
+        },
+        "maximumNumberOfPersons": {
+          "type": "integer"
+        },
+        "userProfileRef": {
+          "$ref": "#/$defs/RefType"
+        }
+      }
+    },
+    "ContactInfo": {
+      "title": "ContactInfo",
+      "type": "object",
+      "properties": {
+        "createdBy": {
+          "$ref": "#/$defs/CustomerRef"
+        },
+        "contact": {
+          "$ref": "#/$defs/CustomerRef"
+        }
+      },
+      "description": "Contact information related to different aspects in the lifecycle of an Order."
+    },
+    "CustomerRef": {
+      "title": "CustomerRef",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID for Customer"
+        }
+      },
+      "description": "Customer reference."
+    },
+    "Distance": {
+      "title": "Distance",
+      "required": [
+        "unit",
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "The distance value.",
+          "format": "decimal"
+        },
+        "unit": {
+          "$ref": "#/$defs/DistanceUnit"
+        }
+      },
+      "description": "A distance value with a unit."
+    },
+    "DistanceUnit": {
+      "title": "DistanceUnit",
+      "type": "string",
+      "description": "Unit of distance measurement.",
+      "enum": [
+        "METER",
+        "KILOMETER"
+      ]
+    },
+    "DistributionDetails": {
+      "title": "DistributionDetails",
+      "type": "object",
+      "properties": {
+        "fulfillmentMethodRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "typeOfTravelDocumentToIssueRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "customerAccountRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "existingTravelDocumentDetails": {
+          "$ref": "#/$defs/TravelDocumentDetails"
+        },
+        "distributionHolderCustomerId": {
+          "type": "string",
+          "description": "Reference to a customer who will use the travel right"
+        }
+      },
+      "description": "Wrapper for references connected to distribution of travel rights and/or tickets"
+    },
+    "DynamicDistanceMatrixElement": {
+      "title": "DynamicDistanceMatrixElement",
+      "type": "object",
+      "properties": {
+        "startStopPointRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "endStopPointRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "startTariffZoneRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "endTariffZoneRef": {
+          "$ref": "#/$defs/RefType"
+        }
+      },
+      "description": ""
+    },
+    "DynamicUsageValidityPeriod": {
+      "title": "DynamicUsageValidityPeriod",
+      "type": "object",
+      "properties": {
+        "standardDuration": {
+          "type": "string",
+          "description": "Standard duration. Represented as a string formatted according to ISO-8601",
+          "format": "duration"
+        },
+        "startDateTime": {
+          "type": "string",
+          "description": "StartDateTime",
+          "format": "date-time"
+        },
+        "usageTrigger": {
+          "$ref": "#/$defs/UsageTrigger"
+        },
+        "endDateTime": {
+          "type": "string",
+          "description": "EndDate",
+          "format": "date-time"
+        },
+        "usageEnd": {
+          "$ref": "#/$defs/UsageEnd"
+        },
+        "activationMeans": {
+          "type": "array",
+          "description": "Activation Means. Describes how a product can be activated.",
+          "items": {
+            "$ref": "#/$defs/ActivationMeans"
+          },
+          "default": []
+        }
+      },
+      "description": "A dynamic UsageValidtyPeriod that is generated on the fly. Thus lacking id and version as it can not be referenced"
+    },
+    "Entitlement": {
+      "title": "Entitlement",
+      "required": [
+        "entitlementProductRef"
+      ],
+      "type": "object",
+      "properties": {
+        "contractId": {
+          "type": "string",
+          "description": "ID of contract used by Traveller for OrderLine"
+        },
+        "entitlementProductRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "externalEntitlementRef": {
+          "$ref": "#/$defs/RefType"
+        }
+      },
+      "description": "Information about the product and contract used when generating offer"
+    },
+    "Fee": {
+      "title": "Fee",
+      "description": "Fee related to one or more OrderLines",
+      "allOf": [
+        {
+          "required": [
+            "id"
+          ],
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "ID used to uniquely identify Fee if deletion is necessary",
+              "format": "uuid"
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/FeeRequest"
+        }
+      ]
+    },
+    "FeeRequest": {
+      "title": "FeeRequest",
+      "required": [
+        "orderLineIds",
+        "price",
+        "reason",
+        "type"
+      ],
+      "type": "object",
+      "properties": {
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of Fee. Valid types: MANUAL, REFUNDING, ONBOARD, CHANGE, INVOICE, CHANGE_NON_REFUNDABLE, PENALTY, BOOKING, REDUCTION"
+        },
+        "externalRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "reason": {
+          "type": "string",
+          "description": "Explanatory text describing the reason for the Fee, if applicable",
+          "default": ""
+        },
+        "orderLineIds": {
+          "type": "array",
+          "description": "References to the OrderLines this Fee refers to, if applicable. If empty, the fee refers to all order lines",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "default": []
+        },
+        "orderVersion": {
+          "type": "integer",
+          "description": "The version of the Order this Fee is added to",
+          "format": "int32"
+        },
+        "linkedByExtRef": {
+          "$ref": "#/$defs/RefType"
+        }
+      },
+      "description": "Fee related to one or more OrderLines"
+    },
+    "GroupTicket": {
+      "title": "GroupTicket",
+      "required": [
+        "companionProfiles"
+      ],
+      "type": "object",
+      "properties": {
+        "companionProfiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CompanionProfile"
+          }
+        },
+        "derivedFromObjectRef": {
+          "type": "string",
+          "description": "Identity of object from which this object of ENTITY was derived. Normally the same."
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Version of this object from which this version of ENTITY was derived."
+        }
+      }
+    },
+    "InterchangeTo": {
+      "title": "InterchangeTo",
+      "required": [
+        "fromServiceJourneyRef",
+        "staySeated",
+        "toServiceJourneyRef"
+      ],
+      "type": "object",
+      "properties": {
+        "staySeated": {
+          "type": "boolean",
+          "description": "Passengers should remain seated when travelling from and to ServiceJourneys referenced in this object"
+        },
+        "fromServiceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "toServiceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        }
+      },
+      "description": "Connected ServiceJourneys without changing material"
+    },
+    "Limitation": {
+      "title": "Limitation",
+      "type": "object",
+      "properties": {
+        "dynamicUsageValidityPeriod": {
+          "$ref": "#/$defs/DynamicUsageValidityPeriod"
+        },
+        "usageValidityPeriodRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "userProfileRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "groupTicketRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "groupTicket": {
+          "$ref": "#/$defs/GroupTicket"
+        }
+      }
+    },
+    "LocalPriceWithTax": {
+      "required": [
+        "amount",
+        "currency",
+        "exchangeRate",
+        "taxAmount",
+        "taxCountry",
+        "taxRate"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount including tax amount."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency"
+        },
+        "exchangeRate": {
+          "type": "string",
+          "description": "Exchange rate used at creation time to convert the local currency into the order's currency. It is the number of units of the order currency paid for 1 (one) unit of the local currency. Must be in valid BigDecimal format. E.g., if the order currency is NOK and the local currency is EUR, and 1 EUR = 10 NOK, then the exchange rate is 10.0000. If the order currency is NOK and the local currency is SEK, and 100 SEK = 96.21 NOK, then the exchange rate is 0.9621."
+        },
+        "taxAmount": {
+          "type": "string",
+          "description": "Tax amount"
+        },
+        "taxCountry": {
+          "pattern": "^[A-Z]{2}$",
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code"
+        },
+        "taxRate": {
+          "type": "string",
+          "description": "Tax rate. Must be in valid BigDecimal format"
+        }
+      },
+      "description": "The original price, with tax, in the local currency of the tax country."
+    },
+    "LogicalOperator": {
+      "title": "LogicalOperator",
+      "type": "string",
+      "description": "Logical operator",
+      "enum": [
+        "AND",
+        "OR",
+        "XOR",
+        "NOT",
+        "NAND",
+        "XNOR",
+        "NOR"
+      ]
+    },
+    "Mode": {
+      "title": "Mode",
+      "type": "string",
+      "description": "Travel mode for Leg.",
+      "enum": [
+        "AIR",
+        "BICYCLE",
+        "BUS",
+        "CABLEWAY",
+        "CAR",
+        "WATER",
+        "FUNICULAR",
+        "LIFT",
+        "LINKSWITCH",
+        "RAIL",
+        "METRO",
+        "TRAM",
+        "TRANSIT",
+        "FOOT",
+        "COACH"
+      ]
+    },
+    "OrderLine": {
+      "title": "OrderLine",
+      "allOf": [
+        {
+          "required": [
+            "createdAt",
+            "id",
+            "status",
+            "version"
+          ],
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "ID of OrderLine",
+              "format": "uuid"
+            },
+            "version": {
+              "type": "integer",
+              "description": "Version of this OrderLine. This is iterated when the OrderLine is updated, but not when it is replaced.",
+              "format": "int32",
+              "default": 1
+            },
+            "status": {
+              "$ref": "#/$defs/WorkflowStatus"
+            },
+            "cancellation": {
+              "$ref": "#/$defs/CancellationReason"
+            },
+            "createdAt": {
+              "type": "string",
+              "description": "Timestamp for when the OrderLine was created.",
+              "format": "date-time"
+            },
+            "lastConfirmedAt": {
+              "type": "string",
+              "description": "Timestamp for when the OrderLine was last confirmed.",
+              "format": "date-time"
+            },
+            "refunded": {
+              "type": "boolean",
+              "description": "If true = refunded, false = cancelled, null = active"
+            },
+            "parameterSpecifications": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PurchasedParameterSpecification"
+              }
+            },
+            "addedBy": {
+              "$ref": "#/$defs/AddedBy"
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/OrderLineRequest"
+        }
+      ]
+    },
+    "OrderLineRequest": {
+      "title": "OrderLineRequest",
+      "required": [
+        "description",
+        "fareProducts",
+        "price",
+        "priceContribution",
+        "travellers"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id for an OrderLine, required when updating orderLines",
+          "format": "uuid"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "localPrice": {
+          "$ref": "#/$defs/LocalPriceWithTax"
+        },
+        "salesPackageRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "parameters": {
+          "$ref": "#/$defs/PurchasedParameters"
+        },
+        "fareProducts": {
+          "type": "array",
+          "description": "The underlying FareProducts which make up this SalesPackage.",
+          "items": {
+            "$ref": "#/$defs/PurchasedFareProduct"
+          },
+          "default": []
+        },
+        "description": {
+          "type": "array",
+          "description": "Description.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          },
+          "default": []
+        },
+        "privateCode": {
+          "type": "string",
+          "description": "Private code."
+        },
+        "travelSpecification": {
+          "$ref": "#/$defs/TravelSpecification"
+        },
+        "travellers": {
+          "type": "array",
+          "description": "The Travellers that are to travel on this OrderLine.",
+          "items": {
+            "$ref": "#/$defs/PurchasedTraveller"
+          },
+          "default": []
+        },
+        "externalReference": {
+          "type": "string",
+          "description": "External reference to another system supplied by the client."
+        },
+        "distributionDetails": {
+          "$ref": "#/$defs/DistributionDetails"
+        },
+        "purchasedProperties": {
+          "$ref": "#/$defs/PurchasedProperties"
+        },
+        "effectiveCancellationDate": {
+          "type": "string",
+          "description": "If set, the effective date for cancellation. Overrides timestamp.",
+          "format": "date-time"
+        },
+        "clientProvidedData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of client provided data. No validation is performed, and no guarantee can be made about its contents."
+        },
+        "parameterSpecifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PurchasedParameterSpecification"
+          }
+        },
+        "externalConfirmation": {
+          "type": "string",
+          "description": "External confirmation status for this OrderLine. Allowed values: PENDING, SUCCESS, FAILED."
+        }
+      }
+    },
+    "OrderRequest": {
+      "title": "OrderRequest",
+      "type": "object",
+      "properties": {
+        "contactInfo": {
+          "$ref": "#/$defs/ContactInfo"
+        },
+        "externalReference": {
+          "type": "string",
+          "description": "External reference for Orders"
+        },
+        "expireAt": {
+          "type": "string",
+          "description": "Any changes not confirmed before this point in time will be discarded. Default is 20 minutes from the last operation. Cannot be in the past, or further into the future than six months.",
+          "format": "date-time"
+        },
+        "specialOrderCause": {
+          "$ref": "#/$defs/SpecialOrderCause"
+        }
+      },
+      "description": "A purchase Order for one or more Travellers"
+    },
+    "OrganisationRef": {
+      "title": "OrganisationRef",
+      "required": [
+        "id",
+        "privateCode"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID for an Organisation"
+        },
+        "privateCode": {
+          "type": "integer",
+          "description": "Private code used to reference an Organisation",
+          "format": "int64"
+        }
+      },
+      "description": "The Organisation that owns the FareProduct"
+    },
+    "PaymentRef": {
+      "title": "PaymentRef",
+      "required": [
+        "amount",
+        "completedAt",
+        "currency",
+        "orderVersion"
+      ],
+      "type": "object",
+      "properties": {
+        "orderVersion": {
+          "type": "integer",
+          "description": "Order version number this Payment confirmed.",
+          "format": "int32"
+        },
+        "paymentId": {
+          "type": "integer",
+          "description": "Reference to the Payment.",
+          "format": "int64"
+        },
+        "creditId": {
+          "type": "integer",
+          "description": "Reference to the Credit.",
+          "format": "int64"
+        },
+        "amount": {
+          "type": "string",
+          "description": "The Payment amount. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022."
+        },
+        "currency": {
+          "type": "string",
+          "default": "NOK"
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Timestamp for when Payment was completed",
+          "format": "date-time"
+        },
+        "settlementId": {
+          "type": "integer",
+          "description": "Supplied to the client by an external system for handling settlements. For Internal Entur Clients this is Entur’s Electronic Journal.",
+          "format": "int64"
+        }
+      },
+      "description": "References to Payments"
+    },
+    "PointToPointValidity": {
+      "title": "PointToPointValidity",
+      "required": [
+        "fromPlace",
+        "toPlace"
+      ],
+      "type": "object",
+      "properties": {
+        "fromPlace": {
+          "type": "string",
+          "description": "Valid from StopPlace"
+        },
+        "toPlace": {
+          "type": "string",
+          "description": "Valid to StopPlace"
+        }
+      },
+      "description": "Start and StopPlaces where the entity is valid"
+    },
+    "PriceWithTax": {
+      "title": "PriceWithTax",
+      "required": [
+        "amount",
+        "currency",
+        "taxAmount"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount including tax amount."
+        },
+        "taxAmount": {
+          "type": "string",
+          "description": "Tax amount"
+        },
+        "taxRate": {
+          "type": "string",
+          "description": "Tax rate. Must be in valid BigDecimal format"
+        },
+        "taxCode": {
+          "type": "string",
+          "description": "Tax code for this tax rate"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency",
+          "default": "NOK"
+        }
+      },
+      "description": "Price with included tax amounts and an optional rate."
+    },
+    "PurchasedAccommodation": {
+      "title": "PurchasedAccommodation",
+      "type": "string",
+      "description": "Type of accommodation chosen by customer",
+      "enum": [
+        "SLEEPER",
+        "SEATING",
+        "DOUBLE_SLEEPER",
+        "SINGLE_SLEEPER",
+        "SPECIAL_SLEEPER",
+        "COUCHETTE",
+        "SINGLE_COUCHETTE",
+        "DOUBLE_COUCHETTE",
+        "RECLINING_SEAT",
+        "BABY_COMPARTMENT",
+        "FAMILY_COMPARTMENT",
+        "PANORAMA_COACH",
+        "PULLMAN_COACH",
+        "STANDING",
+        "ANY_FACILITY_SET"
+      ]
+    },
+    "PurchasedDiscountUsageParameters": {
+      "title": "PurchasedDiscountUsageParameters",
+      "required": [
+        "entitlementGiven",
+        "reserving"
+      ],
+      "type": "object",
+      "properties": {
+        "reserving": {
+          "type": "array",
+          "description": "Reference to reserving parameters with price information.",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        },
+        "entitlementGiven": {
+          "type": "array",
+          "description": "Reference to entitlement products used when calculating price",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        }
+      },
+      "description": "Possible additional parameters for the configurations"
+    },
+    "PurchasedFareClass": {
+      "title": "PurchasedFareClass",
+      "type": "string",
+      "description": "Type of FareClass chosen by customer",
+      "enum": [
+        "FIRST_CLASS",
+        "SECOND_CLASS",
+        "THIRD_CLASS",
+        "ECONOMY_CLASS",
+        "BUSINESS_CLASS",
+        "TURISTA",
+        "PREFERENTE",
+        "STANDARD_CLASS",
+        "PREMIUM_CLASS",
+        "ANY",
+        "UNKNOWN"
+      ]
+    },
+    "PurchasedFareProduct": {
+      "title": "PurchasedFareProduct",
+      "required": [
+        "fareProductRef",
+        "legIds",
+        "price",
+        "priceContribution",
+        "validableElements"
+      ],
+      "type": "object",
+      "properties": {
+        "fareProductRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "legIds": {
+          "type": "array",
+          "description": "The IDs of the Legs that are connected to this FareProduct.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "parameters": {
+          "$ref": "#/$defs/PurchasedParameters"
+        },
+        "validableElements": {
+          "type": "array",
+          "description": "The ValidableElement configurations which makes up this FareProduct.",
+          "items": {
+            "$ref": "#/$defs/PurchasedValidableElement"
+          }
+        },
+        "organisationRef": {
+          "$ref": "#/$defs/OrganisationRef"
+        },
+        "discountRight": {
+          "$ref": "#/$defs/PurchasedFareProduct"
+        },
+        "originatingFromProductId": {
+          "type": "string",
+          "description": "The ID of the entitlement product that allowed the sale discount right to be used"
+        },
+        "elementId": {
+          "type": "string",
+          "description": "Unique ID for this specific PurchasedFareProduct. Note that this ID is only for distinguishing parts of an orderLine. It has no use outside of the orderLine, and can't be found in any other service."
+        },
+        "saleDiscountRight": {
+          "$ref": "#/$defs/PurchasedSaleDiscountRight"
+        },
+        "purchasedProperties": {
+          "$ref": "#/$defs/PurchasedProperties"
+        },
+        "validityId": {
+          "type": "string",
+          "description": "Unique identifier for a purchased FareProduct with validity"
+        },
+        "amount": {
+          "type": "integer",
+          "description": "Amount of priced unit",
+          "format": "int32"
+        },
+        "purchasedProductType": {
+          "$ref": "#/$defs/PurchasedProductType"
+        },
+        "parameterSpecifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PurchasedParameterSpecification"
+          }
+        },
+        "fareAgreementNumber": {
+          "type": "integer",
+          "description": "Fare agreement identifier",
+          "format": "int32"
+        }
+      },
+      "description": "Configuration for a purchased Fare Product"
+    },
+    "PurchasedFareProductValidity": {
+      "title": "PurchasedFareProductValidity",
+      "required": [
+        "validityId"
+      ],
+      "type": "object",
+      "properties": {
+        "validityId": {
+          "type": "string",
+          "description": "Unique identifier for a purchased FareProduct with validity"
+        },
+        "pointToPointValidity": {
+          "$ref": "#/$defs/PointToPointValidity"
+        },
+        "zonalValidity": {
+          "$ref": "#/$defs/ZonalValidity"
+        }
+      },
+      "description": "The PointToPontValidity or ZonalValidity this FareProduct contains."
+    },
+    "PurchasedFareStructureElement": {
+      "title": "PurchasedFareStructureElement",
+      "required": [
+        "fareStructureElementRef",
+        "legIds",
+        "price",
+        "priceContribution"
+      ],
+      "type": "object",
+      "properties": {
+        "fareStructureElementRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "legIds": {
+          "type": "array",
+          "description": "The Leg IDs that are connected to this FareStructureElement",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "parameters": {
+          "$ref": "#/$defs/PurchasedParameters"
+        },
+        "interval": {
+          "$ref": "#/$defs/PurchasedGeographicalInterval"
+        },
+        "qualityStructureFactorRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "elementId": {
+          "type": "string",
+          "description": "Unique ID for this specific PurchasedFareStructureElement. Note that this ID is only for distinguishing parts of an orderLine. It has no use outside of the orderLine, and can't be found in any other service."
+        },
+        "purchasedProperties": {
+          "$ref": "#/$defs/PurchasedProperties"
+        },
+        "parameterSpecifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PurchasedParameterSpecification"
+          }
+        }
+      },
+      "description": "Configuration for a FareStructureElement"
+    },
+    "PurchasedGeographicalInterval": {
+      "title": "PurchasedGeographicalInterval",
+      "required": [
+        "fareZones",
+        "geographicalIntervalRef",
+        "zones"
+      ],
+      "type": "object",
+      "properties": {
+        "geographicalIntervalRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "distance": {
+          "type": "number",
+          "description": "The distance in the geographical interval.",
+          "format": "double"
+        },
+        "zoneCount": {
+          "type": "integer",
+          "description": "Number of zones counted for the journey.",
+          "format": "int32"
+        },
+        "zones": {
+          "type": "array",
+          "description": "The Zones for which the journey passes through. Deprecated. This list will be empty when tariff zones are fully replaced by fare zones.",
+          "deprecated": true,
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "fareZones": {
+          "type": "array",
+          "description": "A list of fare zones that exist in this interval. Empty if not relevant.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "description": "The Geographical Interval with distance and zone data."
+    },
+    "PurchasedGroup": {
+      "title": "PurchasedGroup",
+      "required": [
+        "groupSummary",
+        "groupTicketRef",
+        "price",
+        "priceContribution",
+        "userProfileRefs"
+      ],
+      "type": "object",
+      "properties": {
+        "groupTicketRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "userProfileRefs": {
+          "type": "array",
+          "description": "The UserProfile IDs that are given rights to travel with this GroupTicket.",
+          "items": {
+            "$ref": "#/$defs/RefType"
+          },
+          "default": []
+        },
+        "groupSummary": {
+          "type": "array",
+          "description": "A collection of all the different user profiles with price and tax in the group.",
+          "items": {
+            "$ref": "#/$defs/PurchasedUserProfileSummary"
+          },
+          "default": []
+        }
+      },
+      "description": "A representation of group product"
+    },
+    "PurchasedLeg": {
+      "title": "PurchasedLeg",
+      "required": [
+        "authorityRef",
+        "endTime",
+        "fromStopPlaceRef",
+        "id",
+        "mode",
+        "operatorRef",
+        "serviceJourneyRef",
+        "startTime",
+        "subMode",
+        "toStopPlaceRef"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "datedServiceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "originalDatedServiceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "startTime": {
+          "type": "string",
+          "description": "The date and time this Leg begins.",
+          "format": "date-time"
+        },
+        "fromStopPlaceRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "The date and time this Leg ends.",
+          "format": "date-time"
+        },
+        "toStopPlaceRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "authorityRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "operatorRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "organisationId": {
+          "type": "integer",
+          "description": "The organisation that owns the service journey on this leg, Alternative identifier to authorityRef or operatorRef.",
+          "format": "int64"
+        },
+        "serviceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "mode": {
+          "$ref": "#/$defs/Mode"
+        },
+        "subMode": {
+          "$ref": "#/$defs/SubMode"
+        },
+        "interchangeTo": {
+          "$ref": "#/$defs/InterchangeTo"
+        },
+        "lineId": {
+          "type": "string",
+          "description": "Line ID"
+        },
+        "serviceJourneyPrivateCode": {
+          "type": "string",
+          "description": "Private code of the ServiceJourney"
+        },
+        "railReplacementInfo": {
+          "$ref": "#/$defs/RailReplacementInfo"
+        }
+      },
+      "description": "Part of a trip between two places."
+    },
+    "PurchasedParameterSpecification": {
+      "type": "object",
+      "properties": {
+        "specificationOf": {
+          "type": "string",
+          "description": "Specification of parameter id"
+        },
+        "specificParameterAssignment": {
+          "$ref": "#/$defs/SpecificParameterAssignment"
+        }
+      }
+    },
+    "PurchasedParameters": {
+      "title": "PurchasedParameters",
+      "required": [
+        "entitlementGiven",
+        "exchanging",
+        "luggageAllowance",
+        "replacing",
+        "reserving",
+        "roundTrip"
+      ],
+      "type": "object",
+      "properties": {
+        "userProfile": {
+          "$ref": "#/$defs/PurchasedUserProfile"
+        },
+        "luggageAllowance": {
+          "type": "array",
+          "description": "Reference to luggage allowance parameters with price information.",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        },
+        "exchanging": {
+          "type": "array",
+          "description": "Reference to exchanging parameters with price information.",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        },
+        "reserving": {
+          "type": "array",
+          "description": "Reference to reserving parameters with price information.",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        },
+        "replacing": {
+          "type": "array",
+          "description": "Reference to replacing parameters with price information.",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        },
+        "usageValidityPeriod": {
+          "$ref": "#/$defs/PurchasedUsageParameter"
+        },
+        "group": {
+          "$ref": "#/$defs/PurchasedGroup"
+        },
+        "roundTrip": {
+          "type": "array",
+          "description": "Reference to round trip parameters with price information.",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        },
+        "entitlementGiven": {
+          "type": "array",
+          "description": "Reference to entitlement products used when calculating price",
+          "items": {
+            "$ref": "#/$defs/PurchasedUsageParameter"
+          },
+          "default": []
+        }
+      },
+      "description": "Possible additional parameters for the configurations"
+    },
+    "PurchasedProductType": {
+      "title": "PurchasedProductType",
+      "type": "string",
+      "description": "Type of priced unit",
+      "enum": [
+        "TRIP_CARNET",
+        "PASS_CARNET",
+        "UNIT_COUPONS",
+        "STORED_VALUE",
+        "OTHER"
+      ]
+    },
+    "PurchasedProperties": {
+      "title": "PurchasedProperties",
+      "required": [
+        "purchasedAccommodations",
+        "purchasedFareClasses"
+      ],
+      "type": "object",
+      "properties": {
+        "purchasedFareClasses": {
+          "type": "array",
+          "description": "Type of FareClass chosen by customer",
+          "items": {
+            "$ref": "#/$defs/PurchasedFareClass"
+          },
+          "default": []
+        },
+        "purchasedAccommodations": {
+          "type": "array",
+          "description": "Type of accommodation chosen by customer",
+          "items": {
+            "$ref": "#/$defs/PurchasedAccommodation"
+          },
+          "default": []
+        }
+      },
+      "description": "Classification of the products chosen."
+    },
+    "PurchasedReservation": {
+      "title": "PurchasedReservation",
+      "required": [
+        "datedServiceJourneyRef",
+        "reservationId"
+      ],
+      "type": "object",
+      "properties": {
+        "reservationId": {
+          "type": "string",
+          "description": "ID and version of the Reservation.",
+          "format": "uuid"
+        },
+        "datedServiceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        }
+      }
+    },
+    "PurchasedSaleDiscountRight": {
+      "title": "PurchasedSaleDiscountRight",
+      "required": [
+        "discountRightRef",
+        "price",
+        "priceContribution"
+      ],
+      "type": "object",
+      "properties": {
+        "discountRightRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "discountParameters": {
+          "$ref": "#/$defs/PurchasedDiscountUsageParameters"
+        },
+        "originatingFromProductId": {
+          "type": "string",
+          "description": "The ID of the EntitlementProduct that allowed the SaleDiscountRight to be used."
+        }
+      },
+      "description": "Configuration for a Discount Right"
+    },
+    "PurchasedTraveller": {
+      "title": "PurchasedTraveller",
+      "required": [
+        "entitlements",
+        "travellerId"
+      ],
+      "type": "object",
+      "properties": {
+        "travellerId": {
+          "type": "string",
+          "description": "ID for Traveller",
+          "format": "uuid"
+        },
+        "givenConsentId": {
+          "type": "string"
+        },
+        "entitlements": {
+          "type": "array",
+          "description": "Entitlement information for the customer and the OrderLine",
+          "items": {
+            "$ref": "#/$defs/Entitlement"
+          },
+          "default": []
+        }
+      },
+      "description": "Traveller for OrderLine"
+    },
+    "PurchasedUsageParameter": {
+      "title": "PurchasedUsageParameter",
+      "required": [
+        "price",
+        "priceContribution",
+        "usageParameterRef"
+      ],
+      "type": "object",
+      "properties": {
+        "usageParameterRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        }
+      },
+      "description": "A simple representation of a UsageParameter"
+    },
+    "PurchasedUserProfile": {
+      "title": "PurchasedUserProfile",
+      "required": [
+        "price",
+        "priceContribution",
+        "userProfileRef"
+      ],
+      "type": "object",
+      "properties": {
+        "userProfileRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "typeOfConcession": {
+          "type": "string",
+          "description": "The type of concession for this UserProfile"
+        }
+      },
+      "description": "A representation of a user profile"
+    },
+    "PurchasedUserProfileSummary": {
+      "title": "PurchasedUserProfileSummary",
+      "required": [
+        "count",
+        "price",
+        "priceContribution",
+        "userProfileRef"
+      ],
+      "type": "object",
+      "properties": {
+        "userProfileRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "count": {
+          "type": "integer",
+          "description": "The number of travellers with given user profile."
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        }
+      },
+      "description": "A representation of a user profile to summarize parts of a purchased group. Multiply `count` with `priceContribution` to get sum of all user profiles of same type."
+    },
+    "PurchasedValidableElement": {
+      "title": "PurchasedValidableElement",
+      "required": [
+        "fareStructureElements",
+        "legIds",
+        "price",
+        "priceContribution",
+        "validableElementRef"
+      ],
+      "type": "object",
+      "properties": {
+        "validableElementRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "legIds": {
+          "type": "array",
+          "description": "The Leg IDs that are connected to this ValidableElement.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "parameters": {
+          "$ref": "#/$defs/PurchasedParameters"
+        },
+        "fareStructureElements": {
+          "type": "array",
+          "description": "The underlying FareStructureElement configurations which makes up this ValidableElement",
+          "items": {
+            "$ref": "#/$defs/PurchasedFareStructureElement"
+          }
+        },
+        "elementId": {
+          "type": "string",
+          "description": "Unique ID for this specific PurchasedValidableElement. Note that this ID is only for distinguishing parts of an orderLine. It has no use outside of the orderLine, and can't be found in any other service."
+        },
+        "purchasedProperties": {
+          "$ref": "#/$defs/PurchasedProperties"
+        },
+        "occurs": {
+          "type": "integer",
+          "description": "The number of instances of this particular type of ValidableElement that is collected in this FareProduct",
+          "format": "int32"
+        },
+        "parameterSpecifications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PurchasedParameterSpecification"
+          }
+        }
+      },
+      "description": "Configuration for a ValidableElement"
+    },
+    "RailReplacementInfo": {
+      "required": [
+        "originalFromStopPlaceRef",
+        "originalToStopPlaceRef"
+      ],
+      "type": "object",
+      "properties": {
+        "originalFromStopPlaceRef": {
+          "type": "string",
+          "description": "The stop place ref of the original train station where the passenger would have boarded."
+        },
+        "originalToStopPlaceRef": {
+          "type": "string",
+          "description": "The stop place ref of the original train station where the passenger would have alighted."
+        }
+      },
+      "description": "Present only when this leg is a rail replacement bus service. Contains the original train station stop place references that were used for pricing."
+    },
+    "RefType": {
+      "title": "RefType",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the resources"
+        },
+        "version": {
+          "type": "string",
+          "description": "A specific version of the resource if applicable"
+        }
+      },
+      "description": "Reference to a resource available in a different APIs"
+    },
+    "SetSelection": {
+      "title": "SetSelection",
+      "type": "string",
+      "description": "Set selection type for a group containing multiple elements",
+      "enum": [
+        "ONE_OF_ANY_ONE_SET",
+        "ONE_OF_EACH_SET",
+        "SOME_OF_ANY_SET",
+        "ALL_OF_ONE_SET",
+        "ALL_OF_ALL_SETS"
+      ]
+    },
+    "SpecialOrderCause": {
+      "title": "SpecialOrderCause",
+      "required": [
+        "causeCode"
+      ],
+      "type": "object",
+      "properties": {
+        "causeCode": {
+          "type": "string",
+          "description": "The cause code for issuing the Order."
+        },
+        "organisationId": {
+          "type": "string",
+          "description": "The organisation responsible for the cause. Eg. the Operator responsible for the delay causing a zero ticket to be issued. Should not be confused with the organisationId of the Order, as this has no correlation."
+        }
+      },
+      "description": "Holder for fields used to explain why an Order has been issued. Used for zero tickets."
+    },
+    "SpecificParameterAssignment": {
+      "type": "object",
+      "properties": {
+        "distanceMatrixElementRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "dynamicDistanceMatrixElement": {
+          "$ref": "#/$defs/DynamicDistanceMatrixElement"
+        },
+        "includesGroupingType": {
+          "$ref": "#/$defs/LogicalOperator"
+        },
+        "validityParameters": {
+          "type": "array",
+          "description": "Validity parameters",
+          "items": {
+            "$ref": "#/$defs/ValidityParameter"
+          }
+        },
+        "typeOfAccessRightAssignmentRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "validityParameterGroupingType": {
+          "$ref": "#/$defs/LogicalOperator"
+        },
+        "limitationGroupingType": {
+          "$ref": "#/$defs/LogicalOperator"
+        },
+        "includes": {
+          "type": "array",
+          "description": "Included SpecificParameterAssignments",
+          "items": {
+            "$ref": "#/$defs/SpecificParameterAssignment"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Limitations",
+          "items": {
+            "$ref": "#/$defs/Limitation"
+          }
+        },
+        "validityParameterSetSelectionType": {
+          "$ref": "#/$defs/SetSelection"
+        }
+      }
+    },
+    "SubMode": {
+      "type": "string",
+      "description": "The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride",
+      "default": "UNDEFINED",
+      "enum": [
+        "UNKNOWN",
+        "UNDEFINED",
+        "INTERNATIONAL_FLIGHT",
+        "DOMESTIC_FLIGHT",
+        "INTERCONTINENTAL_FLIGHT",
+        "DOMESTIC_SCHEDULED_FLIGHT",
+        "SHUTTLE_FLIGHT",
+        "INTERCONTINENTAL_CHARTER_FLIGHT",
+        "INTERNATIONAL_CHARTER_FLIGHT",
+        "ROUND_TRIP_CHARTER_FLIGHT",
+        "SIGHTSEEING_FLIGHT",
+        "HELICOPTER_SERVICE",
+        "DOMESTIC_CHARTER_FLIGHT",
+        "SCHENGEN_AREA_FLIGHT",
+        "AIRSHIP_SERVICE",
+        "SHORT_HAUL_INTERNATIONAL_FLIGHT",
+        "CANAL_BARGE",
+        "LOCAL_BUS",
+        "REGIONAL_BUS",
+        "EXPRESS_BUS",
+        "NIGHT_BUS",
+        "POST_BUS",
+        "SPECIAL_NEEDS_BUS",
+        "MOBILITY_BUS",
+        "MOBILITY_BUS_FOR_REGISTERED_DISABLED",
+        "SIGHTSEEING_BUS",
+        "SHUTTLE_BUS",
+        "HIGH_FREQUENCY_BUS",
+        "DEDICATED_LANE_BUS",
+        "SCHOOL_BUS",
+        "SCHOOL_AND_PUBLIC_SERVICE_BUS",
+        "RAIL_REPLACEMENT_BUS",
+        "DEMAND_AND_RESPONSE_BUS",
+        "AIRPORT_LINK_BUS",
+        "INTERNATIONAL_COACH",
+        "NATIONAL_COACH",
+        "SHUTTLE_COACH",
+        "REGIONAL_COACH",
+        "SPECIAL_COACH",
+        "SCHOOL_COACH",
+        "SIGHTSEEING_COACH",
+        "TOURIST_COACH",
+        "COMMUTER_COACH",
+        "FUNICULAR",
+        "STREET_CABLE_CAR",
+        "ALL_FUNICULAR_SERVICES",
+        "UNDEFINED_FUNICULAR",
+        "METRO",
+        "TUBE",
+        "URBAN_RAILWAY",
+        "CITY_TRAM",
+        "LOCAL_TRAM",
+        "REGIONAL_TRAM",
+        "SIGHTSEEING_TRAM",
+        "SHUTTLE_TRAM",
+        "TRAIN_TRAM",
+        "TELECABIN",
+        "CABLE_CAR",
+        "LIFT",
+        "CHAIR_LIFT",
+        "DRAG_LIFT",
+        "TELECABIN_LINK",
+        "LOCAL",
+        "HIGH_SPEED_RAIL",
+        "SUBURBAN_RAILWAY",
+        "REGIONAL_RAIL",
+        "INTERREGIONAL_RAIL",
+        "LONG_DISTANCE",
+        "INTERNATIONAL",
+        "SLEEPER_RAIL_SERVICE",
+        "NIGHT_RAIL",
+        "CAR_TRANSPORT_RAIL_SERVICE",
+        "TOURIST_RAILWAY",
+        "AIRPORT_LINK_RAIL",
+        "RAIL_SHUTTLE",
+        "REPLACEMENT_RAIL_SERVICE",
+        "SPECIAL_TRAIN",
+        "CROSS_COUNTRY_RAIL",
+        "RACK_AND_PINION_RAILWAY",
+        "INTERNATIONAL_CAR_FERRY",
+        "NATIONAL_CAR_FERRY",
+        "REGIONAL_CAR_FERRY",
+        "LOCAL_CAR_FERRY",
+        "INTERNATIONAL_PASSENGER_FERRY",
+        "NATIONAL_PASSENGER_FERRY",
+        "REGIONAL_PASSENGER_FERRY",
+        "LOCAL_PASSENGER_FERRY",
+        "POST_BOAT",
+        "TRAIN_FERRY",
+        "ROAD_FERRY_LINK",
+        "AIRPORT_BOAT_LINK",
+        "HIGH_SPEED_VEHICLE_SERVICE",
+        "HIGH_SPEED_PASSENGER_SERVICE",
+        "SIGHTSEEING_SERVICE",
+        "SCHOOL_BOAT",
+        "CABLE_FERRY",
+        "RIVER_BUS",
+        "SCHEDULED_FERRY",
+        "SHUTTLE_FERRY_SERVICE",
+        "COMMUNAL_TAXI",
+        "CHARTER_TAXI",
+        "WATER_TAXI",
+        "RAIL_TAXI",
+        "BIKE_TAXI",
+        "BLACK_CAB",
+        "MINI_CAB",
+        "ALL_TAXI_SERVICES",
+        "HIRE_CAR",
+        "HIRE_VAN",
+        "HIRE_MOTORBIKE",
+        "HIRE_CYCLE",
+        "ALL_HIRE_VEHICLES"
+      ]
+    },
+    "TextInLanguage": {
+      "title": "TextInLanguage",
+      "required": [
+        "lang",
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "lang": {
+          "type": "string",
+          "description": "Language code according to ISO 639-3"
+        },
+        "value": {
+          "type": "string",
+          "description": "A text to describe the contents of this OrderLine"
+        }
+      }
+    },
+    "TravelDocumentDetails": {
+      "title": "TravelDocumentDetails",
+      "required": [
+        "distributionAction",
+        "travelDocumentRef"
+      ],
+      "type": "object",
+      "properties": {
+        "travelDocumentRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "distributionAction": {
+          "$ref": "#/$defs/TravelDocumentDistributionAction"
+        }
+      }
+    },
+    "TravelDocumentDistributionAction": {
+      "title": "TravelDocumentDistributionAction",
+      "type": "string",
+      "enum": [
+        "ATTACH_FARE_CONTRACT_AND_ACTIVATE"
+      ]
+    },
+    "TravelSpecification": {
+      "title": "TravelSpecification",
+      "required": [
+        "validities"
+      ],
+      "type": "object",
+      "properties": {
+        "legs": {
+          "type": "array",
+          "description": "The Legs of a planned travel route. Only Legs which are rides are expected to be added.",
+          "items": {
+            "$ref": "#/$defs/PurchasedLeg"
+          }
+        },
+        "placesInJourney": {
+          "type": "array",
+          "description": "The StopPlaces the product is valid between. The first element in this array will be the StopPlace the Traveller is travelling from, and the second element will be the StopPlace the Traveller is travelling to. There will never be more than two elements in this array.",
+          "items": {
+            "$ref": "#/$defs/RefType"
+          }
+        },
+        "validities": {
+          "type": "array",
+          "description": "The FareProductValidities for a product.",
+          "items": {
+            "$ref": "#/$defs/PurchasedFareProductValidity"
+          },
+          "default": []
+        },
+        "aimedStartTime": {
+          "type": "string",
+          "description": "Timestamp used when determining the beginning of the ticket's validity. Taken from the offer used by the end user when ordering the ticket. Note that the fallback timestamp is the timestamp at which the orderLine was added to the Order.",
+          "format": "date-time"
+        },
+        "aimedEndTime": {
+          "type": "string",
+          "description": "Timestamp used when determining the end of the ticket's validity. Taken from the offer used by the end user when ordering the ticket. No fallback, null if not available on offer.",
+          "format": "date-time"
+        },
+        "travelDistance": {
+          "$ref": "#/$defs/Distance"
+        }
+      }
+    },
+    "Traveller": {
+      "title": "Traveller",
+      "type": "object",
+      "description": "A Traveller object which might hold a reference to a Customer",
+      "allOf": [
+        {
+          "required": [
+            "id"
+          ],
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        {
+          "$ref": "#/$defs/TravellerRequest"
+        }
+      ]
+    },
+    "TravellerRequest": {
+      "title": "TravellerRequest",
+      "type": "object",
+      "properties": {
+        "ref": {
+          "$ref": "#/$defs/CustomerRef"
+        }
+      },
+      "description": "A Traveller object which might hold a reference to a Customer"
+    },
+    "UsageEnd": {
+      "title": "UsageEnd",
+      "type": "string",
+      "enum": [
+        "STANDARD_DURATION",
+        "END_OF_CALENDAR_PERIOD",
+        "END_OF_RIDE",
+        "END_OF_TRIP",
+        "END_OF_FARE_DAY",
+        "END_OF_FARE_PERIOD",
+        "PRODUCT_EXPIRY",
+        "PROFILE_EXPIRY",
+        "DEREGISTRATION",
+        "OTHER",
+        "NO_TEMPORAL_VALIDITY"
+      ]
+    },
+    "UsageTrigger": {
+      "title": "UsageTrigger",
+      "type": "string",
+      "enum": [
+        "ENROLMENT",
+        "RESERVATION",
+        "PURCHASE",
+        "FULFILMENT",
+        "ACTIVATION",
+        "SPECIFIED_START_DATE",
+        "START_OUTBOUND_RIDE",
+        "END_OUTBOUND_RIDE",
+        "START_RETURN_RIDE",
+        "START_OF_PERIOD",
+        "DAY_OFFSET_BEFORE_CALENDAR_PERIOD"
+      ]
+    },
+    "ValidityParameter": {
+      "type": "object",
+      "properties": {
+        "serviceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "datedServiceJourneyRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "tariffZoneRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "fareZoneRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "passengerSeatRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "groupOfTariffZonesRef": {
+          "$ref": "#/$defs/RefType"
+        }
+      },
+      "description": "ValidityParameter object."
+    },
+    "WorkflowStatus": {
+      "title": "WorkflowStatus",
+      "type": "string",
+      "description": "Status of this Order or OrderLine. Every Order starts out with the status DRAFT, and can only be changed to CONFIRMED when it is balanced - when balance is '0.00'. All OrderLines that are have the status DRAFT at that point in time can also be changed to CONFIRMED.",
+      "default": "DRAFT",
+      "enum": [
+        "DRAFT",
+        "CONFIRMED"
+      ]
+    },
+    "ZonalValidity": {
+      "title": "ZonalValidity",
+      "required": [
+        "fareZones",
+        "groupOfTariffZones",
+        "zones"
+      ],
+      "type": "object",
+      "properties": {
+        "zones": {
+          "type": "array",
+          "description": "Valid in zones. Deprecated. This list will be empty when tariff zones are fully replaced by fare zones.",
+          "deprecated": true,
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "fareZones": {
+          "type": "array",
+          "description": "Valid in fare zones",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "groupOfTariffZones": {
+          "type": "array",
+          "description": "Reference to a group of tariff zones. All zones in the group are valid.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        }
+      },
+      "description": "Zones where the product is valid"
+    }
+  }
+}

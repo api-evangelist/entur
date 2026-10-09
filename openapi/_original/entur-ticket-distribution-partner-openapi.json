@@ -1,0 +1,3673 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Ticket Distributions",
+    "description": "Easy way to manage and distribute new tickets to ticketing systems.",
+    "version": "2026.10.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.staging.entur.io/sales",
+      "description": "Staging test environment"
+    },
+    {
+      "url": "https://api.dev.entur.io/sales",
+      "description": "Development test environment"
+    },
+    {
+      "url": "https://api.entur.io/sales",
+      "description": "Production environment"
+    }
+  ],
+  "security": [
+    {
+      "authHeader": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Ticket Distribution Groups",
+      "description": "Services regarding ticket distribution group level."
+    },
+    {
+      "name": "Ticket Distributions",
+      "description": "Services regarding ticket distribution level."
+    },
+    {
+      "name": "PDF Tickets",
+      "description": "Services for generating and sending pdf tickets."
+    }
+  ],
+  "paths": {
+    "/v1/pdf-tickets": {
+      "get": {
+        "tags": [
+          "PDF Tickets"
+        ],
+        "summary": "Search generated and distributed ticket PDFs",
+        "description": "Searches generated and distributed ticket PDFs. Query parameters support operators eq, ne, gt, gte, lt, lte, in, and nin. Defaults to eq if no operator is given. At least one search parameter is required.",
+        "operationId": "searchPdfTicketsUsingGET",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "PDF ticket id",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "1234"
+                ]
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/orderIdQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/orderLineIdQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/organisationIdQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/ticketDistributionIdQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/paginationPageParam"
+          },
+          {
+            "$ref": "#/components/parameters/paginationPerPageParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageOfPdfTicket"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/pdf-tickets/{orderId}/createOrGet": {
+      "post": {
+        "tags": [
+          "PDF Tickets"
+        ],
+        "summary": "Deprecated. Please use /v1/pdf-tickets/{orderId}",
+        "description": "Creates or gets PDFs with valid tickets. Returns PDFs with qr codes. If a PDF is not created, but found, then the language parameter is irrelevant. PDFs can later be sent by email.",
+        "operationId": "createPDFDeprecated",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/posHeader"
+          },
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          }
+        ],
+        "requestBody": {
+          "description": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketPdfCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PdfTicket"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        },
+        "deprecated": true
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/pdf-tickets/{orderId}": {
+      "post": {
+        "tags": [
+          "PDF Tickets"
+        ],
+        "summary": "Create PDF",
+        "description": "Creates or gets PDFs with valid tickets. Returns PDFs with qr codes. If a PDF is not created, but found, then the language parameter is irrelevant. PDFs can later be sent by email.",
+        "operationId": "createPDF",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/posHeader"
+          },
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          }
+        ],
+        "requestBody": {
+          "description": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketPdfCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PdfTicket"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/pdf-tickets/{orderId}/send": {
+      "post": {
+        "tags": [
+          "PDF Tickets"
+        ],
+        "summary": "Send PDF",
+        "description": "Sends an email containing PDFs with valid tickets",
+        "operationId": "sendPDF",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/posHeader"
+          },
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          }
+        ],
+        "requestBody": {
+          "description": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketPdfSendRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Email"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distribution-groups": {
+      "get": {
+        "tags": [
+          "Ticket Distribution Groups"
+        ],
+        "summary": "Search generated and distributed ticket distribution groups",
+        "description": "Searches generated and distributed ticket distribution groups. Query parameters supports operators eq, ne, gt, gte, lt, lte, in, and nin. Defaults to eq if no operator is given. At least one search parameter is required.",
+        "operationId": "searchTicketDistributionGroupsUsingGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/languageHeader"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "description": "Filters by ticket distribution group ID",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "1234"
+                ]
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/orderIdQueryParam"
+          },
+          {
+            "name": "orderVersion",
+            "in": "query",
+            "description": "Filters by order version",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "1"
+                ]
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/orderLineIdQueryParam"
+          },
+          {
+            "name": "orderOwnerCustomerId",
+            "in": "query",
+            "description": "Filters by field orderOwnerCustomerId on ticket distribution group. Field is a string with only numeric values.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "1234"
+                ]
+              ]
+            }
+          },
+          {
+            "name": "distributionHolderCustomerId",
+            "in": "query",
+            "description": "Filters by field distributionHolderCustomerId on ticket distribution group. Field is a string with only numeric values.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "1234"
+                ]
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/organisationIdQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/ticketDistributionIdQueryParam"
+          },
+          {
+            "name": "distributionStatus",
+            "in": "query",
+            "description": " Filters by ticket distributions group containing a ticket distribution status matching specified query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "DISTRIBUTED"
+                ]
+              ]
+            }
+          },
+          {
+            "name": "mediaSerialNumberId",
+            "in": "query",
+            "description": "Filters by mediaSerialNumberId, id identifying the ecard",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "1234"
+                ]
+              ]
+            }
+          },
+          {
+            "name": "createdAt",
+            "in": "query",
+            "description": "Filters by when ticket distributions were created",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "description": "Must be timestamp string. Supports search in a range by specifying two timestamps each prefixed with an operator. Defaults to eq if no operator is given."
+              },
+              "default": [],
+              "examples": [
+                [
+                  "gte:2023-01-01T00:00:00Z",
+                  "lt:2023-12-31T23:59:59Z"
+                ]
+              ]
+            }
+          },
+          {
+            "name": "updatedAt",
+            "in": "query",
+            "description": "Filters by when ticket distributions last were updated",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "2023-01-01T00:00:00Z",
+                  "2023-12-31T23:59:59Z"
+                ]
+              ]
+            }
+          },
+          {
+            "name": "startOfValidity",
+            "in": "query",
+            "description": "Filters by field startOfValidity on ticket distributions. Must be timestamp string. Supports search in a range by specifying two timestamps each prefixed with an operator.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "2023-01-01T00:00:00Z",
+                  "2023-12-31T23:59:59Z"
+                ]
+              ]
+            }
+          },
+          {
+            "name": "endOfValidity",
+            "in": "query",
+            "description": "Filters by field endOfValidity on ticket distributions. Must be timestamp string. Supports search in a range by specifying two timestamps each prefixed with an operator.",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "2023-01-01T00:00:00Z",
+                  "2023-12-31T23:59:59Z"
+                ]
+              ]
+            }
+          },
+          {
+            "name": "customers",
+            "in": "query",
+            "description": "Filters by customer id",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "examples": [
+                [
+                  "1234"
+                ]
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/paginationPageParam"
+          },
+          {
+            "$ref": "#/components/parameters/paginationPerPageParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageOfTicketDistributionGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distribution-groups/distribute": {
+      "post": {
+        "tags": [
+          "Ticket Distribution Groups"
+        ],
+        "summary": "Distribute ticket distribution groups",
+        "description": "Distribute a set of ticket distribution groups to NOD.",
+        "operationId": "distributeTicketDistributionGroups",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/dciHeader"
+          },
+          {
+            "$ref": "#/components/parameters/posHeader"
+          }
+        ],
+        "requestBody": {
+          "description": "requestBody",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketDistributionGroupDistributeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketDistributionGroup"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distributions/{orderId}/summary": {
+      "get": {
+        "tags": [
+          "Ticket Distributions"
+        ],
+        "summary": "Get summary of distribution data for an order",
+        "description": "Returns a list of the distinct summary data for the orderId. This service/endpoint is useful to just retrieve external distribution data for an order when you may not have access to all order data.",
+        "operationId": "getTicketDistributionSummary",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDistributionSummary"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distribution-groups/{ticketDistributionGroupId}": {
+      "get": {
+        "tags": [
+          "Ticket Distribution Groups"
+        ],
+        "summary": "Get specific ticket distribution group by its id",
+        "description": "Get the ticket distribution group located at this path",
+        "operationId": "getTicketDistributionGroupUsingGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/languageHeader"
+          },
+          {
+            "name": "ticketDistributionGroupId",
+            "in": "path",
+            "description": "ticketDistributionGroupId",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDistributionGroup"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distribution-groups/transfer-distribution-holder": {
+      "post": {
+        "tags": [
+          "Ticket Distribution Groups"
+        ],
+        "summary": "Transfer the distribution holder for ticket distribution groups",
+        "description": "Transfer the distribution holder for these ticket distribution groups to another customer",
+        "operationId": "transferDistributionHolder",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/dciHeader"
+          }
+        ],
+        "requestBody": {
+          "description": "requestBody",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferDistributionHolderRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferDistributionHolderResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distribution-groups/update-validities": {
+      "post": {
+        "tags": [
+          "Ticket Distribution Groups"
+        ],
+        "summary": "Update the validity of ticket distribution groups",
+        "description": "Update the validity of the ticket distribution groups, the endOfValidity is calculated automatically",
+        "operationId": "updateValidities",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/dciHeader"
+          }
+        ],
+        "requestBody": {
+          "description": "requestBody",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateValiditiesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateValiditiesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distributions/{orderId}/distribute": {
+      "post": {
+        "tags": [
+          "Ticket Distributions"
+        ],
+        "summary": "Deprecated. Does not handle higher order version than 1, and does not support defining distribution language. Please use /v1/ticket-distribution-groups/{orderId}/distribute",
+        "description": "Distribute a set of ticket distribution groups to NOD for pick up as QR-code and animation.",
+        "operationId": "distributeTicketDistributions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/posHeader"
+          },
+          {
+            "name": "deliverAfter",
+            "in": "query",
+            "description": "The earliest time it should be possible to pick up the ticket",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          },
+          {
+            "name": "qrChecksumType",
+            "in": "query",
+            "description": "The QR Code checksum type",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketDistributionGroup"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        },
+        "deprecated": true
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distributions/{orderId}/distribute-travel-card": {
+      "post": {
+        "tags": [
+          "Ticket Distributions"
+        ],
+        "summary": "Deprecated. Does not handle higher order version than 1, and does not support defining distribution language. Please use /v1/ticket-distribution-groups/{orderId}/distribute",
+        "description": "Distribute a set of ticket distribution groups to NOD for pick up on travel card.",
+        "operationId": "distributeTicketDistributionsToTravelCard",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/posHeader"
+          },
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          }
+        ],
+        "requestBody": {
+          "description": "requestBody",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketTravelCardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketDistributionGroup"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        },
+        "deprecated": true
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distribution-groups/distribute/travel-card/by-order-id/{orderId}": {
+      "post": {
+        "tags": [
+          "Ticket Distribution Groups"
+        ],
+        "summary": "Distribute travel card tickets by order ID",
+        "description": "Distribute a set of travel card tickets to NOD for pick-up based on an order ID.",
+        "operationId": "distributeTravelCardTicketsByOrderId",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/posHeader"
+          },
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          }
+        ],
+        "requestBody": {
+          "description": "Request body for distributing travel card tickets",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketTravelCardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketDistributionGroup"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    },
+    "/v1/ticket-distributions/{orderId}/generate": {
+      "post": {
+        "tags": [
+          "Ticket Distributions"
+        ],
+        "summary": "Generate ticket distributions",
+        "description": "Generate a set of ticket distribution groups which later will be distributed to a ticket system.",
+        "operationId": "generateTicketDistributions",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/languageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/dciHeader"
+          },
+          {
+            "$ref": "#/components/parameters/posHeader"
+          },
+          {
+            "$ref": "#/components/parameters/orderIdPathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketDistributionGroup"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/badRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/notFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/internalServerError"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/ET-Client-Name"
+        },
+        {
+          "$ref": "#/components/parameters/X-Correlation-Id"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "PdfTicket": {
+        "title": "PdfTicket",
+        "required": [
+          "combinedTicket",
+          "deleteAt",
+          "orderId",
+          "orderLineId",
+          "orderLineVersion",
+          "orderVersion",
+          "pdf",
+          "ticketDistributionId"
+        ],
+        "type": "object",
+        "properties": {
+          "combinedTicket": {
+            "type": "boolean"
+          },
+          "deleteAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "orderLineId": {
+            "type": "string"
+          },
+          "orderLineVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organisationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pdf": {
+            "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$",
+            "type": "string",
+            "contentEncoding": "base64"
+          },
+          "ticketDistributionId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "examples": [
+          {
+            "combinedTicket": false,
+            "deleteAt": "2024-12-31T23:59:59Z",
+            "id": 12345,
+            "orderId": "ABDC1234",
+            "orderLineId": "26b02145-7dbf-4be9-8600-ff4a570d83d5",
+            "orderLineVersion": 1,
+            "orderVersion": 1,
+            "organisationId": 1234,
+            "pdf": "JVBERi0xLjQKJcfsj6IKNSAwIG9iago8PC9UeXBlIC9QYWdlL1BhcmVudCA0IDAgUi9SZXNvdXJjZXMgNiAwIFIvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXT4+CmVuZG9iago2IDAgb2JqCjw8L0ZvbnQgNyAwIFIvUHJvY1NldCBbL1BERiAvVGV4dF0+PgplbmRvYmoK",
+            "ticketDistributionId": 67890
+          }
+        ]
+      },
+      "PageOfPdfTicket": {
+        "title": "PageOfPdfTicket",
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Items on a specific page",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/PdfTicket"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total number of items",
+            "format": "int64",
+            "readOnly": true,
+            "examples": [
+              72
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages available to browse",
+            "format": "int64",
+            "readOnly": true,
+            "examples": [
+              9
+            ]
+          }
+        },
+        "description": "Page displays a subset of a list of entities"
+      },
+      "ApiError": {
+        "title": "ApiError",
+        "required": [
+          "error",
+          "exception",
+          "message",
+          "path",
+          "status",
+          "timestamp",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2025-01-01T12:00:00Z"
+            ]
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "examples": [
+              400
+            ]
+          },
+          "title": {
+            "type": "string",
+            "description": "Short, human-readable summary of the problem"
+          },
+          "error": {
+            "type": "string"
+          },
+          "exception": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string",
+            "examples": [
+              "Validation failed"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "examples": [
+              "/v1/ticket-distributions/XYZ123/distribute"
+            ]
+          }
+        },
+        "examples": [
+          {
+            "timestamp": "2025-01-01T12:00:00Z",
+            "status": 400,
+            "title": "Bad Request",
+            "error": "Bad Request",
+            "exception": "ValidationException",
+            "message": "Validation failed",
+            "path": "/v1/ticket-distributions/XYZ123"
+          }
+        ]
+      },
+      "TicketPdfTraveller": {
+        "title": "TicketPdfTraveller",
+        "required": [
+          "name",
+          "ticketDistributionId"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionId": {
+            "type": "integer",
+            "description": "TicketDistributionIds for this traveller",
+            "format": "int64"
+          },
+          "name": {
+            "type": "string",
+            "description": "Full names of the traveller"
+          }
+        },
+        "description": "Travellers who will be written on the pdf-ticket"
+      },
+      "LanguageCode": {
+        "type": "string",
+        "description": "Desired language. Makes display text appear in defined language - if available. Default: nob",
+        "default": "nob",
+        "enum": [
+          "nob",
+          "nno",
+          "eng"
+        ]
+      },
+      "TicketPdfCreateRequest": {
+        "title": "TicketPdfCreateRequest",
+        "required": [
+          "orderVersion",
+          "pdfLanguage"
+        ],
+        "type": "object",
+        "properties": {
+          "travellers": {
+            "type": "array",
+            "description": "Array of names and ticketDistributionIds of travellers. These names will overwrite existing traveller names on the ticket if the order line does not include any entitlements.",
+            "items": {
+              "$ref": "#/components/schemas/TicketPdfTraveller"
+            },
+            "default": []
+          },
+          "pdfLanguage": {
+            "$ref": "#/components/schemas/LanguageCode"
+          },
+          "orderVersion": {
+            "type": "integer",
+            "description": "Desired version of the order that is going to be distributed as a pdf-ticket. Default: 1",
+            "format": "int32",
+            "default": 1
+          },
+          "shouldGroupTravellers": {
+            "type": "boolean",
+            "description": "Flag to indicate that PDF tickets are grouped together for travellers with the same journey.",
+            "default": true
+          },
+          "orderLineIds": {
+            "type": "array",
+            "description": "List of orderLineIds to include in the pdf-ticket. If unspecified, all order lines for the given order version will be included.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Request for generating and sending pdf-ticket by email",
+        "examples": [
+          {
+            "orderVersion": 2,
+            "pdfLanguage": "nob",
+            "travellers": [
+              {
+                "ticketDistributionId": 123456789,
+                "name": "John Doe"
+              },
+              {
+                "ticketDistributionId": 123456790,
+                "name": "Karen Smith"
+              }
+            ],
+            "shouldGroupTravellers": true
+          }
+        ]
+      },
+      "TicketPdfSendRequest": {
+        "title": "TicketPdfSendRequest",
+        "description": "Request for generating and sending pdf-ticket by email",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TicketPdfCreateRequest"
+          },
+          {
+            "required": [
+              "email"
+            ],
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "description": "Email-address for the receiver of pdf-ticket"
+              }
+            }
+          }
+        ],
+        "examples": [
+          {
+            "email": "test@mail.com",
+            "orderVersion": 2,
+            "pdfLanguage": "nob",
+            "travellers": [
+              {
+                "ticketDistributionId": 123456789,
+                "name": "John Doe"
+              },
+              {
+                "ticketDistributionId": 123456790,
+                "name": "Karen Smith"
+              }
+            ],
+            "shouldGroupTravellers": true
+          }
+        ]
+      },
+      "EmailAttachment": {
+        "title": "EmailAttachment",
+        "required": [
+          "content",
+          "filename",
+          "mimeType"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "disposition": {
+            "type": "string",
+            "enum": [
+              "ATTACHMENT",
+              "INLINE"
+            ]
+          },
+          "filename": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          }
+        }
+      },
+      "EmailAddress": {
+        "title": "EmailAddress",
+        "required": [
+          "email"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Email": {
+        "title": "Email",
+        "required": [
+          "body",
+          "from",
+          "subject",
+          "to"
+        ],
+        "type": "object",
+        "properties": {
+          "attachments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailAttachment"
+            }
+          },
+          "bcc": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailAddress"
+            }
+          },
+          "body": {
+            "type": "string"
+          },
+          "cc": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailAddress"
+            }
+          },
+          "from": {
+            "$ref": "#/components/schemas/EmailAddress"
+          },
+          "replyTo": {
+            "$ref": "#/components/schemas/EmailAddress"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "to": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EmailAddress"
+            }
+          }
+        }
+      },
+      "SalesPackage": {
+        "title": "SalesPackage",
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "Authority": {
+        "title": "Authority",
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "examples": [
+              "ENT:Authority:1234"
+            ]
+          }
+        }
+      },
+      "Entitlement": {
+        "title": "Entitlement",
+        "required": [
+          "entitlementProductId"
+        ],
+        "type": "object",
+        "properties": {
+          "contractId": {
+            "type": "string"
+          },
+          "entitlementProductId": {
+            "type": "string"
+          }
+        }
+      },
+      "Customer": {
+        "title": "Customer",
+        "required": [
+          "customerId",
+          "entitlements",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "type": "string",
+            "description": "The id of the customer in the external system",
+            "examples": [
+              "12345678901"
+            ]
+          },
+          "entitlements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Entitlement"
+            }
+          },
+          "id": {
+            "type": "integer",
+            "description": "The internal id of the customer",
+            "format": "int64",
+            "examples": [
+              1
+            ]
+          }
+        }
+      },
+      "DistributionDetails": {
+        "title": "DistributionDetails",
+        "type": "object",
+        "properties": {
+          "clientSecret": {
+            "type": "string"
+          },
+          "orderGroupId": {
+            "type": "string"
+          },
+          "fareContractRef": {
+            "type": "string",
+            "description": "Reference to an account-based-ticketing farecontract"
+          },
+          "customerAccountRef": {
+            "type": "string",
+            "description": "Reference to an account-based-ticketing customer account"
+          },
+          "distributedAsPdf": {
+            "type": "boolean",
+            "description": "Is set to true if distributed as a PDF by ticket-distribution"
+          }
+        }
+      },
+      "TicketDistributionStatus": {
+        "title": "TicketDistributionStatus",
+        "type": "string",
+        "enum": [
+          "CREATED",
+          "DISTRIBUTED",
+          "CANCELLED",
+          "PICKED_UP",
+          "VALIDATED",
+          "EXPIRED",
+          "FAILED",
+          "ACTIVATED"
+        ]
+      },
+      "ValidableElement": {
+        "title": "ValidableElement",
+        "required": [
+          "elementId",
+          "legIds"
+        ],
+        "type": "object",
+        "properties": {
+          "elementId": {
+            "type": "string",
+            "description": "The elementId as found on the validableElement. NOTE: This is NOT the same as validableElementRef.id"
+          },
+          "legIds": {
+            "type": "array",
+            "description": "list of legIds that belong to this validableElement",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FareProduct": {
+        "title": "FareProduct",
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organisation": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "version": {
+            "type": "string"
+          },
+          "validableElements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidableElement"
+            }
+          }
+        }
+      },
+      "UserProfileInGroup": {
+        "required": [
+          "count",
+          "userProfileId"
+        ],
+        "type": "object",
+        "properties": {
+          "userProfileId": {
+            "type": "string",
+            "description": "Reference to the product register."
+          },
+          "userProfileVersion": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "description": "The number of travellers with given user profile."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of user profile for requested language. Defaults to norwegian name."
+          }
+        },
+        "description": "A representation of a user profile to summarize parts of a group product."
+      },
+      "Group": {
+        "title": "Group",
+        "required": [
+          "id",
+          "userProfileSummary"
+        ],
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "userProfiles": {
+            "type": "string",
+            "description": "Deprecated in favour of new type userProfileSummary.",
+            "deprecated": true
+          },
+          "version": {
+            "type": "string"
+          },
+          "userProfileSummary": {
+            "type": "array",
+            "description": "A collection of all the different user profiles in the group.",
+            "items": {
+              "$ref": "#/components/schemas/UserProfileInGroup"
+            },
+            "default": []
+          }
+        }
+      },
+      "Price": {
+        "title": "Price",
+        "required": [
+          "amount",
+          "taxAmount"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "taxAmount": {
+            "type": "string"
+          },
+          "taxRate": {
+            "type": "string"
+          }
+        }
+      },
+      "Seat": {
+        "title": "Seat",
+        "required": [
+          "externalSeatId",
+          "id",
+          "railcarNumber",
+          "seatNumber",
+          "seatType"
+        ],
+        "type": "object",
+        "properties": {
+          "externalSeatId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "railcarNumber": {
+            "type": "string"
+          },
+          "seatCode": {
+            "type": "string",
+            "description": "Deprecated. Better use the more flexible types in seatingProperties which mirrors the properties from seating manager.",
+            "deprecated": true
+          },
+          "seatNumber": {
+            "type": "string"
+          },
+          "seatType": {
+            "type": "string",
+            "description": "Deprecated. Better use the more flexible types in seatingProperties which mirrors the properties from seating manager.",
+            "deprecated": true
+          },
+          "seatingProperties": {
+            "title": "SeatingProperties",
+            "required": [
+              "baggageType",
+              "mobilityFacilities",
+              "nuisanceFacilities",
+              "passengerCommsFacilities",
+              "sanitaryFacilities"
+            ],
+            "type": "object",
+            "properties": {
+              "fareClass": {
+                "type": "string",
+                "description": "Fare class of the seat. Netex enumeration.",
+                "enum": [
+                  "UNKNOWN",
+                  "FIRST_CLASS",
+                  "SECOND_CLASS",
+                  "THIRD_CLASS",
+                  "PREFERENTE",
+                  "PREMIUM_CLASS",
+                  "BUSINESS_CLASS",
+                  "STANDARD_CLASS",
+                  "TURISTA",
+                  "ECONOMY_CLASS",
+                  "ANY"
+                ],
+                "examples": [
+                  "FIRST_CLASS"
+                ]
+              },
+              "groupBooking": {
+                "type": "string",
+                "description": "Group booking permission of the seat. Netex enumeration.",
+                "enum": [
+                  "GROUPS_ALLOWED",
+                  "GROUPS_NOT_ALLOWED",
+                  "GROUPS_ALLOWED_WITH_RESERVATION",
+                  "GROUP_BOOKINGS_RESTRICTED",
+                  "UNKNOWN"
+                ],
+                "examples": [
+                  "GROUPS_ALLOWED"
+                ]
+              },
+              "accommodationFacility": {
+                "type": "string",
+                "description": "Accommodation property of the seat. Netex enumeration.",
+                "enum": [
+                  "UNKNOWN",
+                  "STANDING",
+                  "SEATING",
+                  "FOLDING_SEAT",
+                  "SLEEPER",
+                  "SINGLE_SLEEPER",
+                  "DOUBLE_SLEEPER",
+                  "SPECIAL_SLEEPER",
+                  "COUCHETTE",
+                  "SINGLE_COUCHETTE",
+                  "DOUBLE_COUCHETTE",
+                  "SPECIAL_SEATING",
+                  "RECLINING_SEATS",
+                  "BABY_COMPARTMENT",
+                  "FAMILY_CARRIAGE",
+                  "RECREATION_AREA",
+                  "PANORAMA_COACH",
+                  "PULLMAN_COACH",
+                  "PUSHCHAIR",
+                  "WHEELCHAIR"
+                ],
+                "examples": [
+                  "SINGLE_SLEEPER"
+                ]
+              },
+              "seatAttachment": {
+                "type": "string",
+                "description": "Attachment of the seat. Netex enumeration.",
+                "enum": [
+                  "REVERSIBLE",
+                  "FIXED",
+                  "FOLDING",
+                  "REMOVABLE",
+                  "OTHER"
+                ],
+                "examples": [
+                  "REVERSIBLE"
+                ]
+              },
+              "seatPosition": {
+                "type": "string",
+                "description": "Position of the seat. Netex enumeration.",
+                "enum": [
+                  "WINDOW",
+                  "AISLE",
+                  "MIDDLE",
+                  "UPPER_BERTH",
+                  "MIDDLE_BERTH",
+                  "LOWER_BERTH",
+                  "OTHER"
+                ],
+                "examples": [
+                  "MIDDLE_BERTH"
+                ]
+              },
+              "relativeDirection": {
+                "type": "string",
+                "description": "Relative direction of the seat. Netex enumeration.",
+                "enum": [
+                  "BOTH",
+                  "FORWARDS",
+                  "BACKWARDS"
+                ],
+                "examples": [
+                  "BACKWARDS"
+                ]
+              },
+              "nuisanceFacilities": {
+                "uniqueItems": true,
+                "type": "array",
+                "description": "Set of possible nuisance factors of the seat. Netex enumerations.",
+                "items": {
+                  "type": "string",
+                  "description": "Set of possible nuisance factors of the seat. Netex enumerations.",
+                  "enum": [
+                    "UNKNOWN",
+                    "SMOKING",
+                    "NO_SMOKING",
+                    "FAMILY_AREA",
+                    "CHILDFREE_AREA",
+                    "ANIMALS_ALLOWED",
+                    "NO_ANIMALS",
+                    "BREASTFEEDING_FRIENDLY",
+                    "MOBILE_PHONE_USE_ZONE",
+                    "MOBILE_PHONE_FREE_ZONE"
+                  ],
+                  "examples": [
+                    "FAMILY_AREA"
+                  ]
+                },
+                "examples": [
+                  [
+                    "FAMILY_AREA",
+                    "SMOKING"
+                  ]
+                ]
+              },
+              "passengerCommsFacilities": {
+                "uniqueItems": true,
+                "type": "array",
+                "description": "Set of possible communication facilities available for passenger in the seat. Netex enumerations.",
+                "items": {
+                  "type": "string",
+                  "description": "Set of possible communication facilities available for passenger in the seat. Netex enumerations.",
+                  "enum": [
+                    "UNKNOWN",
+                    "FREE_WIFI",
+                    "PUBLIC_WIFI",
+                    "POWER_SUPPLY_SOCKETS",
+                    "TELEPHONE",
+                    "AUDIO_ENTERTAINMENT",
+                    "VIDEO_ENTERTAINMENT",
+                    "BUSINESS_SERVICES",
+                    "INTERNET",
+                    "POST_OFFICE",
+                    "POST_BOX"
+                  ],
+                  "examples": [
+                    "POWER_SUPPLY_SOCKETS"
+                  ]
+                },
+                "examples": [
+                  [
+                    "POWER_SUPPLY_SOCKETS",
+                    "TELEPHONE"
+                  ]
+                ]
+              },
+              "sanitaryFacilities": {
+                "uniqueItems": true,
+                "type": "array",
+                "description": "Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.",
+                "items": {
+                  "type": "string",
+                  "description": "Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.",
+                  "enum": [
+                    "NONE",
+                    "TOILET",
+                    "WHEELCHAIR_ACCESS_TOILET",
+                    "SHOWER",
+                    "WASHING_AND_CHANGE_FACILITIES",
+                    "BABY_CHANGE",
+                    "WHEELCHAIR_BABY_CHANGE",
+                    "SHOE_SHINER",
+                    "OTHER"
+                  ],
+                  "examples": [
+                    "TOILET"
+                  ]
+                },
+                "examples": [
+                  [
+                    "TOILET",
+                    "SHOWER"
+                  ]
+                ]
+              },
+              "mobilityFacilities": {
+                "uniqueItems": true,
+                "type": "array",
+                "description": "Set of possible mobility facilities available for passenger in the seat. Netex enumerations.",
+                "items": {
+                  "type": "string",
+                  "description": "Set of possible mobility facilities available for passenger in the seat. Netex enumerations.",
+                  "enum": [
+                    "UNKNOWN",
+                    "LOW_FLOOR",
+                    "STEP_FREE_ACCESS",
+                    "SUITABLE_FOR_PUSHCHAIRS",
+                    "SUITABLE_FOR_WHEELCHAIRS",
+                    "SUITABLE_FOR_HEAVILIY_DISABLED",
+                    "BOARDING_ASSISTANCE",
+                    "ONBOARD_ASSISTANCE",
+                    "UNACCOMPANIED_MINOR_ASSISTANCE",
+                    "TACTILE_PLATFORM_EDGES",
+                    "TACTILE_GUIDING_STRIPS"
+                  ],
+                  "examples": [
+                    "SUITABLE_FOR_WHEELCHAIRS"
+                  ]
+                },
+                "examples": [
+                  [
+                    "SUITABLE_FOR_WHEELCHAIRS",
+                    "LOW_FLOOR"
+                  ]
+                ]
+              },
+              "baggageType": {
+                "uniqueItems": true,
+                "type": "array",
+                "description": "Set of possible baggage types possible for passenger in the seat. Netex enumerations.",
+                "items": {
+                  "type": "string",
+                  "description": "Set of possible baggage types possible for passenger in the seat. Netex enumerations.",
+                  "enum": [
+                    "HANDBAG",
+                    "HAND_LUGGAGE",
+                    "SMALL_SUITCASE",
+                    "SUITCASE",
+                    "TRUNK",
+                    "OVERSIZE_ITEM",
+                    "BICYCLE",
+                    "MOTORCYCLE",
+                    "SPORTING_EQUIPMENT",
+                    "SKIS",
+                    "MUSICAL_INSTRUMENT",
+                    "PUSH_CHAIR",
+                    "WHEELCHAIR",
+                    "MOTORIZED_WHEELCHAIR",
+                    "LARGE_MOTORIZED_WHEELCHAIR",
+                    "SMALL_ANIMAL",
+                    "ANIMAL",
+                    "GAME",
+                    "OTHER"
+                  ],
+                  "examples": [
+                    "HANDBAG"
+                  ]
+                },
+                "examples": [
+                  [
+                    "HANDBAG",
+                    "SUITCASE"
+                  ]
+                ]
+              }
+            },
+            "description": "Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class."
+          }
+        }
+      },
+      "Reservation": {
+        "title": "Reservation",
+        "required": [
+          "externalReservationId",
+          "id",
+          "seats"
+        ],
+        "type": "object",
+        "properties": {
+          "datedServiceJourneyId": {
+            "type": "string"
+          },
+          "externalReservationId": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "seats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Seat"
+            }
+          }
+        }
+      },
+      "Vehicle": {
+        "title": "Vehicle",
+        "required": [
+          "licencePlateNumber"
+        ],
+        "type": "object",
+        "properties": {
+          "licencePlateNumber": {
+            "type": "string",
+            "examples": [
+              "AA12345"
+            ]
+          }
+        },
+        "description": "A vehicle registered for a parking reservation."
+      },
+      "Parking": {
+        "title": "Parking",
+        "required": [
+          "vehicles"
+        ],
+        "type": "object",
+        "properties": {
+          "vehicles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Vehicle"
+            }
+          }
+        },
+        "description": "Parking data for a PARKING supplement product."
+      },
+      "SupplementProduct": {
+        "title": "SupplementProduct",
+        "required": [
+          "id",
+          "price",
+          "product"
+        ],
+        "type": "object",
+        "properties": {
+          "datedServiceJourneyRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "product": {
+            "$ref": "#/components/schemas/FareProduct"
+          },
+          "supplementType": {
+            "type": "string",
+            "description": "Type to indicate if for instance the product is some kind of passenger or just a seat allocation. Mirrors the supplement types defined in NeTEx and configured on supplement products in Entur Product catalog.",
+            "enum": [
+              "ANIMAL",
+              "BICYCLE",
+              "DOG",
+              "EVENT_ADD_ON",
+              "EXTRA_LUGGAGE",
+              "JOURNEY_ADD_ON",
+              "JOURNEY_EXTENSION",
+              "MEAL",
+              "OTHER",
+              "PARKING",
+              "PASSENGER_SPOT",
+              "PASSENGER_VEHICLE_SPOT",
+              "PENALTY",
+              "SEAT_RESERVATION",
+              "TOP_UP",
+              "UPGRADE",
+              "WIFI"
+            ]
+          },
+          "parking": {
+            "$ref": "#/components/schemas/Parking"
+          }
+        }
+      },
+      "GroupOfTariffZone": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "description": "Reference to a group of tariff zones with display name."
+      },
+      "TariffZone": {
+        "title": "TariffZone",
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "FareZone": {
+        "required": [
+          "id",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "description": "Reference to fare zone with display name. Will eventually replace tariff zones."
+      },
+      "Topology": {
+        "title": "Topology",
+        "type": "object",
+        "properties": {
+          "datedServiceJourneyRef": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "distance": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fromStopPlace": {
+            "type": "string"
+          },
+          "fromStopPlaceExt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "fromStopPlaceName": {
+            "type": "string"
+          },
+          "fromTariffZone": {
+            "type": "string",
+            "deprecated": true
+          },
+          "fromTariffZoneExt": {
+            "type": "integer",
+            "format": "int32",
+            "deprecated": true
+          },
+          "fromTariffZoneName": {
+            "type": "string",
+            "deprecated": true
+          },
+          "groupOfTariffZones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GroupOfTariffZone"
+            }
+          },
+          "toStopPlace": {
+            "type": "string"
+          },
+          "toStopPlaceExt": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "toStopPlaceName": {
+            "type": "string"
+          },
+          "toTariffZone": {
+            "type": "string",
+            "deprecated": true
+          },
+          "toTariffZoneExt": {
+            "type": "integer",
+            "format": "int32",
+            "deprecated": true
+          },
+          "toTariffZoneName": {
+            "type": "string",
+            "deprecated": true
+          },
+          "viaTariffZones": {
+            "type": "array",
+            "deprecated": true,
+            "items": {
+              "$ref": "#/components/schemas/TariffZone"
+            }
+          },
+          "zoneType": {
+            "type": "string",
+            "enum": [
+              "POINT_TO_POINT",
+              "RING"
+            ]
+          },
+          "fromFareZone": {
+            "$ref": "#/components/schemas/FareZone"
+          },
+          "toFareZone": {
+            "$ref": "#/components/schemas/FareZone"
+          },
+          "viaFareZones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FareZone"
+            }
+          }
+        }
+      },
+      "UserProfile": {
+        "title": "UserProfile",
+        "required": [
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "StopPlace": {
+        "title": "StopPlace",
+        "required": [
+          "ref"
+        ],
+        "type": "object",
+        "properties": {
+          "ref": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Mode": {
+        "title": "Mode",
+        "type": "string",
+        "description": "Travel mode for Leg.",
+        "enum": [
+          "AIR",
+          "BICYCLE",
+          "BUS",
+          "CABLEWAY",
+          "CAR",
+          "WATER",
+          "FUNICULAR",
+          "LIFT",
+          "LINKSWITCH",
+          "RAIL",
+          "METRO",
+          "TRAM",
+          "TRANSIT",
+          "FOOT",
+          "COACH"
+        ]
+      },
+      "SubMode": {
+        "title": "SubMode",
+        "type": "string",
+        "description": "The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride",
+        "default": "UNDEFINED",
+        "enum": [
+          "UNKNOWN",
+          "UNDEFINED",
+          "INTERNATIONAL_FLIGHT",
+          "DOMESTIC_FLIGHT",
+          "INTERCONTINENTAL_FLIGHT",
+          "DOMESTIC_SCHEDULED_FLIGHT",
+          "SHUTTLE_FLIGHT",
+          "INTERCONTINENTAL_CHARTER_FLIGHT",
+          "INTERNATIONAL_CHARTER_FLIGHT",
+          "ROUND_TRIP_CHARTER_FLIGHT",
+          "SIGHTSEEING_FLIGHT",
+          "HELICOPTER_SERVICE",
+          "DOMESTIC_CHARTER_FLIGHT",
+          "SCHENGEN_AREA_FLIGHT",
+          "AIRSHIP_SERVICE",
+          "SHORT_HAUL_INTERNATIONAL_FLIGHT",
+          "CANAL_BARGE",
+          "LOCAL_BUS",
+          "REGIONAL_BUS",
+          "EXPRESS_BUS",
+          "NIGHT_BUS",
+          "POST_BUS",
+          "SPECIAL_NEEDS_BUS",
+          "MOBILITY_BUS",
+          "MOBILITY_BUS_FOR_REGISTERED_DISABLED",
+          "SIGHTSEEING_BUS",
+          "SHUTTLE_BUS",
+          "HIGH_FREQUENCY_BUS",
+          "DEDICATED_LANE_BUS",
+          "SCHOOL_BUS",
+          "SCHOOL_AND_PUBLIC_SERVICE_BUS",
+          "RAIL_REPLACEMENT_BUS",
+          "DEMAND_AND_RESPONSE_BUS",
+          "AIRPORT_LINK_BUS",
+          "INTERNATIONAL_COACH",
+          "NATIONAL_COACH",
+          "SHUTTLE_COACH",
+          "REGIONAL_COACH",
+          "SPECIAL_COACH",
+          "SCHOOL_COACH",
+          "SIGHTSEEING_COACH",
+          "TOURIST_COACH",
+          "COMMUTER_COACH",
+          "FUNICULAR",
+          "STREET_CABLE_CAR",
+          "ALL_FUNICULAR_SERVICES",
+          "UNDEFINED_FUNICULAR",
+          "METRO",
+          "TUBE",
+          "URBAN_RAILWAY",
+          "CITY_TRAM",
+          "LOCAL_TRAM",
+          "REGIONAL_TRAM",
+          "SIGHTSEEING_TRAM",
+          "SHUTTLE_TRAM",
+          "TRAIN_TRAM",
+          "TELECABIN",
+          "CABLE_CAR",
+          "LIFT",
+          "CHAIR_LIFT",
+          "DRAG_LIFT",
+          "TELECABIN_LINK",
+          "LOCAL",
+          "HIGH_SPEED_RAIL",
+          "SUBURBAN_RAILWAY",
+          "REGIONAL_RAIL",
+          "INTERREGIONAL_RAIL",
+          "LONG_DISTANCE",
+          "INTERNATIONAL",
+          "SLEEPER_RAIL_SERVICE",
+          "NIGHT_RAIL",
+          "CAR_TRANSPORT_RAIL_SERVICE",
+          "TOURIST_RAILWAY",
+          "AIRPORT_LINK_RAIL",
+          "RAIL_SHUTTLE",
+          "REPLACEMENT_RAIL_SERVICE",
+          "SPECIAL_TRAIN",
+          "CROSS_COUNTRY_RAIL",
+          "RACK_AND_PINION_RAILWAY",
+          "INTERNATIONAL_CAR_FERRY",
+          "NATIONAL_CAR_FERRY",
+          "REGIONAL_CAR_FERRY",
+          "LOCAL_CAR_FERRY",
+          "INTERNATIONAL_PASSENGER_FERRY",
+          "NATIONAL_PASSENGER_FERRY",
+          "REGIONAL_PASSENGER_FERRY",
+          "LOCAL_PASSENGER_FERRY",
+          "POST_BOAT",
+          "TRAIN_FERRY",
+          "ROAD_FERRY_LINK",
+          "AIRPORT_BOAT_LINK",
+          "HIGH_SPEED_VEHICLE_SERVICE",
+          "HIGH_SPEED_PASSENGER_SERVICE",
+          "SIGHTSEEING_SERVICE",
+          "SCHOOL_BOAT",
+          "CABLE_FERRY",
+          "RIVER_BUS",
+          "SCHEDULED_FERRY",
+          "SHUTTLE_FERRY_SERVICE",
+          "COMMUNAL_TAXI",
+          "CHARTER_TAXI",
+          "WATER_TAXI",
+          "RAIL_TAXI",
+          "BIKE_TAXI",
+          "BLACK_CAB",
+          "MINI_CAB",
+          "ALL_TAXI_SERVICES",
+          "HIRE_CAR",
+          "HIRE_VAN",
+          "HIRE_MOTORBIKE",
+          "HIRE_CYCLE",
+          "ALL_HIRE_VEHICLES"
+        ],
+        "examples": [
+          "LOCAL"
+        ]
+      },
+      "Leg": {
+        "title": "Leg",
+        "required": [
+          "arrivalTime",
+          "departureTime",
+          "fromStopPlace",
+          "mode",
+          "serviceJourneyRef",
+          "subMode",
+          "toStopPlace"
+        ],
+        "type": "object",
+        "properties": {
+          "arrivalTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "departureTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "toStopPlace": {
+            "$ref": "#/components/schemas/StopPlace"
+          },
+          "fromStopPlace": {
+            "$ref": "#/components/schemas/StopPlace"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/Mode"
+          },
+          "subMode": {
+            "$ref": "#/components/schemas/SubMode"
+          },
+          "datedServiceJourneyRef": {
+            "type": "string"
+          },
+          "serviceJourneyRef": {
+            "type": "string"
+          },
+          "legId": {
+            "type": "string"
+          }
+        }
+      },
+      "Carnet": {
+        "title": "Carnet",
+        "required": [
+          "remainingCount",
+          "totalCount",
+          "usedCount"
+        ],
+        "type": "object",
+        "properties": {
+          "totalCount": {
+            "type": "integer",
+            "description": "Total number of tickets purchased.",
+            "format": "int32"
+          },
+          "usedCount": {
+            "type": "integer",
+            "description": "Number of tickets that have been activated.",
+            "format": "int32"
+          },
+          "remainingCount": {
+            "type": "integer",
+            "description": "Number of tickets left, totalCount minus usedCount.",
+            "format": "int32"
+          }
+        },
+        "description": "Carnet (klippekort) details, only present on the main ticket of an id-based carnet. Each ticket on the carnet is one trip (TRIP_CARNET) or one pass (PASS_CARNET)."
+      },
+      "TicketDistribution": {
+        "title": "TicketDistribution",
+        "required": [
+          "authority",
+          "combinedTicket",
+          "customers",
+          "distributionStatus",
+          "endOfValidity",
+          "id",
+          "loyaltyProgram",
+          "networkId",
+          "orderLineVersion",
+          "price",
+          "productTemplate",
+          "provider",
+          "purchaseDate",
+          "reservations",
+          "startOfValidity",
+          "supplementProducts",
+          "tariffCode",
+          "ticketType",
+          "ticketWithZones",
+          "topology",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "arrivalTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "authority": {
+            "$ref": "#/components/schemas/Authority"
+          },
+          "combinedTicket": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "customers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Customer"
+            }
+          },
+          "deliverAfter": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "departureTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "distributionDetails": {
+            "$ref": "#/components/schemas/DistributionDetails"
+          },
+          "distributionStatus": {
+            "$ref": "#/components/schemas/TicketDistributionStatus"
+          },
+          "duration": {
+            "type": "string"
+          },
+          "endOfValidity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fareContractId": {
+            "type": "string"
+          },
+          "fareProduct": {
+            "$ref": "#/components/schemas/FareProduct"
+          },
+          "fullAreaValidity": {
+            "type": "boolean"
+          },
+          "group": {
+            "$ref": "#/components/schemas/Group"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "loyaltyProgram": {
+            "type": "boolean"
+          },
+          "maxTravellers": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "mediaSerialNumberId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "networkId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "orderLineVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "price": {
+            "$ref": "#/components/schemas/Price"
+          },
+          "productTemplate": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "provider": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "purchaseDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reservations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reservation"
+            }
+          },
+          "startOfValidity": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "supplementProducts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SupplementProduct"
+            }
+          },
+          "tariffCode": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ticketType": {
+            "type": "string",
+            "description": "Deprecated in favour of type. Only SINGLE or PERIODIC, the main ticket of a carnet gets the duration based value here.",
+            "deprecated": true,
+            "enum": [
+              "SINGLE",
+              "PERIODIC"
+            ]
+          },
+          "ticketWithZones": {
+            "type": "boolean"
+          },
+          "topology": {
+            "$ref": "#/components/schemas/Topology"
+          },
+          "travelDocumentId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "description": "SINGLE for tickets valid less than 24 hours, PERIODIC for tickets valid 24 hours or more, CARNET for the main ticket of an id-based carnet (klippekort), which has carnet with the number of tickets. New values may be added, so consumers should handle unknown values.",
+            "examples": [
+              "PERIODIC"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "usageTrigger": {
+            "type": "string",
+            "enum": [
+              "START_OF_PERIOD",
+              "START_OUT_BOUND_RIDE",
+              "END_OUT_BOUND_RIDE",
+              "START_RETURN_RIDE",
+              "PURCHASE",
+              "SPECIFIED_START_DATE",
+              "FULFILMENT",
+              "DAY_OFFSET_BEFORE_CALENDAR_PERIOD"
+            ]
+          },
+          "userProfile": {
+            "$ref": "#/components/schemas/UserProfile"
+          },
+          "legs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Leg"
+            }
+          },
+          "cancellationReason": {
+            "type": "string",
+            "description": "reason for cancellation of the ticket distribution, Possible values: TRANSFERRED, DEVIATION, SEAT_CHANGED, VALIDITY_UPDATED"
+          },
+          "carnet": {
+            "$ref": "#/components/schemas/Carnet"
+          }
+        }
+      },
+      "TicketDistributionGroup": {
+        "title": "TicketDistributionGroup",
+        "required": [
+          "id",
+          "orderId",
+          "orderLineId",
+          "orderVersion",
+          "ticketDistributions",
+          "updatedForOrderLineVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "createdByDCI": {
+            "type": "string"
+          },
+          "distributedByDCI": {
+            "type": "string"
+          },
+          "distributedByOrgId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "orderLineId": {
+            "type": "string"
+          },
+          "orderVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "organisationId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "salesPackage": {
+            "$ref": "#/components/schemas/SalesPackage"
+          },
+          "ticketDistributions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketDistribution"
+            }
+          },
+          "updatedForOrderLineVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fulfillmentMethod": {
+            "type": "string",
+            "description": "The fulfillment method given by the order line. Useful for determining which external ticketing system to retrieve validation data from. Possible values: NOD, ACCOUNT_BASED_TICKETING, INTERNATIONAL, BIFROST"
+          },
+          "orderOwnerCustomerId": {
+            "type": "string",
+            "description": "The customerId of the customer that owns the order"
+          },
+          "distributionHolderCustomerId": {
+            "type": "string",
+            "description": "The customerId of the customer that will receive the ticket"
+          }
+        },
+        "examples": [
+          {
+            "id": 123456789,
+            "orderId": "ABCD1234",
+            "orderVersion": 1,
+            "orderLineId": "e9154697-41e6-4955-985e-d474d438a557",
+            "orderLineVersion": 1,
+            "ticketDistributions": [
+              {
+                "id": 987654321,
+                "distributionStatus": "DISTRIBUTED",
+                "authority": {
+                  "id": "1234",
+                  "name": "WayFare"
+                },
+                "customers": [
+                  {
+                    "customerId": "12345678901",
+                    "entitlements": [],
+                    "id": 1
+                  }
+                ],
+                "loyaltyProgram": false,
+                "networkId": 1,
+                "orderLineVersion": 1,
+                "productTemplate": 1,
+                "provider": 51,
+                "tariffCode": 321,
+                "combinedTicket": false,
+                "fareProduct": {
+                  "id": "ABC:PurchasedFareProduct:SingleTicket",
+                  "version": "ABC:Version:PFP-1",
+                  "name": "Single Ticket",
+                  "organisationId": 5678
+                },
+                "supplementProducts": [],
+                "userProfile": {
+                  "id": "ABC:UserProfile:Adult",
+                  "version": "ABC:Version:UP-1",
+                  "name": "Adult"
+                },
+                "reservations": [
+                  {
+                    "id": 1,
+                    "externalReservationId": "RESV123456",
+                    "datedServiceJourneyId": "TST:DatedServiceJourney:20250601",
+                    "seats": [
+                      {
+                        "externalSeatId": "SEAT123",
+                        "id": 1,
+                        "railcarNumber": "4",
+                        "seatNumber": "12",
+                        "seatType": "WINDOW",
+                        "seatingProperties": {
+                          "fareClass": "STANDARD_CLASS",
+                          "accommodationFacility": "SEATING",
+                          "seatAttachment": "FIXED",
+                          "seatPosition": "WINDOW",
+                          "mobilityFacilities": [],
+                          "passengerCommsFacilities": [],
+                          "sanitaryFacilities": [],
+                          "nuisanceFacilities": [],
+                          "baggageType": []
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "price": {
+                  "amount": "29.90",
+                  "currency": "NOK",
+                  "taxAmount": "5.98",
+                  "taxRate": "0.20"
+                },
+                "purchaseDate": "2025-06-01T12:00:00Z",
+                "startOfValidity": "2025-06-01T13:00:00Z",
+                "endOfValidity": "2025-06-01T14:00:00Z",
+                "ticketType": "SINGLE",
+                "ticketWithZones": false,
+                "type": "SINGLE",
+                "topology": {
+                  "fromStopPlace": "TST:StopPlace:123",
+                  "fromStopPlaceName": "Central Station",
+                  "toStopPlace": "TST:StopPlace:456",
+                  "toStopPlaceName": "Airport",
+                  "fareZones": [],
+                  "groupOfTariffZones": []
+                },
+                "distributionDetails": {
+                  "customerAccountRef": "ABC:CustomerAccount:209ea428-9457-4ee6-bcc8-3559ffda5dd4",
+                  "fareContractRef": "ABC:FareContract:ABCD1235-fae3c8b3-5f4b-4d3e-9f7a-2c6e8f4d2b1a"
+                }
+              }
+            ],
+            "updatedForOrderLineVersion": 1,
+            "fulfillmentMethod": "ACCOUNT_BASED_TICKETING",
+            "orderOwnerCustomerId": "123456789",
+            "distributionHolderCustomerId": "987654321"
+          }
+        ]
+      },
+      "PageOfTicketDistributionGroup": {
+        "title": "PageOfTicketDistributionGroup",
+        "required": [
+          "items",
+          "totalItems",
+          "totalPages"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "Items on a specific page",
+            "readOnly": true,
+            "items": {
+              "$ref": "#/components/schemas/TicketDistributionGroup"
+            }
+          },
+          "totalItems": {
+            "type": "integer",
+            "description": "Total number of items",
+            "format": "int64",
+            "readOnly": true,
+            "examples": [
+              72
+            ]
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages available to browse",
+            "format": "int64",
+            "readOnly": true,
+            "examples": [
+              9
+            ]
+          }
+        },
+        "description": "Page displays a subset of a list of entities"
+      },
+      "OrderLineDistributionRequest": {
+        "title": "OrderLineDistributionRequest",
+        "required": [
+          "orderLineId"
+        ],
+        "type": "object",
+        "properties": {
+          "orderLineId": {
+            "type": "string",
+            "description": "ID of the order line"
+          },
+          "startOfValidity": {
+            "type": "string",
+            "description": "The time when the ticket for this order line should become active. Will be specified by order data if not overridden here.",
+            "format": "date-time"
+          },
+          "deliverAfter": {
+            "type": "string",
+            "description": "The earliest time it should be possible to pick up the ticket. If specified then it will override the value from the parent",
+            "format": "date-time"
+          }
+        },
+        "description": "Distribute a set of ticket distribution groups to NOD"
+      },
+      "TicketDistributionGroupDistributeRequest": {
+        "title": "TicketDistributionGroupDistributeRequest",
+        "required": [
+          "orderId",
+          "orderVersion"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "ID of the order"
+          },
+          "orderVersion": {
+            "type": "integer",
+            "description": "Version of the order",
+            "format": "int32",
+            "default": 1
+          },
+          "deliverAfter": {
+            "type": "string",
+            "description": "The earliest time it should be possible to pick up the ticket(s)",
+            "format": "date-time"
+          },
+          "orderLineDistributionRequests": {
+            "type": "array",
+            "description": "List of specific orderlineIds to distribute tickets for. If not specified, all tickets for the order will be distributed.",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineDistributionRequest"
+            }
+          },
+          "qrChecksumType": {
+            "type": "integer",
+            "description": "The 'toughness' of the QR-code. If not specified the service will determine it automatically based on deliverAfter and startOfValidity",
+            "format": "int32"
+          },
+          "languageCode": {
+            "$ref": "#/components/schemas/LanguageCode"
+          }
+        },
+        "description": "Distribute a set of ticket distribution groups to NOD"
+      },
+      "Distribution": {
+        "title": "Distribution",
+        "type": "object",
+        "properties": {
+          "customerAccountRef": {
+            "type": "string",
+            "description": "Reference to an account-based-ticketing customer account"
+          },
+          "fareContractRef": {
+            "type": "string",
+            "description": "Reference to an account-based-ticketing farecontract"
+          }
+        }
+      },
+      "TicketDistributionSummary": {
+        "title": "TicketDistributionSummary",
+        "required": [
+          "distributions",
+          "orderId"
+        ],
+        "type": "object",
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "description": "The orderId of the ticket distribution summary"
+          },
+          "distributions": {
+            "type": "array",
+            "description": "List of distinct summaries of all ticket distributions of the ticket distribution groups for a given orderId. At least one of the fields in a distribution is non-null.",
+            "items": {
+              "$ref": "#/components/schemas/Distribution"
+            }
+          }
+        },
+        "examples": [
+          {
+            "orderId": "ABCD1234",
+            "distributions": [
+              {
+                "customerAccountRef": "ABC:CustomerAccount:209ea428-9457-4ee6-bcc8-3559ffda5dd4",
+                "fareContractRef": "ABC:FareContract:ABCD1235-fae3c8b3-5f4b-4d3e-9f7a-2c6e8f4d2b1a"
+              },
+              {
+                "customerAccountRef": "ABC:CustomerAccount:309ea428-9457-4ee6-bcc8-3559ffda5dd4"
+              }
+            ]
+          }
+        ]
+      },
+      "TicketDistributionGroupTransfer": {
+        "title": "TicketDistributionGroupTransfer",
+        "required": [
+          "ticketDistributionGroupId",
+          "toCustomerId"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionGroupId": {
+            "type": "integer",
+            "description": "The id of the ticket distribution group to transfer to another customer",
+            "format": "int64"
+          },
+          "toCustomerId": {
+            "type": "string",
+            "description": "The customerId of the customer that will receive the ticket",
+            "examples": [
+              "123456789"
+            ]
+          },
+          "toCustomerAccountRef": {
+            "type": "string",
+            "description": "Reference to an account-based-ticketing customer account"
+          }
+        }
+      },
+      "TransferDistributionHolderRequest": {
+        "title": "TransferDistributionHolderRequest",
+        "required": [
+          "ticketDistributionGroupTransfers"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionGroupTransfers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketDistributionGroupTransfer"
+            }
+          }
+        },
+        "examples": [
+          {
+            "ticketDistributionGroupTransfers": [
+              {
+                "ticketDistributionGroupId": 987654321,
+                "toCustomerId": "987654321"
+              },
+              {
+                "ticketDistributionGroupId": 123456789,
+                "toCustomerId": "123456789",
+                "toCustomerAccountRef": "ABC:CustomerAccount:209ea428-9457-4ee6-bcc8-3559ffda5dd4"
+              }
+            ]
+          }
+        ]
+      },
+      "SuccessfulTicketDistributionGroupTransfer": {
+        "title": "SuccessfulTicketDistributionGroupTransfer",
+        "required": [
+          "ticketDistributionGroupId"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionGroupId": {
+            "type": "integer",
+            "description": "The ticketDistributionGroupId of the ticket distribution group that was successfully transferred to another customer",
+            "format": "int64"
+          }
+        }
+      },
+      "FailedTicketDistributionGroupTransfer": {
+        "title": "FailedTicketDistributionGroupTransfer",
+        "required": [
+          "errorMessage",
+          "ticketDistributionGroupId"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionGroupId": {
+            "type": "integer",
+            "description": "The ticketDistributionGroupId of the ticket distribution group that failed to be transferred to another customer",
+            "format": "int64"
+          },
+          "errorMessage": {
+            "type": "string",
+            "description": "The error message that explains why the transfer failed"
+          }
+        }
+      },
+      "TransferDistributionHolderResponse": {
+        "title": "TransferDistributionHolderResponse",
+        "required": [
+          "failedTicketDistributionGroupTransfers",
+          "successfulTicketDistributionGroupTransfers"
+        ],
+        "type": "object",
+        "properties": {
+          "successfulTicketDistributionGroupTransfers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuccessfulTicketDistributionGroupTransfer"
+            }
+          },
+          "failedTicketDistributionGroupTransfers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FailedTicketDistributionGroupTransfer"
+            }
+          }
+        },
+        "examples": [
+          {
+            "successfulTicketDistributionGroupTransfers": [
+              {
+                "ticketDistributionGroupId": 987654321
+              }
+            ],
+            "failedTicketDistributionGroupTransfers": [
+              {
+                "ticketDistributionGroupId": 123456789,
+                "errorMessage": "Ticket distribution group not found"
+              }
+            ]
+          }
+        ]
+      },
+      "UpdateValidityRequest": {
+        "required": [
+          "startOfValidity",
+          "ticketDistributionGroupId",
+          "ticketDistributionId"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionGroupId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "ticketDistributionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "elementId": {
+            "type": "string",
+            "description": "If set, startOfValidity will only be updated for this elementId. If not, startOfValidity will be updated for entire TicketDistribution"
+          },
+          "startOfValidity": {
+            "type": "string",
+            "description": "Format is DateTime. It is also possible to send in the keyword NOW to set the startOfValidity to the current time calculated by ticket-distribution",
+            "examples": [
+              "NOW, 2020-01-01T00:00:00Z"
+            ]
+          }
+        }
+      },
+      "UpdateValiditiesRequest": {
+        "title": "UpdateValiditiesRequest",
+        "required": [
+          "updateValidities"
+        ],
+        "type": "object",
+        "properties": {
+          "updateValidities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UpdateValidityRequest"
+            }
+          }
+        },
+        "examples": [
+          {
+            "updateValidities": [
+              {
+                "ticketDistributionGroupId": 123456789,
+                "ticketDistributionId": 987654321,
+                "startOfValidity": "2024-07-01T00:00:00Z"
+              },
+              {
+                "ticketDistributionGroupId": 223344556,
+                "ticketDistributionId": 112233445,
+                "elementId": "element-001",
+                "startOfValidity": "NOW"
+              }
+            ]
+          }
+        ]
+      },
+      "SuccessfulValidityUpdates": {
+        "title": "SuccessfulUpdateValidities",
+        "required": [
+          "ticketDistributionGroupId"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionGroupId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "FailedValidityUpdates": {
+        "title": "FailedValidityUpdates",
+        "required": [
+          "errorMessage",
+          "ticketDistributionGroupId"
+        ],
+        "type": "object",
+        "properties": {
+          "ticketDistributionGroupId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "errorMessage": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateValiditiesResponse": {
+        "title": "UpdateValiditiesResponse",
+        "required": [
+          "failedValidityUpdates",
+          "successfulValidityUpdates"
+        ],
+        "type": "object",
+        "properties": {
+          "successfulValidityUpdates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuccessfulValidityUpdates"
+            }
+          },
+          "failedValidityUpdates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FailedValidityUpdates"
+            }
+          }
+        },
+        "examples": [
+          {
+            "successfulValidityUpdates": [
+              {
+                "ticketDistributionGroupId": 123456789
+              }
+            ],
+            "failedValidityUpdates": [
+              {
+                "ticketDistributionGroupId": 987654321,
+                "errorMessage": "Ticket distribution not found"
+              }
+            ]
+          }
+        ]
+      },
+      "PaymentMeansType": {
+        "title": "PaymentMeansType",
+        "type": "string",
+        "description": "The payment means type used to purchase the ticket",
+        "enum": [
+          "NULL",
+          "FREE",
+          "TPURSE"
+        ]
+      },
+      "TicketTravelCardRequest": {
+        "title": "TicketTravelCardRequest",
+        "required": [
+          "activate",
+          "mediaSerialNumberId",
+          "paymentMeansType"
+        ],
+        "type": "object",
+        "properties": {
+          "activate": {
+            "type": "boolean",
+            "description": "Activate the product"
+          },
+          "mediaSerialNumberId": {
+            "maximum": 4294967295,
+            "minimum": 0,
+            "type": "integer",
+            "description": "The media serial number (MSN) ID of the travel card",
+            "format": "int64"
+          },
+          "paymentMeansType": {
+            "$ref": "#/components/schemas/PaymentMeansType"
+          }
+        },
+        "description": "Request for generating ticket for travel card"
+      }
+    },
+    "responses": {
+      "badRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "timestamp": "2025-01-01T12:00:00Z",
+                  "status": 400,
+                  "title": "Bad Request",
+                  "error": "Bad Request",
+                  "exception": "ValidationException",
+                  "message": "Validation failed",
+                  "path": "/v1/ticket-distributions/XYZ123/distribute"
+                }
+              }
+            }
+          }
+        }
+      },
+      "internalServerError": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "timestamp": "2025-01-01T12:00:00Z",
+                  "status": 500,
+                  "title": "Internal Server Error",
+                  "error": "Internal Server Error",
+                  "exception": "RuntimeException",
+                  "message": "An unexpected error occurred",
+                  "path": "/v1/ticket-distributions/XYZ123/distribute"
+                }
+              }
+            }
+          }
+        }
+      },
+      "notFound": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "timestamp": "2025-01-01T12:00:00Z",
+                  "status": 404,
+                  "title": "Not Found",
+                  "error": "Not Found",
+                  "exception": "EntityNotFoundException",
+                  "message": "Ticket distribution with id 'XYZ123' not found",
+                  "path": "/v1/ticket-distributions/XYZ123/distribute"
+                }
+              }
+            }
+          }
+        }
+      },
+      "conflict": {
+        "description": "Conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ApiError"
+            },
+            "examples": {
+              "default": {
+                "value": {
+                  "timestamp": "2025-01-01T12:00:00Z",
+                  "status": 409,
+                  "title": "Conflict",
+                  "error": "Conflict",
+                  "exception": "ConflictException",
+                  "message": "Ticket distribution with id 'XYZ123' is already distributed",
+                  "path": "/v1/ticket-distributions/XYZ123/distribute"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "orderIdQueryParam": {
+        "name": "orderId",
+        "in": "query",
+        "description": "Filters by order ID",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "examples": [
+            [
+              "NTA2JGR7"
+            ]
+          ]
+        }
+      },
+      "orderLineIdQueryParam": {
+        "name": "orderLineId",
+        "in": "query",
+        "description": "Filters by order line ID",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "examples": [
+            [
+              "26b02145-7dbf-4be9-8600-ff4a570d83d5"
+            ]
+          ]
+        }
+      },
+      "organisationIdQueryParam": {
+        "name": "organisationId",
+        "in": "query",
+        "description": "Filters by organisation if the user has correct privileges",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "examples": [
+            [
+              "1"
+            ]
+          ]
+        }
+      },
+      "ticketDistributionIdQueryParam": {
+        "name": "ticketDistributionId",
+        "in": "query",
+        "description": "Filters by ticket distribution id",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "examples": [
+            [
+              "1234"
+            ]
+          ]
+        }
+      },
+      "paginationPageParam": {
+        "name": "page",
+        "in": "query",
+        "description": "Selects a specific page in the collection",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 1,
+          "examples": [
+            2
+          ]
+        }
+      },
+      "paginationPerPageParam": {
+        "name": "perPage",
+        "in": "query",
+        "description": "Specifies the number of entries returned in a page. Maximum allowed value is 100.",
+        "required": false,
+        "style": "form",
+        "explode": true,
+        "schema": {
+          "maximum": 100,
+          "type": "integer",
+          "format": "int32",
+          "default": 30,
+          "examples": [
+            20
+          ]
+        }
+      },
+      "posHeader": {
+        "name": "Entur-Pos",
+        "in": "header",
+        "description": "A header containing a point-of-sale reference",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "MyApplication"
+          ]
+        }
+      },
+      "orderIdPathParam": {
+        "name": "orderId",
+        "in": "path",
+        "description": "orderId",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "NTA2JGR7"
+          ]
+        }
+      },
+      "languageHeader": {
+        "name": "Accepts-Language",
+        "in": "header",
+        "description": "A header used to select language",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "description": "Current supported languages are 'nob', 'nno' and 'eng'"
+        },
+        "examples": {
+          "default": {
+            "value": "nob"
+          }
+        }
+      },
+      "dciHeader": {
+        "name": "Entur-Distribution-Channel",
+        "in": "header",
+        "description": "A header containing a distribution channel reference",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "examples": [
+            "ENT:DistributionChannel:App"
+          ]
+        }
+      },
+      "ET-Client-Name": {
+        "name": "ET-Client-Name",
+        "in": "header",
+        "description": "Entur Client Header.\nIt is required that all consumers identify themselves by using this header.\nEntur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.\nThe structure of ET-Client-Name should be: `<company>-<application>`.",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "X-Correlation-Id": {
+        "name": "X-Correlation-Id",
+        "in": "header",
+        "description": "Correlation id",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

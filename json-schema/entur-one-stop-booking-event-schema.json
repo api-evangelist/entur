@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-one-stop-booking-event-schema.json",
+  "title": "OneStopBookingEvent",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-shared-mobility-openapi.yml#/components/schemas/OneStopBookingEvent",
+  "type": "object",
+  "properties": {
+    "event": {
+      "type": "string",
+      "enum": [
+        "PREPARE",
+        "START",
+        "PAUSE",
+        "RESUME",
+        "START_FINISHING",
+        "FINISH",
+        "CANCEL"
+      ]
+    },
+    "fileName": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fileType": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fileData": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "byte"
+    }
+  },
+  "required": [
+    "event"
+  ]
+}

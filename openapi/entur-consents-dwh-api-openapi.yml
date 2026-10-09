@@ -1,0 +1,261 @@
+openapi: 3.2.0
+info:
+  title: Entur Consents DWH API
+  version: 2026.07.1
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Consents DWH across 2 of this provider''s published API definitions: entur-consents-openapi.json, entur-consents-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2/consents
+security:
+- jwt: []
+tags:
+- name: Consents DWH
+  description: API for displaying all consent info (Data warehouse API)
+paths:
+  /crm:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents DWH
+      summary: Find all given consents
+      description: 'Find all given consents. This endpoint is intended for data warehouse use and returns all consents with related contact information.
+
+        |The response can be filtered by consent IDs, and you can choose to include email and telephone numbers.
+
+        |If no filters are provided, all given consents for your organisation are returned.'
+      operationId: findAllGivenConsents
+      parameters:
+      - name: consentIds
+        in: query
+        description: Filter consents by its id (comma separated). Returns all consents if not provided.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+        examples:
+          default:
+            value:
+            - 1
+            - 2
+            - 3
+      - name: includeEmail
+        in: query
+        description: Whether or not to include email in the response. Defaults to false
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+        examples:
+          default:
+            value: true
+      - name: includeTelephoneNumber
+        in: query
+        description: Whether or not to include telephone number in the response. Defaults to false
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+        examples:
+          default:
+            value: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsentCrmResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: consents-customer-data:les
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+components:
+  schemas:
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: ErrorMessage
+    ConsentCrmResponse:
+      required:
+      - consentBaseVersion
+      - consentCode
+      - consentId
+      - consentOrganisationId
+      - createdByOrgId
+      - customerNumber
+      - customerRef
+      - givenConsentId
+      type: object
+      properties:
+        consentBaseVersion:
+          type: integer
+          description: The consent base version associated with the consent
+          format: int32
+        consentCode:
+          type: string
+          description: The consent code of the base consent associated with the consent
+        consentId:
+          type: integer
+          description: The id of the Consent that has been consented
+          format: int64
+        consentOrganisationId:
+          type: integer
+          description: The organisation that owns the Consent. Typically an 'Operatør'
+          format: int64
+        countryCode:
+          type: string
+          description: The telephone number country code
+        createdByOrgId:
+          type: integer
+          description: The organisation through which the consent was given
+          format: int64
+        customerNumber:
+          type: integer
+          description: Customer number, a unique identifier for the customer.
+          format: int64
+        customerRef:
+          type: string
+          description: Customer ref, a unique identifier for the customer within an organisation
+        email:
+          type: string
+          description: The customer's email
+        fromStopPlace:
+          type: string
+          description: The stop place where the customer’s journey started, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+        givenConsentId:
+          type: integer
+          description: Given consent id.
+          format: int64
+        lineRef:
+          type: string
+          description: Reference to the customers journey line, in NeTEx format
+          examples:
+          - VYT:Line:L1
+        originalDatedServiceJourneyId:
+          type: string
+          description: Unique Id for a specific Service Journey, in NeTEx format with ENT as operator
+          examples:
+          - ENT:DatedServiceJourney:12345
+        telephoneNumber:
+          type: string
+          description: The customer's telephone number
+        toStopPlace:
+          type: string
+          description: The stop place where the customer’s journey ended, in NeTEx format.
+          examples:
+          - NSR:StopPlace:12345
+      description: A condensed view of consent information
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-consents-openapi.json
+- entur-consents-openapi.yml

@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-add-supplement-products-request-schema.json",
+  "title": "AddSupplementProductsRequest",
+  "description": "The holder for an add supplement product configuration.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-reserve-offers-partner-openapi.yml#/components/schemas/AddSupplementProductsRequest",
+  "required": [
+    "offerConfigurations",
+    "orderId"
+  ],
+  "type": "object",
+  "properties": {
+    "offerConfigurations": {
+      "type": "array",
+      "description": "A list of supplement product configurations selected for purchase",
+      "items": {
+        "$ref": "#/$defs/AddSupplementProductsConfiguration"
+      }
+    },
+    "orderId": {
+      "type": "string",
+      "description": "The order to add the supplement product(s) to"
+    }
+  },
+  "$defs": {
+    "AddSupplementProductsConfiguration": {
+      "title": "AddSupplementProductsConfiguration",
+      "required": [
+        "offerId",
+        "orderLineId",
+        "selectedProductsConfiguration"
+      ],
+      "type": "object",
+      "properties": {
+        "customers": {
+          "type": "array",
+          "description": "Customers with optional entitlement data; used to link travellers to order line and when offers are created with entitlements",
+          "items": {
+            "$ref": "#/$defs/Customer"
+          },
+          "default": []
+        },
+        "offerId": {
+          "type": "string",
+          "description": "The id of the offer that is used",
+          "format": "uuid"
+        },
+        "orderLineId": {
+          "type": "string",
+          "description": "The id of the order line to add supplement products to"
+        },
+        "selectedProductsConfiguration": {
+          "type": "array",
+          "description": "A list of ids and counts for selected supplement product configurations. Count is only considered for fare products.",
+          "items": {
+            "$ref": "#/$defs/SelectedProductConfiguration"
+          },
+          "default": []
+        }
+      },
+      "description": "The configuration-holder for an offer configuration"
+    },
+    "Customer": {
+      "title": "Customer",
+      "required": [
+        "customerId",
+        "entitlements"
+      ],
+      "type": "object",
+      "properties": {
+        "customerId": {
+          "type": "string",
+          "description": "Customer id that will be linked to the order line created from the offer specified"
+        },
+        "entitlements": {
+          "type": "array",
+          "description": "The entitlement data for a customer; used if the the offer is created with entitlements",
+          "items": {
+            "$ref": "#/$defs/CustomerEntitlement"
+          },
+          "default": []
+        }
+      },
+      "description": "A holder for a customer and entitlements used by the customer for the offer"
+    },
+    "CustomerEntitlement": {
+      "title": "CustomerEntitlement",
+      "required": [
+        "entitlementProductRef"
+      ],
+      "type": "object",
+      "properties": {
+        "contractId": {
+          "type": "string",
+          "description": "The id of a benefit-contract that gives a customer an entitlement",
+          "format": "uuid"
+        },
+        "entitlementProductRef": {
+          "$ref": "#/$defs/IdAndVersionRef"
+        },
+        "externalEntitlementRef": {
+          "$ref": "#/$defs/IdAndVersionRef"
+        }
+      },
+      "description": "A holder for a customers entitlements"
+    },
+    "IdAndVersionRef": {
+      "title": "IdAndVersionRef",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id reference to an external entity"
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional version reference to an external entity"
+        }
+      },
+      "description": "A holder for an id and version combination"
+    },
+    "SelectedProductConfiguration": {
+      "title": "SelectedProductConfiguration",
+      "required": [
+        "count",
+        "selectedProductId"
+      ],
+      "type": "object",
+      "properties": {
+        "selectedProductId": {
+          "type": "string",
+          "description": "A selectable product id."
+        },
+        "count": {
+          "type": "integer",
+          "description": "The number of times to add said product. Count will only be considered on a fare product level. Default 1",
+          "format": "int32",
+          "default": 1
+        }
+      },
+      "description": "Configuration for a selectable product from an offer"
+    }
+  }
+}

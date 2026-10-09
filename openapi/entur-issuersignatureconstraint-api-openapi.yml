@@ -1,0 +1,198 @@
+openapi: 3.2.0
+info:
+  version: 2.2.2
+  title: BoB.participantMetadata. Issuer Signature Constraint API
+  description: The Participant Metadata API provides an interface for participants to manage metadata coordinated by an Administering Body (AB).
+servers:
+- url: /api/v2
+tags:
+- name: issuerSignatureConstraint
+  description: An issuer signature constraint lets a participant grant other participants (sales channels) permission to sign tickets issued by the participant. The purpose of issuer signature constraint is to control which participants that are allowed to sign tickets issued by other participants.
+paths:
+  /participantMetadata/{pid}/issuerSignatureConstraint:
+    get:
+      tags:
+      - issuerSignatureConstraint
+      summary: Get issuer signature constraints published by participant identifier
+      operationId: getIssuerSignatureConstraints
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/issuerSignatureConstraint'
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+    post:
+      tags:
+      - issuerSignatureConstraint
+      summary: Add issuer signature constraint to participant object
+      operationId: addIssuerSignatureConstraint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                description: the URL of the newly created issuerSignatureConstraint object
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issuerSignatureConstraint'
+        description: issuerSignatureConstraint object
+        required: true
+  /participantMetadata/{pid}/issuerSignatureConstraint/{acceptablePid}:
+    get:
+      tags:
+      - issuerSignatureConstraint
+      summary: Get issuer signature constraint published by participant identifier for the…
+      operationId: getIssuerSignatureConstraint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: acceptablePid
+        in: path
+        description: Acceptable participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/issuerSignatureConstraint'
+        '401':
+          description: unauthorised
+        '404':
+          description: pid/acceptablePid not found
+    put:
+      tags:
+      - issuerSignatureConstraint
+      summary: Update issuer signature constraint published by participant identifier for the…
+      operationId: updateIssuerSignatureConstraint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: acceptablePid
+        in: path
+        description: Acceptable participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '204':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid/acceptablePid not found
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/issuerSignatureConstraint'
+        description: issuerSignatureConstraint object
+        required: true
+    delete:
+      tags:
+      - issuerSignatureConstraint
+      summary: Delete issuer signature constraint published by participant identifier for the…
+      operationId: deleteIssuerSignatureConstraint
+      parameters:
+      - name: pid
+        in: path
+        description: Participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: acceptablePid
+        in: path
+        description: Acceptable participant identifier
+        required: true
+        schema:
+          type: integer
+          format: int64
+      security:
+      - Pop: []
+      responses:
+        '204':
+          description: successful operation
+        '401':
+          description: unauthorised
+        '404':
+          description: pid not found
+components:
+  schemas:
+    issuerSignatureConstraint:
+      type: object
+      required:
+      - pid
+      properties:
+        pid:
+          description: PID of acceptable issuer
+          type: integer
+          format: int64
+          example: 20
+        signatureLifetime:
+          description: Maximum signature life-time allowed for this PID as ISO 8601:2004 duration format (<a href="https://bitbucket.org/samtrafiken/bob-mts-8-date-and-time-formats/src/master/mts8.pdf" target="_blank">MTS8</a>, chapter 2.4)
+          type: string
+          example: P3W
+  securitySchemes:
+    Pop:
+      description: OAuth 2.0 Proof-of-possession (pop) Token
+      type: apiKey
+      name: Authorization
+      in: header

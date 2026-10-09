@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-extend-expiry-time-input-schema.json",
+  "title": "extendExpiryTimeInput",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-omsa-openapi.yml#/components/schemas/extendExpiryTimeInput",
+  "required": [
+    "packageId",
+    "type"
+  ],
+  "type": "object",
+  "properties": {
+    "packageId": {
+      "$ref": "#/$defs/packageReference"
+    },
+    "type": {
+      "pattern": "^(extend_expiry_time)$",
+      "type": "string"
+    },
+    "extensionReason": {
+      "pattern": "^(purchase_pending|payment_pending|other)$",
+      "type": "string",
+      "description": "in case operation is EXTEND_EXPIRY_TIME, the reason for extension must be supplied here.<br> _PURCHASE_PENDING_ - The internal purchase process on the MP side is not yet finished<br> _PAYMENT_PENDING_ - The customer is in the payment process<br> _OTHER_ - unspecified"
+    }
+  },
+  "$defs": {
+    "normalString": {
+      "maxLength": 200,
+      "type": "string",
+      "description": "default string, full names etc (length 0-200)"
+    },
+    "packageReference": {
+      "$ref": "#/$defs/normalString"
+    }
+  }
+}

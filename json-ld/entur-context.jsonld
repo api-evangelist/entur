@@ -1,0 +1,1351 @@
+{
+  "@context": {
+    "@vocab": "https://entur.no/schema#",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "entur": "https://entur.no/schema#",
+    "CleosProblemJsonDto": "entur:CleosProblemJsonDto",
+    "type": {
+      "@id": "entur:type",
+      "@type": "@id"
+    },
+    "title": {
+      "@id": "entur:title",
+      "@type": "xsd:string"
+    },
+    "status": {
+      "@id": "entur:status",
+      "@type": "xsd:integer"
+    },
+    "detail": {
+      "@id": "entur:detail",
+      "@type": "xsd:string"
+    },
+    "instance": {
+      "@id": "entur:instance",
+      "@type": "@id"
+    },
+    "properties": {
+      "@id": "entur:properties"
+    },
+    "timestamp": {
+      "@id": "entur:timestamp",
+      "@type": "xsd:dateTime"
+    },
+    "correlationId": {
+      "@id": "entur:correlationId",
+      "@type": "xsd:string"
+    },
+    "domainRefs": {
+      "@id": "entur:domainRefs",
+      "@container": "@list"
+    },
+    "PartnerRefDto": "entur:PartnerRefDto",
+    "id": {
+      "@id": "entur:id",
+      "@type": "xsd:string"
+    },
+    "name": {
+      "@id": "entur:name",
+      "@type": "xsd:string"
+    },
+    "PartnerAnnexDto": "entur:PartnerAnnexDto",
+    "cancel": {
+      "@id": "entur:cancel",
+      "@type": "xsd:boolean"
+    },
+    "guid": {
+      "@id": "entur:guid",
+      "@type": "xsd:string"
+    },
+    "annexRef": {
+      "@id": "entur:annexRef",
+      "@type": "xsd:string"
+    },
+    "attributes": {
+      "@id": "entur:attributes"
+    },
+    "price": {
+      "@id": "entur:price",
+      "@type": "@id"
+    },
+    "priceContribution": {
+      "@id": "entur:priceContribution",
+      "@type": "@id"
+    },
+    "foreignAmount": {
+      "@id": "entur:foreignAmount",
+      "@type": "@id"
+    },
+    "description": {
+      "@id": "entur:description",
+      "@type": "xsd:string"
+    },
+    "context": {
+      "@id": "entur:context"
+    },
+    "parameters": {
+      "@id": "entur:parameters",
+      "@container": "@list"
+    },
+    "subAnnexes": {
+      "@id": "entur:subAnnexes",
+      "@container": "@list"
+    },
+    "PartnerCommentDto": "entur:PartnerCommentDto",
+    "comment": {
+      "@id": "entur:comment",
+      "@type": "xsd:string"
+    },
+    "PartnerMoneyDto": "entur:PartnerMoneyDto",
+    "amount": {
+      "@id": "entur:amount",
+      "@type": "xsd:string"
+    },
+    "currency": {
+      "@id": "entur:currency",
+      "@type": "xsd:string"
+    },
+    "taxCode": {
+      "@id": "entur:taxCode",
+      "@type": "xsd:string"
+    },
+    "localTaxCode": {
+      "@id": "entur:localTaxCode",
+      "@type": "xsd:string"
+    },
+    "taxRate": {
+      "@id": "entur:taxRate",
+      "@type": "xsd:string"
+    },
+    "weight": {
+      "@id": "entur:weight",
+      "@type": "xsd:string"
+    },
+    "PartnerSettlementImportDto": "entur:PartnerSettlementImportDto",
+    "msgSubjectId": {
+      "@id": "entur:msgSubjectId",
+      "@type": "xsd:string"
+    },
+    "posRef": {
+      "@id": "entur:posRef",
+      "@type": "xsd:string"
+    },
+    "distributionChannelRef": {
+      "@id": "entur:distributionChannelRef",
+      "@type": "xsd:string"
+    },
+    "settlementDate": {
+      "@id": "entur:settlementDate",
+      "@type": "xsd:date"
+    },
+    "settlementNo": {
+      "@id": "entur:settlementNo",
+      "@type": "xsd:integer"
+    },
+    "correctionForSmntId": {
+      "@id": "entur:correctionForSmntId",
+      "@type": "xsd:integer"
+    },
+    "externalSettlementNo": {
+      "@id": "entur:externalSettlementNo",
+      "@type": "xsd:integer"
+    },
+    "comments": {
+      "@id": "entur:comments",
+      "@container": "@list"
+    },
+    "genericTransactions": {
+      "@id": "entur:genericTransactions",
+      "@container": "@list"
+    },
+    "PartnerTransactionImportDto": "entur:PartnerTransactionImportDto",
+    "transactionType": {
+      "@id": "entur:transactionType",
+      "@type": "xsd:string"
+    },
+    "orderId": {
+      "@id": "entur:orderId",
+      "@type": "xsd:string"
+    },
+    "orderVersion": {
+      "@id": "entur:orderVersion",
+      "@type": "xsd:integer"
+    },
+    "genericAnnexes": {
+      "@id": "entur:genericAnnexes",
+      "@container": "@list"
+    },
+    "PartnerSettlementImportResponseDto": "entur:PartnerSettlementImportResponseDto",
+    "correctedSettlementId": {
+      "@id": "entur:correctedSettlementId",
+      "@type": "xsd:integer"
+    },
+    "ignoreSequence": {
+      "@id": "entur:ignoreSequence",
+      "@type": "xsd:boolean"
+    },
+    "statusDescription": {
+      "@id": "entur:statusDescription",
+      "@type": "xsd:string"
+    },
+    "PartnerDatasetDownloadJobDto": "entur:PartnerDatasetDownloadJobDto",
+    "reportName": {
+      "@id": "entur:reportName",
+      "@type": "xsd:string"
+    },
+    "contentType": {
+      "@id": "entur:contentType",
+      "@type": "xsd:string"
+    },
+    "datasetIDs": {
+      "@id": "entur:datasetIDs",
+      "@container": "@list"
+    },
+    "jobCreatedAt": {
+      "@id": "entur:jobCreatedAt",
+      "@type": "xsd:dateTime"
+    },
+    "rows": {
+      "@id": "entur:rows",
+      "@type": "xsd:integer"
+    },
+    "signedBucketUrl": {
+      "@id": "entur:signedBucketUrl",
+      "@type": "xsd:string"
+    },
+    "crc32c": {
+      "@id": "entur:crc32c",
+      "@type": "xsd:string"
+    },
+    "PartnerDatasetRpt": "entur:PartnerDatasetRpt",
+    "dataProductVersion": {
+      "@id": "entur:dataProductVersion",
+      "@type": "xsd:integer"
+    },
+    "dataProductCode": {
+      "@id": "entur:dataProductCode",
+      "@type": "xsd:string"
+    },
+    "orderDate": {
+      "@id": "entur:orderDate",
+      "@type": "xsd:date"
+    },
+    "orderBy": {
+      "@id": "entur:orderBy",
+      "@type": "xsd:string"
+    },
+    "datasetType": {
+      "@id": "entur:datasetType",
+      "@type": "xsd:string"
+    },
+    "datasetName": {
+      "@id": "entur:datasetName",
+      "@type": "xsd:string"
+    },
+    "bqProject": {
+      "@id": "entur:bqProject",
+      "@type": "xsd:string"
+    },
+    "chartOfAccountsRef": {
+      "@id": "entur:chartOfAccountsRef",
+      "@type": "xsd:string"
+    },
+    "ownerOrgRef": {
+      "@id": "entur:ownerOrgRef",
+      "@type": "xsd:string"
+    },
+    "copyOrgRefs": {
+      "@id": "entur:copyOrgRefs",
+      "@container": "@list"
+    },
+    "acctMonthId": {
+      "@id": "entur:acctMonthId",
+      "@type": "xsd:integer"
+    },
+    "glBatchId": {
+      "@id": "entur:glBatchId",
+      "@type": "xsd:integer"
+    },
+    "apBatchId": {
+      "@id": "entur:apBatchId",
+      "@type": "xsd:integer"
+    },
+    "arBatchId": {
+      "@id": "entur:arBatchId",
+      "@type": "xsd:integer"
+    },
+    "inBatchId": {
+      "@id": "entur:inBatchId",
+      "@type": "xsd:integer"
+    },
+    "agreementId": {
+      "@id": "entur:agreementId",
+      "@type": "xsd:integer"
+    },
+    "ConsentBaseRequest": "entur:ConsentBaseRequest",
+    "consentCode": {
+      "@id": "entur:consentCode",
+      "@type": "xsd:string"
+    },
+    "consentOwnerOrgId": {
+      "@id": "entur:consentOwnerOrgId",
+      "@type": "xsd:integer"
+    },
+    "internalDescription": {
+      "@id": "entur:internalDescription",
+      "@container": "@list"
+    },
+    "orgNameSubstitutionPattern": {
+      "@id": "entur:orgNameSubstitutionPattern",
+      "@type": "xsd:string"
+    },
+    "terms": {
+      "@id": "entur:terms",
+      "@container": "@list"
+    },
+    "validFrom": {
+      "@id": "entur:validFrom",
+      "@type": "xsd:dateTime"
+    },
+    "validTo": {
+      "@id": "entur:validTo",
+      "@type": "xsd:dateTime"
+    },
+    "ConsentBaseResponse": "entur:ConsentBaseResponse",
+    "changedAt": {
+      "@id": "entur:changedAt",
+      "@type": "xsd:dateTime"
+    },
+    "createdAt": {
+      "@id": "entur:createdAt",
+      "@type": "xsd:dateTime"
+    },
+    "version": {
+      "@id": "entur:version",
+      "@type": "xsd:integer"
+    },
+    "ConsentBaseVersionPatchRequest": "entur:ConsentBaseVersionPatchRequest",
+    "ConsentBaseVersionRequest": "entur:ConsentBaseVersionRequest",
+    "ConsentCrmResponse": "entur:ConsentCrmResponse",
+    "consentBaseVersion": {
+      "@id": "entur:consentBaseVersion",
+      "@type": "xsd:integer"
+    },
+    "consentId": {
+      "@id": "entur:consentId",
+      "@type": "xsd:integer"
+    },
+    "consentOrganisationId": {
+      "@id": "entur:consentOrganisationId",
+      "@type": "xsd:integer"
+    },
+    "countryCode": {
+      "@id": "entur:countryCode",
+      "@type": "xsd:string"
+    },
+    "createdByOrgId": {
+      "@id": "entur:createdByOrgId",
+      "@type": "xsd:integer"
+    },
+    "customerNumber": {
+      "@id": "entur:customerNumber",
+      "@type": "xsd:integer"
+    },
+    "customerRef": {
+      "@id": "entur:customerRef",
+      "@type": "xsd:string"
+    },
+    "email": {
+      "@id": "entur:email",
+      "@type": "xsd:string"
+    },
+    "fromStopPlace": {
+      "@id": "entur:fromStopPlace",
+      "@type": "xsd:string"
+    },
+    "givenConsentId": {
+      "@id": "entur:givenConsentId",
+      "@type": "xsd:integer"
+    },
+    "lineRef": {
+      "@id": "entur:lineRef",
+      "@type": "xsd:string"
+    },
+    "originalDatedServiceJourneyId": {
+      "@id": "entur:originalDatedServiceJourneyId",
+      "@type": "xsd:string"
+    },
+    "telephoneNumber": {
+      "@id": "entur:telephoneNumber",
+      "@type": "xsd:string"
+    },
+    "toStopPlace": {
+      "@id": "entur:toStopPlace",
+      "@type": "xsd:string"
+    },
+    "ConsentPatchRequest": "entur:ConsentPatchRequest",
+    "ConsentRequest": "entur:ConsentRequest",
+    "isEmailSupported": {
+      "@id": "entur:isEmailSupported",
+      "@type": "xsd:boolean"
+    },
+    "isSmsSupported": {
+      "@id": "entur:isSmsSupported",
+      "@type": "xsd:boolean"
+    },
+    "organisationId": {
+      "@id": "entur:organisationId",
+      "@type": "xsd:integer"
+    },
+    "ConsentResponse": "entur:ConsentResponse",
+    "consentBase": {
+      "@id": "entur:consentBase",
+      "@type": "@id"
+    },
+    "ConsentTermsRequest": "entur:ConsentTermsRequest",
+    "fullDescription": {
+      "@id": "entur:fullDescription",
+      "@type": "xsd:string"
+    },
+    "languageCode": {
+      "@id": "entur:languageCode",
+      "@type": "xsd:string"
+    },
+    "shortDescription": {
+      "@id": "entur:shortDescription",
+      "@type": "xsd:string"
+    },
+    "ConsentTermsResponse": "entur:ConsentTermsResponse",
+    "ErrorMessage": "entur:ErrorMessage",
+    "errorCode": {
+      "@id": "entur:errorCode",
+      "@type": "xsd:integer"
+    },
+    "longEnglish": {
+      "@id": "entur:longEnglish",
+      "@type": "xsd:string"
+    },
+    "longNorwegian": {
+      "@id": "entur:longNorwegian",
+      "@type": "xsd:string"
+    },
+    "shortEnglish": {
+      "@id": "entur:shortEnglish",
+      "@type": "xsd:string"
+    },
+    "shortNorwegian": {
+      "@id": "entur:shortNorwegian",
+      "@type": "xsd:string"
+    },
+    "GivenConsentBulkGetRequest": "entur:GivenConsentBulkGetRequest",
+    "customerNumbers": {
+      "@id": "entur:customerNumbers",
+      "@container": "@list"
+    },
+    "customerRefs": {
+      "@id": "entur:customerRefs",
+      "@container": "@list"
+    },
+    "GivenConsentBulkUpdateRequest": "entur:GivenConsentBulkUpdateRequest",
+    "consentChoice": {
+      "@id": "entur:consentChoice",
+      "@type": "xsd:boolean"
+    },
+    "expirationDate": {
+      "@id": "entur:expirationDate",
+      "@type": "xsd:dateTime"
+    },
+    "GivenConsentPutRequest": "entur:GivenConsentPutRequest",
+    "GivenConsentRequest": "entur:GivenConsentRequest",
+    "GivenConsentResponse": "entur:GivenConsentResponse",
+    "consent": {
+      "@id": "entur:consent",
+      "@type": "@id"
+    },
+    "distributionChannel": {
+      "@id": "entur:distributionChannel",
+      "@type": "xsd:string"
+    },
+    "InternalDescriptionRequest": "entur:InternalDescriptionRequest",
+    "InternalDescriptionResponse": "entur:InternalDescriptionResponse",
+    "ErrorResponse": "entur:ErrorResponse",
+    "error": {
+      "@id": "entur:error",
+      "@type": "xsd:string"
+    },
+    "path": {
+      "@id": "entur:path",
+      "@type": "xsd:string"
+    },
+    "message": {
+      "@id": "entur:message",
+      "@type": "xsd:string"
+    },
+    "errors": {
+      "@id": "entur:errors",
+      "@container": "@list"
+    },
+    "ErrorSpecification": "entur:ErrorSpecification",
+    "field": {
+      "@id": "entur:field",
+      "@type": "xsd:string"
+    },
+    "defaultMessage": {
+      "@id": "entur:defaultMessage",
+      "@type": "xsd:string"
+    },
+    "rejectedValues": {
+      "@id": "entur:rejectedValues"
+    },
+    "GeneratePasswordRequest": "entur:GeneratePasswordRequest",
+    "PurchasedLeg": "entur:PurchasedLeg",
+    "datedServiceJourneyRef": {
+      "@id": "entur:datedServiceJourneyRef",
+      "@type": "@id"
+    },
+    "originalDatedServiceJourneyRef": {
+      "@id": "entur:originalDatedServiceJourneyRef",
+      "@type": "@id"
+    },
+    "startTime": {
+      "@id": "entur:startTime",
+      "@type": "xsd:dateTime"
+    },
+    "fromStopPlaceRef": {
+      "@id": "entur:fromStopPlaceRef",
+      "@type": "@id"
+    },
+    "endTime": {
+      "@id": "entur:endTime",
+      "@type": "xsd:dateTime"
+    },
+    "toStopPlaceRef": {
+      "@id": "entur:toStopPlaceRef",
+      "@type": "@id"
+    },
+    "authorityRef": {
+      "@id": "entur:authorityRef",
+      "@type": "@id"
+    },
+    "operatorRef": {
+      "@id": "entur:operatorRef",
+      "@type": "@id"
+    },
+    "serviceJourneyRef": {
+      "@id": "entur:serviceJourneyRef",
+      "@type": "@id"
+    },
+    "mode": {
+      "@id": "entur:mode",
+      "@type": "xsd:string"
+    },
+    "purchasedFareProducts": {
+      "@id": "entur:purchasedFareProducts",
+      "@container": "@list"
+    },
+    "RefType": "entur:RefType",
+    "TravellerInfo": "entur:TravellerInfo",
+    "firstName": {
+      "@id": "entur:firstName",
+      "@type": "xsd:string"
+    },
+    "surname": {
+      "@id": "entur:surname",
+      "@type": "xsd:string"
+    },
+    "languagePreference": {
+      "@id": "entur:languagePreference",
+      "@type": "xsd:string"
+    },
+    "legs": {
+      "@id": "entur:legs",
+      "@container": "@list"
+    },
+    "ChangePasswordRequest": "entur:ChangePasswordRequest",
+    "newPassword": {
+      "@id": "entur:newPassword",
+      "@type": "xsd:string"
+    },
+    "oldPassword": {
+      "@id": "entur:oldPassword",
+      "@type": "xsd:string"
+    },
+    "validationErrors": {
+      "@id": "entur:validationErrors",
+      "@container": "@list"
+    },
+    "ContactDetailsBulkRequest": "entur:ContactDetailsBulkRequest",
+    "ConvertTemporaryCustomerRequest": "entur:ConvertTemporaryCustomerRequest",
+    "changedBy": {
+      "@id": "entur:changedBy",
+      "@type": "xsd:string"
+    },
+    "changedByChannel": {
+      "@id": "entur:changedByChannel",
+      "@type": "xsd:string"
+    },
+    "password": {
+      "@id": "entur:password",
+      "@type": "xsd:string"
+    },
+    "CustomerAccountPatchRequest": "entur:CustomerAccountPatchRequest",
+    "alias": {
+      "@id": "entur:alias",
+      "@type": "xsd:string"
+    },
+    "isDefault": {
+      "@id": "entur:isDefault",
+      "@type": "xsd:boolean"
+    },
+    "CustomerAccountRequest": "entur:CustomerAccountRequest",
+    "accountId": {
+      "@id": "entur:accountId",
+      "@type": "xsd:string"
+    },
+    "CustomerAccountResponse": "entur:CustomerAccountResponse",
+    "createdBy": {
+      "@id": "entur:createdBy",
+      "@type": "xsd:string"
+    },
+    "customerAccountId": {
+      "@id": "entur:customerAccountId",
+      "@type": "xsd:string"
+    },
+    "CustomerConnectRequest": "entur:CustomerConnectRequest",
+    "customerNumberToConnect": {
+      "@id": "entur:customerNumberToConnect",
+      "@type": "xsd:integer"
+    },
+    "temporaryCustomerNumber": {
+      "@id": "entur:temporaryCustomerNumber",
+      "@type": "xsd:integer"
+    },
+    "CustomerConnectResponse": "entur:CustomerConnectResponse",
+    "relatedCustomerNumbers": {
+      "@id": "entur:relatedCustomerNumbers",
+      "@container": "@list"
+    },
+    "CustomerConsent": "entur:CustomerConsent",
+    "customerId": {
+      "@id": "entur:customerId",
+      "@type": "xsd:integer"
+    },
+    "CustomerContactDetailsResponse": "entur:CustomerContactDetailsResponse",
+    "telephoneNumberNoCountryCode": {
+      "@id": "entur:telephoneNumberNoCountryCode",
+      "@type": "xsd:string"
+    },
+    "CustomerPostRequest": "entur:CustomerPostRequest",
+    "createdByChannel": {
+      "@id": "entur:createdByChannel",
+      "@type": "xsd:string"
+    },
+    "dateOfBirth": {
+      "@id": "entur:dateOfBirth",
+      "@type": "xsd:date"
+    },
+    "landlineNumber": {
+      "@id": "entur:landlineNumber",
+      "@type": "xsd:string"
+    },
+    "languagePreferenceISO6393": {
+      "@id": "entur:languagePreferenceISO6393",
+      "@type": "xsd:string"
+    },
+    "nationality": {
+      "@id": "entur:nationality",
+      "@type": "xsd:string"
+    },
+    "postalAddresses": {
+      "@id": "entur:postalAddresses",
+      "@container": "@list"
+    },
+    "profileType": {
+      "@id": "entur:profileType",
+      "@type": "xsd:string"
+    },
+    "telephoneNumberVerifiedAt": {
+      "@id": "entur:telephoneNumberVerifiedAt",
+      "@type": "xsd:dateTime"
+    },
+    "vippsId": {
+      "@id": "entur:vippsId",
+      "@type": "xsd:string"
+    },
+    "CustomerPreferenceRequest": "entur:CustomerPreferenceRequest",
+    "preferenceId": {
+      "@id": "entur:preferenceId",
+      "@type": "xsd:integer"
+    },
+    "preferenceValue": {
+      "@id": "entur:preferenceValue",
+      "@type": "xsd:string"
+    },
+    "CustomerPreferenceResponse": "entur:CustomerPreferenceResponse",
+    "preference": {
+      "@id": "entur:preference",
+      "@type": "@id"
+    },
+    "CustomerPutRequest": "entur:CustomerPutRequest",
+    "emailVerifiedAt": {
+      "@id": "entur:emailVerifiedAt",
+      "@type": "xsd:dateTime"
+    },
+    "CustomerResponse": "entur:CustomerResponse",
+    "customerAccounts": {
+      "@id": "entur:customerAccounts",
+      "@container": "@list"
+    },
+    "customerConsents": {
+      "@id": "entur:customerConsents",
+      "@container": "@list"
+    },
+    "dateOfDeath": {
+      "@id": "entur:dateOfDeath",
+      "@type": "@id"
+    },
+    "ecardOwnerships": {
+      "@id": "entur:ecardOwnerships",
+      "@container": "@list"
+    },
+    "emailOld": {
+      "@id": "entur:emailOld",
+      "@type": "xsd:string"
+    },
+    "givenConsents": {
+      "@id": "entur:givenConsents",
+      "@container": "@list"
+    },
+    "lastSignInAt": {
+      "@id": "entur:lastSignInAt",
+      "@type": "xsd:dateTime"
+    },
+    "lastSignInFrom": {
+      "@id": "entur:lastSignInFrom",
+      "@type": "xsd:string"
+    },
+    "notes": {
+      "@id": "entur:notes",
+      "@container": "@list"
+    },
+    "parentId": {
+      "@id": "entur:parentId"
+    },
+    "personnelTicketBearer": {
+      "@id": "entur:personnelTicketBearer",
+      "@type": "@id"
+    },
+    "preferences": {
+      "@id": "entur:preferences",
+      "@container": "@list"
+    },
+    "username": {
+      "@id": "entur:username",
+      "@type": "xsd:string"
+    },
+    "uuid": {
+      "@id": "entur:uuid",
+      "@type": "xsd:string"
+    },
+    "EcardOwnershipRequest": "entur:EcardOwnershipRequest",
+    "bookingDate": {
+      "@id": "entur:bookingDate",
+      "@type": "xsd:dateTime"
+    },
+    "ecardName": {
+      "@id": "entur:ecardName",
+      "@type": "xsd:string"
+    },
+    "ecardNumber": {
+      "@id": "entur:ecardNumber",
+      "@type": "xsd:integer"
+    },
+    "ecardNumber16digits": {
+      "@id": "entur:ecardNumber16digits",
+      "@type": "xsd:string"
+    },
+    "ecardOperator": {
+      "@id": "entur:ecardOperator",
+      "@type": "xsd:integer"
+    },
+    "endOfOwnership": {
+      "@id": "entur:endOfOwnership",
+      "@type": "xsd:dateTime"
+    },
+    "shippingDate": {
+      "@id": "entur:shippingDate",
+      "@type": "xsd:dateTime"
+    },
+    "startOfOwnership": {
+      "@id": "entur:startOfOwnership",
+      "@type": "xsd:dateTime"
+    },
+    "EcardOwnershipResponse": "entur:EcardOwnershipResponse",
+    "GeneratePasswordResponse": "entur:GeneratePasswordResponse",
+    "generatedPassword": {
+      "@id": "entur:generatedPassword",
+      "@type": "xsd:string"
+    },
+    "LocalDateResponse": "entur:LocalDateResponse",
+    "day": {
+      "@id": "entur:day",
+      "@type": "xsd:integer"
+    },
+    "month": {
+      "@id": "entur:month",
+      "@type": "xsd:integer"
+    },
+    "year": {
+      "@id": "entur:year",
+      "@type": "xsd:integer"
+    },
+    "NewPasswordRequest": "entur:NewPasswordRequest",
+    "NoteResponse": "entur:NoteResponse",
+    "text": {
+      "@id": "entur:text",
+      "@type": "xsd:string"
+    },
+    "PageCustomerResponse": "entur:PageCustomerResponse",
+    "items": {
+      "@id": "entur:items",
+      "@container": "@list"
+    },
+    "totalItems": {
+      "@id": "entur:totalItems",
+      "@type": "xsd:integer"
+    },
+    "totalPages": {
+      "@id": "entur:totalPages",
+      "@type": "xsd:integer"
+    },
+    "PersonnelTicketBearer": "entur:PersonnelTicketBearer",
+    "bearerCustomerId": {
+      "@id": "entur:bearerCustomerId",
+      "@type": "xsd:integer"
+    },
+    "isSelfServedRetrieval": {
+      "@id": "entur:isSelfServedRetrieval",
+      "@type": "xsd:boolean"
+    },
+    "ticketRightBearer": {
+      "@id": "entur:ticketRightBearer",
+      "@type": "xsd:string"
+    },
+    "ticketRightOwner": {
+      "@id": "entur:ticketRightOwner",
+      "@type": "xsd:string"
+    },
+    "PostalAddressRequest": "entur:PostalAddressRequest",
+    "addressLine1": {
+      "@id": "entur:addressLine1",
+      "@type": "xsd:string"
+    },
+    "addressLine2": {
+      "@id": "entur:addressLine2",
+      "@type": "xsd:string"
+    },
+    "postCode": {
+      "@id": "entur:postCode",
+      "@type": "xsd:string"
+    },
+    "town": {
+      "@id": "entur:town",
+      "@type": "xsd:string"
+    },
+    "typeOfAddress": {
+      "@id": "entur:typeOfAddress",
+      "@type": "xsd:string"
+    },
+    "verifiedAt": {
+      "@id": "entur:verifiedAt",
+      "@type": "xsd:dateTime"
+    },
+    "PostalAddressResponse": "entur:PostalAddressResponse",
+    "PreferenceRequest": "entur:PreferenceRequest",
+    "isActive": {
+      "@id": "entur:isActive",
+      "@type": "xsd:boolean"
+    },
+    "preferenceCode": {
+      "@id": "entur:preferenceCode",
+      "@type": "xsd:string"
+    },
+    "preferenceDescription": {
+      "@id": "entur:preferenceDescription",
+      "@type": "xsd:string"
+    },
+    "preferenceType": {
+      "@id": "entur:preferenceType",
+      "@type": "xsd:string"
+    },
+    "PreferenceResponse": "entur:PreferenceResponse",
+    "ProfilesBulkRequest": "entur:ProfilesBulkRequest",
+    "customerReferences": {
+      "@id": "entur:customerReferences",
+      "@container": "@list"
+    },
+    "includePreferences": {
+      "@id": "entur:includePreferences",
+      "@type": "xsd:boolean"
+    },
+    "TemporaryCustomerPostRequest": "entur:TemporaryCustomerPostRequest",
+    "TemporaryCustomerPutRequest": "entur:TemporaryCustomerPutRequest",
+    "TemporaryCustomerResponse": "entur:TemporaryCustomerResponse",
+    "VerifyCredentialsRequest": "entur:VerifyCredentialsRequest",
+    "Result": "entur:Result",
+    "features": {
+      "@id": "entur:features",
+      "@container": "@list"
+    },
+    "metadata": {
+      "@id": "entur:metadata",
+      "@type": "@id"
+    },
+    "bbox": {
+      "@id": "entur:bbox",
+      "@container": "@list"
+    },
+    "Feature": "entur:Feature",
+    "geometry": {
+      "@id": "entur:geometry",
+      "@type": "@id"
+    },
+    "Geometry": "entur:Geometry",
+    "coordinates": {
+      "@id": "entur:coordinates",
+      "@container": "@list"
+    },
+    "Place": "entur:Place",
+    "names": {
+      "@id": "entur:names",
+      "@type": "@id"
+    },
+    "layer": {
+      "@id": "entur:layer",
+      "@type": "@id"
+    },
+    "address": {
+      "@id": "entur:address",
+      "@type": "@id"
+    },
+    "categories": {
+      "@id": "entur:categories",
+      "@container": "@list"
+    },
+    "fareZones": {
+      "@id": "entur:fareZones",
+      "@container": "@list"
+    },
+    "transportModes": {
+      "@id": "entur:transportModes",
+      "@container": "@list"
+    },
+    "stopPlaceTypes": {
+      "@id": "entur:stopPlaceTypes",
+      "@container": "@list"
+    },
+    "stopPlaceRole": {
+      "@id": "entur:stopPlaceRole",
+      "@type": "xsd:string"
+    },
+    "source": {
+      "@id": "entur:source",
+      "@type": "xsd:string"
+    },
+    "distance": {
+      "@id": "entur:distance",
+      "@type": "xsd:decimal"
+    },
+    "Names": "entur:Names",
+    "default": {
+      "@id": "entur:default",
+      "@type": "xsd:string"
+    },
+    "label": {
+      "@id": "entur:label",
+      "@type": "xsd:string"
+    },
+    "display": {
+      "@id": "entur:display",
+      "@type": "xsd:string"
+    },
+    "Address": "entur:Address",
+    "streetName": {
+      "@id": "entur:streetName",
+      "@type": "xsd:string"
+    },
+    "houseNumber": {
+      "@id": "entur:houseNumber",
+      "@type": "xsd:string"
+    },
+    "postalCode": {
+      "@id": "entur:postalCode",
+      "@type": "xsd:string"
+    },
+    "locality": {
+      "@id": "entur:locality",
+      "@type": "xsd:string"
+    },
+    "localityId": {
+      "@id": "entur:localityId",
+      "@type": "xsd:string"
+    },
+    "borough": {
+      "@id": "entur:borough",
+      "@type": "xsd:string"
+    },
+    "boroughId": {
+      "@id": "entur:boroughId",
+      "@type": "xsd:string"
+    },
+    "county": {
+      "@id": "entur:county",
+      "@type": "xsd:string"
+    },
+    "countyId": {
+      "@id": "entur:countyId",
+      "@type": "xsd:string"
+    },
+    "TransportMode": "entur:TransportMode",
+    "subMode": {
+      "@id": "entur:subMode",
+      "@type": "xsd:string"
+    },
+    "Layer": "entur:Layer",
+    "Metadata": "entur:Metadata",
+    "query": {
+      "@id": "entur:query",
+      "@type": "@id"
+    },
+    "resultCount": {
+      "@id": "entur:resultCount",
+      "@type": "xsd:integer"
+    },
+    "QueryInfo": "entur:QueryInfo",
+    "lat": {
+      "@id": "entur:lat",
+      "@type": "xsd:decimal"
+    },
+    "lon": {
+      "@id": "entur:lon",
+      "@type": "xsd:decimal"
+    },
+    "limit": {
+      "@id": "entur:limit",
+      "@type": "xsd:integer"
+    },
+    "lang": {
+      "@id": "entur:lang",
+      "@type": "xsd:string"
+    },
+    "filters": {
+      "@id": "entur:filters",
+      "@type": "@id"
+    },
+    "Filters": "entur:Filters",
+    "layers": {
+      "@id": "entur:layers",
+      "@container": "@list"
+    },
+    "sources": {
+      "@id": "entur:sources",
+      "@container": "@list"
+    },
+    "countries": {
+      "@id": "entur:countries",
+      "@container": "@list"
+    },
+    "counties": {
+      "@id": "entur:counties",
+      "@container": "@list"
+    },
+    "localities": {
+      "@id": "entur:localities",
+      "@container": "@list"
+    },
+    "fareZoneAuthorities": {
+      "@id": "entur:fareZoneAuthorities",
+      "@container": "@list"
+    },
+    "multimodal": {
+      "@id": "entur:multimodal",
+      "@type": "xsd:string"
+    },
+    "Error": "entur:Error",
+    "UpdatedReservationLine": "entur:UpdatedReservationLine",
+    "productId": {
+      "@id": "entur:productId",
+      "@type": "xsd:string"
+    },
+    "ReservationLineResponseV1": "entur:ReservationLineResponseV1",
+    "created": {
+      "@id": "entur:created",
+      "@type": "xsd:dateTime"
+    },
+    "changed": {
+      "@id": "entur:changed",
+      "@type": "xsd:dateTime"
+    },
+    "ReservationLine": "entur:ReservationLine",
+    "OdRequestV1": "entur:OdRequestV1",
+    "origin": {
+      "@id": "entur:origin",
+      "@type": "xsd:string"
+    },
+    "destination": {
+      "@id": "entur:destination",
+      "@type": "xsd:string"
+    },
+    "UpdateQuotaRequestV1": "entur:UpdateQuotaRequestV1",
+    "quota": {
+      "@id": "entur:quota",
+      "@type": "xsd:integer"
+    },
+    "products": {
+      "@id": "entur:products",
+      "@container": "@list"
+    },
+    "ods": {
+      "@id": "entur:ods",
+      "@container": "@list"
+    },
+    "quotaConfigurationId": {
+      "@id": "entur:quotaConfigurationId",
+      "@type": "xsd:integer"
+    },
+    "purchaseWindowStart": {
+      "@id": "entur:purchaseWindowStart",
+      "@type": "xsd:dateTime"
+    },
+    "purchaseWindowStop": {
+      "@id": "entur:purchaseWindowStop",
+      "@type": "xsd:dateTime"
+    },
+    "useStoplist": {
+      "@id": "entur:useStoplist",
+      "@type": "xsd:boolean"
+    },
+    "OdResponse": "entur:OdResponse",
+    "QuotaResponseV1": "entur:QuotaResponseV1",
+    "datedServiceJourneyId": {
+      "@id": "entur:datedServiceJourneyId",
+      "@type": "xsd:string"
+    },
+    "QuotaConfiguration": "entur:QuotaConfiguration",
+    "priority": {
+      "@id": "entur:priority",
+      "@type": "xsd:integer"
+    },
+    "selectionRule": {
+      "@id": "entur:selectionRule",
+      "@type": "xsd:string"
+    },
+    "consumptionRule": {
+      "@id": "entur:consumptionRule",
+      "@type": "xsd:string"
+    },
+    "directionRule": {
+      "@id": "entur:directionRule",
+      "@type": "xsd:string"
+    },
+    "parent": {
+      "@id": "entur:parent",
+      "@type": "xsd:integer"
+    },
+    "closedBy": {
+      "@id": "entur:closedBy",
+      "@container": "@list"
+    },
+    "QuotaConfigurationResponseV1": "entur:QuotaConfigurationResponseV1",
+    "StockQuery": "entur:StockQuery",
+    "datedServiceJourney": {
+      "@id": "entur:datedServiceJourney",
+      "@type": "xsd:string"
+    },
+    "MultiStockResponse": "entur:MultiStockResponse",
+    "spannedDatedServiceJourneys": {
+      "@id": "entur:spannedDatedServiceJourneys",
+      "@container": "@list"
+    },
+    "reservableStock": {
+      "@id": "entur:reservableStock",
+      "@container": "@list"
+    },
+    "Reservation": "entur:Reservation",
+    "reservationLines": {
+      "@id": "entur:reservationLines",
+      "@container": "@list"
+    },
+    "ReservationResponseV1": "entur:ReservationResponseV1",
+    "RepairRequestV1": "entur:RepairRequestV1",
+    "departureIds": {
+      "@id": "entur:departureIds",
+      "@container": "@list"
+    },
+    "QuotaRequestV1": "entur:QuotaRequestV1",
+    "NestingConfigTree": "entur:NestingConfigTree",
+    "root": {
+      "@id": "entur:root",
+      "@type": "@id"
+    },
+    "flattenTree": {
+      "@id": "entur:flattenTree",
+      "@container": "@list"
+    },
+    "NestingConfigTreeNodeRequestV1": "entur:NestingConfigTreeNodeRequestV1",
+    "quotaConfigurationRequest": {
+      "@id": "entur:quotaConfigurationRequest",
+      "@type": "@id"
+    },
+    "children": {
+      "@id": "entur:children",
+      "@container": "@list"
+    },
+    "NestingConfigTreeNodeResponseV1": "entur:NestingConfigTreeNodeResponseV1",
+    "quotaConfiguration": {
+      "@id": "entur:quotaConfiguration",
+      "@type": "@id"
+    },
+    "NestingConfigTreeResponseV1": "entur:NestingConfigTreeResponseV1",
+    "DepartureResponseV1": "entur:DepartureResponseV1",
+    "invertedDirection": {
+      "@id": "entur:invertedDirection",
+      "@type": "xsd:string"
+    },
+    "line": {
+      "@id": "entur:line",
+      "@type": "@id"
+    },
+    "departureDate": {
+      "@id": "entur:departureDate",
+      "@type": "xsd:date"
+    },
+    "isClosed": {
+      "@id": "entur:isClosed",
+      "@type": "xsd:boolean"
+    },
+    "Line": "entur:Line",
+    "stops": {
+      "@id": "entur:stops",
+      "@container": "@list"
+    },
+    "StockResponseV1": "entur:StockResponseV1",
+    "stock": {
+      "@id": "entur:stock",
+      "@container": "@list"
+    },
+    "QuotaTemplateQuotaRequestV1": "entur:QuotaTemplateQuotaRequestV1",
+    "productIds": {
+      "@id": "entur:productIds",
+      "@container": "@list"
+    },
+    "QuotaTemplateRequestV1": "entur:QuotaTemplateRequestV1",
+    "lineId": {
+      "@id": "entur:lineId",
+      "@type": "xsd:string"
+    },
+    "privateCode": {
+      "@id": "entur:privateCode",
+      "@type": "xsd:string"
+    },
+    "quotas": {
+      "@id": "entur:quotas",
+      "@container": "@list"
+    },
+    "QuotaTemplateUpdateRequestV1": "entur:QuotaTemplateUpdateRequestV1",
+    "QuotaTemplateQuotaResponseV1": "entur:QuotaTemplateQuotaResponseV1",
+    "QuotaTemplateResponseV1": "entur:QuotaTemplateResponseV1",
+    "UpdateDepartureRequestV1": "entur:UpdateDepartureRequestV1",
+    "LineResponse": "entur:LineResponse",
+    "UserTypeEnum": "entur:UserTypeEnum",
+    "BaggageTypeEnum": "entur:BaggageTypeEnum",
+    "CustomerIdentity": "entur:CustomerIdentity",
+    "CappingSpecification": "entur:CappingSpecification",
+    "cappedDiscountRightId": {
+      "@id": "entur:cappedDiscountRightId",
+      "@type": "xsd:string"
+    },
+    "minimumDurationBetweenAlternatives": {
+      "@id": "entur:minimumDurationBetweenAlternatives",
+      "@type": "xsd:string"
+    },
+    "minimumAlternativeDuration": {
+      "@id": "entur:minimumAlternativeDuration",
+      "@type": "xsd:string"
+    },
+    "OwnedRight": "entur:OwnedRight",
+    "zones": {
+      "@id": "entur:zones",
+      "@container": "@list"
+    },
+    "cappingSpecification": {
+      "@id": "entur:cappingSpecification",
+      "@type": "@id"
+    },
+    "TravellerContext": "entur:TravellerContext",
+    "customerIdentity": {
+      "@id": "entur:customerIdentity",
+      "@container": "@list"
+    },
+    "ownedRights": {
+      "@id": "entur:ownedRights",
+      "@container": "@list"
+    },
+    "Traveller": "entur:Traveller",
+    "userType": {
+      "@id": "entur:userType",
+      "@type": "@id"
+    },
+    "age": {
+      "@id": "entur:age",
+      "@type": "xsd:integer"
+    },
+    "baggageTypes": {
+      "@id": "entur:baggageTypes",
+      "@container": "@list"
+    },
+    "campaignCodes": {
+      "@id": "entur:campaignCodes",
+      "@container": "@list"
+    },
+    "travellerContext": {
+      "@id": "entur:travellerContext",
+      "@type": "@id"
+    },
+    "TypeOfRecommendationEnum": "entur:TypeOfRecommendationEnum",
+    "DurationEnum": "entur:DurationEnum",
+    "FareClassEnum": "entur:FareClassEnum",
+    "AccommodationFacilityEnum": "entur:AccommodationFacilityEnum",
+    "CategorySpec": "entur:CategorySpec",
+    "typesOfRecommendation": {
+      "@id": "entur:typesOfRecommendation",
+      "@container": "@list"
+    },
+    "durationTypes": {
+      "@id": "entur:durationTypes",
+      "@container": "@list"
+    },
+    "fareClasses": {
+      "@id": "entur:fareClasses",
+      "@container": "@list"
+    },
+    "facilitySet": {
+      "@id": "entur:facilitySet",
+      "@container": "@list"
+    },
+    "JourneyOrganizeAlgorithmEnum": "entur:JourneyOrganizeAlgorithmEnum"
+  },
+  "@type": "schema:Dataset",
+  "schema:name": "Entur API JSON-LD context",
+  "schema:description": "A JSON-LD @context for the objects Entur's own API contract declares: one class per component schema, one property per declared field, typed from the contract. Derived by script (derive-json-ld.py, 2026-10-09) from openapi/entur-clearing-openapi.yml, openapi/entur-clearing-reports-openapi.yml, openapi/entur-consents-openapi.yml.",
+  "dcterms:created": "2026-10-09",
+  "dcterms:source": [
+    "openapi/entur-clearing-openapi.yml",
+    "openapi/entur-clearing-reports-openapi.yml",
+    "openapi/entur-consents-openapi.yml",
+    "openapi/entur-customers-openapi.yml",
+    "openapi/entur-geocoder-openapi.yml"
+  ]
+}

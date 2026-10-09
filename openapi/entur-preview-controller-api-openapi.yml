@@ -1,0 +1,195 @@
+openapi: 3.2.0
+info:
+  title: Entur Preview Controller API
+  version: 2026.09.0
+  description: 'Operations tagged preview-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seating-manager
+security:
+- bearer-key: []
+tags:
+- name: preview-controller
+paths:
+  /v1-beta/preview/updated-material:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - preview-controller
+      summary: Get preview of customer communications for rebookings triggered by updated…
+      operationId: getUpdatedMaterialPreview
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/preview/replaced-departure-override:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - preview-controller
+      summary: Get preview of customer communications after rebooking to another departure
+      operationId: getReplacedDepartureOverridePreview
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: replacerDatedServiceJourneyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/preview/rebooked-travel-intention/by-reference:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - preview-controller
+      summary: Get preview of RebookedTravelIntention Gnaal workflow for a specific travel…
+      operationId: getRebookedTravelIntentionPreviewByReference
+      parameters:
+      - name: travelIntentionReference
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/preview/rebooked-travel-intention/by-dated-service-journey:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - preview-controller
+      summary: Get preview of RebookedTravelIntention Gnaal workflow for a dated service…
+      operationId: getRebookedTravelIntentionPreviewByDsj
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+    servers:
+    - url: https://api.entur.io/seating-manager
+  /v1-beta/preview/material-override:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - preview-controller
+      summary: Get preview of customer communications for rebookings triggered by a…
+      operationId: getMaterialOverridePreview
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewResponse'
+    servers:
+    - url: https://api.entur.io/seating-manager
+components:
+  schemas:
+    PreviewResponse:
+      required:
+      - englishPreview
+      - norwegianPreview
+      type: object
+      properties:
+        norwegianPreview:
+          type: string
+        englishPreview:
+          type: string
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seating-manager-openapi.json
+- entur-seating-manager-openapi.yml

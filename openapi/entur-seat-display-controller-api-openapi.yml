@@ -1,0 +1,577 @@
+openapi: 3.2.0
+info:
+  title: Entur Seat Display Controller API
+  version: 2026.09.0
+  description: 'Operations tagged seat-display-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seating-manager
+security:
+- bearer-key: []
+tags:
+- name: seat-display-controller
+paths:
+  /v1/seat-display/{datedServiceJourneyId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - seat-display-controller
+      summary: Get trip data by ID
+      description: Retrieves detailed information about a specific trip including coaches, seats, reservations, route & station names. Designed for use by seat displays in trains.
+      operationId: getTripById
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        description: The unique identifier of the trip (DSJ)
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TripResponse'
+    servers:
+    - url: https://api.entur.io/seating-manager
+components:
+  schemas:
+    TripResponse:
+      required:
+      - coaches
+      - route
+      - stations
+      - tripId
+      type: object
+      properties:
+        tripId:
+          type: string
+          description: The unique identifier of the trip (DSJ)
+          examples:
+          - VYG:DatedServiceJourney:67_OSL-BRG_25-05-22
+        route:
+          type: array
+          items:
+            type: string
+            description: Ordered list of stop place IDs in the route
+            examples:
+            - '["NSR:StopPlace:337","NSR:StopPlace:548"]'
+        stations:
+          type: object
+          additionalProperties:
+            type: string
+            description: Mapping of stop place IDs to human-readable station names
+            examples:
+            - '{"NSR:StopPlace:337":"Oslo","NSR:StopPlace:548":"Bergen"}'
+          description: Mapping of stop place IDs to human-readable station names
+          examples:
+          - NSR:StopPlace:337: Oslo
+            NSR:StopPlace:548: Bergen
+        coaches:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoachResponse'
+    ReservationLineResponse:
+      required:
+      - reference
+      - requestedProperties
+      - requestedSeatingProperties
+      - reservedProperties
+      - reservedSeatingProperties
+      - type
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference for this reservation line`
+          format: uuid
+        reservedProperties:
+          type: array
+          items:
+            minLength: 1
+            type: string
+            description: The properties reserved by the reservation line.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        reservedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        requestedProperties:
+          type: array
+          items:
+            minLength: 1
+            type: string
+            description: The properties required by the traveller.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        requestedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line.
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        numberOfTravellers:
+          type: integer
+          description: Number of travellers on the reservation line.
+          format: int32
+          examples:
+          - 2
+        type:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+      discriminator:
+        propertyName: type
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineResponse'
+          COMPARTMENT: '#/components/schemas/CompartmentReservationLineResponse'
+          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineResponse'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineResponse'
+    SeatResponse:
+      required:
+      - id
+      - label
+      - reservations
+      type: object
+      properties:
+        id:
+          type: string
+          description: The identifier of the seat
+          examples:
+          - '1'
+        label:
+          type: string
+          description: The label for the seat
+          examples:
+          - 12A
+        reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationResponse'
+      description: List of seats in this coach
+    SeatingPropertiesResponseV1:
+      type: object
+      properties:
+        fareClass:
+          type:
+          - string
+          - 'null'
+          description: Fare class of the seat. Netex enumeration.
+          enum:
+          - UNKNOWN
+          - FIRST_CLASS
+          - SECOND_CLASS
+          - THIRD_CLASS
+          - PREFERENTE
+          - PREMIUM_CLASS
+          - BUSINESS_CLASS
+          - STANDARD_CLASS
+          - TURISTA
+          - ECONOMY_CLASS
+          - ANY
+          examples:
+          - FIRST_CLASS
+        groupBooking:
+          type:
+          - string
+          - 'null'
+          description: Group booking permission of the seat. Netex enumeration.
+          enum:
+          - GROUPS_ALLOWED
+          - GROUPS_NOT_ALLOWED
+          - GROUPS_ALLOWED_WITH_RESERVATION
+          - GROUP_BOOKINGS_RESTRICTED
+          - UNKNOWN
+          examples:
+          - GROUPS_ALLOWED
+        accommodationFacility:
+          type:
+          - string
+          - 'null'
+          description: Accommodation property of the seat. Netex enumeration.
+          enum:
+          - UNKNOWN
+          - SEATING
+          - FOLDING_SEAT
+          - SLEEPER
+          - SINGLE_SLEEPER
+          - DOUBLE_SLEEPER
+          - SPECIAL_SLEEPER
+          - COUCHETTE
+          - SINGLE_COUCHETTE
+          - DOUBLE_COUCHETTE
+          - SPECIAL_SEATING
+          - RECLINING_SEATS
+          - BABY_COMPARTMENT
+          - FAMILY_CARRIAGE
+          - RECREATION_AREA
+          - PANORAMA_COACH
+          - PULLMAN_COACH
+          - PUSHCHAIR
+          - WHEELCHAIR
+          - STANDING
+          examples:
+          - SINGLE_SLEEPER
+        seatAttachment:
+          type:
+          - string
+          - 'null'
+          description: Attachment of the seat. Netex enumeration.
+          enum:
+          - REVERSIBLE
+          - FIXED
+          - FOLDING
+          - REMOVABLE
+          - OTHER
+          examples:
+          - REVERSIBLE
+        seatPosition:
+          type:
+          - string
+          - 'null'
+          description: Position of the seat. Netex enumeration.
+          enum:
+          - WINDOW
+          - AISLE
+          - MIDDLE
+          - UPPER_BERTH
+          - MIDDLE_BERTH
+          - LOWER_BERTH
+          - OTHER
+          examples:
+          - MIDDLE_BERTH
+        relativeDirection:
+          type:
+          - string
+          - 'null'
+          description: Relative direction of the seat. Netex enumeration.
+          enum:
+          - BOTH
+          - FORWARDS
+          - BACKWARDS
+          examples:
+          - BACKWARDS
+        nuisanceFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible nuisance factors of the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible nuisance factors of the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - SMOKING
+            - NO_SMOKING
+            - FAMILY_AREA
+            - CHILDFREE_AREA
+            - ANIMALS_ALLOWED
+            - NO_ANIMALS
+            - BREASTFEEDING_FRIENDLY
+            - MOBILE_PHONE_USE_ZONE
+            - MOBILE_PHONE_FREE_ZONE
+            examples:
+            - FAMILY_AREA,SMOKING
+          examples:
+          - FAMILY_AREA,SMOKING
+        passengerCommsFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible communication facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible communication facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - FREE_WIFI
+            - PUBLIC_WIFI
+            - POWER_SUPPLY_SOCKETS
+            - TELEPHONE
+            - AUDIO_ENTERTAINMENT
+            - VIDEO_ENTERTAINMENT
+            - BUSINESS_SERVICES
+            - INTERNET
+            - POST_OFFICE
+            - POST_BOX
+            examples:
+            - POWER_SUPPLY_SOCKETS,TELEPHONE
+          examples:
+          - POWER_SUPPLY_SOCKETS,TELEPHONE
+        sanitaryFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible sanitary facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - NONE
+            - TOILET
+            - WHEELCHAIR_ACCESS_TOILET
+            - SHOWER
+            - WASHING_AND_CHANGE_FACILITIES
+            - BABY_CHANGE
+            - WHEELCHAIR_BABY_CHANGE
+            - SHOE_SHINER
+            - OTHER
+            examples:
+            - TOILET,SHOWER
+          examples:
+          - TOILET,SHOWER
+        mobilityFacilities:
+          uniqueItems: true
+          type: array
+          description: Set of possible mobility facilities available for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible mobility facilities available for passenger in the seat. Netex enumerations.
+            enum:
+            - UNKNOWN
+            - LOW_FLOOR
+            - STEP_FREE_ACCESS
+            - SUITABLE_FOR_PUSHCHAIRS
+            - SUITABLE_FOR_WHEELCHAIRS
+            - SUITABLE_FOR_HEAVILIY_DISABLED
+            - BOARDING_ASSISTANCE
+            - ONBOARD_ASSISTANCE
+            - UNACCOMPANIED_MINOR_ASSISTANCE
+            - TACTILE_PLATFORM_EDGES
+            - TACTILE_GUIDING_STRIPS
+            examples:
+            - SUITABLE_FOR_WHEELCHAIRS,LOW_FLOOR
+          examples:
+          - SUITABLE_FOR_WHEELCHAIRS,LOW_FLOOR
+        baggageType:
+          uniqueItems: true
+          type: array
+          description: Set of possible baggage types possible for passenger in the seat. Netex enumerations.
+          items:
+            type: string
+            description: Set of possible baggage types possible for passenger in the seat. Netex enumerations.
+            enum:
+            - HANDBAG
+            - HAND_LUGGAGE
+            - SMALL_SUITCASE
+            - SUITCASE
+            - TRUNK
+            - OVERSIZE_ITEM
+            - BICYCLE
+            - MOTORCYCLE
+            - SPORTING_EQUIPMENT
+            - SKIS
+            - MUSICAL_INSTRUMENT
+            - PUSH_CHAIR
+            - WHEELCHAIR
+            - MOTORIZED_WHEELCHAIR
+            - LARGE_MOTORIZED_WHEELCHAIR
+            - SMALL_ANIMAL
+            - ANIMAL
+            - GAME
+            - OTHER
+            examples:
+            - HANDBAG,SUITCASE
+          examples:
+          - HANDBAG,SUITCASE
+      description: Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class.
+    CoachResponse:
+      required:
+      - id
+      - label
+      - seats
+      - sequenceNumber
+      type: object
+      properties:
+        id:
+          type: string
+          description: The identifier of the coach
+          examples:
+          - '1'
+        label:
+          type: string
+          description: The label of the coach
+          examples:
+          - '1'
+        sequenceNumber:
+          type: integer
+          description: The sequence number in this coach
+          format: int32
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatResponse'
+      description: List of coaches in this trip
+    ReservationResponse:
+      required:
+      - createdAt
+      - createdBy
+      - datedServiceJourneyId
+      - destinationStopPlace
+      - organisationId
+      - originStopPlace
+      - reference
+      - reservationLines
+      - status
+      - updatedAt
+      - version
+      - versionedAt
+      type: object
+      properties:
+        version:
+          type: integer
+          description: The `version` of the reservation. Starts with `1`.
+          format: int32
+          examples:
+          - 1
+        originStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        destinationStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        datedServiceJourneyId:
+          minLength: 1
+          type: string
+          description: Id of the dated service journey
+        status:
+          minLength: 1
+          type: string
+          description: Describes the `reservation` status.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        reference:
+          minLength: 1
+          type: string
+          description: The reference for this reservation
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        organisationId:
+          type: integer
+          description: The organisation id of the order which the `reservation` belongs to.
+          format: int64
+          examples:
+          - 20
+        createdAt:
+          minLength: 1
+          type: string
+          description: When this reservation was initially created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        rebookingStatus:
+          type:
+          - string
+          - 'null'
+          description: Describes the `rebooking` status of the reservation.
+          enum:
+          - ACCEPTED
+          - MANUAL
+          - SUGGESTED
+          - REBOOKED_DRAFT
+          - REJECTED
+          examples:
+          - ACCEPTED
+        versionedAt:
+          minLength: 1
+          type: string
+          description: When this version of this reservation was created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        updatedAt:
+          minLength: 1
+          type: string
+          description: When this was previously updated. This includes status changes, reservation line changes and so on.
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLineResponse'
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: The 'id' of the order the reservation belongs to
+          examples:
+          - A1B2C3D4
+        createdBy:
+          type: integer
+          description: The organisation id this version of the `reservation` was created by.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        updatedBy:
+          type:
+          - integer
+          - 'null'
+          description: The organisation id of the organisation that last updated this `reservation`.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        info:
+          type:
+          - string
+          - 'null'
+          description: Additional free text information about the reservation.
+          examples:
+          - Unable to rebook this reservation due to no available seats.
+    StopPlaceResponseV1:
+      required:
+      - nsrCode
+      - sequenceNr
+      type: object
+      properties:
+        nsrCode:
+          type: string
+          description: Stop Place id defined by National StopPlace registry.
+          examples:
+          - NSR:StopPlace:337
+        sequenceNr:
+          type: integer
+          description: The ordering of the station in the journey.
+          format: int32
+          examples:
+          - 0
+      description: Destination `StopPlace` of the `reservation`
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seating-manager-openapi.json
+- entur-seating-manager-openapi.yml

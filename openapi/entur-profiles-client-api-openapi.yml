@@ -1,0 +1,2972 @@
+openapi: 3.2.0
+info:
+  title: Entur Profiles client API
+  version: 2026.10.0
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Profiles client across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2
+security:
+- jwt: []
+tags:
+- name: Profiles client
+  description: Api for creating, fetching, modifying and deleting customers and related information.
+paths:
+  /profiles/{customerNumber}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find customer by customer number
+      description: Gets a customer with related information. If the passed customer number is for a merged and passive customer, the result will instead be the active, merged customer. Thus, you may find a customer with a different customer number than you specified in the URL.
+      operationId: findCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: includeECards
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePersonnelTicket
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePreferences
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeDeleted
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeNotes
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    put:
+      tags:
+      - Profiles client
+      summary: Update customer
+      description: Updates a customer with the added data. If an address is not specified in the request, it will not be changed. After the update is complete, an UPDATE event will be added to the customer-changes queue.
+      operationId: updateCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPutRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/restore:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Profiles client
+      summary: Restore deactivated customer
+      description: Restores a deactivated customer. This means reinstating the status it had before deletion. If another customer has been registered for the same organisation with the same email address since marking for deactivation, the restoration will fail.
+      operationId: restoreDeactivatedCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/preferences:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find all preferences for customer
+      description: Get all customer preferences for the given customer number.
+      operationId: findAllPreferencesForCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    put:
+      tags:
+      - Profiles client
+      summary: Bulk update customer preferences
+      description: Replaces all a customers preferences with the supplied list. All existing preferences will be deleted! Use with caution.
+      operationId: bulkUpdateCustomerPreferencesByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListCustomerPreferenceRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomerPreferenceResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    post:
+      tags:
+      - Profiles client
+      summary: Create customer preference
+      description: Create a new customer preference. This will fail if the customer already has that preference set.
+      operationId: createCustomerPreferenceByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPreferenceRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPreferenceResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/preferences/{preferenceId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find a specific preference for customer
+      description: Get a specific customer preference by preference Id.
+      operationId: findSpecificPreferenceForCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: preferenceId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPreferenceResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    put:
+      tags:
+      - Profiles client
+      summary: Update a customer preference
+      description: Set a new value for a given customer preference. This will fail if the customer doesn't have this preference set already.
+      operationId: updateCustomerPreferenceByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: preferenceId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPreferenceRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPreferenceResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    delete:
+      tags:
+      - Profiles client
+      summary: Delete a customer preference
+      description: Deletes the given customer preference from the database.
+      operationId: deleteCustomerPreferenceByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: preferenceId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/postal-addresses/{postalAddressId}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Profiles client
+      summary: Update postal address
+      description: Updates an existing postal address on the customer.
+      operationId: updatePostalAddressByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: postalAddressId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostalAddressRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostalAddressResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    delete:
+      tags:
+      - Profiles client
+      summary: Delete postal address
+      description: Deletes the given postal address from the customer.
+      operationId: deletePostalAddressByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: postalAddressId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/merge-personnel-ticket-profile/{pticketCustomerNumber}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Profiles client
+      summary: Merge customers
+      description: Merge a personnel ticket customer with a standard customer. Given the customer number to a profile that has been created solely for being the recipient of a personnel ticket, you can merge that profile into an active profile. In practice this deletes the personnel ticket profile and transfers any tickets onto the current profile.
+      operationId: mergeCustomersByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: pticketCustomerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/ecard-ownerships/{ecardOperator}/{ecardNumber}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find specific E-card
+      description: Get a specific ecard by customer number and ecard information.
+      operationId: findSpecificEcardByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: ecardOperator
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      - name: ecardNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcardOwnershipResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    put:
+      tags:
+      - Profiles client
+      summary: Update E-card registration
+      description: Update an existing E-card for a customer. Can also be used to set a new owner of the E-card. The internal logic is 'find the customer who owns this E-card. Then, see if this is the same customer who is specified in the URL. If it isn't, move the card to this new customer.' Regardless of whether the card is moved, all fields are overwritten with the supplied info. Also note that it isn't possible to switch the card ownership to a customer from another organisation.
+      operationId: updateEcardRegistrationByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: ecardOperator
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+      - name: ecardNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EcardOwnershipRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcardOwnershipResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/delete:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Profiles client
+      summary: Deactivate customer
+      description: Deactivates a customer. In practice this means mark them for deletion and set the expiration date. Another process is responsible for the actual removal from the database. While a customer is deactivated, it's still possible to look them up, by specifying the includeDeleted flag.
+      operationId: deactivateCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: expirationDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date-time
+        examples:
+          default:
+            value: '2018-02-12T13:23:53+01:00'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:slett
+          - customers-profile-global:slett
+          - customers-profile-jdir:slett
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find customers by parameters
+      description: A list of customers matching the search criteria. Always includes postalAddresses and personnelTickets if available.
+      operationId: findCustomersByParameters
+      parameters:
+      - name: firstName
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: surname
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: email
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: countryCode
+        in: query
+        description: Ignored unless telephoneNumberNoCountryCode is also set.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: '+47'
+      - name: telephoneNumber
+        in: query
+        description: Ignored if countryCode and telephoneNumberNoCountryCode are set.
+        required: false
+        deprecated: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: telephoneNumberNoCountryCode
+        in: query
+        description: Telephone number with no country code prefix. Ignored unless countryCode is also set.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: landlineNumber
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: dateOfBirth
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: yyyy-MM-dd
+        examples:
+          default:
+            value: '2018-02-12'
+      - name: postalAddress
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: postCode
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: ticketRightOwner
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: ticketRightBearer
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: organisationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: maxResultSet
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: includeTemporary
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      - name: invoiceOrganisationId
+        in: query
+        description: Organisation ID from Brønnøysund, for invoice profiles
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 123456785
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    post:
+      tags:
+      - Profiles client
+      summary: Create a customer
+      description: Creates a new customer in the database. If a customerRef is not specified, one will be assigned. The customerRef and email fields must be unique within an organisation. After the creation is complete, a CREATE event will be posted to the customer-changed queue.
+      operationId: createCustomer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerPostRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:opprett
+          - customers-profile-global:opprett
+          - customers-profile-jdir:opprett
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/related-customer-numbers:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Profiles client
+      summary: Connect a profile to a permanent profile
+      description: Connects a profile a permanent profile. A temporary (T) or permanent (S) profile can be connected to a permanent profile (S). This is typically used when a customer has created a temporary profile to purchase a ticket, and later wants to connect this profile to their permanent profile. Both profiles need to be active.
+      operationId: connectCustomer
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerConnectRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerConnectResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/postal-addresses:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Profiles client
+      summary: Create a new postal address
+      description: Create a new postal address for the customer.
+      operationId: createPostalAddressByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostalAddressRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostalAddressResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerNumber}/ecard-ownerships:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find all E-cards for customer
+      description: Get all ecard information for the given customer.
+      operationId: findAllEcardsForCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    post:
+      tags:
+      - Profiles client
+      summary: Add E-card to customer
+      description: Create a new E-card registration for the given customer.
+      operationId: addEcardToCustomerByCustomerNumber
+      parameters:
+      - name: customerNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EcardOwnershipRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcardOwnershipResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:endre
+          - customers-profile-global:endre
+          - customers-profile-jdir:endre
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/get-by/bulk:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Profiles client
+      summary: Get many customers by customerNumbers
+      description: Get customer profile data for the provided customer numbers or customer references. The list is filtered based on the organisationId of the logged inn user. If both customer numbers and customer references is passed then customer numbers will be used, unless customer numbers is an empty list while customer references is a non-empty list.
+      operationId: getManyCustomersByCustomerNumbers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfilesBulkRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/get-by/bulk/contact-details:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Profiles client
+      summary: Get contact details for many customers by customer number
+      description: Lightweight bulk lookup returning only email and telephone number for the given customer numbers. Max 1000 customer numbers per call.
+      operationId: getCustomerContactDetailsInBulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactDetailsBulkRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCustomerContactDetailsResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{uuid}/by-uuid:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find customer by UUID
+      description: Gets a customer with related information, even if this customer has been deleted (though, in this case, that is all you're told). Like in the lookup by customerNumber, if the customer has been merged into another, you will get the active customer.
+      operationId: findCustomerByUuid
+      parameters:
+      - name: uuid
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: includeECards
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePersonnelTicket
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePreferences
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeDeleted
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeNotes
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{organisationId}/{username}/by-org-and-email:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find Customer by organisation and username
+      description: Look up a customer with related information using the username for the profile. Within an organisation, email address is unique. Unlike the other lookups, this might return a passive customer or a customer created only for personnel ticket connection.
+      operationId: findCustomerByOrganisationAndEmail
+      parameters:
+      - name: organisationId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+      - name: username
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{ecardNumber}/by-ecard:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find customer by E-card number
+      description: Accepts both 16 digit and 10 digit ecard numbers. Gets a customer with related information. Like in the lookup by customerNumber, if the customer has been merged into another, you will get the active customer.
+      operationId: findCustomerByEcardNumber
+      parameters:
+      - name: ecardNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: includeECards
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePersonnelTicket
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePreferences
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeDeleted
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeNotes
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles/{customerReference}/by-customer-reference:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find customer by customer reference
+      description: Gets a customer with related information. If the passed customer reference is for a merged and passive customer, the result will instead be the active, merged customer. Thus, you may find a customer with a different customer reference than you specified in the URL.
+      operationId: findCustomerByCustomerReference
+      parameters:
+      - name: customerReference
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: includeECards
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePersonnelTicket
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includePreferences
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeDeleted
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeNotes
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: organisationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+  /profiles-search:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Profiles client
+      summary: Find customers by parameters, paginated
+      description: A paginated list of customers matching the search criteria. Always includes postalAddresses and personnelTickets if available.
+      operationId: findCustomersByParametersPaginated
+      parameters:
+      - name: firstName
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: surname
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: email
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: countryCode
+        in: query
+        description: Ignored unless telephoneNumberNoCountryCode is also set.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: '+47'
+      - name: telephoneNumber
+        in: query
+        description: Ignored if countryCode and telephoneNumberNoCountryCode are set.
+        required: false
+        deprecated: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: telephoneNumberNoCountryCode
+        in: query
+        description: Telephone number with no country code prefix. Ignored unless countryCode is also set.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: landlineNumber
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: dateOfBirth
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: yyyy-MM-dd
+        examples:
+          default:
+            value: '2018-02-12'
+      - name: postalAddress
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: postCode
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: ticketRightOwner
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: ticketRightBearer
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: organisationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: includePreferences
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+      - name: includeTemporary
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+          default: false
+      - name: invoiceOrganisationId
+        in: query
+        description: Organisation ID from Brønnøysund, for invoice profiles
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 123456785
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: sortBy
+        in: query
+        description: Sort field. Allowable values are customerNumber, firstName, surname, email,dateOfBirth, organisationId
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: id
+        examples:
+          default:
+            value: sortBy=surname
+      - name: sortDirection
+        in: query
+        description: Sort direction if sortBy is given.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: asc
+        examples:
+          default:
+            value: sortDirection=desc
+      - name: distributionChannelId
+        in: query
+        description: Distribution channel that created the customer profile. Case-insensitive exact match.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT:DistributionChannel:xxxxx
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCustomerResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-profile:les
+          - customers-profile-global:les
+          - customers-profile-jdir:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+components:
+  schemas:
+    CustomerConsent:
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer consent was last changed.
+          format: date-time
+        consentChoice:
+          type: boolean
+          description: Whether the customer has approved or declined this consent.
+        consentCode:
+          maxLength: 20
+          type: string
+          description: The consent code.
+        createdAt:
+          type: string
+          description: When the customer consent was created.
+          format: date-time
+        customerId:
+          type: integer
+          description: Id of the customer.
+          format: int64
+      description: Legacy consents for a customer
+    CustomerAccountResponse:
+      required:
+      - createdAt
+      - createdBy
+      - customerAccountId
+      - customerNumber
+      - id
+      type: object
+      properties:
+        alias:
+          type: string
+          description: Alias for the customer account
+          examples:
+          - Tommy
+        changedAt:
+          type: string
+          description: When the customer account was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          type: string
+          description: Who changed the customer account.
+        createdAt:
+          type: string
+          description: When the customer account was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          type: string
+          description: Who created the customer account.
+        customerAccountId:
+          type: string
+          description: Customer account id string
+          examples:
+          - ATB:CustomerAccount:abc58673cde-1c82-4bc5-989c-9d5eaa7ea866
+        customerNumber:
+          type: integer
+          description: Unique customer number
+          format: int64
+        id:
+          type: integer
+          description: Customer account unique id.
+          format: int64
+        isDefault:
+          type: boolean
+          description: True if the account is the default account for the customer
+      description: Customer account connected to a customer
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: 'An Error message. '
+    EcardOwnershipRequest:
+      required:
+      - ecardNumber
+      - ecardOperator
+      - startOfOwnership
+      type: object
+      properties:
+        bookingDate:
+          type: string
+          description: When the physical ecard was booked. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        ecardName:
+          maxLength: 100
+          type: string
+          description: Customer defined ecard alias.
+        ecardNumber:
+          type: integer
+          description: Ecard number.
+          format: int64
+        ecardNumber16digits:
+          maxLength: 16
+          minLength: 16
+          type: string
+          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
+        ecardOperator:
+          type: integer
+          description: Ecard operator.
+          format: int32
+        endOfOwnership:
+          type: string
+          description: When the customer removed the ecard connection. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: When the physical ecard expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        shippingDate:
+          type: string
+          description: When the physical ecard was shipped to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        startOfOwnership:
+          type: string
+          description: When the ecard was first connected to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Ecards connected to a customer
+    CustomerContactDetailsResponse:
+      type: object
+      properties:
+        countryCode:
+          type: string
+          description: The customer's telephone country code (e.g. '+47'), if set.
+        customerNumber:
+          type: integer
+          description: The customer's customer number.
+          format: int64
+        email:
+          type: string
+          description: The customer's email address, if set.
+        telephoneNumberNoCountryCode:
+          type: string
+          description: The customer's telephone number without country code, if set.
+      description: Contact details for a customer.
+    LocalDateResponse:
+      required:
+      - day
+      - month
+      - year
+      type: object
+      properties:
+        day:
+          type: integer
+          description: day of month
+          format: int32
+        month:
+          type: integer
+          description: month number
+          format: int32
+        year:
+          type: integer
+          description: year
+          format: int32
+      description: Date as object
+    PostalAddressRequest:
+      required:
+      - countryCode
+      - postCode
+      - town
+      - typeOfAddress
+      type: object
+      properties:
+        addressLine1:
+          maxLength: 80
+          type: string
+          description: Address line 1.
+        addressLine2:
+          maxLength: 80
+          type: string
+          description: Address line 2, often used for c/o information.
+        countryCode:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The address country code. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        id:
+          type: integer
+          description: Unique id for postal address. This value is exclusively used when updating a full customer, to identify which of the addresses to update. Otherwise it is ignored.
+          format: int64
+        postCode:
+          maxLength: 10
+          type: string
+          description: The address post code. Only 4 digits for Norwegian addresses.
+        town:
+          type: string
+          description: The address post town. Will be required
+        typeOfAddress:
+          type: string
+          description: 'The type of address. Types supported: ''P'' = Private, ''I'' = Invoice, ''S'' = Shadow.'
+          enum:
+          - P
+          - I
+          - S
+        verifiedAt:
+          type: string
+          description: When the address was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Postal address connected to a customer
+    CustomerPreferenceRequest:
+      required:
+      - preferenceId
+      type: object
+      properties:
+        preferenceId:
+          type: integer
+          description: Id of the preference
+          format: int64
+        preferenceValue:
+          maxLength: 100
+          type: string
+          description: Value of the preference. This can be things like membership number.
+      description: Preferences request for a customer
+    ListCustomerResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomerResponse'
+    CustomerPostRequest:
+      required:
+      - createdBy
+      - createdByChannel
+      - firstName
+      - organisationId
+      - surname
+      type: object
+      properties:
+        countryCode:
+          maxLength: 4
+          type: string
+          description: Telephone number country code, starting with +.
+          examples:
+          - '+47'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        createdByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who created the customer. Examples include web, app, crm. Used for traceability in accordance with GDPR
+        customerAccountId:
+          maxLength: 60
+          type: string
+          description: Deprecated. Use /profiles/{customerNumber}/customer-accounts. Customer account id used for account based ticketing
+          deprecated: true
+          examples:
+          - XYZ:CustomerAccount:<uuid>
+        customerRef:
+          maxLength: 40
+          minLength: 1
+          type: string
+          description: Optional customer reference. Defaults to customer number if not set
+        dateOfBirth:
+          type: string
+          description: Date of birth. ISO 8601 date format
+          format: date
+          examples:
+          - '2019-04-05'
+        email:
+          maxLength: 80
+          type: string
+          description: Email used for contact and potentially also for login.
+        expirationDate:
+          type: string
+          description: The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        firstName:
+          maxLength: 50
+          type: string
+          description: First and middle name.
+        landlineNumber:
+          maxLength: 20
+          type: string
+          description: Landline telephone number.
+        languagePreference:
+          type: string
+          description: Deprecated, please use languagePreferenceISO6393. Which language the customer wants information in. Default is 'NO'.
+          deprecated: true
+          enum:
+          - 'NO'
+          - EN
+        languagePreferenceISO6393:
+          type: string
+          description: Which language the customer wants information in. ISO 639-3 format. Default is 'NOB'.
+          enum:
+          - NOB
+          - NNO
+          - ENG
+        nationality:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The customers nationality. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        organisationId:
+          type: integer
+          description: The organisation the customer is registered with.
+          format: int64
+        password:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: The users password
+        postalAddresses:
+          type: array
+          description: The postal addresses connected to the customer.
+          items:
+            $ref: '#/components/schemas/PostalAddressRequest'
+        profileType:
+          type: string
+          description: 'Type of profile. Types supported: ''S'' = Standard customer, ''P'' = Personnel ticket customer, ''T'' = Temporary customer. Default is ''S''.'
+          default: S
+          enum:
+          - S
+          - P
+          - T
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname.
+        telephoneNumber:
+          maxLength: 20
+          type: string
+          description: Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number.
+        telephoneNumberNoCountryCode:
+          maxLength: 12
+          type: string
+          description: Telephone number without country code or punctuation.
+        telephoneNumberVerifiedAt:
+          type: string
+          description: When the telephone number was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        vippsId:
+          type: string
+          description: Deprecated. The field is no longer stored and is ignored. Vipps unique user identifier.
+          format: uuid
+          deprecated: true
+          examples:
+          - c06c4afe-d9e1-4c5d-939a-177d752a0944
+      description: A registered customer post request
+    PostalAddressResponse:
+      required:
+      - changedAt
+      - countryCode
+      - createdAt
+      - customerId
+      - id
+      - postCode
+      - town
+      - typeOfAddress
+      type: object
+      properties:
+        addressLine1:
+          maxLength: 80
+          type: string
+          description: Address line 1.
+        addressLine2:
+          maxLength: 80
+          type: string
+          description: Address line 2, often used for c/o information.
+        changedAt:
+          type: string
+          description: When the postal address was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        countryCode:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The address country code. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        createdAt:
+          type: string
+          description: When the postal address was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: The customer connected to the address.
+          format: int64
+        id:
+          type: integer
+          description: Postal address id.
+          format: int64
+        postCode:
+          maxLength: 10
+          type: string
+          description: The address post code.
+        town:
+          maxLength: 50
+          type: string
+          description: The address post town.
+        typeOfAddress:
+          type: string
+          description: 'The type of address. Types supported: ''P'' = Private, ''I'' = Invoice, ''S'' = Shadow.'
+          enum:
+          - P
+          - I
+          - S
+        verifiedAt:
+          type: string
+          description: When the address was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Postal address connected to a customer
+    CustomerResponse:
+      required:
+      - changedAt
+      - changedBy
+      - changedByChannel
+      - createdAt
+      - createdBy
+      - createdByChannel
+      - customerNumber
+      - firstName
+      - organisationId
+      - profileType
+      - status
+      - surname
+      - uuid
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          maxLength: 100
+          type: string
+          description: Who last changed the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        changedByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
+        countryCode:
+          maxLength: 4
+          type: string
+          description: Telephone number country code, starting with +.
+          examples:
+          - '+47'
+        createdAt:
+          type: string
+          description: When the customer was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        createdByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who created the customer. Used for traceability in accordance with GDPR
+        customerAccountId:
+          maxLength: 60
+          type: string
+          description: Customer account id used for account based ticketing
+          examples:
+          - XYZ:CustomerAccount:<uuid>
+        customerAccounts:
+          type: array
+          description: Customer accounts used for account based ticketing
+          items:
+            $ref: '#/components/schemas/CustomerAccountResponse'
+        customerConsents:
+          type: array
+          description: The legacy consents connected to the customer.
+          items:
+            $ref: '#/components/schemas/CustomerConsent'
+        customerNumber:
+          type: integer
+          description: Customer number.
+          format: int64
+        customerRef:
+          maxLength: 40
+          type: string
+          description: Optional customer reference. Defaults to customer number if not set.
+        dateOfBirth:
+          $ref: '#/components/schemas/LocalDateResponse'
+        dateOfDeath:
+          $ref: '#/components/schemas/LocalDateResponse'
+        ecardOwnerships:
+          type: array
+          description: The ecards connected to the customer.
+          items:
+            $ref: '#/components/schemas/EcardOwnershipResponse'
+        email:
+          maxLength: 80
+          type: string
+          description: Contact email. May become different from username
+        emailOld:
+          maxLength: 80
+          type: string
+          description: When customer is deleted (status='D'), the value of 'email' is moved here to allow creation of a new customer with the same email.
+        emailVerifiedAt:
+          type: string
+          description: When the email was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        firstName:
+          maxLength: 50
+          type: string
+          description: First and middle name.
+        givenConsents:
+          type: array
+          description: The consents connected to the customer. Deprecated
+          deprecated: true
+          items:
+            type: object
+            description: The consents connected to the customer. Deprecated
+            deprecated: true
+        id:
+          type: integer
+          description: Customer id. Deprecated
+          format: int64
+          deprecated: true
+        landlineNumber:
+          maxLength: 20
+          type: string
+          description: Landline telephone number.
+        languagePreference:
+          type: string
+          description: Deprecated, please use languagePreferenceISO6393. Which language the customer wants information in. Default is 'NO'.
+          deprecated: true
+          enum:
+          - 'NO'
+          - EN
+        languagePreferenceISO6393:
+          type: string
+          description: Which language the customer wants information in. ISO 639-3 format. Default is 'NOB'.
+          enum:
+          - NOB
+          - NNO
+          - ENG
+        lastSignInAt:
+          type: string
+          description: When the customer last signed in. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        lastSignInFrom:
+          maxLength: 100
+          type: string
+          description: Where the customer last signed in from. Typically web or app. Typically used to display to the user where the last login was performed.
+        nationality:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The customers nationality. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        notes:
+          type: array
+          description: Deprecated. The notes connected to the customer.
+          deprecated: true
+          items:
+            $ref: '#/components/schemas/NoteResponse'
+        organisationId:
+          type: integer
+          description: The organisation the customer is registered with.
+          format: int64
+        parentId:
+          type: object
+          description: Id of the parent customer. Used to connect different customer types.
+        personnelTicketBearer:
+          $ref: '#/components/schemas/PersonnelTicketBearer'
+        postalAddresses:
+          type: array
+          description: The postal addresses connected to the customer.
+          items:
+            $ref: '#/components/schemas/PostalAddressResponse'
+        preferences:
+          type: array
+          description: The preferences connected to the customer.
+          items:
+            $ref: '#/components/schemas/CustomerPreferenceResponse'
+        profileType:
+          type: string
+          description: 'Type of profile. Types supported: ''S'' = Standard customer, ''P'' = Personnel ticket customer, ''T'' = Temporary customer. Default is ''S''.'
+          enum:
+          - S
+          - P
+          - T
+        relatedCustomerNumbers:
+          type: array
+          description: The customer number of profiles which has been merged into the current profile. These may be used to lookup customer information in other systems
+          items:
+            type: integer
+            description: The customer number of profiles which has been merged into the current profile. These may be used to lookup customer information in other systems
+            format: int64
+        status:
+          type: string
+          description: 'Customer status. Statuses supported: ''A'' = Active, ''P'' = Passive, ''D'' = Deleted. Default is ''A''.'
+          enum:
+          - A
+          - P
+          - D
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname.
+        telephoneNumber:
+          maxLength: 20
+          type: string
+          description: Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number.
+        telephoneNumberNoCountryCode:
+          maxLength: 12
+          type: string
+          description: Telephone number without country code or punctuation.
+        telephoneNumberVerifiedAt:
+          type: string
+          description: When the telephone number was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        username:
+          type: string
+          description: Username the customer can use to log unto their profile. Only available on profile type S(tamkunde) and profile status A(ctive)
+        uuid:
+          maxLength: 32
+          minLength: 32
+          type: string
+          description: A universal unique id for the customer. 32 random alphanumeric characters. Not RFC 4122 compliant
+          examples:
+          - 7018222E18CB5C46E05400144FF9F89C
+        vippsId:
+          type: string
+          description: Deprecated. The field is no longer stored. Vipps unique user identifier.
+          format: uuid
+          deprecated: true
+      description: A registered customer response
+    ListCustomerContactDetailsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomerContactDetailsResponse'
+    ListCustomerPreferenceRequest:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomerPreferenceRequest'
+    NoteResponse:
+      required:
+      - changedAt
+      - changedBy
+      - createdAt
+      - createdBy
+      - customerId
+      - id
+      - text
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the note was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          maxLength: 100
+          type: string
+          description: Who last changed the note.
+        createdAt:
+          type: string
+          description: When the note was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the note.
+        customerId:
+          type: integer
+          description: Id of the customer connected to the note.
+          format: int64
+        id:
+          type: integer
+          description: Note id.
+          format: int64
+        text:
+          maxLength: 4000
+          type: string
+          description: Note content.
+      description: Deprecated
+    PersonnelTicketBearer:
+      type: object
+      properties:
+        bearerCustomerId:
+          type: integer
+          format: int64
+        changedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        isSelfServedRetrieval:
+          type: boolean
+        ticketRightBearer:
+          type: string
+        ticketRightOwner:
+          type: string
+      description: The personnel tickets connected to the customer. Deprecated. Does not contain updated information.
+    ProfilesBulkRequest:
+      type: object
+      properties:
+        customerNumbers:
+          type: array
+          description: Customer numbers to look up. Max 1000 numbers at a time.
+          items:
+            type: integer
+            description: Customer numbers to look up. Max 1000 numbers at a time.
+            format: int64
+        customerReferences:
+          type: array
+          description: Customer references (aka external references) to look up. Will not be used if non-empty list of customer numbers is provided. Max 1000 references at a time.
+          items:
+            type: string
+            description: Customer references (aka external references) to look up. Will not be used if non-empty list of customer numbers is provided. Max 1000 references at a time.
+        includePreferences:
+          type: boolean
+          description: Optional flag to include profile preferences
+      description: A request for multiple customers.
+    CustomerConnectResponse:
+      required:
+      - changedAt
+      - relatedCustomerNumbers
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the list of connected profiles was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        relatedCustomerNumbers:
+          type: array
+          description: Customer numbers for temporary profiles that is connected to a profile
+          items:
+            type: integer
+            description: Customer numbers for temporary profiles that is connected to a profile
+            format: int64
+      description: Connected temporary profiles for a profile
+    CustomerPutRequest:
+      required:
+      - changedBy
+      - changedByChannel
+      - firstName
+      - surname
+      type: object
+      properties:
+        changedBy:
+          maxLength: 100
+          type: string
+          description: Who last changed the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR
+        changedByChannel:
+          maxLength: 100
+          type: string
+          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
+        countryCode:
+          maxLength: 4
+          type: string
+          description: Telephone number country code, starting with +.
+          examples:
+          - '+47'
+        customerAccountId:
+          maxLength: 60
+          type: string
+          description: Deprecated. The field is no longer stored. Use /profiles/{customerNumber}/customer-accounts. Customer account id used for account based ticketing.
+          deprecated: true
+          examples:
+          - XYZ:CustomerAccount:<uuid>
+        dateOfBirth:
+          type: string
+          description: Date of birth. ISO 8601 date format
+          format: date
+          examples:
+          - '2019-04-05'
+        email:
+          maxLength: 80
+          type: string
+          description: Email used for contact and potentially also for login
+        emailVerifiedAt:
+          type: string
+          description: When the email was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        firstName:
+          maxLength: 50
+          type: string
+          description: First and middle name.
+        landlineNumber:
+          maxLength: 80
+          type: string
+          description: Landline telephone number.
+        languagePreference:
+          type: string
+          description: Deprecated, please use languagePreferenceISO6393. Which language the customer wants information in. Default is 'NO'.
+          deprecated: true
+          enum:
+          - 'NO'
+          - EN
+        languagePreferenceISO6393:
+          type: string
+          description: Which language the customer wants information in. ISO 639-3 format. Default is 'NOB'.
+          enum:
+          - NOB
+          - NNO
+          - ENG
+        nationality:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The customers nationality. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        postalAddresses:
+          type: array
+          description: The postal addresses connected to the customer.
+          items:
+            $ref: '#/components/schemas/PostalAddressRequest'
+        status:
+          type: string
+          description: 'Customer status. Statuses supported: ''A'' = Active, ''P'' = Passive, ''D'' = Deleted. Default is ''A''.'
+          default: A
+          enum:
+          - A
+          - P
+          - D
+        surname:
+          maxLength: 50
+          type: string
+          description: Surname.
+        telephoneNumber:
+          maxLength: 80
+          type: string
+          description: Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number.
+        telephoneNumberNoCountryCode:
+          maxLength: 12
+          type: string
+          description: Telephone number without country code or punctuation.
+        telephoneNumberVerifiedAt:
+          type: string
+          description: When the telephone number was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        vippsId:
+          type: string
+          description: Deprecated. The field is no longer stored and is ignored. Vipps unique user identifier.
+          format: uuid
+          deprecated: true
+          examples:
+          - c06c4afe-d9e1-4c5d-939a-177d752a0944
+      description: A registered customer put request. Required fields are firstName, surname, password, organizationId, changedBy and changedByChannel.
+    PreferenceResponse:
+      required:
+      - changedAt
+      - createdAt
+      - id
+      - isActive
+      - preferenceCode
+      - preferenceDescription
+      - preferenceType
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the preference was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the preference was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Preference id.
+          format: int64
+        isActive:
+          type: boolean
+          description: Whether the preference is active.
+        preferenceCode:
+          maxLength: 20
+          type: string
+          description: The preference code.
+        preferenceDescription:
+          maxLength: 255
+          type: string
+          description: A description of the preference.
+        preferenceType:
+          maxLength: 20
+          type: string
+          description: Type of preference.
+      description: Preference
+    ListCustomerPreferenceResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomerPreferenceResponse'
+    CustomerConnectRequest:
+      required:
+      - changedByChannel
+      type: object
+      properties:
+        changedByChannel:
+          type: string
+          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
+        customerNumberToConnect:
+          type: integer
+          description: Customer number of the profile to connect
+          format: int64
+          examples:
+          - 123456
+        temporaryCustomerNumber:
+          type: integer
+          description: Customer number of temporary customer to connect
+          format: int64
+          deprecated: true
+          examples:
+          - 123456
+      description: Request to connect a profile to another profile
+    CustomerPreferenceResponse:
+      required:
+      - changedAt
+      - createdAt
+      - preference
+      - preferenceId
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer preference was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the customer preference was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: Id of the customer. Deprecated
+          format: int64
+          deprecated: true
+        preference:
+          $ref: '#/components/schemas/PreferenceResponse'
+        preferenceId:
+          type: integer
+          description: Id of the preference
+          format: int64
+        preferenceValue:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Value of the preference. This can be things like membership number.
+      description: Preferences response for a customer
+    EcardOwnershipResponse:
+      required:
+      - changedAt
+      - createdAt
+      - customerId
+      - ecardNumber
+      - ecardNumber16digits
+      - ecardOperator
+      - id
+      - startOfOwnership
+      type: object
+      properties:
+        bookingDate:
+          type: string
+          description: When the physical ecard was booked. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedAt:
+          type: string
+          description: When the ecard was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the ecard was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: The customer connected to the ecard. Deprecated
+          format: int64
+          deprecated: true
+        ecardName:
+          maxLength: 100
+          type: string
+          description: Customer defined ecard alias.
+        ecardNumber:
+          type: integer
+          description: Ecard number.
+          format: int64
+        ecardNumber16digits:
+          maxLength: 16
+          minLength: 16
+          type: string
+          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
+        ecardOperator:
+          type: integer
+          description: Ecard operator.
+          format: int32
+        endOfOwnership:
+          type: string
+          description: When the customer removed the ecard connection. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: When the physical ecard expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Ecard id.
+          format: int64
+        shippingDate:
+          type: string
+          description: When the physical ecard was shipped to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        startOfOwnership:
+          type: string
+          description: When the ecard was first connected to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Ecards connected to a customer
+    ContactDetailsBulkRequest:
+      type: object
+      properties:
+        customerNumbers:
+          type: array
+          description: Customer numbers to look up. Max 1000 numbers at a time.
+          items:
+            type: integer
+            description: Customer numbers to look up. Max 1000 numbers at a time.
+            format: int64
+      description: A request for contact details for multiple customers.
+    PageCustomerResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items on a specific page
+          items:
+            $ref: '#/components/schemas/CustomerResponse'
+        totalItems:
+          type: integer
+          description: Total number of items
+          format: int64
+          examples:
+          - 72
+        totalPages:
+          type: integer
+          description: Total number of pages available to browse
+          format: int64
+          examples:
+          - 9
+      description: Page displays a subset of a list of entities
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-customers-openapi.json
+- entur-customers-openapi.yml

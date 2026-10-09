@@ -1,0 +1,309 @@
+openapi: 3.2.0
+info:
+  title: Entur Dated Service Journey Controller Beta API
+  version: 2026.09.0
+  description: 'Operations tagged dated-service-journey-controller-beta across 2 of this provider''s published API definitions: entur-seatingservices-openapi.json, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/seatingservices
+tags:
+- name: dated-service-journey-controller-beta
+paths:
+  /beta/dated-service-journeys/{datedServiceJourneyId}/seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getAvailableSeatsInATrain_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarResponseBeta'
+      deprecated: true
+      summary: Get available seats in ATrain 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getRailcars_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarTypeResponseBeta'
+      deprecated: true
+      summary: Get railcars 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars/{railcarNumber}/seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getAvailableSeatsInARailcar_1
+      parameters:
+      - name: railcarNumber
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: requestScrolling
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          default: F
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RailcarResponseBeta'
+      deprecated: true
+      summary: Get available seats in ARailcar 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars/seats:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getAvailableSeatsInRailcarBySeatTypeId_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: travellers
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: origin
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: destination
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: seatTypeId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RailcarResponseBeta'
+      deprecated: true
+      summary: Get available seats in railcar by seat type id 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+  /beta/dated-service-journeys/{datedServiceJourneyId}/railcars/configs:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - dated-service-journey-controller-beta
+      operationId: getRailcarGroupInfo_1
+      parameters:
+      - name: datedServiceJourneyId
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeqRailcarTypeInfoResponseBeta'
+      deprecated: true
+      summary: Get railcar group info 1
+      x-summary-source: derived
+    servers:
+    - url: https://api.entur.io/seatingservices
+components:
+  schemas:
+    SeqRailcarTypeInfoResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqRailcarResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqRailcarTypeResponseBeta:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    RailcarResponseBeta: {}
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    bearer-key:
+      type: http
+      scheme: Bearer
+      bearerFormat: jwt
+x-refined-from:
+- entur-seatingservices-openapi.json
+- entur-seatingservices-openapi.yml

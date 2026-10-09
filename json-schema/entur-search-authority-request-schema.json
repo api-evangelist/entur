@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-search-authority-request-schema.json",
+  "title": "SearchAuthorityRequest",
+  "description": "A request used to search for fare products without inputting geographic data, but instead use Authority.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-offers-partner-openapi.yml#/components/schemas/SearchAuthorityRequest",
+  "type": "object",
+  "properties": {
+    "travelDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The specific time for when the ticket should be activated. For most purposes it is recommended to use the current time as travel date. That is because most period tickets are activated immediately on purchase. If you want to get a period ticket that should be activated some time in the future, specify the future date."
+    },
+    "travellers": {
+      "type": "array",
+      "description": "The travellers the offer should be valid for.",
+      "items": {
+        "$ref": "#/$defs/Traveller"
+      },
+      "minItems": 1
+    },
+    "authorityId": {
+      "type": "string",
+      "description": "NeTEx-id of Authority. Only offers valid for this Authority will be considered.",
+      "pattern": "^[A-Z]{3}:Authority:.+$",
+      "x-pattern-message": "Wrong format for NeTEx id. Must be on the format \"XXX:Authority:___\"."
+    }
+  },
+  "required": [
+    "authorityId",
+    "travelDate",
+    "travellers"
+  ],
+  "$defs": {
+    "BaggageTypeEnum": {
+      "type": "string",
+      "description": "Type of baggage. Subset of BaggageTypeEnumeration from NeTEx usage parameter luggage support.",
+      "enum": [
+        "HANDBAG",
+        "HAND_LUGGAGE",
+        "SMALL_SUITCASE",
+        "SUITCASE",
+        "TRUNK",
+        "OVERSIZE_ITEM",
+        "BICYCLE",
+        "SPORTING_EQUIPMENT",
+        "SKIS",
+        "MUSICAL_INSTRUMENT",
+        "PUSH_CHAIR",
+        "MOTORIZED_WHEELCHAIR",
+        "LARGE_MOTORIZED_WHEELCHAIR",
+        "WHEELCHAIR",
+        "SMALL_ANIMAL",
+        "ANIMAL",
+        "GAME",
+        "MOTORCYCLE",
+        "OTHER"
+      ]
+    },
+    "CappingSpecification": {
+      "type": "object",
+      "description": "Configuration on how to configure the discount right. Requires a CustomerIdentity with source ABT.",
+      "properties": {
+        "cappedDiscountRightId": {
+          "type": "string",
+          "description": "Reference to a CappedDiscountRight.",
+          "pattern": "^[A-Z]{3}:CappedDiscountRight:.+$",
+          "x-pattern-message": "Wrong format for NeTEx id. Must be on the format \"XXX:CappedDiscountRight:___\"."
+        },
+        "minimumDurationBetweenAlternatives": {
+          "type": "string",
+          "format": "duration",
+          "description": "To avoid too many similar alternatives you can specify a minimum period between the start date of each alternative."
+        },
+        "minimumAlternativeDuration": {
+          "type": "string",
+          "format": "duration",
+          "description": "Specify a minimum alternative duration to avoid alternatives that doesn't last long enough in the future to be useful."
+        }
+      },
+      "required": [
+        "cappedDiscountRightId"
+      ]
+    },
+    "CustomerIdentity": {
+      "type": "object",
+      "description": "One or more references identifying the customer.",
+      "properties": {
+        "customerRef": {
+          "type": "string",
+          "description": "A reference to a customer."
+        },
+        "source": {
+          "type": "string",
+          "default": "CUSTOMERS",
+          "description": "Which system the customer information can be found in.",
+          "enum": [
+            "CUSTOMERS",
+            "ABT"
+          ]
+        }
+      },
+      "required": [
+        "customerRef",
+        "source"
+      ]
+    },
+    "OwnedRight": {
+      "type": "object",
+      "description": "A specification of preowned products or other entitlements that the customer already owns. They are taken into account when considering which products the user may need.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The netex-id of the entity.",
+          "pattern": "^[A-Z]{3}:.+:.+$",
+          "x-pattern-message": "Wrong format for NeTEx id. Must be on the format \"XXX:___:___\"."
+        },
+        "zones": {
+          "type": "array",
+          "description": "The zones the existing ticket is valid for.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "pattern": "^[A-Z]{3}:FareZone:.+$",
+          "x-pattern-message": "Wrong format for NeTEx id. Must be on the format \"XXX:FareZone:___\"."
+        },
+        "cappingSpecification": {
+          "$ref": "#/$defs/CappingSpecification"
+        }
+      },
+      "required": [
+        "id"
+      ]
+    },
+    "Traveller": {
+      "type": "object",
+      "description": "A specification of a traveller. Either age or userType must be set.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Identifier for the traveller. The travellers id will be referenced in the response where natural. Specifying an id for each traveller can make it easier to determine the seating and for whom each product is intended. If no ID is specified, the traveller will be assigned a random ID, only valid for the particular offer."
+        },
+        "userType": {
+          "$ref": "#/$defs/UserTypeEnum"
+        },
+        "age": {
+          "type": "integer",
+          "description": "Specify the travellers age, to let the system calculate the corresponding userType.",
+          "minimum": 0
+        },
+        "baggageTypes": {
+          "type": "array",
+          "description": "A filter for what kind of luggage the traveller wants offers for. If, for example, a user wants to bring a bicycle along for the trip. \"BICYCLE\" can be specified in that array. Offers that can't fulfil the wish for a \"BICYCLE\" accommodation are still returned from our services.",
+          "items": {
+            "$ref": "#/$defs/BaggageTypeEnum"
+          },
+          "minItems": 1
+        },
+        "campaignCodes": {
+          "type": "array",
+          "description": "Campaign codes that may grant entitlements or discounts. Usually not connected to the identity of the Traveller.",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "travellerContext": {
+          "$ref": "#/$defs/TravellerContext"
+        }
+      },
+      "x-class-extra-annotation": "@org.entur.offers.config.validation.AtLeastOneParameter(parameters = {\"userType\", \"age\"})"
+    },
+    "TravellerContext": {
+      "type": "object",
+      "description": "Customer-specific context used to personalise and determine entitlements for a traveller.",
+      "properties": {
+        "customerIdentity": {
+          "type": "array",
+          "description": "One or more references to customer identities in different systems.",
+          "items": {
+            "$ref": "#/$defs/CustomerIdentity"
+          },
+          "minItems": 1
+        },
+        "ownedRights": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OwnedRight"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "customerIdentity"
+      ]
+    },
+    "UserTypeEnum": {
+      "type": "string",
+      "description": "A type of traveller. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Subset of UserTypeEnumeration from NeTEx usage parameter eligibility support.",
+      "enum": [
+        "ANYONE",
+        "ADULT",
+        "CHILD",
+        "INFANT",
+        "ANIMAL",
+        "SENIOR",
+        "GUIDE_DOG",
+        "YOUNG_PERSON",
+        "STUDENT",
+        "MILITARY"
+      ]
+    }
+  }
+}

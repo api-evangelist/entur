@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-order-request-schema.json",
+  "title": "OrderRequest",
+  "description": "A purchase Order for one or more Travellers",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-order-partner-openapi.yml#/components/schemas/OrderRequest",
+  "type": "object",
+  "properties": {
+    "contactInfo": {
+      "$ref": "#/$defs/ContactInfo"
+    },
+    "externalReference": {
+      "type": "string",
+      "description": "External reference for Orders"
+    },
+    "expireAt": {
+      "type": "string",
+      "description": "Any changes not confirmed before this point in time will be discarded. Default is 20 minutes from the last operation. Cannot be in the past, or further into the future than six months.",
+      "format": "date-time"
+    },
+    "specialOrderCause": {
+      "$ref": "#/$defs/SpecialOrderCause"
+    }
+  },
+  "$defs": {
+    "ContactInfo": {
+      "title": "ContactInfo",
+      "type": "object",
+      "properties": {
+        "createdBy": {
+          "$ref": "#/$defs/CustomerRef"
+        },
+        "contact": {
+          "$ref": "#/$defs/CustomerRef"
+        }
+      },
+      "description": "Contact information related to different aspects in the lifecycle of an Order."
+    },
+    "CustomerRef": {
+      "title": "CustomerRef",
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID for Customer"
+        }
+      },
+      "description": "Customer reference."
+    },
+    "SpecialOrderCause": {
+      "title": "SpecialOrderCause",
+      "required": [
+        "causeCode"
+      ],
+      "type": "object",
+      "properties": {
+        "causeCode": {
+          "type": "string",
+          "description": "The cause code for issuing the Order."
+        },
+        "organisationId": {
+          "type": "string",
+          "description": "The organisation responsible for the cause. Eg. the Operator responsible for the delay causing a zero ticket to be issued. Should not be confused with the organisationId of the Order, as this has no correlation."
+        }
+      },
+      "description": "Holder for fields used to explain why an Order has been issued. Used for zero tickets."
+    }
+  }
+}

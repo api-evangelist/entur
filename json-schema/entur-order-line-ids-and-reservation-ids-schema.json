@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-order-line-ids-and-reservation-ids-schema.json",
+  "title": "OrderLineIdsAndReservationIds",
+  "description": "A wrapper that holds the resulting ids for newly created order lines, reservations and possible replacement order lines",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-reserve-offers-partner-openapi.yml#/components/schemas/OrderLineIdsAndReservationIds",
+  "required": [
+    "orderId",
+    "orderLineIds",
+    "replacedByOrderLineIds",
+    "reservationIds"
+  ],
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string"
+    },
+    "orderLineIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reservationIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "replacedByOrderLineIds": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ReplacedOrderLineIds"
+      },
+      "default": []
+    }
+  },
+  "$defs": {
+    "ReplacedOrderLineIds": {
+      "title": "ReplacedOrderLineIds",
+      "required": [
+        "originalOrderLineIds",
+        "replacedByOrderLineIds"
+      ],
+      "type": "object",
+      "properties": {
+        "originalOrderLineIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "replacedByOrderLineIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "A holder that combines orginal order line ids with those that replaces them"
+    }
+  }
+}

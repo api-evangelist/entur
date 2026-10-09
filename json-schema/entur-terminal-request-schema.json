@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-terminal-request-schema.json",
+  "title": "TerminalRequest",
+  "description": "Information used to customize the payment terminal.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-payment-partner-openapi.yml#/components/schemas/TerminalRequest",
+  "required": [
+    "redirectUrl"
+  ],
+  "type": "object",
+  "properties": {
+    "callbackUrl": {
+      "type": "string",
+      "description": "Location where notification of payment completion will be sent. If this is not provided, then the client will have to check for completion manually by getting the transaction and checking its status. The callback will be repeated until the server receives an HTTP 202 response."
+    },
+    "customerNumber": {
+      "type": "string",
+      "description": "Customer number used with recurring payment creation. This field is optional and will only be considered for certain privileged clients."
+    },
+    "redirectUrl": {
+      "pattern": "^(https?://).{0,1024}",
+      "type": "string",
+      "description": "Location to be redirected to from the payment terminal."
+    },
+    "storePayment": {
+      "type": "boolean",
+      "description": "Should the card be stored for recurring payments. If customer is not logged in, the value of this will be disregarded.",
+      "default": false
+    },
+    "terminalLanguage": {
+      "$ref": "#/$defs/TerminalLanguage"
+    },
+    "countryCode": {
+      "$ref": "#/$defs/TerminalCountryCode"
+    },
+    "autoSale": {
+      "type": "boolean",
+      "description": "If this flag is set to true, the capture call after a customer returns from the terminal is not needed. The processing starts automatically. This is only compatible with payments done with payment cards.",
+      "default": false
+    },
+    "transactionType": {
+      "$ref": "#/$defs/TransactionType"
+    },
+    "singlePage": {
+      "type": "boolean",
+      "description": "If this flag is set to true, we will attempt to generate a single-page terminal. If false, multi-page terminal might be used.",
+      "default": false
+    }
+  },
+  "$defs": {
+    "TerminalCountryCode": {
+      "type": "string",
+      "description": "ISO 3166-1 Alpha 2 country code used for certain terminals (PayPal, Collector). Used to decide which country store the customer wants to use. Default is 'NO'",
+      "default": "NO",
+      "enum": [
+        "NO",
+        "DK",
+        "SE",
+        "FI"
+      ]
+    },
+    "TerminalLanguage": {
+      "type": "string",
+      "description": "Language used in the payment terminal. Default is 'no_NO'.",
+      "enum": [
+        "da_DK",
+        "de_DE",
+        "en_GB",
+        "es_ES",
+        "et_EE",
+        "fi_FI",
+        "fr_FR",
+        "it_IT",
+        "lt_LT",
+        "lv_LV",
+        "nl_NL",
+        "no_NO",
+        "pl_PL",
+        "ru_RU",
+        "sv_SE"
+      ]
+    },
+    "TransactionType": {
+      "type": "string",
+      "description": "Set the type of transaction. Only set this field to MIT_UCOF if you want to create a Merchant Initiated Transaction (MIT) which refers to a card payment started by a merchant without the customer being actively involved. If this value is not set, a payment terminal will be created as normal.",
+      "enum": [
+        "MIT_UCOF"
+      ]
+    }
+  }
+}

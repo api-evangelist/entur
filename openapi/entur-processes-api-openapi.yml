@@ -1,0 +1,3037 @@
+openapi: 3.2.0
+info:
+  title: Entur Processes API
+  version: 2026.10.0
+  contact:
+    name: Team Selgerintegrasjoner
+    url: https://github.com/entur/omsa
+  x-stability-level: draft
+  description: 'Operations tagged processes across 2 of this provider''s published API definitions: entur-omsa-openapi.json, entur-omsa-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/omsa/v1
+  description: Production environment
+- url: https://api.dev.entur.io/omsa/v1
+  description: Development environment
+- url: https://api.staging.entur.io/omsa/v1
+  description: Staging environment
+tags:
+- name: processes
+  description: Process endpoints for creating and mutating packages, offers, and refunds.
+paths:
+  /processes/search-offers/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Search available travel offers
+      description: Searches for available offers based on travel and traveller criteria.
+      operationId: searchOfferHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/bbox'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/searchOfferInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/searchOfferResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/geojson'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/select-offers/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Create draft package from selected offers
+      description: Creates or updates a draft package from selected offer identifiers.
+      operationId: selectOffersHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/selectOffersInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/add-traveller/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Add traveller to package
+      description: Adds a traveller to an existing package.
+      operationId: addTravellerHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/addTravellerInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/update-traveller/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Update traveller in package
+      description: Updates traveller details in an existing package.
+      operationId: updateTravellerHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/updateTravellerInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/remove-traveller/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Remove traveller from package
+      description: Removes a traveller from an existing package.
+      operationId: removeTravellerHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/removeTravellerInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/assign-asset/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Assign asset to package leg
+      description: Assigns an asset to a specific package leg.
+      operationId: assignAssetHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/assetInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/assign-ancillary/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Assign ancillary products to package
+      description: Assigns ancillary products to a package or a package leg.
+      operationId: assignAncillaryProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/ancillaryInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/purchase-offers/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Purchase selected offers directly
+      description: Purchases selected offers directly and returns the resulting package.
+      operationId: purchaseOffersProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/purchaseOffersInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/purchase-package/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Purchase existing package
+      description: Purchases a previously created package.
+      operationId: purchasePackageProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/packageInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/confirm-package/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Confirm package before purchase
+      description: Confirms a package before final purchase.
+      operationId: confirmPackageProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/bbox'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/packageInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/release-package/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Release package reservation
+      description: Releases a package reservation.
+      operationId: releasePackageProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/offset'
+      - $ref: '#/components/parameters/bbox'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/packageInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/extend-expiry-time/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Extend package reservation expiry
+      description: Extends the expiry time for a reserved package.
+      operationId: extendExpiryTimeProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/extendExpiryTimeInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/update-travel-document-validity/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Update travel document validity start
+      description: Updates the validity start time for a travel document in a package.
+      operationId: updateTravelDocumentValidityProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/updateTravelDocumentValidityInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          description: Validity updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/updateTravelDocumentValidityResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/cancel-package/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Cancel package
+      description: Cancels an existing purchased or reserved package.
+      operationId: cancelPackageProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/packageInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/claim-refund-option/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Claim refund option for package
+      description: Claims a refund option for the selected package content.
+      operationId: claimRefundProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      - $ref: '#/components/parameters/EnturDistributionChannelHeaderRequired'
+      - $ref: '#/components/parameters/EnturPOSHeaderRequired'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/refundOptionInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+  /processes/confirm-refund-option/execute:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - processes
+      summary: Confirm claimed refund option
+      description: Confirms a previously claimed refund option.
+      operationId: confirmRefundClaimProcessHandler
+      parameters:
+      - $ref: '#/components/parameters/acceptLanguage'
+      - $ref: '#/components/parameters/authorization'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inputs:
+                  $ref: '#/components/schemas/refundOptionInput'
+                subscriber:
+                  $ref: '#/components/schemas/subscriber'
+        required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/packageResponse'
+        default:
+          $ref: '#/components/responses/errorResponse'
+      callbacks:
+        jobCompleted:
+          '{$request.body#/subscriber/successUri}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/package'
+              responses:
+                '200':
+                  description: Results received successfully
+      security:
+      - BearerAuth: []
+      - OAuth: []
+      - OAuthPKI: []
+    servers:
+    - url: https://api.entur.io/omsa/v1
+      description: Production environment
+    - url: https://api.dev.entur.io/omsa/v1
+      description: Development environment
+    - url: https://api.staging.entur.io/omsa/v1
+      description: Staging environment
+components:
+  responses:
+    searchOfferResponse:
+      description: a search offer response
+      headers:
+        Version:
+          $ref: '#/components/headers/version'
+        Content-Language:
+          $ref: '#/components/headers/contentLanguage'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/offerCollection'
+    packageResponse:
+      description: a geojson response, containing the package details in the main properties and the legs are represented in the features
+      headers:
+        Version:
+          $ref: '#/components/headers/version'
+        Entur-Order-Version:
+          $ref: '#/components/headers/enturOrderVersion'
+        Content-Language:
+          $ref: '#/components/headers/contentLanguage'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/package'
+    errorResponse:
+      description: Bad request.
+      headers:
+        Version:
+          $ref: '#/components/headers/version'
+        Content-Language:
+          $ref: '#/components/headers/contentLanguage'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  schemas:
+    organisationReference:
+      required:
+      - organisationId
+      type: object
+      properties:
+        organisationId:
+          $ref: '#/components/schemas/normalString'
+        name:
+          $ref: '#/components/schemas/normalString'
+    dateTimeOrNow:
+      type: string
+      description: Either RFC3339 date-time (for example 2019-10-12T07:20:50Z) or the keyword NOW for server-side immediate start.
+      x-pattern: ^([Nn][Oo][Ww]|[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2}))$
+    longInt:
+      minimum: 0
+      type: integer
+      description: long number, for distances etc. (>1.000)
+      default: 0
+    assetSelection:
+      type: string
+      description: Whether a concrete asset, such as a seat, can be selected manually, assigned automatically, or is not available for this reservation.
+      enum:
+      - NOT_AVAILABLE
+      - AUTO_ASSIGNED
+      - MANUAL_AVAILABLE
+    accommodation:
+      type: object
+      properties:
+        type:
+          pattern: ^(accommodation)$
+          type: string
+        description:
+          $ref: '#/components/schemas/longString'
+        classOfUse:
+          $ref: '#/components/schemas/classOfUse'
+        name:
+          $ref: '#/components/schemas/shortString'
+        gender:
+          type: string
+          enum:
+          - M
+          - F
+          - X
+          - U
+        berthType:
+          $ref: '#/components/schemas/berthType'
+        nuisanceFacility:
+          type: array
+          items:
+            $ref: '#/components/schemas/shortString'
+      description: A combination of accommodation characteristics available on a service, e.g. "First Class Couchette with shower and 2 bunks".
+      x-tm: ACCOMODATION
+    extendExpiryTimeInput:
+      required:
+      - packageId
+      - type
+      type: object
+      properties:
+        packageId:
+          $ref: '#/components/schemas/packageReference'
+        type:
+          pattern: ^(extend_expiry_time)$
+          type: string
+        extensionReason:
+          pattern: ^(purchase_pending|payment_pending|other)$
+          type: string
+          description: in case operation is EXTEND_EXPIRY_TIME, the reason for extension must be supplied here.<br> _PURCHASE_PENDING_ - The internal purchase process on the MP side is not yet finished<br> _PAYMENT_PENDING_ - The customer is in the payment process<br> _OTHER_ - unspecified
+    frequencyOfUse:
+      required:
+      - id
+      - type
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/frequencyOfUseReference'
+        type:
+          pattern: ^(frequency_of_use)$
+          type: string
+        frequencyOfUseType:
+          $ref: '#/components/schemas/frequencyOfUseType'
+        minimalFrequency:
+          minimum: 0
+          type: integer
+          description: Minimum number of times the product can be used.
+        maximalFrequency:
+          minimum: 0
+          type: integer
+          description: Maximum number of times the product can be used.
+        frequencyInterval:
+          type: string
+          description: Positive ISO 8601 interval within which frequency is measured.
+          format: duration
+      x-tm: FREQUENCY OF USE
+    geojsonMultiPolygon:
+      required:
+      - coordinates
+      type: object
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/basePoint'
+      description: geojson representation of a multi polygon. See also https://geojson.org/geojson-spec.html#multipolygon
+    networkParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(network)$
+          type: string
+        location:
+          $ref: '#/components/schemas/placeReference'
+        line:
+          $ref: '#/components/schemas/lineReference'
+        zones:
+          type: array
+          items:
+            $ref: '#/components/schemas/zoneReference'
+      x-tm: NETWORK VALIDITY PARAMETERS
+    tripPattern:
+      type: array
+      items:
+        type: object
+        properties:
+          serviceJourney:
+            $ref: '#/components/schemas/serviceJourneyReference'
+          date:
+            $ref: '#/components/schemas/date'
+          from:
+            $ref: '#/components/schemas/placeReference'
+          to:
+            $ref: '#/components/schemas/placeReference'
+    licenseType:
+      required:
+      - mode
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(license_type)$
+          type: string
+        modes:
+          type: array
+          items:
+            $ref: '#/components/schemas/mode'
+        licenseCode:
+          $ref: '#/components/schemas/shortString'
+        issuingCountry:
+          $ref: '#/components/schemas/country'
+        customFields:
+          $ref: '#/components/schemas/customProperties'
+      description: A category of license to use a certain asset class
+      x-tm: TYPE OF DRIVER PERMIT
+    geojsonFeature:
+      required:
+      - id
+      - properties
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(Feature)$
+          type: string
+        geometry:
+          oneOf:
+          - $ref: '#/components/schemas/geojsonPoint'
+          - $ref: '#/components/schemas/geojsonLine'
+          - $ref: '#/components/schemas/geojsonPolygon'
+          - $ref: '#/components/schemas/geojsonMultiPolygon'
+        properties:
+          oneOf:
+          - $ref: '#/components/schemas/asset'
+          - $ref: '#/components/schemas/seat'
+        id:
+          $ref: '#/components/schemas/shortString'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+    reservationPolicy:
+      type: string
+      description: Reservation policy used by clients to decide whether reservation UI is hidden, optional, recommended, or required.
+      enum:
+      - NOT_POSSIBLE
+      - OPTIONAL
+      - RECOMMENDED
+      - COMPULSORY
+    normalInt:
+      maximum: 1000
+      minimum: 0
+      type: integer
+      description: default length for an integer (0-1000)
+      default: 0
+    onboardStay:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(onboard_stay)$
+          type: string
+        description:
+          $ref: '#/components/schemas/longString'
+        classOfUse:
+          $ref: '#/components/schemas/classOfUse'
+        permission:
+          type: boolean
+        duration:
+          $ref: '#/components/schemas/shortString'
+      description: Permission to board early before the journey or stay on board after the journey.
+      x-tm: ONBOARD STAY
+    userProfile:
+      allOf:
+      - $ref: '#/components/schemas/travelParty'
+      - required:
+        - id
+        - type
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/userProfileReference'
+          type:
+            pattern: ^(user_profile)$
+            type: string
+          count:
+            $ref: '#/components/schemas/shortInt'
+          minimumAge:
+            $ref: '#/components/schemas/shortInt'
+          maximumAge:
+            $ref: '#/components/schemas/shortInt'
+          monthDayOnWhichAgeApplies:
+            $ref: '#/components/schemas/shortInt'
+          ageGroup:
+            type: string
+            enum:
+            - ANYONE
+            - INFANT
+            - CHILD
+            - YOUTH
+            - ADULT
+            - SENIOR
+          minimumHeight:
+            $ref: '#/components/schemas/shortInt'
+          maximumHeight:
+            $ref: '#/components/schemas/shortInt'
+          localResident:
+            type: boolean
+          genderLimitation:
+            type: boolean
+        x-tm: USER PROFILE
+    dateTime:
+      type: string
+      description: https://www.rfc-editor.org/rfc/rfc3339#section-5.6, date-time (2019-10-12T07:20:50.52Z)
+      format: date-time
+      x-pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$
+    travellingAsset:
+      required:
+      - id
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(asset)$
+          type: string
+        id:
+          $ref: '#/components/schemas/assetReference'
+    frequencyOfUseReference:
+      $ref: '#/components/schemas/normalString'
+    classOfUse:
+      type: string
+      description: A classification of fare and other service classes by category of user entitled to use them. Use ECONOMY_CLASS for standard class products.
+      enum:
+      - FIRST_CLASS
+      - SECOND_CLASS
+      - THIRD_CLASS
+      - ECONOMY_CLASS
+      - BUSINESS_CLASS
+      - TURISTA
+      - PREFERENTE
+      - PREMIUM_CLASS
+      - ANY
+      - UNKNOWN
+      x-tm: CLASS OF USE
+    spotReservationParameter:
+      required:
+      - spot
+      - spotType
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(spot_reservation)$
+          type: string
+        spotType:
+          type: string
+          enum:
+          - VEHICLE_SPOT
+          - PASSENGER_SPOT
+          - LUGGAGE_SPOT
+        deck:
+          $ref: '#/components/schemas/externalReference'
+        space:
+          $ref: '#/components/schemas/externalReference'
+        spot:
+          description: 'For LUGGAGE_SPOT and VEHICLE_SPOT, supported values are: HANDBAG, HAND_LUGGAGE, SMALL_SUITCASE, SUITCASE, TRUNK, OVERSIZE_ITEM, BICYCLE, SPORTING_EQUIPMENT, SKIS, MUSICAL_INSTRUMENT, PUSH_CHAIR, MOTORIZED_WHEELCHAIR, LARGE_MOTORIZED_WHEELCHAIR, WHEELCHAIR, SMALL_ANIMAL, ANIMAL, GAME, MOTORCYCLE, OTHER, GUIDE_DOG. Unknown values are ignored. Use VEHICLE_SPOT for vehicles transported as cargo (e.g. motorcycle on a ferry). For PASSENGER_SPOT, the value is an operator-specific seat identifier and is not used for requirement mapping.
+
+            '
+          allOf:
+          - $ref: '#/components/schemas/externalReference'
+        width:
+          type: number
+        length:
+          type: number
+        height:
+          type: number
+        fuel:
+          type: string
+        weight:
+          type: string
+        mode:
+          $ref: '#/components/schemas/mode'
+      x-tm: SEATING VALIDITY PARAMETERS
+    equipmentParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(equipment)$
+          type: string
+        id:
+          $ref: '#/components/schemas/equipmentReference'
+        name:
+          $ref: '#/components/schemas/shortString'
+        description:
+          $ref: '#/components/schemas/longString'
+        infoLink:
+          $ref: '#/components/schemas/url'
+        image:
+          $ref: '#/components/schemas/url'
+      x-tm: EQUIPMENT VALIDITY PARAMETERS
+    subscriber:
+      required:
+      - successUrl
+      type: object
+      properties:
+        successUri:
+          type: string
+          format: uri
+        inProgressUri:
+          type: string
+          format: uri
+        failedUri:
+          type: string
+          format: uri
+      description: 'Optional URIs for callbacks for this job.
+
+
+        Support for this parameter is not required and the parameter may be
+
+        removed from the API definition, if conformance class **''callback''**
+
+        is not listed in the conformance declaration under `/conformance`.'
+      externalDocs:
+        url: https://github.com/opengeospatial/ogcapi-processes/raw/refs/heads/master/openapi/schemas/processes-core/subscriber.yaml
+    usageValidityPeriodType:
+      type: string
+      description: NeTEx classification of a usage validity period.
+      enum:
+      - SINGLE_RIDE
+      - SINGLE_TRIP
+      - RETURN_TRIP
+      - CARNET
+      - DAY_PASS
+      - WEEKLY_PASS
+      - WEEKEND_PASS
+      - MONTHLY_PASS
+      - ANNUAL_PASS
+      - SEASON_TICKET
+      - PROFILE_MEMBERSHIP
+      - SUBSCRIPTION
+      - OPEN_ENDED
+      - CAP
+      - OTHER
+    assetInput:
+      allOf:
+      - $ref: '#/components/schemas/legInput'
+      - required:
+        - assetId
+        - type
+        type: object
+        properties:
+          type:
+            pattern: ^(asset)$
+            type: string
+          assetId:
+            $ref: '#/components/schemas/assetReference'
+          replaceAssetId:
+            $ref: '#/components/schemas/assetReference'
+    country:
+      maxLength: 2
+      minLength: 2
+      pattern: '[A-Z]{2}'
+      type: string
+      description: two-letter country codes according to ISO 3166-1
+    geojsonLine:
+      required:
+      - coordinates
+      type: object
+      properties:
+        coordinates:
+          type: array
+          items:
+            $ref: '#/components/schemas/basePoint'
+      description: An array of WGS84 coordinate pairs
+    ancillaryReference:
+      required:
+      - ancillaryId
+      type: object
+      properties:
+        ancillaryId:
+          $ref: '#/components/schemas/normalString'
+        name:
+          $ref: '#/components/schemas/normalString'
+    httpStatus:
+      maximum: 599
+      minimum: 100
+      type: integer
+      description: HTTP status code (100–599)
+    legState:
+      type: string
+      description: status of a leg<br> _NOT_STARTED_ the leg is not started, initial state<br> _PREPARING_ the _PREPARE_ operation has been received<br> _PREPARED_ the leg is ready to use<br> _IN_USE_ the travelers are on their way<br> _PAUSED_ the asset is paused<br> _ENDED_ the travelers have arrived at their destination<br> _ISSUE_REPORTED_ due to an issue, there is (temporarily) no progress to report, when the issue isn't solved, this is a final state<br> _CANCELLED_ the leg has been cancelled, before execution<br> _ABENDED_ the leg is abnormally ended (e.g. due to an issue)
+      enum:
+      - NOT_STARTED
+      - PREPARING
+      - PREPARED
+      - IN_USE
+      - PAUSED
+      - ENDED
+      - ISSUE_REPORTED
+      - CANCELLED
+      - ABENDED
+    entitlementGiven:
+      required:
+      - entitlementType
+      - type
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/shortString'
+        type:
+          pattern: ^(entitlement)$
+          type: string
+        entitlementType:
+          $ref: '#/components/schemas/normalString'
+      x-tm: ENTITLEMENT GIVEN
+    error:
+      required:
+      - category
+      - code
+      - detail
+      - hint
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/url'
+        title:
+          $ref: '#/components/schemas/shortString'
+        status:
+          $ref: '#/components/schemas/httpStatus'
+        detail:
+          $ref: '#/components/schemas/longString'
+        instance:
+          $ref: '#/components/schemas/url'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        code:
+          type: string
+          description: Stable machine-readable problem code.
+        category:
+          type: string
+          description: Public problem category used by curated problems.
+          enum:
+          - authorization
+          - validation
+          - downstream
+          - state
+          - resource
+          - availability
+          - server
+        hint:
+          type: string
+          description: Short client-facing remediation hint.
+        context:
+          type: object
+          additionalProperties: true
+          description: Safe structured context fields for the problem.
+      additionalProperties: true
+      description: JSON schema for exceptions based on RFC 7807
+    updateTravellerInput:
+      required:
+      - packageId
+      - travellerId
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(traveller)$
+          type: string
+        packageId:
+          $ref: '#/components/schemas/packageReference'
+        travellerId:
+          $ref: '#/components/schemas/travellerReference'
+        individualTraveller:
+          $ref: '#/components/schemas/individualTraveller'
+        userProfile:
+          $ref: '#/components/schemas/userProfile'
+        travellingAsset:
+          $ref: '#/components/schemas/travellingAsset'
+    packageStatus:
+      type: string
+      description: The life-cycle state of the package (from NEW to ENDED)<br> _OFFERED_ the package is offered<br> _SELECTED_ the package is selected to modify<br> _PENDING_ the purchase of the package is not confirmed (the end user has shown intentions to purchase this offer), must be finalized with the package-confirm operation<br> _CONFIRMED_ a finalized package ('purchased'). Both parties agreed to deliver services in return of payment<br> _CANCELLED_ the package is cancelled after it is purchased. The agreement will specify whether there is a refund, or under which conditions<br> _EXPIRED_ the MP didn't respond on time, the package offer has been expired<br> _STARTED_ the package is started, the <u>trip execution</u> module is needed now to manage the execution of the package<br> _ENDED_ the package has ended, the trip has been executed<br> _RELEASED_ for internal archiving, the package has not been purchased.<br>
+      enum:
+      - OFFERED
+      - SELECTED
+      - PENDING
+      - CONFIRMED
+      - RELEASED
+      - EXPIRED
+      - CANCELLED
+      - REFUND_CLAIMED
+      - REFUNDED
+      - STARTED
+      - ENDED
+      x-tm: CUSTOMER PURCHASE STATUS
+    currencyCode:
+      maxLength: 3
+      minLength: 3
+      pattern: '[a-zA-Z]{3}'
+      type: string
+      description: ISO 4217 currency code
+    asset:
+      properties:
+        type:
+          pattern: ^(asset)$
+          type: string
+        id:
+          $ref: '#/components/schemas/assetReference'
+        visualId:
+          $ref: '#/components/schemas/shortString'
+        product:
+          $ref: '#/components/schemas/productReference'
+        mode:
+          $ref: '#/components/schemas/mode'
+        subMode:
+          $ref: '#/components/schemas/normalString'
+        equipment:
+          maxItems: 100
+          type: array
+          description: list of external references
+          items:
+            $ref: '#/components/schemas/equipmentReference'
+      description: the asset that can by applied to execute a leg.
+      x-tm: VEHICLE, PARKING BAY, CYCLE STORAGE EQUIPMENT, VEHICLE CHARGING EQUIPMENT
+    berthType:
+      type: string
+      enum:
+      - SLEEPER
+      - COUCHETTE
+      - SEAT
+      - OTHER
+    guarantee:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/shortString'
+        type:
+          $ref: '#/components/schemas/normalString'
+    amountOfMoney:
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          type: number
+          description: This should be in the base unit as defined by the ISO 4217 currency code with the appropriate number of decimal places and omitting the currency symbol. e.g. if the price is in US Dollars the price would be 9.95. This is inclusive VAT
+          format: float
+        taxPercentageUsed:
+          $ref: '#/components/schemas/float'
+        currencyCode:
+          $ref: '#/components/schemas/currencyCode'
+        vatCountryCode:
+          $ref: '#/components/schemas/country'
+      description: an amount of money, usable in fares, fare calculations or in extra costs.
+      x-tm:
+      - concept: FARE PRICE
+    travellerReference:
+      $ref: '#/components/schemas/normalString'
+    commercialProfile:
+      required:
+      - type
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/shortString'
+        type:
+          pattern: ^(commercial_profile)$
+          type: string
+        code:
+          $ref: '#/components/schemas/shortString'
+        name:
+          $ref: '#/components/schemas/normalString'
+      x-tm: COMMERCIAL PROFILE
+    product:
+      type: object
+      properties:
+        type:
+          pattern: ^(product)$
+          type: string
+        productId:
+          $ref: '#/components/schemas/productReference'
+        productName:
+          $ref: '#/components/schemas/normalString'
+        guarantees:
+          type: array
+          description: references to products that are contained in this product (to facilitate e.g. travel through) If his combined product is named in a package, the referenced packages must be enlisted as well.
+          items:
+            $ref: '#/components/schemas/guarantee'
+        service:
+          type: array
+          description: Service characteristics covered by this product, such as service journey, class of use, asset, or accommodation.
+          items:
+            $ref: '#/components/schemas/serviceParameter'
+        reservationRequirements:
+          type: array
+          description: Reservation rules carried by this product.
+          items:
+            $ref: '#/components/schemas/reservationRequirement'
+      x-tm: FARE PRODUCT
+    cancellationParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(cancel)$
+          type: string
+        cancellationAllowed:
+          type: boolean
+          description: is it possible to cancel this package?
+        cancellationFee:
+          $ref: '#/components/schemas/amountOfMoney'
+        cancellationFeePercentage:
+          maximum: 100
+          minimum: 0
+          type: number
+          description: percentage of the offered price you have to pay when you cancel this purchased package
+      description: conditions regarding cancellation of a purchased package
+      x-tm:
+      - concept: CANCELLING
+      - cancellationFee: lacking
+      - cancellationAllowed: cancellationAllowed
+      - cancellationFeePercentage: lacking
+    float:
+      minimum: 0
+      type: number
+      description: the travelled distance. Only if applicable.
+      format: float
+    zoneReference:
+      required:
+      - zoneId
+      type: object
+      properties:
+        zoneId:
+          $ref: '#/components/schemas/normalString'
+        name:
+          $ref: '#/components/schemas/normalString'
+    geojsonPolygon:
+      required:
+      - coordinates
+      type: object
+      properties:
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/basePoint'
+      description: geojson representation of a polygon. First and last point must be equal. See also https://geojson.org/geojson-spec.html#polygon and example https://geojson.org/geojson-spec.html#id4. The order should be lon, lat [[[lon1, lat1], [lon2,lat2], [lon3,lat3], [lon1,lat1]]], the first point should match the last point.
+    date:
+      type: string
+      description: https://www.rfc-editor.org/rfc/rfc3339#section-5.6, full-date (2019-10-12)
+      format: full-date
+      x-pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}$
+    activationMeans:
+      type: string
+      description: Means used to activate the usage validity period.
+      enum:
+      - NONE_REQUIRED
+      - CHECK_IN
+      - USE_OF_VALIDATOR
+      - USE_OF_MOBILE_DEVICE
+      - AUTOMATIC_BY_TIME
+      - AUTOMATIC_BY_PROXIMITY
+      - ACCESS_CODE
+      - OTHER
+    searchOfferFilter:
+      discriminator:
+        propertyName: type
+        mapping:
+          service: '#/components/schemas/serviceFilter'
+          organisational: '#/components/schemas/organisationalFilter'
+      oneOf:
+      - $ref: '#/components/schemas/serviceFilter'
+      - $ref: '#/components/schemas/organisationalFilter'
+    placeDefinitions:
+      type: object
+      properties:
+        placeDefinitions:
+          maxItems: 3
+          minItems: 0
+          type: array
+          description: Places that are not specified in an external data source (like a home address)
+          items:
+            $ref: '#/components/schemas/postalAddress'
+    productReference:
+      required:
+      - name
+      - productId
+      type: object
+      properties:
+        productId:
+          $ref: '#/components/schemas/normalString'
+        name:
+          $ref: '#/components/schemas/normalString'
+    assetReference:
+      $ref: '#/components/schemas/normalString'
+    mode:
+      type: string
+      description: These classes are taken from the NeTeX standard, but ALL and UNKNOWN are removed. On the other hand OTHER and PARKING are added.
+      enum:
+      - AIR
+      - BUS
+      - TROLLEYBUS
+      - TRAM
+      - COACH
+      - RAIL
+      - INTERCITYRAIL
+      - URBANRAIL
+      - METRO
+      - WATER
+      - CABLEWAY
+      - FUNICULAR
+      - TAXI
+      - SELFDRIVE
+      - FOOT
+      - BICYCLE
+      - MOTORCYCLE
+      - CAR
+      - SHUTTLE
+      - OTHER
+      - PARKING
+      - MOPED
+      - STEP
+      - FERRY
+      x-tm:
+      - concept: MODE
+    basePoint:
+      maxItems: 2
+      minItems: 2
+      type: array
+      items:
+        minimum: 0
+        type: number
+        format: float
+    enturRecommendationType:
+      type: string
+      description: Entur Offers recommendation category.
+      enum:
+      - FLEXIBLE
+      - SEMI_FLEXIBLE
+      - NON_FLEXIBLE
+      - CHEAPEST
+    userProfileReference:
+      $ref: '#/components/schemas/normalString'
+    serviceParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(service)$
+          type: string
+        product:
+          $ref: '#/components/schemas/productReference'
+        asset:
+          $ref: '#/components/schemas/assetReference'
+        serviceJourney:
+          $ref: '#/components/schemas/serviceJourneyReference'
+        userNeeds:
+          type: array
+          items:
+            $ref: '#/components/schemas/userNeedReference'
+        class:
+          $ref: '#/components/schemas/classOfUse'
+        onboardStay:
+          type: array
+          items:
+            $ref: '#/components/schemas/onboardStay'
+        accommodations:
+          type: array
+          items:
+            $ref: '#/components/schemas/accommodation'
+      x-tm: SERVICE VALIDITY PARAMETERS
+    placeReference:
+      required:
+      - placeId
+      type: object
+      properties:
+        placeId:
+          maxLength: 200
+          pattern: ^(GPS:|NSR:StopPlace:|P:)
+          type: string
+          description: this string references to information that can be found in the `data sources`. Enlist all prefixes (=rel) from the /collections/datasources/items that apply to a place/location. Default it matches already with 'GPS' (no entry required in the datasources). In case of a custom place (like home address), you can use the 'P:' prefix and add the address to the **placeDefinitions** list of the request.
+          x-example-format: ^(GPS:|GBFS:stations:)
+        name:
+          $ref: '#/components/schemas/normalString'
+    equipmentReference:
+      required:
+      - equipmentId
+      type: object
+      properties:
+        equipmentId:
+          $ref: '#/components/schemas/normalString'
+        name:
+          $ref: '#/components/schemas/normalString'
+    travelPartyRequirements:
+      type: object
+      properties:
+        organisational:
+          type: array
+          items:
+            $ref: '#/components/schemas/organisationalParameter'
+        spotReservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/spotReservationParameter'
+        distribution:
+          type: array
+          items:
+            $ref: '#/components/schemas/distributionParameter'
+        network:
+          type: array
+          items:
+            $ref: '#/components/schemas/networkParameter'
+        routing:
+          type: array
+          items:
+            $ref: '#/components/schemas/routingParameter'
+        service:
+          type: array
+          items:
+            $ref: '#/components/schemas/serviceParameter'
+        temporal:
+          type: array
+          items:
+            $ref: '#/components/schemas/temporalParameter'
+        equipment:
+          type: array
+          items:
+            $ref: '#/components/schemas/equipmentParameter'
+        cancellation:
+          type: array
+          items:
+            $ref: '#/components/schemas/cancellationParameter'
+        purchase:
+          type: array
+          items:
+            $ref: '#/components/schemas/purchaseParameter'
+    externalReference:
+      $ref: '#/components/schemas/normalString'
+    blackoutUse:
+      type: string
+      description: How the validity period interacts with blackout periods.
+      enum:
+      - MAY_TRAVEL_ANYTIME
+      - NO_TRAVEL_WITHIN_PERIOD
+      - NO_TRAVEL_WITHIN_TIMEBAND
+      - MAY_COMPLETE_IF_STARTED_BEFORE
+    refundOptionInput:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(claim_refund_option|confirm_refund_option)$
+          type: string
+        optionId:
+          $ref: '#/components/schemas/uuid'
+    searchOfferInput:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(search_offer)
+          type: string
+        specification:
+          allOf:
+          - $ref: '#/components/schemas/travelSpecification'
+          - $ref: '#/components/schemas/placeDefinitions'
+        filters:
+          type: array
+          description: Request-wide predicates that every returned offer must satisfy.
+          items:
+            $ref: '#/components/schemas/searchOfferFilter'
+        pattern:
+          $ref: '#/components/schemas/tripPattern'
+        packageToExchange:
+          $ref: '#/components/schemas/packageReference'
+        travellers:
+          maxItems: 10
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/individualTraveller'
+        profiles:
+          minItems: 1
+          type: array
+          items:
+            $ref: '#/components/schemas/userProfile'
+        travellingAssets:
+          type: array
+          items:
+            $ref: '#/components/schemas/travellingAsset'
+        entur:
+          $ref: '#/components/schemas/enturSearchOfferInput'
+      description: A package planning request, resulting in package options
+      anyOf:
+      - required:
+        - travellers
+      - required:
+        - profiles
+    ancillary:
+      allOf:
+      - $ref: '#/components/schemas/ancillaryReference'
+      - type: object
+        properties:
+          type:
+            pattern: ^(ancillary)$
+            type: string
+          price:
+            $ref: '#/components/schemas/amountOfMoney'
+          description:
+            type: string
+            description: A user-friendly description of the ancillary (e.g. 'Reserved seat for bike').
+          available:
+            type: integer
+            description: Number of items available in stock (inventory). Useful for creating urgency in GUI.
+          service:
+            type: array
+            description: Service characteristics covered by this ancillary, such as service journey, class of use, asset, or accommodation.
+            items:
+              $ref: '#/components/schemas/serviceParameter'
+          reservationRequirements:
+            type: array
+            description: Reservation rules carried by this ancillary.
+            items:
+              $ref: '#/components/schemas/reservationRequirement'
+          links:
+            type: array
+            items:
+              $ref: '#/components/schemas/link'
+        x-tm: ANCILLARY
+    customProperties:
+      maxProperties: 20
+      type: object
+      additionalProperties: true
+      description: dictionary for extra fields (bilatural agreements)
+    offer:
+      required:
+      - properties
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/shortString'
+        type:
+          pattern: ^(offer)$
+          type: string
+        properties:
+          type: object
+          properties:
+            legs:
+              type: array
+              items:
+                $ref: '#/components/schemas/leg'
+            usageValidityPeriods:
+              type: array
+              description: Usage validity periods referenced by the offer's legs.
+              items:
+                $ref: '#/components/schemas/usageValidityPeriod'
+            frequenciesOfUse:
+              type: array
+              description: Frequency-of-use parameters referenced by the offer's legs.
+              items:
+                $ref: '#/components/schemas/frequencyOfUse'
+            ancillaries:
+              type: array
+              items:
+                $ref: '#/components/schemas/ancillary'
+            products:
+              type: array
+              items:
+                $ref: '#/components/schemas/product'
+            price:
+              $ref: '#/components/schemas/amountOfMoney'
+            summary:
+              type: object
+              additionalProperties: true
+              description: "Flexible summary metadata for the offer. Known keys include:\n  - `name`: offer display name\n  - `description`: human-readable offer description\n  - `isRefundable`: whether included products are refundable\n  - `isExchangeable`: whether included products are exchangeable\n  - `geographicalValidity`: zonal validity details, including labeled `fareZones` and `groups`\n  - `recommendationType`: recommendation category from Offers (for example `CHEAPEST`)\n  - `recommendationGroup`: 1-based recommendation index in Offers response order\n  - `recommendationRank`: 1-based `offersToBuy` index within a recommendation\n"
+            guarantees:
+              type: array
+              items:
+                $ref: '#/components/schemas/guarantee'
+            expiryTime:
+              $ref: '#/components/schemas/dateTime'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+      x-tm: SALES OFFER PACKAGE
+    serviceFilter:
+      minProperties: 2
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(service)$
+          type: string
+        productId:
+          $ref: '#/components/schemas/normalString'
+        serviceJourney:
+          $ref: '#/components/schemas/serviceJourneyReference'
+        class:
+          $ref: '#/components/schemas/classOfUse'
+        berthTypes:
+          minItems: 1
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/berthType'
+      additionalProperties: false
+      description: Service characteristics that every returned offer must satisfy.
+    card:
+      required:
+      - cardNumber
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(card)$
+          type: string
+        cardType:
+          $ref: '#/components/schemas/cardType'
+        cardNumber:
+          $ref: '#/components/schemas/shortString'
+        description:
+          $ref: '#/components/schemas/shortString'
+        additionalNumber:
+          $ref: '#/components/schemas/shortString'
+        endValidity:
+          $ref: '#/components/schemas/date'
+        country:
+          $ref: '#/components/schemas/country'
+      description: Any kind of card that isn't a license, only provide the cards that are required
+      x-tm: CUSTOMER PAYMENT MEANS, MEDIUM APPLICATION INSTANCE
+    travelParty:
+      type: object
+      properties:
+        type:
+          type: string
+        entitlements:
+          type: object
+          properties:
+            commercialProfiles:
+              type: array
+              items:
+                $ref: '#/components/schemas/commercialProfile'
+            entitlementsGiven:
+              type: array
+              items:
+                $ref: '#/components/schemas/entitlementGiven'
+            cardTypes:
+              type: array
+              items:
+                $ref: '#/components/schemas/cardType'
+            cards:
+              type: array
+              items:
+                $ref: '#/components/schemas/card'
+            licenseTypes:
+              type: array
+              items:
+                $ref: '#/components/schemas/licenseType'
+            licenses:
+              type: array
+              items:
+                $ref: '#/components/schemas/license'
+        requirements:
+          $ref: '#/components/schemas/travelPartyRequirements'
+      x-tm: ACCESS RIGHT PARAMETER ASSIGNMENT
+    usageStartConstraintType:
+      type: string
+      description: Constraint applied to the start of the usage validity period.
+      enum:
+      - VARIABLE
+      - FIXED
+      - FIXED_WINDOW
+    longString:
+      maxLength: 10000
+      type: string
+      description: long string, memos etc (length 0-10.000)
+    ancillaryInput:
+      allOf:
+      - $ref: '#/components/schemas/legInput'
+      - required:
+        - ancillaryId
+        - type
+        type: object
+        properties:
+          type:
+            pattern: ^(ancillary)$
+            type: string
+          ancillaryId:
+            $ref: '#/components/schemas/ancillaryReference'
+          replaceAncillaryId:
+            $ref: '#/components/schemas/ancillaryReference'
+    shortString:
+      maxLength: 75
+      type: string
+      description: short string, display names (length 0-75)
+    leg:
+      allOf:
+      - $ref: '#/components/schemas/travelSpecification'
+      - required:
+        - id
+        - type
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/legReference'
+          type:
+            pattern: ^(leg)$
+            type: string
+          sequenceNumber:
+            $ref: '#/components/schemas/shortInt'
+          traveller:
+            $ref: '#/components/schemas/travellerReference'
+          state:
+            $ref: '#/components/schemas/legState'
+          price:
+            $ref: '#/components/schemas/amountOfMoney'
+          products:
+            type: array
+            description: a reference to a product in the 'products' collection of the offer
+            items:
+              $ref: '#/components/schemas/shortString'
+          ancillaries:
+            type: array
+            description: additional products that can be assigned to this leg, references to 'ancillaries' collection
+            items:
+              $ref: '#/components/schemas/shortString'
+          usageValidityPeriods:
+            type: array
+            description: References to usage validity periods in the offer's usageValidityPeriods collection.
+            items:
+              $ref: '#/components/schemas/usageValidityPeriodReference'
+          frequenciesOfUse:
+            type: array
+            description: References to frequency-of-use parameters in the offer's frequenciesOfUse collection.
+            items:
+              $ref: '#/components/schemas/frequencyOfUseReference'
+          mode:
+            $ref: '#/components/schemas/mode'
+          assets:
+            type: array
+            description: The physical asset(s) used for the execution of the leg
+            items:
+              $ref: '#/components/schemas/assetReference'
+          reservationRequirement:
+            $ref: '#/components/schemas/reservationRequirement'
+          operator:
+            $ref: '#/components/schemas/organisationReference'
+        description: A (planned) consumption of a product within a package
+      x-tm: LEG
+    geojsonPoint:
+      required:
+      - coordinates
+      type: object
+      properties:
+        coordinates:
+          $ref: '#/components/schemas/basePoint'
+      description: Geojson Coordinate
+    packageInput:
+      required:
+      - packageId
+      - type
+      type: object
+      properties:
+        packageId:
+          $ref: '#/components/schemas/packageReference'
+        type:
+          pattern: ^(package)
+          type: string
+    seat:
+      type: object
+      properties:
+        type:
+          pattern: ^(seat)$
+          type: string
+        id:
+          $ref: '#/components/schemas/externalReference'
+        deck:
+          $ref: '#/components/schemas/shortString'
+        space:
+          $ref: '#/components/schemas/shortString'
+        row:
+          $ref: '#/components/schemas/shortInt'
+        seatNumber:
+          $ref: '#/components/schemas/shortInt'
+        facing:
+          type: string
+          enum:
+          - FRONT
+          - REAR
+          - LEFT
+          - RIGHT
+          - OTHER
+        byWindow:
+          type: boolean
+        legSpace:
+          $ref: '#/components/schemas/shortInt'
+        byAisle:
+          type: boolean
+        hasArmRest:
+          type: boolean
+        hasTray:
+          type: boolean
+        hasAirco:
+          type: boolean
+        hasEnergySupply:
+          type: boolean
+        hasLight:
+          type: boolean
+    geojson:
+      type: object
+      properties:
+        type:
+          pattern: ^(FeatureCollection)$
+          type: string
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/geojsonFeature'
+        properties:
+          type: object
+        crs:
+          type: object
+          properties:
+            type:
+              type: string
+            properties:
+              type: object
+              properties:
+                name:
+                  type: string
+        numberMatched:
+          type: integer
+        numberReturned:
+          type: integer
+        links:
+          type: array
+          description: actions that can be performed on this package, but also alternative (rel=alternative+1, alternative+2) offers or references to other resources In case it is an alternative, specify clearly in the description what the financial consequences are.
+          items:
+            $ref: '#/components/schemas/link'
+    packageReference:
+      $ref: '#/components/schemas/normalString'
+    removeTravellerInput:
+      required:
+      - packageId
+      - travellerId
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(traveller)$
+          type: string
+        travellerId:
+          $ref: '#/components/schemas/travellerReference'
+        packageId:
+          $ref: '#/components/schemas/packageReference'
+    enturSearchOfferInput:
+      type: object
+      properties:
+        recommendationControl:
+          $ref: '#/components/schemas/enturRecommendationControl'
+      description: Entur-specific OMSA extensions for search-offers input.
+    selectOffersInput:
+      required:
+      - offerIds
+      - type
+      type: object
+      properties:
+        offerIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/offerReference'
+        type:
+          pattern: ^(select_offers)
+          type: string
+        customer:
+          $ref: '#/components/schemas/customerRef'
+        contact:
+          $ref: '#/components/schemas/customerRef'
+        externalReference:
+          $ref: '#/components/schemas/externalReference'
+    organisationalParameter:
+      required:
+      - id
+      - type
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/shortString'
+        type:
+          pattern: ^(organisational)$
+          type: string
+        name:
+          $ref: '#/components/schemas/normalString'
+        legalName:
+          $ref: '#/components/schemas/normalString'
+      x-tm: ORGANISATIONAL VALIDITY PARAMETERS
+    uuid:
+      type: string
+      description: https://en.wikipedia.org/wiki/Universally_unique_identifier see also https://www.ietf.org/rfc/rfc4122.txt (ae76f51c-a1a6-46af-b9ab-8233564adcae)
+      x-preferred-pattern: ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$
+    tinyString:
+      maxLength: 10
+      type: string
+      description: real short string, codes (length 0-10)
+    cardType:
+      required:
+      - id
+      - type
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/shortString'
+        type:
+          pattern: ^(card_type)$
+          type: string
+        cardCategory:
+          type: string
+          description: The category of card<br> DISCOUNT - discount card, can be applied in the purchase process to get rebate<br> TRAVEL - (external) travel card, possibly paid for in other context, but also monthly, weekly or day-cards<br> BANK - bank card<br> CREDIT - credit card<br> ID - identification card, like an ID card<br> PASSPORT - passport to identify yourself<br> OTHER - unspecified, use 'subCategory' to specify the category of card
+          enum:
+          - DISCOUNT
+          - TRAVEL
+          - BANK
+          - CREDIT
+          - ID
+          - PASSPORT
+          - OTHER
+        subCategory:
+          $ref: '#/components/schemas/shortString'
+        relatedProduct:
+          $ref: '#/components/schemas/productReference'
+        transportOrganisations:
+          maxItems: 15
+          type: array
+          description: references to accepting parties, only if applicable
+          items:
+            $ref: '#/components/schemas/organisationReference'
+        customFields:
+          $ref: '#/components/schemas/customProperties'
+      description: A generic description of a CARD
+      x-tm: TYPE OF PAYMENT METHOD, MEDIUM ACCESS DEVICE
+    shortInt:
+      maximum: 100
+      minimum: 0
+      type: integer
+      description: a bit short integer (0-100)
+      default: 0
+    enturRecommendationControl:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Enable recommendation-driven bundling based on Offers `recommendations` and `offersToBuy`.
+          default: false
+        types:
+          minItems: 1
+          type: array
+          description: 'Entur recommendation categories to request when `enabled` is true.
+
+            If omitted, the API defaults to `["CHEAPEST", "NON_FLEXIBLE", "SEMI_FLEXIBLE", "FLEXIBLE"]`.
+
+            '
+          items:
+            $ref: '#/components/schemas/enturRecommendationType'
+        stripDuplicates:
+          type: boolean
+          description: 'Deduplicate recommendation-driven plans by provider offer + traveller groups + ancillary selections + quantity.
+
+            '
+          default: false
+      description: 'Entur recommendation behavior control for Offers.
+
+        If omitted, the API defaults to raw mode (recommendation-driven bundling disabled).
+
+        '
+    legReference:
+      $ref: '#/components/schemas/normalString'
+    routingParameter:
+      required:
+      - journeyPattern
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(routing)$
+          type: string
+        journeyPattern:
+          type: array
+          items:
+            $ref: '#/components/schemas/externalReference'
+      x-tm: ROUTING VALIDITY PARAMETERS
+    addTravellerInput:
+      required:
+      - packageId
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(traveller)$
+          type: string
+        packageId:
+          $ref: '#/components/schemas/packageReference'
+        individualTraveller:
+          $ref: '#/components/schemas/individualTraveller'
+        userProfile:
+          $ref: '#/components/schemas/userProfile'
+        travellingAsset:
+          $ref: '#/components/schemas/travellingAsset'
+    temporalParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(temporal)$
+          type: string
+        startTime:
+          $ref: '#/components/schemas/dateTime'
+        endTime:
+          $ref: '#/components/schemas/dateTime'
+        duration:
+          $ref: '#/components/schemas/normalInt'
+        dayType:
+          $ref: '#/components/schemas/day'
+      x-tm: TEMPORAL VALIDITY PARAMETERS
+    lineReference:
+      $ref: '#/components/schemas/normalString'
+    organisationalFilter:
+      required:
+      - organisationId
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(organisational)$
+          type: string
+        organisationId:
+          $ref: '#/components/schemas/normalString'
+      additionalProperties: false
+      description: Organisation or operator that every returned offer must reference.
+    customerReference:
+      $ref: '#/components/schemas/normalString'
+    individualTraveller:
+      allOf:
+      - $ref: '#/components/schemas/travelParty'
+      - required:
+        - id
+        - type
+        type: object
+        properties:
+          id:
+            $ref: '#/components/schemas/travellerReference'
+          type:
+            pattern: ^(individual_traveller)$
+            type: string
+          isValidated:
+            type: boolean
+            description: Whether this traveler's identity and properties have been verified by the MaaS provider
+          age:
+            $ref: '#/components/schemas/shortInt'
+          gender:
+            type: string
+            enum:
+            - M
+            - F
+            - X
+            - U
+          fullName:
+            $ref: '#/components/schemas/normalString'
+          customerReference:
+            $ref: '#/components/schemas/customerReference'
+          customFields:
+            $ref: '#/components/schemas/customProperties'
+        description: A generic description of a traveler, not including any identifying information
+        x-tm: INDIVIDUAL TRAVELLER
+    url:
+      type: string
+      description: valid URL
+      format: uri
+    normalString:
+      maxLength: 200
+      type: string
+      description: default string, full names etc (length 0-200)
+    updateTravelDocumentValidityResponse:
+      required:
+      - newTravelDocumentId
+      - previousTravelDocumentId
+      type: object
+      properties:
+        previousTravelDocumentId:
+          type: string
+          description: The travel document id that was replaced
+        newTravelDocumentId:
+          type: string
+          description: The new travel document id with updated validity
+    legInput:
+      required:
+      - legId
+      - packageId
+      - type
+      type: object
+      properties:
+        packageId:
+          $ref: '#/components/schemas/packageReference'
+        type:
+          type: string
+        offerId:
+          $ref: '#/components/schemas/offerReference'
+        legId:
+          $ref: '#/components/schemas/legReference'
+        location:
+          $ref: '#/components/schemas/placeReference'
+    day:
+      type: string
+      enum:
+      - MON
+      - TUE
+      - WED
+      - THU
+      - FRI
+      - SAT
+      - SUN
+      x-tm: DAY OF WEEK
+    purchaseParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(purchase)$
+          type: string
+        maximumPeriodBeforeDeparture:
+          $ref: '#/components/schemas/longInt'
+        requiredLicenseTypes:
+          maxItems: 5
+          type: array
+          description: ONE of these licenses is required to operate the asset
+          items:
+            $ref: '#/components/schemas/licenseType'
+      description: specify required information to complete a purchase
+      x-tm:
+      - concept: PURCHASE WINDOW
+      - maximumPeriodBeforeDeparture: MaximumPeriodBeforeDeparture
+      - requiredLicenseTypes: ENTITLEMENT REQUIRED
+    offerReference:
+      $ref: '#/components/schemas/normalString'
+    updateTravelDocumentValidityInput:
+      required:
+      - newStartTime
+      - packageId
+      - travelDocumentId
+      - type
+      type: object
+      properties:
+        packageId:
+          $ref: '#/components/schemas/packageReference'
+        type:
+          pattern: ^(update_travel_document_validity)$
+          type: string
+        travelDocumentId:
+          type: string
+          description: The id of the travel document to update
+        newStartTime:
+          $ref: '#/components/schemas/dateTimeOrNow'
+    usageValidityPeriod:
+      required:
+      - id
+      - type
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/usageValidityPeriodReference'
+        type:
+          pattern: ^(usage_validity_period)$
+          type: string
+        validityPeriodType:
+          $ref: '#/components/schemas/usageValidityPeriodType'
+        usageTrigger:
+          $ref: '#/components/schemas/usageTrigger'
+        usageEnd:
+          $ref: '#/components/schemas/usageEnd'
+        standardDuration:
+          type: string
+          description: Positive ISO 8601 duration of the usage validity period, for example PT168H.
+          format: duration
+        activationMeans:
+          $ref: '#/components/schemas/activationMeans'
+        startDate:
+          $ref: '#/components/schemas/date'
+        startTime:
+          type: string
+          format: time
+        endDate:
+          $ref: '#/components/schemas/date'
+        endTime:
+          type: string
+          format: time
+        usageStartConstraintType:
+          $ref: '#/components/schemas/usageStartConstraintType'
+        blackoutUse:
+          $ref: '#/components/schemas/blackoutUse'
+      x-tm: USAGE VALIDITY PERIOD
+    package:
+      allOf:
+      - $ref: '#/components/schemas/travelSpecification'
+      - $ref: '#/components/schemas/placeDefinitions'
+      - required:
+        - offers
+        - price
+        - status
+        - type
+        type: object
+        properties:
+          type:
+            pattern: ^(package)$
+            type: string
+          id:
+            type: string
+          externalReference:
+            $ref: '#/components/schemas/externalReference'
+          status:
+            $ref: '#/components/schemas/packageStatus'
+          price:
+            $ref: '#/components/schemas/amountOfMoney'
+          offers:
+            type: array
+            items:
+              $ref: '#/components/schemas/offer'
+          guarantees:
+            type: array
+            items:
+              $ref: '#/components/schemas/externalReference'
+          travellers:
+            type: array
+            items:
+              oneOf:
+              - $ref: '#/components/schemas/individualTraveller'
+              - $ref: '#/components/schemas/userProfile'
+              - $ref: '#/components/schemas/travellingAsset'
+          links:
+            type: array
+            items:
+              $ref: '#/components/schemas/link'
+        description: a purchased package is a registration of an agreement between end user and TO, to execute a package (=set of legs) according a specification, including all conditions
+      x-tm: TRAVEL OFFER PACKAGE, CUSTOMER PURCHASE PACKAGE
+    offerCollection:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(OfferCollection)$
+          type: string
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/offer'
+        numberMatched:
+          type: integer
+        numberReturned:
+          type: integer
+        links:
+          type: array
+          description: actions that can be performed on this package, but also alternative (rel=alternative+1, alternative+2) offers or references to other resources In case it is an alternative, specify clearly in the description what the financial consequences are.
+          items:
+            $ref: '#/components/schemas/link'
+    travelSpecification:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/placeReference'
+        via:
+          maxItems: 3
+          minItems: 0
+          type: array
+          description: use an ID contained in the **placeDefinitions** field, or from an external source, when using coordinates, please use the prefix 'gps:'
+          items:
+            $ref: '#/components/schemas/placeReference'
+        to:
+          $ref: '#/components/schemas/placeReference'
+        startTime:
+          $ref: '#/components/schemas/dateTime'
+        endTime:
+          $ref: '#/components/schemas/dateTime'
+      x-tm: TRAVEL SPECIFICATION
+    purchaseOffersInput:
+      required:
+      - offerIds
+      - type
+      type: object
+      properties:
+        offerIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/offerReference'
+        type:
+          pattern: ^(purchase_offers)$
+          type: string
+        customer:
+          $ref: '#/components/schemas/customerRef'
+        contact:
+          $ref: '#/components/schemas/customerRef'
+        externalReference:
+          $ref: '#/components/schemas/externalReference'
+    usageValidityPeriodReference:
+      $ref: '#/components/schemas/normalString'
+    license:
+      required:
+      - number
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(license)$
+          type: string
+        licenseType:
+          $ref: '#/components/schemas/licenseType'
+        licenseNumber:
+          $ref: '#/components/schemas/shortString'
+        endValidity:
+          $ref: '#/components/schemas/date'
+      description: driver or usage license for a specific user. Contains the number and the assetType you're allowed to operate (e.g. driver license for CAR)
+      x-tm: ACCEPTED DRIVER PERMIT
+    usageEnd:
+      type: string
+      description: Event that ends the usage validity period.
+      enum:
+      - STANDARD_DURATION
+      - END_OF_CALENDAR_PERIOD
+      - END_OF_RIDE
+      - END_OF_TRIP
+      - END_OF_FARE_DAY
+      - END_OF_FARE_PERIOD
+      - PRODUCT_EXPIRY
+      - PROFILE_EXPIRY
+      - DEREGISTRATION
+      - OTHER
+    userNeedReference:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/normalString'
+        name:
+          $ref: '#/components/schemas/normalString'
+    postalAddress:
+      required:
+      - addressLine1
+      - addressLine2
+      type: object
+      properties:
+        placeId:
+          $ref: '#/components/schemas/placeReference'
+        addressLine1:
+          $ref: '#/components/schemas/longString'
+        addressLine2:
+          $ref: '#/components/schemas/longString'
+        street:
+          $ref: '#/components/schemas/normalString'
+        houseNumber:
+          $ref: '#/components/schemas/normalInt'
+        houseNumberAddition:
+          $ref: '#/components/schemas/tinyString'
+        postalCode:
+          $ref: '#/components/schemas/shortString'
+        city:
+          $ref: '#/components/schemas/shortString'
+        province:
+          $ref: '#/components/schemas/shortString'
+        state:
+          $ref: '#/components/schemas/shortString'
+        country:
+          $ref: '#/components/schemas/country'
+        additionalInfo:
+          $ref: '#/components/schemas/longString'
+      additionalProperties: false
+      description: address parts, where addressLine1 and 2 should contain the complete address, matches Content-Language
+      x-tm: POSTAL ADDRESS
+    distributionParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(distribution)$
+          type: string
+        fulfilmentMethod:
+          $ref: '#/components/schemas/normalString'
+        distributionChannel:
+          $ref: '#/components/schemas/normalString'
+      x-tm: DISTRIBUTION VALIDITY PARAMETERS
+    link:
+      required:
+      - href
+      - rel
+      type: object
+      properties:
+        rel:
+          type: string
+          description: the action that can be performed OR part of the URI allowed values include the 'processId's, prefixes for the referenced data sources, prefixes for deeplinks ('apple' and 'android'), OGC compliant ones (alternative, next, etc)
+        href:
+          $ref: '#/components/schemas/url'
+        type:
+          $ref: '#/components/schemas/shortString'
+        method:
+          type: string
+          description: to indicate the http method.
+          enum:
+          - POST
+          - GET
+          - PUT
+          - DELETE
+          - PATCH
+        description:
+          type: string
+          description: the description of the external data source
+        body:
+          type: object
+          description: the (prefilled) body for the request
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        isMandatory:
+          type: boolean
+          description: is this link informative, or must it be used?
+        hash:
+          type: string
+          description: to validate that the content of the link hasn't been changed.
+        validity:
+          $ref: '#/components/schemas/temporalParameter'
+      additionalProperties: false
+      x-externalDocs:
+        url: https://github.com/opengeospatial/ogcapi-processes/raw/refs/heads/master/openapi/schemas/common-core/link.yaml
+    frequencyOfUseType:
+      type: string
+      description: NeTEx classification of a frequency-of-use parameter.
+      enum:
+      - NONE
+      - UNLIMITED
+      - LIMITED
+      - TWICE_A_DAY
+      - SINGLE
+    reservationRequirement:
+      required:
+      - reservationPolicy
+      - spotType
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(reservation_requirement)$
+          type: string
+        spotType:
+          type: string
+          description: The kind of spot the reservation rule applies to.
+          enum:
+          - VEHICLE_SPOT
+          - PASSENGER_SPOT
+          - LUGGAGE_SPOT
+        reservationPolicy:
+          $ref: '#/components/schemas/reservationPolicy'
+        sourceReservationPolicy:
+          type: string
+          description: Raw reservation policy from the upstream provider, when available.
+        assetSelection:
+          $ref: '#/components/schemas/assetSelection'
+        serviceJourney:
+          $ref: '#/components/schemas/serviceJourneyReference'
+        fulfilledByAncillaries:
+          type: array
+          description: Ancillaries that can fulfill this reservation requirement when reservation is sold as a separate product.
+          items:
+            $ref: '#/components/schemas/ancillaryReference'
+      x-tm: SEATING RESERVATION REQUIREMENT
+    customerRef:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/normalString'
+      description: Reference to an existing customer by id.
+      x-tm: TRANSPORT CUSTOMER
+    serviceJourneyReference:
+      $ref: '#/components/schemas/normalString'
+    usageTrigger:
+      type: string
+      description: Event that starts the usage validity period.
+      enum:
+      - ENROLMENT
+      - RESERVATION
+      - PURCHASE
+      - FULFILMENT
+      - ACTIVATION
+      - SPECIFIED_START_DATE
+      - START_OUTBOUND_RIDE
+      - END_OUTBOUND_RIDE
+      - START_RETURN_RIDE
+      - START_OF_PERIOD
+      - DAY_OFFSET_BEFORE_CALENDAR_PERIOD
+  headers:
+    contentLanguage:
+      description: The language/localization of user-facing content, One IETF BCP 47 (RFC 5646) language tag (nl-NL)
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^[a-zA-Z]+-[a-zA-Z]+$
+        type: string
+    enturOrderVersion:
+      description: order version from Entur Orders API for the returned package
+      required: false
+      style: simple
+      explode: false
+      schema:
+        minimum: 1
+        type: integer
+    version:
+      description: the version used to format the response
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  parameters:
+    authorization:
+      name: authorization
+      in: header
+      description: Header field, JWT must be supplied
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    limit:
+      name: limit
+      in: query
+      description: 'The optional limit parameter limits the number of items that are presented in the response document.
+
+        Only items are counted that are on the first level of the collection in the response document.
+
+        Nested objects contained within the explicitly requested items shall not be counted. Minimum = 1. Maximum = 10000. Default = 100.'
+      required: false
+      style: form
+      explode: false
+      schema:
+        maximum: 10000
+        minimum: 1
+        type: integer
+        default: 100
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    EnturPOSHeaderRequired:
+      name: Entur-POS
+      in: header
+      description: Point-of-sale identifier used by downstream sales and ticket distribution services.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    offset:
+      name: offset
+      in: query
+      description: 'The optional offset parameter representing the starting index of the returned collection.
+
+        Only items are counted that are on the first level of the collection in the response document.
+
+        Nested objects contained within the explicitly requested items shall not be counted.
+
+        Default = 0.'
+      required: false
+      style: form
+      explode: false
+      schema:
+        minimum: 0
+        type: integer
+        default: 0
+    acceptLanguage:
+      name: Accept-Language
+      in: header
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/shortString'
+      x-externalDocs:
+        description: A comma-separated list of BCP 47 (RFC 5646) language tags and optional weights as described in IETF RFC7231 section 5.3.5. A list of the languages/localizations the user would like to see the results in. For user privacy and ease of use on the TO side, this list should be kept as short as possible
+    bbox:
+      name: bbox
+      in: query
+      description: 'Only features that have a geometry that intersects the bounding box are selected. The bounding box is provided as four or six numbers, depending on whether the coordinate reference system includes a vertical axis (height or depth): * Lower left corner, coordinate axis 1 * Lower left corner, coordinate axis 2 * Minimum value, coordinate axis 3 (optional) * Upper right corner, coordinate axis 1 * Upper right corner, coordinate axis 2 * Maximum value, coordinate axis 3 (optional)
+
+        If the value consists of four numbers, the coordinate reference system is WGS 84 longitude/latitude (http://www.opengis.net/def/crs/OGC/1.3/CRS84)
+
+        unless a different coordinate reference system is specified in the parameter `bbox-crs`.
+
+        If the value consists of six numbers, the coordinate reference system is WGS 84 longitude/latitude/ellipsoidal height (http://www.opengis.net/def/crs/OGC/0/CRS84h) unless a different coordinate reference system is specified in the parameter `bbox-crs`.
+
+        The query parameter `bbox-crs` is specified in OGC API - Features - Part 2: Coordinate Reference Systems by Reference.
+
+        For WGS 84 longitude/latitude the values are in most cases the sequence of minimum longitude, minimum latitude, maximum longitude and maximum latitude.
+
+        However, in cases where the box spans the antimeridian the first value (west-most box edge) is larger than the third value (east-most box edge).
+
+        If the vertical axis is included, the third and the sixth number are the bottom and the top of the 3-dimensional bounding box.
+
+        If a feature has multiple spatial geometry properties, it is the decision of the server whether only a single spatial geometry property is used to determine the extent or all relevant geometries.'
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: number
+    EnturDistributionChannelHeaderRequired:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier used by downstream sales and ticket distribution services.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    OpenData:
+      type: http
+      description: this data set is open. If it is one of the options, it is up to the implementing party whether it is open or not.
+      scheme: none
+    BearerAuth:
+      type: http
+      description: This authentication is the basic one. If you have obtained a JWT (somewhere), you can use this token to identify you at endpoints.
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth:
+      type: oauth2
+      description: This flow facilitates to get access tokens based on username/password. These can be obtained by the owner of the service, look at the landing page to find out how to contact it.
+      flows:
+        authorizationCode:
+          authorizationUrl: /
+          tokenUrl: /oauth/token
+          scopes:
+            processes: Access to /processes/
+    OAuthPKI:
+      type: oauth2
+      description: OAuth 2.0 with PKI and mutual TLS for client authentication The client sends its X.509 during the handshake. The server validates and accepts the certificate. The call to the /oauth/token can use the provided credentials (O or CN) to provide a access_token (JWT).
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes:
+            processes: Access to /processes/
+x-refined-from:
+- entur-omsa-openapi.json
+- entur-omsa-openapi.yml

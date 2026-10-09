@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-quota-configuration-response-v1-schema.json",
+  "title": "QuotaConfigurationResponseV1",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-inventory-openapi.yml#/components/schemas/QuotaConfigurationResponseV1",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "organisationId": {
+      "type": "integer",
+      "format": "int64"
+    },
+    "name": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "selectionRule": {
+      "type": "string",
+      "enum": [
+        "COMBINED",
+        "SINGLE"
+      ]
+    },
+    "consumptionRule": {
+      "type": "string",
+      "enum": [
+        "DIRECT",
+        "BY_PRIORITY"
+      ]
+    },
+    "directionRule": {
+      "type": "string",
+      "enum": [
+        "FROM_RIGHT",
+        "FROM_LEFT"
+      ]
+    },
+    "parent": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "closedBy": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "format": "int32"
+      }
+    }
+  },
+  "required": [
+    "closedBy",
+    "id",
+    "name",
+    "organisationId",
+    "priority"
+  ]
+}

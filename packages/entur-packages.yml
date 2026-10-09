@@ -1,0 +1,59 @@
+name: Entur Packages
+generated: '2026-10-09'
+method: searched
+source: https://registry.npmjs.org/@entur/sdk ; https://search.maven.org/solrsearch/select?q=g:org.entur
+note: No SDK is listed in the developer.entur.no docs (llms-full.txt); the docs recommend generic OAuth2 libraries. Entur's design-system npm packages (@entur/button, @entur/tokens, @entur/travel ...) are UI components, not API clients, and are left out.
+packages:
+- name: '@entur/sdk'
+  registry: npm
+  url: https://www.npmjs.com/package/@entur/sdk
+  language: TypeScript
+  official: true
+  version: 5.3.0
+  published: '2022-07-07'
+  repository: https://github.com/entur/sdk
+  note: The GitHub repo entur/sdk is archived (GitHub API archived=true, last push 2023-03-04). It is not mentioned in the current developer docs.
+- name: org.entur:netex-java-model
+  registry: maven
+  url: https://central.sonatype.com/artifact/org.entur/netex-java-model
+  language: Java
+  official: true
+  version: 2.0.15
+  published: '2023-11-01'
+  note: NeTEx data-format model. Version and date come from the search.maven.org index, which can lag behind Maven Central.
+- name: org.entur:siri-java-model
+  registry: maven
+  url: https://central.sonatype.com/artifact/org.entur/siri-java-model
+  language: Java
+  official: true
+  version: 2.0.0
+  published: '2025-01-07'
+  note: SIRI data-format model. Version and date come from the search.maven.org index.
+- name: org.entur:netex-parser-java
+  registry: maven
+  url: https://central.sonatype.com/artifact/org.entur/netex-parser-java
+  language: Java
+  official: true
+  version: 3.1.52
+  published: '2025-06-11'
+- name: org.entur:netex-validator-java
+  registry: maven
+  url: https://central.sonatype.com/artifact/org.entur/netex-validator-java
+  language: Java
+  official: true
+  version: 10.3.0
+  published: '2025-06-13'
+- name: org.entur:netex-gtfs-converter-java
+  registry: maven
+  url: https://central.sonatype.com/artifact/org.entur/netex-gtfs-converter-java
+  language: Java
+  official: true
+  version: 2.1.84
+  published: '2025-06-16'
+- name: org.entur:siri-protobuf-mapper
+  registry: maven
+  url: https://central.sonatype.com/artifact/org.entur/siri-protobuf-mapper
+  language: Java
+  official: true
+  version: 1.0.3
+  published: '2023-08-04'

@@ -1,0 +1,1228 @@
+openapi: 3.2.0
+info:
+  title: Entur Consents admin API
+  version: 2026.07.1
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Consents admin across 2 of this provider''s published API definitions: entur-consents-openapi.json, entur-consents-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2/consents
+security:
+- jwt: []
+tags:
+- name: Consents admin
+  description: Api for creating, fetching, modifying and deleting consents by admins
+paths:
+  /admin/consents/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents admin
+      summary: Get a consent
+      description: Get a consent by its id.
+      operationId: getConsentAsAdmin
+      parameters:
+      - name: id
+        in: path
+        description: The id of the consent to retrieve
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 123
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    put:
+      tags:
+      - Consents admin
+      summary: Update a draft consent
+      description: Update a consent by its id. Only consents in DRAFT state can be updated.
+      operationId: updateConsent
+      parameters:
+      - name: id
+        in: path
+        description: The id of the consent to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:endre
+          - consents-admin-data-global:endre
+    delete:
+      tags:
+      - Consents admin
+      summary: Delete a consent
+      description: Delete a consent by its id.
+      operationId: deleteConsent
+      parameters:
+      - name: id
+        in: path
+        description: The id of the consent to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 123
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:slett
+          - consents-admin-data-global:slett
+    patch:
+      tags:
+      - Consents admin
+      summary: Update an active consent
+      description: 'Update the valid to for an active consent. This is the only thing that can be changed after a consent is active.
+
+        If you want to change other fields you have to create a new consent.'
+      operationId: patchConsent
+      parameters:
+      - name: id
+        in: path
+        description: The id of the consent to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int64
+        examples:
+          default:
+            value: 123
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentPatchRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:endre
+          - consents-admin-data-global:endre
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /admin/consent-bases/{consentCode}/versions/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents admin
+      summary: Find version of a consent base
+      description: Find a specific version of a consent base
+      operationId: findVersionOfConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base for which to to find a version.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      - name: version
+        in: path
+        description: The version to find
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+        examples:
+          default:
+            value: 2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    put:
+      tags:
+      - Consents admin
+      summary: Update a consent base version
+      description: 'Update a consent base version by its consent code. Note: you can only edit draft versions of consent bases. If you want to update an active consent base, you need to create a new version.'
+      operationId: updateVersionOfConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base to update.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      - name: version
+        in: path
+        description: The version to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+        examples:
+          default:
+            value: 2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentBaseVersionRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:endre
+          - consents-admin-data-global:endre
+    delete:
+      tags:
+      - Consents admin
+      summary: Delete a consent base version
+      operationId: deleteVersionOfConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base to delete version for.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      - name: version
+        in: path
+        description: The version to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+        examples:
+          default:
+            value: 2
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:slett
+          - consents-admin-data-global:slett
+    patch:
+      tags:
+      - Consents admin
+      summary: Patch a consent base version
+      description: Patch an active consent base version.
+      operationId: patchVersionOfConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base to patch version for.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      - name: version
+        in: path
+        description: The version to patch
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int32
+        examples:
+          default:
+            value: 2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentBaseVersionPatchRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:endre
+          - consents-admin-data-global:endre
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /admin/consents:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents admin
+      summary: Find consents
+      description: Find consents filtered by given query parameters
+      operationId: findConsentsAsAdmin
+      parameters:
+      - name: organisationIds
+        in: query
+        description: Filter consents by organisation ids (comma separated).
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: integer
+            format: int64
+        examples:
+          default:
+            value:
+            - 1
+            - 20
+            - 25
+      - name: consentCodes
+        in: query
+        description: Filter consents by consent codes (comma separated).
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          default:
+            value:
+            - ENT_INFO_SMS
+            - ENT_INFO_EMAIL
+      - name: versions
+        in: query
+        description: 'Filter consents by versions (comma separated). You can also use the keywords ALL or CURRENT. Example: versions=1,2 or versions=CURRENT'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+          default:
+          - CURRENT
+      - name: includeInactive
+        in: query
+        description: 'Whether or not to include inactive consents (default: false)'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+        examples:
+          default:
+            value: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    post:
+      tags:
+      - Consents admin
+      summary: Add a consent
+      description: Add a consent to a consent base
+      operationId: addConsent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:opprett
+          - consents-admin-data-global:opprett
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /admin/consent-bases:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents admin
+      summary: Find all consent bases
+      description: List all available consent bases
+      operationId: findAllConsentBases
+      parameters:
+      - name: includeAllVersions
+        in: query
+        description: 'Whether or not to include all versions of all consents bases. If set to false, will only return the currently active versions. (default: false)'
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: boolean
+        examples:
+          default:
+            value: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    post:
+      tags:
+      - Consents admin
+      summary: Create a consent base
+      operationId: addConsentBase
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentBaseRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:opprett
+          - consents-admin-data-global:opprett
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /admin/consent-bases/{consentCode}/versions:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents admin
+      summary: Find all consent base versions
+      description: Returns a list of all versions for the consent base
+      operationId: findAllVersionsOfConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base for which to find versions.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    post:
+      tags:
+      - Consents admin
+      summary: Create a new version and update values for a consent base
+      description: Create a new version and update values for a consent base.
+      operationId: createNewVersionOfConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base to update.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentBaseVersionRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:endre
+          - consents-admin-data-global:endre
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+  /admin/consent-bases/{consentCode}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Consents admin
+      summary: Find current version of consent base
+      description: Returns the currently active version of consent base. Returns 404 if the are no active versions.
+      operationId: findConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base to find.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentBaseResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:les
+          - consents-admin-data-global:les
+    delete:
+      tags:
+      - Consents admin
+      summary: Delete a consent base
+      description: Delete a consent base and all it's versions
+      operationId: deleteConsentBase
+      parameters:
+      - name: consentCode
+        in: path
+        description: The consent code of the consent base to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+        examples:
+          default:
+            value: ENT_INFO_SMS
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value:
+          any:
+          - consents-admin-data:slett
+          - consents-admin-data-global:slett
+    servers:
+    - url: https://api.entur.io/customers/v2/consents
+components:
+  schemas:
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: ErrorMessage
+    ConsentPatchRequest:
+      type: object
+      properties:
+        validTo:
+          type: string
+          description: If set, the date the consent is valid to. Set the date to deactivate the consent. If not set the consent is active from validFrom and forever after
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Request to set the valid to date for a consent
+    ConsentBaseRequest:
+      required:
+      - consentCode
+      - terms
+      type: object
+      properties:
+        consentCode:
+          maxLength: 20
+          type: string
+          description: Consent code, identifying the consent base. Must be unique within the system, prefixing it with the organisation's code space is advisable tp avoid conflict. Has a maximum length of 20 characters.
+          examples:
+          - ENT_INFO_SMS
+        consentOwnerOrgId:
+          type: integer
+          description: "The organisation that owns the consent. If not set all organisations can use the consent base.\n          |If you're a partner, this will be filled out from your authentication token.\n        "
+          format: int64
+        internalDescription:
+          type: array
+          description: Internal description, describing the use cases for the consent base
+          items:
+            $ref: '#/components/schemas/InternalDescriptionRequest'
+        orgNameSubstitutionPattern:
+          type: string
+          description: The pattern on which to perform substitution within terms. Facilitates reusable consent bases across organisations.
+          examples:
+          - '[ORG]'
+        terms:
+          type: array
+          description: Consent terms with long and short description in multiple languages. The descriptions can contain MarkDown
+          items:
+            $ref: '#/components/schemas/ConsentTermsRequest'
+        validFrom:
+          type: string
+          description: If set, the date the consent base is valid from. It is not possible to change the terms after this date without creating a new version. If not set, the consent base is in draft mode.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        validTo:
+          type: string
+          description: If set, the date the consent base is valid to. Set the date to deactivate the consent. If not set the consent is active from validFrom and onwards.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Create new consent base
+    ConsentTermsResponse:
+      required:
+      - fullDescription
+      - languageCode
+      - shortDescription
+      type: object
+      properties:
+        fullDescription:
+          type: string
+          description: Text describing the terms in detail. The text can contain MarkDown
+        languageCode:
+          type: string
+          description: ISO-639-3 language code. 3 characters
+          examples:
+          - ENG
+        shortDescription:
+          type: string
+          description: Short text explaining the terms. The text can contain MarkDown
+      description: Text for terms in a specific language
+    InternalDescriptionRequest:
+      required:
+      - languageCode
+      type: object
+      properties:
+        description:
+          type: string
+          description: A description for the partner administrating consents. If the request is an update and this is set to null, the description for the language will be deleted
+        languageCode:
+          type: string
+          description: ISO-639-3 languageCode. 3 characters
+          examples:
+          - ENG
+      description: Contains internal description for a consent. Will not be shown to a customer
+    ConsentBaseVersionRequest:
+      required:
+      - terms
+      type: object
+      properties:
+        internalDescription:
+          type: array
+          description: Internal description, describing what the usecases are for the consent
+          items:
+            $ref: '#/components/schemas/InternalDescriptionRequest'
+        orgNameSubstitutionPattern:
+          type: string
+          description: The pattern on which to perform substitution within consentDescription and consentTerms. Facilitates reusable consents across organisations.
+          examples:
+          - '[ORG]'
+        terms:
+          type: array
+          description: Consent description and terms in multiple languages. Supports MarkDown
+          items:
+            $ref: '#/components/schemas/ConsentTermsRequest'
+        validFrom:
+          type: string
+          description: The date the consent base is valid from. It is not possible to change the consent terms after this date without creating a new version. If not set the consent is in draft mode.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        validTo:
+          type: string
+          description: If set, the date the consent base id valid to. Set the date to deactivate the consent. If not set the consent is active from validFrom and forever after
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Request body for updating a consent base in draft mode or creating a new version of a consent base.
+    ConsentTermsRequest:
+      required:
+      - fullDescription
+      - languageCode
+      - shortDescription
+      type: object
+      properties:
+        fullDescription:
+          type: string
+          description: Text describing the terms in detail. The text can contain MarkDown
+        languageCode:
+          type: string
+          description: ISO-639-3 languageCode.
+          examples:
+          - ENG
+        shortDescription:
+          type: string
+          description: Short text explaining the terms. The text can contain MarkDown
+      description: 'Text for terms in a specific language. Short descriptions should contain enough information to obtain consents, with the long description containing detailed information. '
+    InternalDescriptionResponse:
+      required:
+      - description
+      - languageCode
+      type: object
+      properties:
+        description:
+          type: string
+          description: A description for the partner administrating consents
+        languageCode:
+          type: string
+          description: ISO-639-3 language code. 3 characters
+          examples:
+          - ENG
+      description: Contains internal description for a consent. Will not be shown to customer
+    ConsentBaseResponse:
+      required:
+      - changedAt
+      - consentCode
+      - createdAt
+      - terms
+      - version
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the consent base was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        consentCode:
+          type: string
+          description: Consent code used to identify the consent base
+          examples:
+          - ENT_INFO_SMS
+        consentOwnerOrgId:
+          type: integer
+          description: The organisation that owns the consent base. If not set, the consent base can be used by all organisations.
+          format: int64
+        createdAt:
+          type: string
+          description: When the consent base was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        internalDescription:
+          type: array
+          description: Internal description, describing the use cases for the consent base
+          items:
+            $ref: '#/components/schemas/InternalDescriptionResponse'
+        orgNameSubstitutionPattern:
+          type: string
+          description: The pattern on which to perform substitution within terms. Facilitates reusable consent basess across organisations
+          examples:
+          - '[ORG]'
+        terms:
+          type: array
+          description: Consent terms with long and short description in multiple languages. The descriptions can contain MarkDown
+          items:
+            $ref: '#/components/schemas/ConsentTermsResponse'
+        validFrom:
+          type: string
+          description: If set, the date the consent base is valid from. It is not possible to change the consent terms after this date without creating a new version. If not set, the consent base is in draft mode.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        validTo:
+          type: string
+          description: If set, the date the consent base is valid to. If this date is in the past, the consent base is deactivated. If not set, the consent is active from validFrom and onwards.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        version:
+          type: integer
+          description: The consent base version
+          format: int32
+      description: Consent base
+    ConsentResponse:
+      required:
+      - changedAt
+      - consentBase
+      - consentCode
+      - createdAt
+      - id
+      - isEmailSupported
+      - isSmsSupported
+      - organisationId
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the consent was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        consentBase:
+          $ref: '#/components/schemas/ConsentBaseResponse'
+        consentCode:
+          type: string
+          description: Code  of the consent base
+        createdAt:
+          type: string
+          description: When the consent was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Consent ID.
+          format: int64
+        isEmailSupported:
+          type: boolean
+          description: Whether the organisation supports email as a contact method
+        isSmsSupported:
+          type: boolean
+          description: Whether the organisation supports SMS as a contact method
+        organisationId:
+          type: integer
+          description: The organisation the consent is valid for.
+          format: int64
+        validFrom:
+          type: string
+          description: If set, the date the consent is valid from. Can only be set to a date after consent base validFrom. If not set, the consent base is in draft mode.
+          format: date-time
+        validTo:
+          type: string
+          description: If set, the date the consent is valid to. Set the date to deactivate the consent. Can only be set to a date before the consent base validTo. If not set the consent is active from validFrom and forever after.
+          format: date-time
+      description: Consent response, includes the consent base
+    ConsentBaseVersionPatchRequest:
+      type: object
+      properties:
+        internalDescription:
+          type: array
+          description: The internal description. Is only exposed for admin endpoints
+          items:
+            $ref: '#/components/schemas/InternalDescriptionRequest'
+        terms:
+          type: array
+          description: Terms to add. Only new languages can be added to existing terms. Updating terms for an existing language will result in an exception.
+          items:
+            $ref: '#/components/schemas/ConsentTermsRequest'
+        validTo:
+          type: string
+          description: If set, the date the consent base is valid to. Set the date to deactivate the consent base. If not set, the consent base is active from validFrom and onwards
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Request to update updatable fields after the consent base is active
+    ConsentRequest:
+      required:
+      - consentCode
+      - isEmailSupported
+      - isSmsSupported
+      - organisationId
+      type: object
+      properties:
+        consentBaseVersion:
+          type: integer
+          description: Consent base version for adding a consent to a specific version. If not provided, the latest version is used.
+          format: int32
+          examples:
+          - 1
+        consentCode:
+          type: string
+          description: Consent code. Use the consent code + consent base version to identify the consent base
+          examples:
+          - ENT_INFO_SMS
+        isEmailSupported:
+          type: boolean
+          description: Whether the organisation supports email as a contact method
+          examples:
+          - true
+        isSmsSupported:
+          type: boolean
+          description: Whether the organisation supports SMS as a contact method
+          examples:
+          - false
+        organisationId:
+          type: integer
+          description: The organisation the consent is valid for.
+          format: int64
+        validFrom:
+          type: string
+          description: If set, the date the consent is valid from. Can only be set to a date after consent base validFrom. If not set, the consent base is in draft mode.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        validTo:
+          type: string
+          description: If set, the date the consent is valid to. Set the date to deactivate the consent. Can only be set to a date before the consent base validTo. If not set the consent is active from validFrom and forever after.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: 'Adds a consent to a given consent base. '
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-consents-openapi.json
+- entur-consents-openapi.yml

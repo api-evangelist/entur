@@ -1,0 +1,338 @@
+openapi: 3.2.0
+info:
+  title: Entur Fees API
+  version: 2026.09.0
+  description: 'Operations tagged Fees across 2 of this provider''s published API definitions: entur-order-partner-openapi.json, entur-order-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.staging.entur.io/sales
+  description: Staging test environment
+- url: https://api.dev.entur.io/sales
+  description: Development test environment
+- url: https://api.entur.io/sales
+  description: Production environment
+security:
+- authHeader: []
+tags:
+- name: Fees
+  description: Services related to fees on order.
+paths:
+  /v1/orders/{orderId}/fees:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Fees
+      summary: Add Fee to Order
+      description: Add Fee to specified Order
+      operationId: addFeeToOrder
+      requestBody:
+        description: Fee
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fee'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.staging.entur.io/sales
+      description: Staging test environment
+    - url: https://api.dev.entur.io/sales
+      description: Development test environment
+    - url: https://api.entur.io/sales
+      description: Production environment
+  /v1/orders/{orderId}/fees/{feeId}:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/orderIdPathParam'
+    - name: feeId
+      in: path
+      description: Fee ID
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        format: uuid
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    delete:
+      tags:
+      - Fees
+      summary: Delete Fee from Order
+      description: Delete Fee with specified ID from Order with specified ID
+      operationId: deleteFeeFromOrder
+      responses:
+        '204':
+          $ref: '#/components/responses/noContent'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.staging.entur.io/sales
+      description: Staging test environment
+    - url: https://api.dev.entur.io/sales
+      description: Development test environment
+    - url: https://api.entur.io/sales
+      description: Production environment
+components:
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    noContent:
+      description: No Content
+  schemas:
+    FeeRequest:
+      title: FeeRequest
+      required:
+      - orderLineIds
+      - price
+      - reason
+      - type
+      type: object
+      properties:
+        price:
+          $ref: '#/components/schemas/PriceWithTax'
+        type:
+          type: string
+          description: 'Type of Fee. Valid types: MANUAL, REFUNDING, ONBOARD, CHANGE, INVOICE, CHANGE_NON_REFUNDABLE, PENALTY, BOOKING, REDUCTION'
+          examples:
+          - REFUND
+        externalRef:
+          $ref: '#/components/schemas/RefType'
+        reason:
+          type: string
+          description: Explanatory text describing the reason for the Fee, if applicable
+          default: ''
+          examples:
+          - VYB:Refunding:HalfRefunded
+        orderLineIds:
+          type: array
+          description: References to the OrderLines this Fee refers to, if applicable. If empty, the fee refers to all order lines
+          items:
+            type: string
+            format: uuid
+            examples:
+            - dd3e1d71-1c96-4b88-a683-538a8724ee0d
+          default: []
+        orderVersion:
+          type: integer
+          description: The version of the Order this Fee is added to
+          format: int32
+          examples:
+          - 2
+        linkedByExtRef:
+          $ref: '#/components/schemas/RefType'
+      description: Fee related to one or more OrderLines
+      examples:
+      - price:
+          amount: '50.00'
+          taxAmount: '10.00'
+          currency: NOK
+        type: REFUND
+        reason: ABC:Refunding:HalfRefunded
+        orderLineIds:
+        - dd3e1d71-1c96-4b88-a683-538a8724ee0d
+        orderVersion: 2
+    ApiError:
+      title: ApiError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      type: object
+      properties:
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      examples:
+      - timestamp: '2025-05-13T07:19:30.389Z'
+        status: 404
+        error: Not Found
+        title: Not Found
+        exception: NotFoundException
+        message: The requested resource was not found.
+        path: /orders/ABDC1234
+    Fee:
+      title: Fee
+      description: Fee related to one or more OrderLines
+      allOf:
+      - required:
+        - id
+        type: object
+        properties:
+          id:
+            type: string
+            description: ID used to uniquely identify Fee if deletion is necessary
+            format: uuid
+            examples:
+            - dd3e1d71-1c96-4b88-a683-538a8724ee0d
+      - $ref: '#/components/schemas/FeeRequest'
+    RefType:
+      title: RefType
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the resources
+          examples:
+          - ENT:Resource:12345
+        version:
+          type: string
+          description: A specific version of the resource if applicable
+          examples:
+          - '1'
+      description: Reference to a resource available in a different APIs
+    PriceWithTax:
+      title: PriceWithTax
+      required:
+      - amount
+      - currency
+      - taxAmount
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount including tax amount.
+          examples:
+          - '399.00'
+        taxAmount:
+          type: string
+          description: Tax amount
+          examples:
+          - '36.27'
+        taxRate:
+          type: string
+          description: Tax rate. Must be in valid BigDecimal format
+          examples:
+          - '12.00'
+        taxCode:
+          type: string
+          description: Tax code for this tax rate
+          examples:
+          - '33'
+        currency:
+          type: string
+          description: Currency
+          default: NOK
+          examples:
+          - NOK
+      description: Price with included tax amounts and an optional rate.
+  parameters:
+    orderIdPathParam:
+      name: orderId
+      in: path
+      description: Order ID
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: A header containing the distribution channel ID.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+x-refined-from:
+- entur-order-partner-openapi.json
+- entur-order-partner-openapi.yml

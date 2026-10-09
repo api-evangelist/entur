@@ -1,0 +1,1100 @@
+openapi: 3.2.0
+info:
+  title: Entur Penalty Policy Possibilities API
+  version: 2026.10.0
+  description: 'Operations tagged penalty-policy-possibilities across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: penalty-policy-possibilities
+paths:
+  /penalty-policy-possibilities:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - penalty-policy-possibilities
+      summary: Retrieves penalty policy rules for given elements
+      operationId: penalty-policy-possibilities_getPenaltyPolicyPossibilities
+      parameters:
+      - name: Accept-Language
+        in: header
+        description: The language code for the name and description fields.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Entur-Distribution-Channel
+        in: header
+        description: The id of the distribution channel.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ParameterPossibilitiesRequest'
+        required: true
+      responses:
+        '200':
+          description: Returns the resource.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PenaltyPolicyAlternatives'
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /penalty-policy-possibilities/fare-structure-element/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - penalty-policy-possibilities
+      summary: Retrieves penalty policy rules for given elements
+      operationId: penalty-policy-possibilities_getFSEPenaltyPolicyPossibilities
+      parameters:
+      - name: id
+        in: path
+        description: The id to identify a fare structure element.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The version of the element.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code for the name and description fields.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Entur-Distribution-Channel
+        in: header
+        description: The id of the distribution channel.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the resource.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PenaltyPolicy'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /penalty-policy-possibilities/preassigned-product/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - penalty-policy-possibilities
+      summary: Retrieves penalty policy rules for given elements
+      operationId: penalty-policy-possibilities_getFPPenaltyPolicyPossibilities
+      parameters:
+      - name: id
+        in: path
+        description: The id to identify a product.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The version of the element.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code for the name and description fields.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Entur-Distribution-Channel
+        in: header
+        description: The id of the distribution channel.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the resource.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PenaltyPolicy'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /penalty-policy-possibilities/sales-package/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - penalty-policy-possibilities
+      summary: Retrieves penalty policy rules for given elements
+      operationId: penalty-policy-possibilities_getSPPenaltyPolicyPossibilities
+      parameters:
+      - name: id
+        in: path
+        description: The unique id to identify a sales package.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The version of the element.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code for the name and description fields.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Entur-Distribution-Channel
+        in: header
+        description: The id of the distribution channel.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the resource.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PenaltyPolicy'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /penalty-policy-possibilities/validable-element/{id}/{version}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - penalty-policy-possibilities
+      summary: Retrieves penalty policy rules for given elements
+      operationId: penalty-policy-possibilities_getVEPenaltyPolicyPossibilities
+      parameters:
+      - name: id
+        in: path
+        description: The id to identify a validable element.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: version
+        in: path
+        description: The version of the element.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+      - name: Accept-Language
+        in: header
+        description: The language code for the name and description fields.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: Entur-Distribution-Channel
+        in: header
+        description: The id of the distribution channel.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: If-None-Match
+        in: header
+        description: Used to make conditional requests. It allows the client to provide an ETag value, and the server will process the request only if the ETag does not match the current version of the resource.
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the resource.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PenaltyPolicy'
+        '304':
+          description: Not Modified
+        '400':
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '403':
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '404':
+          description: Resource not found.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+        '500':
+          description: Internal server error.
+          content:
+            application/problem+json:
+              schema:
+                type: string
+      security:
+      - basic_auth: []
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    PenaltyPolicy:
+      required:
+      - changed
+      - created
+      - fareTableRefs
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: CompatibleWithVersionRef
+        created:
+          type: string
+          description: Created
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References for associated fare tables.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id
+          examples:
+          - NSB:PenaltyPolicy:InspectionFeeYoung
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        minimumTimeBeforeReentry:
+          type: string
+          description: MinimumTimeBeforeReentry
+          examples:
+          - PT24H
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: NameOfClass
+          readOnly: true
+          examples:
+          - PenaltyPolicy
+        paymentMethod:
+          type: string
+          description: PaymentMethod
+          examples:
+          - CASH
+        penaltyAction:
+          type: string
+          description: PenaltyAction
+          examples:
+          - FINE
+        penaltyPolicyType:
+          type: string
+          description: PenaltyPolicyType
+          examples:
+          - NO_TICKET
+        prices:
+          type: array
+          description: Prices in different currencies for the penalty policy.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        sameStationReentryPolicyType:
+          type: string
+          description: SameStationReentryPolicyType
+          examples:
+          - BLOCKED
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        typeOfUsageParameterRef:
+          type: string
+          description: typeOfUsageParameter.
+          examples:
+          - ENT:TypeOfUsageParameter:OpenSeating
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A PENALTY POLICY
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    IdAndVersion:
+      required:
+      - id
+      - version
+      type: object
+      properties:
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: ID of the element.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version of the element.
+      description: Describes the ID and version of an element.
+    FarePrice:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          maximum: 100
+          minimum: -100
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - FarePrice
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/Rounding'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+          description: Version.
+          readOnly: true
+          examples:
+          - NSB:Version:V1
+      description: A description of the price and factor for a set fare
+    ParameterPossibilitiesRequest:
+      type: object
+      properties:
+        fareStructureElements:
+          type: array
+          description: Fare structure elements the user wants to retrieve the parameter alternatives for.
+          items:
+            $ref: '#/components/schemas/IdAndVersion'
+        preassignedFareProducts:
+          type: array
+          description: Preassigned products the user wants to retrieve the parameter alternatives for.
+          items:
+            $ref: '#/components/schemas/IdAndVersion'
+        salesPackages:
+          type: array
+          description: Sales packages the user wants to retrieve the parameter alternatives for.
+          items:
+            $ref: '#/components/schemas/IdAndVersion'
+        validableElements:
+          type: array
+          description: Validable elements the user wants to retrieve the parameter alternatives for.
+          items:
+            $ref: '#/components/schemas/IdAndVersion'
+      description: Request for retrieving refunding alternatives for elements.
+    LimitingRule:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        canBeCumulative:
+          type: boolean
+          description: CanBeCumulative.
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountAsPercentage:
+          type: number
+          description: DiscountAsPercentage.
+          format: float
+        discountAsValue:
+          type: number
+          description: DiscountAsValue.
+          format: float
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        maximumPrice:
+          type: string
+          description: MaximumPrice.
+          examples:
+          - '164.0'
+        maximumPriceAsPercentage:
+          type: number
+          description: MaximumPriceAsPercentage.
+          format: double
+        minimumLimitPrice:
+          type: string
+          description: MinimumLimitPrice.
+          examples:
+          - '164.0'
+        minimumPrice:
+          type: string
+          description: MinimumPrice.
+          examples:
+          - '164.0'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - LimitingRule
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A LimitingRule
+    PenaltyPolicyAlternatives:
+      required:
+      - penaltyOptions
+      - ref
+      type: object
+      properties:
+        penaltyOptions:
+          type: array
+          description: Penalty policy alternatives for this element.
+          items:
+            $ref: '#/components/schemas/PenaltyPolicy'
+        ref:
+          $ref: '#/components/schemas/IdAndVersion'
+      description: Penalty policy alternatives for an element.
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-products-openapi.json
+- entur-products-openapi.yml

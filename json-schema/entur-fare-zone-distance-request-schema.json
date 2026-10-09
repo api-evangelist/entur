@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-fare-zone-distance-request-schema.json",
+  "title": "FareZoneDistanceRequest",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-prdudisapi-openapi.yml#/components/schemas/FareZoneDistanceRequest",
+  "type": "object",
+  "properties": {
+    "from": {
+      "type": "string"
+    },
+    "to": {
+      "type": "string"
+    },
+    "organisationId": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int64"
+    },
+    "time": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "via": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Use 'via' to force the path through one or more intermediate zones.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "preOwned": {
+      "uniqueItems": true,
+      "type": [
+        "array",
+        "null"
+      ],
+      "description": "Use 'preOwned' to exclude zones the traveller already owns — these zones are not counted toward the distance.",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

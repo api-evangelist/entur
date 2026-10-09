@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-point-period-schema.json",
+  "title": "PointPeriod",
+  "description": "The core information about a point period",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personalisation-client-openapi.yml#/components/schemas/PointPeriod",
+  "required": [
+    "endAt",
+    "id",
+    "startAt"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "The ID of the point period",
+      "format": "int64"
+    },
+    "startAt": {
+      "type": "string",
+      "description": "The start time of the point period",
+      "format": "date-time"
+    },
+    "endAt": {
+      "type": "string",
+      "description": "The end time of the point period",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "description": "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+      },
+      "description": "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+    }
+  },
+  "readOnly": true
+}

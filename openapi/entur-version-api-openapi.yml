@@ -1,0 +1,538 @@
+openapi: 3.2.0
+info:
+  title: Entur Version API
+  contact:
+    name: Team Produkt
+    email: teamprodukt@entur.org
+  x-stability-level: draft
+  version: '1.0'
+  description: 'Operations tagged Version across 3 of this provider''s published API definitions: entur-pricing-api-openapi.json, entur-product-parameters-api-openapi.json, entur-products-api-openapi.json. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/products
+  description: Production environment
+- url: https://api.staging.entur.io/products
+  description: Staging environment
+- url: https://api.dev.entur.io/products
+  description: Development environment
+security:
+- jwt: []
+tags:
+- name: Version
+  description: Version management endpoints
+paths:
+  /v3/versions/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Version
+      summary: Get a version by ID
+      description: Retrieve a specific version by its netex ID.
+      operationId: getVersionById
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Version found successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponse'
+              examples:
+                draftVersion:
+                  $ref: '#/components/examples/draftVersion'
+                versionedVersion:
+                  $ref: '#/components/examples/versionedVersion'
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                invalidTransition:
+                  summary: Invalid ID format
+                  value:
+                    type: https://example.com/probs/illegal-transition
+                    title: Illegal status transition
+                    status: 400
+                    detail: Invalid netex ID format
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Version not found
+                  value:
+                    type: https://example.com/probs/not-found
+                    title: Not Found
+                    status: 404
+                    detail: Version ENT:Version:001 not found.
+      x-entur-permissions:
+        value: product-api-access:les
+    put:
+      tags:
+      - Version
+      summary: Update an existing version
+      description: Update an existing version. Can be used to change status (e.g., from DRAFT to PROPOSED or PROPOSED to VERSIONED) or modify dates.
+      operationId: updateVersion
+      parameters:
+      - $ref: '#/components/parameters/id'
+      requestBody:
+        description: "The request body must include the new status and startDate. The endDate is optional. Valid status transitions are:\n  - DRAFT -> PROPOSED\n  - PROPOSED -> VERSIONED\n  - DRAFT -> DEPRECATED\n  - PROPOSED -> DEPRECATED\n"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionRequest'
+            examples:
+              draft:
+                $ref: '#/components/examples/draft'
+        required: true
+      responses:
+        '200':
+          description: Version updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponse'
+              examples:
+                draftVersion:
+                  $ref: '#/components/examples/draftVersion'
+        '400':
+          description: Bad request - Invalid data or illegal status transition
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                invalidTransition:
+                  summary: Illegal status transition
+                  value:
+                    type: https://example.com/probs/illegal-transition
+                    title: Illegal status transition
+                    status: 400
+                    detail: 'Invalid status transition: DRAFT -> $to'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          description: Version not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                notFound:
+                  summary: Version not found
+                  value:
+                    type: https://example.com/probs/not-found
+                    title: Not Found
+                    status: 404
+                    detail: Version ENT:Version:001 not found.
+        '409':
+          description: Conflict - Version already exists or overlaps with existing version
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                conflict:
+                  summary: Version already exists
+                  value:
+                    type: https://example.com/probs/conflict
+                    title: Conflict
+                    status: 409
+                    detail: Version ENT:Version:001 exists already.
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v3/versions:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Version
+      summary: Create a new version
+      description: Create a new version in DRAFT status. The version will be assigned the current date as startDate if not provided.
+      operationId: createVersion
+      requestBody:
+        description: 'The request body must include the netex ID and status (must be DRAFT). The startDate is optional and will default to the current date if not provided. The endDate is also optional.
+
+          '
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionRequest'
+            examples:
+              draft:
+                $ref: '#/components/examples/draft'
+        required: true
+      responses:
+        '201':
+          description: Version created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponse'
+              examples:
+                draftVersion:
+                  $ref: '#/components/examples/draftVersion'
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                invalidStatus:
+                  summary: Illegal status
+                  value:
+                    type: https://example.com/probs/illegal-transition
+                    title: Illegal status for new version
+                    status: 400
+                    detail: Invalid version status VERSIONED. New versions must be created with status DRAFT.
+                invalidDate:
+                  summary: Illegal date
+                  value:
+                    type: https://example.com/probs/illegal-transition
+                    title: Illegal date for new version
+                    status: 400
+                    detail: 'Invalid version dates: endDate must be strictly after startDate.'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                conflict:
+                  summary: Version already exists
+                  value:
+                    type: https://example.com/probs/conflict
+                    title: Conflict
+                    status: 409
+                    detail: Version ENT:Version:001 exists already.
+                inProgress:
+                  summary: Version already in progress
+                  value:
+                    type: https://example.com/probs/conflict
+                    title: Conflict with other in progress
+                    status: 409
+                    detail: 'Cannot create new version: ENT:Version:001 are already in PROPOSED (only one in-progress version allowed).'
+      x-entur-permissions:
+        value: product-api-access:endre
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+  /v3/versions/history/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Version
+      summary: Get version history for a versionable element by ID
+      description: Retrieve the list for all version that is related to the given versionable element.
+      operationId: getVersionHistoryById
+      parameters:
+      - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: Version history found successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VersionResponse'
+              examples:
+                versionHistory:
+                  $ref: '#/components/examples/versionHistory'
+        '400':
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              examples:
+                invalidTransition:
+                  summary: Invalid ID format
+                  value:
+                    type: https://example.com/probs/illegal-transition
+                    title: Illegal status transition
+                    status: 400
+                    detail: Invalid NetEx ID format
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+      x-entur-permissions:
+        value: product-api-access:les
+    servers:
+    - url: https://api.entur.io/products
+      description: Production environment
+    - url: https://api.staging.entur.io/products
+      description: Staging environment
+    - url: https://api.dev.entur.io/products
+      description: Development environment
+components:
+  schemas:
+    VersionResponse:
+      required:
+      - changed
+      - created
+      - id
+      - startDate
+      - status
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+          examples:
+          - EXA:Version:001
+        number:
+          type: integer
+          description: Version number of the version. Only present when versionStatus is VERSIONED. Starts at 1 for a new product and is incremented by 1 for each new version.
+          format: int64
+          examples:
+          - 1
+        status:
+          $ref: '#/components/schemas/VersionStatus'
+        startDate:
+          type: string
+          description: The start date of the version.
+          format: date
+        endDate:
+          type: string
+          description: The end date of the version.
+          format: date
+        published:
+          type: string
+          description: Timestamp for when the version was published (set to status VERSIONED).
+          format: date-time
+        created:
+          type: string
+          description: Created datetime
+          format: date-time
+        changed:
+          type: string
+          description: Changed datetime
+          format: date-time
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
+    VersionRequest:
+      required:
+      - startDate
+      - status
+      type: object
+      properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: Must be DRAFT for new versions.
+        startDate:
+          type: string
+          description: The start date of the version. Defaults to current date if not provided.
+          format: date
+        endDate:
+          type: string
+          description: The end date of the version (optional).
+          format: date
+        ownerOrganisationId:
+          minimum: 1
+          type: integer
+          description: Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.
+          format: int64
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+  responses:
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  examples:
+    versionedVersion:
+      summary: Versioned version
+      value:
+        id: EXA:Version:d88d0af0-4fe1-4457-a3a6-dbe1db5b3005
+        status: VERSIONED
+        startDate: '2025-01-01'
+        endDate: '2025-12-31'
+        created: '2025-01-01T10:00:00Z'
+        changed: '2025-01-01T10:00:00Z'
+        published: '2025-01-15T10:00:00Z'
+        number: 1
+    versionHistory:
+      summary: Example version history
+      value:
+      - id: EXA:Version:853a7d14-794e-4af5-b569-301711a26e26
+        status: VERSIONED
+        startDate: '2025-01-01'
+        endDate: '2025-12-31'
+        created: '2024-12-01T10:00:00Z'
+        changed: '2024-12-01T10:00:00Z'
+        published: '2024-12-30T10:00:00Z'
+        number: 1
+      - id: EXA:Version:e7104d26-16a5-4db5-aa42-b32ae0a3f684
+        status: VERSIONED
+        startDate: '2026-01-01'
+        created: '2025-12-01T10:00:00Z'
+        changed: '2025-12-01T10:00:00Z'
+        published: '2025-12-01T13:00:00Z'
+        number: 2
+      - id: EXA:Version:6be856a5-dd98-496b-b3f2-ad9939270ec3
+        status: PROPOSED
+        startDate: '2026-07-01'
+        created: '2026-06-01T10:00:00Z'
+        changed: '2026-06-01T10:00:00Z'
+    draft:
+      summary: Create a new version in DRAFT
+      value:
+        id: EXA:Version:7775e5aa-eb05-4190-9330-25c7f62b0b53
+        status: DRAFT
+        startDate: '2025-01-01'
+    draftVersion:
+      summary: Draft version
+      value:
+        id: EXA:Version:bf4d317a-8e61-49fd-b095-906b79c05872
+        status: DRAFT
+        startDate: '2025-01-01'
+        created: '2025-01-01T10:00:00Z'
+        changed: '2025-01-01T10:00:00Z'
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-pricing-api-openapi.json
+- entur-product-parameters-api-openapi.json
+- entur-products-api-openapi.json

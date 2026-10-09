@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-temporary-customer-post-request-schema.json",
+  "title": "TemporaryCustomerPostRequest",
+  "description": "A registered customer. Required fields are expirationDate, createdBy and createdByChannel.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-customers-openapi.yml#/components/schemas/TemporaryCustomerPostRequest",
+  "required": [
+    "createdBy",
+    "createdByChannel",
+    "expirationDate"
+  ],
+  "type": "object",
+  "properties": {
+    "countryCode": {
+      "maxLength": 4,
+      "type": "string",
+      "description": "Telephone number country code, starting with +."
+    },
+    "createdBy": {
+      "maxLength": 100,
+      "type": "string",
+      "description": "Who created the customer. Either web, app or username of employee. Used for traceability in accordance with GDPR"
+    },
+    "createdByChannel": {
+      "maxLength": 100,
+      "type": "string",
+      "description": "Which sales channel or system who created the customer. Used for traceability in accordance with GDPR"
+    },
+    "customerAccountId": {
+      "maxLength": 60,
+      "type": "string",
+      "description": "Deprecated. Use /profiles/{customerNumber}/customer-accounts. Customer account id used for account based ticketing",
+      "deprecated": true
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "description": "Date of birth. ISO 8601 date format",
+      "format": "date"
+    },
+    "email": {
+      "maxLength": 80,
+      "type": "string",
+      "description": "Contact email"
+    },
+    "expirationDate": {
+      "type": "string",
+      "description": "The date when the customers personal data should be deleted. Personal data will be deleted continuously. ISO 8601 date format",
+      "format": "date-time"
+    },
+    "firstName": {
+      "maxLength": 50,
+      "type": "string",
+      "description": "First and middle name."
+    },
+    "landlineNumber": {
+      "maxLength": 20,
+      "type": "string",
+      "description": "Landline telephone number."
+    },
+    "organisationId": {
+      "type": "integer",
+      "description": "The organisation the customer is registered with.",
+      "format": "int64"
+    },
+    "surname": {
+      "maxLength": 50,
+      "type": "string",
+      "description": "Surname."
+    },
+    "telephoneNumber": {
+      "maxLength": 20,
+      "type": "string",
+      "description": "Deprecated. Please use countryCode and telephoneNumberNoCountryCode. Telephone number for customer. This should be a cell phone number."
+    },
+    "telephoneNumberNoCountryCode": {
+      "maxLength": 12,
+      "type": "string",
+      "description": "Telephone number without country code or punctuation."
+    }
+  }
+}

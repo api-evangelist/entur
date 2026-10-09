@@ -1,0 +1,242 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-reserve-third-party-products-request-schema.json",
+  "title": "ReserveThirdPartyProductsRequest",
+  "description": "The requested list of third party products to create and add to the order.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-reserve-offers-partner-openapi.yml#/components/schemas/ReserveThirdPartyProductsRequest",
+  "required": [
+    "orderId",
+    "thirdPartyProductConfigurations"
+  ],
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "The orderId the third party products belongs to."
+    },
+    "thirdPartyProductConfigurations": {
+      "minItems": 1,
+      "uniqueItems": true,
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ThirdPartyProductConfiguration"
+      }
+    }
+  },
+  "$defs": {
+    "DistributionDetails": {
+      "title": "DistributionDetails",
+      "type": "object",
+      "properties": {
+        "fulfillmentMethodRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "typeOfTravelDocumentToIssueRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "customerAccountRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "distributionHolderCustomerId": {
+          "type": "string",
+          "description": "The Entur customer id that will be linked to the distribution of the order line created"
+        }
+      },
+      "description": "Wrapper for references connected to distribution of travel rights and/or tickets"
+    },
+    "Parameters": {
+      "title": "Parameters",
+      "type": "object",
+      "properties": {
+        "userProfile": {
+          "$ref": "#/$defs/UserProfile"
+        }
+      },
+      "description": "Similar to OrderLine.fareProducts.parameters, but with additional fields for third party products."
+    },
+    "PriceWithTax": {
+      "title": "PriceWithTax",
+      "required": [
+        "amount",
+        "currency",
+        "taxAmount"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount including tax amount."
+        },
+        "taxAmount": {
+          "type": "string",
+          "description": "Tax amount"
+        },
+        "taxRate": {
+          "type": "string",
+          "description": "Tax rate"
+        },
+        "taxCode": {
+          "type": "string",
+          "description": "Tax code for this tax rate"
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency",
+          "default": "NOK"
+        }
+      },
+      "description": "Price with included tax amounts and an optional rate."
+    },
+    "RefType": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Value to identify a given resource"
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional version for a given resource"
+        }
+      },
+      "description": "Versioned Reference to a resource"
+    },
+    "TPPTravelSpecification": {
+      "type": "object",
+      "properties": {
+        "aimedStartTime": {
+          "type": "string",
+          "description": "Timestamp used when determining the beginning of the product's validity.",
+          "format": "date-time"
+        },
+        "aimedEndTime": {
+          "type": "string",
+          "description": "Timestamp used when determining the end of the product's validity.",
+          "format": "date-time"
+        }
+      },
+      "description": "Optional travel information for the order lines to be created"
+    },
+    "TextInLanguage": {
+      "required": [
+        "lang",
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "lang": {
+          "type": "string",
+          "description": "The language of the text"
+        },
+        "value": {
+          "type": "string",
+          "description": "The value of the text in the given language"
+        }
+      },
+      "description": "Contains a text value in a given language"
+    },
+    "ThirdPartyProductConfiguration": {
+      "required": [
+        "name",
+        "price",
+        "priceContribution",
+        "productRef",
+        "quantity"
+      ],
+      "type": "object",
+      "properties": {
+        "quantity": {
+          "minimum": 1,
+          "type": "integer",
+          "description": "The amount of equal third party products to add to the order",
+          "default": 1
+        },
+        "productRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "name": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "description": "A human-readable list of names for the product",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "authorityId": {
+          "type": "string",
+          "description": "Owner of the product."
+        },
+        "externalReference": {
+          "type": "string",
+          "description": "External reference to an order line. Only used by external operators to identify order lines created by ThirdPartyProductConfigurations."
+        },
+        "clientProvidedData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "A map of client provided data to be placed on the order line. No validation is performed, and no guarantee can be made about its contents."
+        },
+        "customerIds": {
+          "type": "array",
+          "description": "Entur customer ids that will be linked to the order line created",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "travelSpecification": {
+          "$ref": "#/$defs/TPPTravelSpecification"
+        },
+        "distributionDetails": {
+          "$ref": "#/$defs/DistributionDetails"
+        },
+        "parameters": {
+          "$ref": "#/$defs/Parameters"
+        }
+      },
+      "description": "The request object used to create a third party product"
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "required": [
+        "name",
+        "userProfileRef"
+      ],
+      "type": "object",
+      "properties": {
+        "userProfileRef": {
+          "$ref": "#/$defs/RefType"
+        },
+        "name": {
+          "minItems": 1,
+          "uniqueItems": true,
+          "type": "array",
+          "description": "A human-readable list of names for the product",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "price": {
+          "$ref": "#/$defs/PriceWithTax"
+        },
+        "priceContribution": {
+          "$ref": "#/$defs/PriceWithTax"
+        }
+      }
+    }
+  }
+}

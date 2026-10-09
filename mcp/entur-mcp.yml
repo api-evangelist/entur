@@ -1,0 +1,77 @@
+type: MCPServer
+name: Entur OpenTripPlanner MCP (proof of concept)
+provider: entur
+generated: '2026-10-09'
+method: searched
+source: https://github.com/entur/opentripplanner-mcp
+status: poc
+description: >-
+  Entur publishes, in its own GitHub org, a Java/Spring AI MCP server described as a
+  "poc mcp using journey-planner and geocoder apis". It wraps the Journey Planner v3
+  (OpenTripPlanner transmodel GraphQL), the Geocoder and the Mobility v2 GraphQL APIs,
+  and ships embedded MCP App UIs (departure board, trip map, nearby stops/mobility maps).
+  The README documents running it as a stateless HTTP server at http://localhost:8080/mcp.
+  The repo's Helm values name hosted ingresses (opentripplanner-mcp.entur.io for prd,
+  opentripplanner-mcp.staging.entur.io for tst); both answered 403 Forbidden to an
+  unauthenticated MCP initialize POST on 2026-10-09, so the hosted endpoint is not
+  publicly reachable.
+deployment:
+  mode: remote
+  endpoint: https://opentripplanner-mcp.entur.io/mcp
+  auth: unknown
+  verified: probed
+  reachable: false
+  probe:
+    url: https://opentripplanner-mcp.entur.io/mcp
+    method: POST initialize
+    status: 403
+    date: '2026-10-09'
+  endpoint_evidence: >-
+    Host from helm/opentripplanner-mcp/env/values-kub-ent-prd.yaml (ingress.host);
+    /mcp path from README ("The MCP server will be available at http://localhost:8080/mcp").
+  self_host:
+    transport: streamable-http (stateless)
+    local_endpoint: http://localhost:8080/mcp
+    package: https://github.com/entur/opentripplanner-mcp
+    build: Maven (pom.xml) / Dockerfile
+    env: [SERVER_PORT, ORG_ENTUR_OTP_URL, ORG_ENTUR_GEOCODER_URL]
+repository:
+  url: https://github.com/entur/opentripplanner-mcp
+  language: Java
+  default_branch: master
+  last_push: '2026-08-25'
+backing_apis:
+  - Journey Planner v3 GraphQL (https://api.entur.io/journey-planner/v3/graphql)
+  - Geocoder (https://api.entur.io/geocoder/v2/autocomplete per README)
+  - Mobility v2 GraphQL
+tools_source: documented   # names from README + @McpTool annotations in source; tools/list not called (endpoint 403)
+tools:
+  - name: trip
+    visibility: model
+    description: Find trip options between two locations, with an interactive map UI.
+    parameters: [from, to, departureTime, arrivalTime, maxResults, language]
+  - name: departures
+    visibility: model
+    description: Real-time departures from a stop or station, with a departure board UI.
+    parameters: [stop, numberOfDepartures, startTime, timeRangeMinutes, transportModes, language]
+  - name: nearby-stops
+    visibility: model
+    description: Find public transport stops near a location, sorted by distance, with a map UI.
+    parameters: [location, radius, maximumResults, transportModes, language]
+  - name: alerts
+    visibility: model
+    description: Active service disruptions and cancellations.
+    parameters: [severities]
+  - name: geocode
+    visibility: model
+    description: Search for locations by name or address.
+    parameters: [text, maxResults]
+  - name: nearby-mobility
+    visibility: model
+    description: Defined in src/main/java/org/entur/mcp/tools/MobilityTool.java (not listed in the README tool section).
+  - name: poll-departures
+    visibility: app-only
+    description: Refreshes departure data for the departure board UI.
+  - name: poll-trip
+    visibility: app-only
+    description: Re-plans a trip with updated parameters for the trip map UI.

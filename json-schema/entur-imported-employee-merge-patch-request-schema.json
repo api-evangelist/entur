@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-imported-employee-merge-patch-request-schema.json",
+  "title": "ImportedEmployeeMergePatchRequest",
+  "description": "Merge patch request for an Employee",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-personnel-tickets-openapi.yml#/components/schemas/ImportedEmployeeMergePatchRequest",
+  "required": [
+    "companyId",
+    "employeeNo",
+    "employmentPercentage",
+    "employmentTypeId",
+    "isDeleted"
+  ],
+  "type": "object",
+  "properties": {
+    "employeeNo": {
+      "type": "string",
+      "description": "Employee number"
+    },
+    "companyId": {
+      "type": "string",
+      "description": "Company Id"
+    },
+    "employmentTypeId": {
+      "type": "string",
+      "description": "Type of employment"
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "description": "When the employee was born",
+      "format": "date"
+    },
+    "ssn": {
+      "type": "string",
+      "description": "Birthdate-number og D-number, 5 digits"
+    },
+    "firstName": {
+      "type": "string",
+      "description": "The employee's first name"
+    },
+    "surname": {
+      "type": "string",
+      "description": "The employee's surname"
+    },
+    "addressLine": {
+      "type": "string",
+      "description": "The employee's address line"
+    },
+    "postalCode": {
+      "type": "string",
+      "description": "The postal code for the employee's address"
+    },
+    "preferredProductId": {
+      "type": "integer",
+      "description": "The employee's product",
+      "format": "int64"
+    },
+    "abstainFromTicket": {
+      "type": "boolean",
+      "description": "Whether a ticket should be created"
+    },
+    "hireStartDate": {
+      "type": "string",
+      "description": "When the employee was hired",
+      "format": "date"
+    },
+    "payType": {
+      "type": "string",
+      "description": "Pay type - see the codes in the API documentation"
+    },
+    "hireEndDate": {
+      "type": "string",
+      "description": "When the employee left the company",
+      "format": "date"
+    },
+    "hireEndCause": {
+      "type": "string",
+      "description": "Why the employee left the company"
+    },
+    "disabilityGrade": {
+      "type": "integer",
+      "description": "The employee's degree of disability. Default 0.",
+      "format": "int32"
+    },
+    "disabilityFromDate": {
+      "type": "string",
+      "description": "When the employee's disability was granted",
+      "format": "date"
+    },
+    "employmentPercentage": {
+      "type": "integer",
+      "description": "Employment percentage",
+      "format": "int32"
+    },
+    "employmentPercentageDate": {
+      "type": "string",
+      "description": "Date for registered employment percentage",
+      "format": "date"
+    },
+    "paidPercentage": {
+      "type": "integer",
+      "description": "The pay level. This is calculated based on the employment percentage and the type of employment. Typically holds the same value as employment percentage, unless special circumstances apply",
+      "format": "int32"
+    },
+    "leaveFromDate": {
+      "type": "string",
+      "description": "When the employee starts a leave",
+      "format": "date"
+    },
+    "isDeleted": {
+      "type": "boolean",
+      "description": "Whether the employee has been marked for deletion. Default false"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+overlay: 1.0.0
+info:
+  title: Entur Personnel tickets overlay
+  version: 1.0.0
+extends: ../openapi/_original/entur-personnel-tickets-openapi.yml
+x-generated: '2026-10-09'
+x-method: generated
+actions:
+- target: $.info
+  description: API Evangelist provider metadata.
+  update:
+    x-provider: entur
+    x-provider-name: Entur
+    x-apievangelist-operation-count: 32
+    x-apievangelist-generated: '2026-10-09'
+    x-apievangelist-source: openapi/entur-personnel-tickets-openapi.yml
+- target: $.paths['/personnelticket/v2/reports/tax-savings'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Create tax savings report
+- target: $.paths['/customers/v2/benefits/contract-consumers/{customerNumber}/contracts'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get all valid contracts by customer number

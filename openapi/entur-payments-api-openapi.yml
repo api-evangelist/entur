@@ -1,0 +1,2844 @@
+openapi: 3.2.0
+info:
+  title: Entur Payments API
+  version: 2026.10.2
+  contact:
+    name: Entur
+    url: https://developer.entur.org
+  description: 'Operations tagged Payments across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: Entur's Production environment
+- url: https://api.staging.entur.io/sales
+  description: Entur's Staging environment
+- url: https://api.dev.entur.io/sales
+  description: Entur's Development environment
+security:
+- jwt: []
+tags:
+- name: Payments
+  description: Create, update, deactivate and retrieve payments. Create, initiate, capture, cancel, and retrieve payment transactions
+paths:
+  /v1/payments:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Payments
+      summary: Search for payments
+      description: Returns matching payments with all its transactions. Query params are able to used expression like gt:1 for searching. Other expressions can contain eq, ne, gt, gte, lt, lte.
+      operationId: searchPayments
+      parameters:
+      - name: cardNumber
+        in: query
+        description: Last 4 digits in card number used in transaction for payment
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '100'
+          equals:
+            value:
+            - eq:1234
+          not equals:
+            value:
+            - ne:1234
+      - name: createdAt
+        in: query
+        description: When the payment was created.
+        required: false
+        style: pipeDelimited
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '2025-09-30T22:00:00.000Z'
+          equals:
+            value:
+            - eq:2025-09-30T22:00:00.000Z
+          not equals:
+            value:
+            - ne:2025-09-30T22:00:00.000Z
+          greater than:
+            value:
+            - gt:2025-09-30T22:00:00.000Z
+          greater than or equal:
+            value:
+            - gte:2025-09-30T22:00:00.000Z
+          less than:
+            value:
+            - lt:2025-09-30T22:00:00.000Z
+          less than or equals:
+            value:
+            - lte:2025-09-30T22:00:00.000Z
+      - name: currency
+        in: query
+        description: Currencies
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - NOK
+          equals:
+            value:
+            - eq:NOK
+          not equals:
+            value:
+            - ne:NOK
+      - name: customerNumber
+        in: query
+        description: Numeric id of customer
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+      - name: externalTransactionId
+        in: query
+        description: Transaction ID from 3rd party payment provider
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '123'
+          equals:
+            value:
+            - eq:123
+          not equals:
+            value:
+            - ne:123
+      - name: orderId
+        in: query
+        description: Order IDs
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - ABCD1234
+          equals:
+            value:
+            - eq:ABCD1234
+          not equals:
+            value:
+            - ne:ABCD1234
+      - name: orderVersion
+        in: query
+        description: Order version
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+          greater than:
+            value:
+            - gt:1
+          greater than or equal:
+            value:
+            - gte:1
+          less than:
+            value:
+            - lt:3
+          less than or equals:
+            value:
+            - lte:3
+      - name: organisationId
+        in: query
+        description: organisationId of the customer company
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+      - $ref: '#/components/parameters/paginationPageParam'
+      - name: paymentId
+        in: query
+        description: Payment IDs
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+      - name: paymentTransactionId
+        in: query
+        description: Id of (one of) the PaymentTransaction(s) performed as part of the payment
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '1'
+          equals:
+            value:
+            - eq:1
+          not equals:
+            value:
+            - ne:1
+      - name: paymentType
+        in: query
+        description: Type of payment transaction
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - VISA
+          equals:
+            value:
+            - eq:VISA
+          not equals:
+            value:
+            - ne:MASTERCARD
+      - name: paymentTypeGroup
+        in: query
+        description: The PaymentTypeGroup the payment type belongs to
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - PAYMENTCARD
+          equals:
+            value:
+            - eq:PAYMENTCARD
+          not equals:
+            value:
+            - ne:MOBILE
+      - $ref: '#/components/parameters/paginationPerPageParam'
+      - name: rrn
+        in: query
+        description: Reconciliation reference number used to track a transaction through different economy systems.
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - 000012345678
+          equals:
+            value:
+            - eq:000012345678
+          not equals:
+            value:
+            - ne:000012345678
+      - name: settlementId
+        in: query
+        description: ID of settlement the transaction is linked to.
+        required: false
+        style: pipeDelimited
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '123'
+          equals:
+            value:
+            - eq:123
+          not equals:
+            value:
+            - ne:123
+      - name: status
+        in: query
+        description: Status of transaction relating to payment
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - CAPTURED
+          equals:
+            value:
+            - eq:CAPTURED
+          not equals:
+            value:
+            - ne:CAPTURED
+      - name: totalAmount
+        in: query
+        description: Total amounts
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '100'
+          equals:
+            value:
+            - eq:100
+          not equals:
+            value:
+            - ne:100
+          greater than:
+            value:
+            - gt:100
+          greater than or equal:
+            value:
+            - gte:100
+          less than:
+            value:
+            - lt:300
+          less than or equals:
+            value:
+            - lte:300
+      - name: updatedAt
+        in: query
+        description: When the payment was last updated.
+        required: false
+        style: pipeDelimited
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+        examples:
+          equals without operator:
+            summary: When operation is omitted it is treated as equals.
+            value:
+            - '2025-09-30T22:00:00.000Z'
+          equals:
+            value:
+            - eq:2025-09-30T22:00:00.000Z
+          not equals:
+            value:
+            - ne:2025-09-30T22:00:00.000Z
+          greater than:
+            value:
+            - gt:2025-09-30T22:00:00.000Z
+          greater than or equal:
+            value:
+            - gte:2025-09-30T22:00:00.000Z
+          less than:
+            value:
+            - lt:2025-09-30T22:00:00.000Z
+          less than or equals:
+            value:
+            - lte:2025-09-30T22:00:00.000Z
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PageOfPayment'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+      - Payments
+      summary: Create a new payment
+      description: Create a new payment. You may either create the payment without transactions and add them later, or include an initial transaction whose amount matches the payment total. Note that Entur can deactivate a payment method temporarily. If you include a transaction in this request, make sure its payment method is available by retrieving all current available methods first via GET /v1/payment-methods.
+      operationId: createPayment
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      - $ref: '#/components/parameters/onBehalfOfHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}:
+    parameters:
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Payments
+      summary: Get a payment
+      description: Returns the payment with all its transactions.
+      operationId: findPayment
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    patch:
+      tags:
+      - Payments
+      summary: Update a payment
+      description: The payment will be patched with specified fields. NULL values specifically set is considered as removing the field. In other words, only included fields will be modified. As of now, the only editable field is 'totalAmount' and 'active' (only for activation, not deactivation). For more information about the PATCH endpoint and the merge-patch content-type, please refer to RFC7396.
+      operationId: mergePatchPayment
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentMergePatch'
+          application/merge-patch+json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/PaymentMergePatch'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '409':
+          $ref: '#/components/responses/conflictValidationError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/deactivate:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Deactivate a payment
+      description: The payment will be deactivated. Any previously captured transactions will be credited (as long as it is not an imported transaction), and all other transactions will be cancelled.
+      operationId: deactivatePayment
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '501':
+          $ref: '#/components/responses/notImplemented'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Create a new transaction and add to payment
+      description: Add a transaction to an existing payment. Provide either a payment method or a recurring payment ID (at least one must be present). A payment can have more than one transaction. This operation can be seen in the operation log of the transaction as CREATE. Note that Entur can deactivate a payment method temporarily, retrieve all available payment methods first via GET /v1/payment-methods.
+      operationId: addTransaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}:
+    parameters:
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Payments
+      summary: Get a single transaction
+      description: Returns the transaction including an operation log showing everything that happened to the transaction.
+      operationId: findTransaction
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/app-claim:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Create payment claim in mobile app
+      description: 'Register the transaction with Vipps, which will present payment information to the customer in the Vipps app. Note that the receipt of confirmation in the payment app will not serve as payment confirmation, as this action will only reserve the money on the customer''s bank account. When the payment is accepted by the customer, a callback will be sent to the location provided in the request. This operation can be seen in the operation log of the transaction as INITIATE.
+
+
+        The response depends on how the transaction was created:
+
+        - **Standard Vipps payment** (no agreement): returns **201** with an `appClaimUrl` the client uses to open the Vipps app and present the payment to the customer.
+
+        - **New agreement** (`createAgreement=true`): returns **201** with a confirmation URL the customer must visit to approve the new agreement.
+
+        - **Existing agreement** (`paymentAgreementId` set): returns **204 No Content**. The charge is initiated directly against the existing agreement; no redirect or customer interaction is required. Clients implementing `paymentAgreementId` support must handle both 201 and 204 responses.'
+      operationId: createAppClaim
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppClaimRequest'
+        required: true
+      responses:
+        '201':
+          description: Created. Returned for standard Vipps payments and new agreements (`createAgreement=true`). Contains an `appClaimUrl` used to direct the customer to Vipps.
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/AppClaimResponse'
+        '204':
+          description: No Content. Returned when the transaction was created with `paymentAgreementId` (existing agreement). The charge has been initiated in Vipps; no redirect URL is needed.
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/cancel:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Cancel a transaction which is already CREATED/INITIATED
+      description: To be able to continue using the same payment (for the same order and order version), but with a new transaction, cancel needs to be called to not have it be included when summing up the total amount. There are several cases where this can be necessary, i.e. customer wants to use another payment method, or something goes wrong with the transaction before it is CAPTURED. This also takes care of cleaning up with the 3rd party payment provider if necessary.
+      operationId: cancelTransaction
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '501':
+          $ref: '#/components/responses/notImplemented'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/capture:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Payments
+      summary: Capture the transaction
+      description: Updates the state of the transaction to CAPTURED, and returns the state of the whole payment. After this operation, the transaction is considered to be paid, and a credit is needed to revert it. This operation can be seen in the operation log of the transaction as CAPTURE.
+      operationId: captureTransaction
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentError'
+              examples:
+                example-1:
+                  value:
+                    error: string
+                    exception: string
+                    message: string
+                    path: string
+                    status: 0
+                    timestamp: '2019-08-24T14:15:22Z'
+                soft_decline:
+                  value:
+                    error: string
+                    exception: string
+                    message: string
+                    path: string
+                    status: 0
+                    timestamp: '2019-08-24T14:15:22Z'
+                    errorReason: SOFT_DECLINE
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/gift-card-claim:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Claim a gift-card
+      description: The gift-card will be claimed
+      operationId: captureWithGiftCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GiftCardRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/import:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Import transaction data from external client
+      description: This endpoint is to be used to fill an existing PaymentTransaction with predetermined data from a completed PaymentTransaction. This should only be used by certain privileged clients.
+      operationId: importTransaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionImportRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TransactionResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/invoice:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Create or replace an invoice for an order
+      description: Initiate a payment by creating or replacing an invoice based on orderId and PaymentType.
+      operationId: createOrReplaceInvoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/InvoiceResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/pan-hash-terminal:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Create payment terminal
+      description: Registers the transaction with a 3rd party PSP and returns the location of the payment terminal. This operation can be seen in the operation log of the transaction as INITIATE.
+      operationId: createTerminalWithPanHash
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PanHashTerminalRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TerminalResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/terminal:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Create payment terminal
+      description: Registers the transaction with a 3rd party PSP and returns the location of the payment terminal where the user will provide card information. The terminal is available for 15min before the transaction times out. After this, a new transaction must be created. This operation can be seen in the operation log of the transaction as INITIATE.
+      operationId: createPaymentTerminal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/TerminalResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/internal-terminal:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Create an internal payment terminal
+      description: Returns a terminal-url where the user can provide further information and complete the payment process.
+      operationId: createInternalPaymentTerminal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InternalTerminalRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/InternalTerminalResponse'
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/authorize:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/posHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    put:
+      tags:
+      - Payments
+      summary: Pre-authorization and authorization adjustments of a transaction
+      description: 'Authorize a transaction pre-capture. The initial authorization, also called a pre-authorization is to reserve the total you think the transaction will amount to. If the total changes between the initial authorization and the time of capture, initial authorization-calls can be made to either increment or reduce the authorized amount. To trigger this just change the totalAmount in the authorizeRequest accordingly to your needs.
+
+
+        Note: An incremental authorization must be directly preceeded by either a pre-authorization or another incremental authorization.
+
+        Note: A reductional authorization can only be performed once per transaction. Once a reductional authorization has been done, it is no longe possible to alter the totalAmount of the transaction.'
+      operationId: authorizeTransaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/AuthorizeResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payments/{paymentId}/transactions/{transactionId}/wallet:
+    parameters:
+    - $ref: '#/components/parameters/dciHeader'
+    - $ref: '#/components/parameters/paymentIdPathParam'
+    - $ref: '#/components/parameters/transactionIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payments
+      summary: Register wallet-transaction in order to send payments to Netaxept by use of…
+      description: Register with data regarding payment and wallet provider in order to make payments with e.g. ApplePay. Clients must ask Entur to activate agreements for your merchant before using this endpoint.
+      operationId: registerWalletTransaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterWalletTransactionRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterWalletTransactionResponse'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '503':
+          $ref: '#/components/responses/serviceUnavailableError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payment-methods:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Payments
+      summary: Find all Payment Methods
+      description: Find all Payment Methods for a specific clientId. This method uses the Entur-Distribution-Channel header as a filter to show only those payment methods with the distributionChannelId matching this header.
+      operationId: findAllPaymentMethods
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - name: paymentType
+        in: query
+        description: Filter by PaymentType
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          $ref: '#/components/schemas/PaymentType'
+        examples:
+          default:
+            value: VISA
+      - name: paymentTypeGroup
+        in: query
+        description: Filter by PaymentTypeGroup
+        required: false
+        style: form
+        explode: true
+        allowReserved: true
+        schema:
+          $ref: '#/components/schemas/PaymentTypeGroup'
+        examples:
+          default:
+            value: PAYMENTCARD
+      responses:
+        '200':
+          description: OK
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentMethodResponse'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+components:
+  parameters:
+    transactionIdPathParam:
+      name: transactionId
+      in: path
+      description: transactionId
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    onBehalfOfHeader:
+      name: Entur-On-Behalf-Of
+      in: header
+      description: Identifier of the organisation on whose behalf the request is made. Use of this header requires a separate agreement before use.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    paginationPageParam:
+      name: page
+      in: query
+      description: Selects a specific page in the collection
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    paginationPerPageParam:
+      name: perPage
+      in: query
+      description: Selects the number of elements per page
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 30
+    posHeader:
+      name: Entur-POS
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    paymentIdPathParam:
+      name: paymentId
+      in: path
+      description: paymentId
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+  schemas:
+    TransactionImportRequest:
+      title: TransactionImportRequest
+      required:
+      - transactionConfirmedAt
+      type: object
+      properties:
+        companyId:
+          pattern: '[\d]{1,4}'
+          type: string
+          description: Id of the issuing organisation. The id is equal to the internal id in Enturs Organisation Register. Required for ECARD.
+          examples:
+          - '1'
+        envNetworkId:
+          pattern: '[\d]{6}'
+          type: string
+          description: County code for issuer
+          examples:
+          - '578000'
+        mediaSerialNumberId:
+          pattern: '[\d]{1,10}'
+          type: string
+          description: Numerical e-Card identifier. Required for ECARD.
+          examples:
+          - '0067340023'
+        paymentType:
+          type: string
+          description: Name of the specific payment type used. This further specifies the type of payment method used for this transaction. Often referred to as the name of the issuer for payment cards in the transaction data retrieved from payment terminals. Required for PAYMENTCARD.
+          examples:
+          - Coop Mastercard
+        rrn:
+          maxLength: 12
+          minLength: 1
+          type: string
+          description: Reconciliation reference number used to track a transaction through different economy systems. Required for PAYMENTCARD.
+          examples:
+          - 000012345678
+        terminalId:
+          type: string
+          description: Unique identifier for a physical terminal. Makes a transaction unique together with rrn. Required for PAYMENTCARD.
+          examples:
+          - 123-133-44
+        externalTransactionId:
+          type: string
+          description: Transaction ID from 3rd party payment provider.
+          examples:
+          - 7381cc2886b147198tuf257440c614fd
+        transactionConfirmedAt:
+          type: string
+          description: Time when payment transaction was completed by the client.
+          format: date-time
+          examples:
+          - '2018-03-07T12:20:46Z'
+        transactionData:
+          type: object
+          additionalProperties:
+            type: string
+          description: Any extra transaction data which could be relevant can be specified as a key value map of strings.
+          examples:
+          - someKey: someValue
+      description: Request body for importing an already completed transaction.
+      examples:
+      - companyId: '1'
+        envNetworkId: '578000'
+        mediaSerialNumberId: '0067340023'
+        paymentType: Coop Mastercard
+        rrn: '000123456123'
+        terminalId: 123-133-44
+        externalTransactionId: 7381cc2886b147198tuf257440c614fd
+        transactionConfirmedAt: '2025-01-12T16:13:13Z'
+        transactionData:
+          someKey: someValue
+    TerminalRequest:
+      title: TerminalRequest
+      required:
+      - redirectUrl
+      type: object
+      properties:
+        callbackUrl:
+          type: string
+          description: Location where notification of payment completion will be sent. If this is not provided, then the client will have to check for completion manually by getting the transaction and checking its status. The callback will be repeated until the server receives an HTTP 202 response.
+          examples:
+          - https://entur.org
+        customerNumber:
+          type: string
+          description: Customer number used with recurring payment creation. This field is optional and will only be considered for certain privileged clients.
+          examples:
+          - '123456789'
+        redirectUrl:
+          pattern: ^(https?://).{0,1024}
+          type: string
+          description: Location to be redirected to from the payment terminal.
+          examples:
+          - https://www.entur.org
+        storePayment:
+          type: boolean
+          description: Should the card be stored for recurring payments. If customer is not logged in, the value of this will be disregarded.
+          default: false
+          examples:
+          - false
+        terminalLanguage:
+          $ref: '#/components/schemas/TerminalLanguage'
+        countryCode:
+          $ref: '#/components/schemas/TerminalCountryCode'
+        autoSale:
+          type: boolean
+          description: If this flag is set to true, the capture call after a customer returns from the terminal is not needed. The processing starts automatically. This is only compatible with payments done with payment cards.
+          default: false
+        transactionType:
+          $ref: '#/components/schemas/TransactionType'
+        singlePage:
+          type: boolean
+          description: If this flag is set to true, we will attempt to generate a single-page terminal. If false, multi-page terminal might be used.
+          default: false
+          examples:
+          - false
+      description: Information used to customize the payment terminal.
+      examples:
+      - callbackUrl: https://entur.org
+        customerNumber: '123456789'
+        redirectUrl: https://www.entur.org
+        storePayment: true
+        terminalLanguage: no_NO
+        countryCode: 'NO'
+        autoSale: true
+        singlePage: true
+    TransactionResponse:
+      title: Transaction
+      required:
+      - amount
+      - createdAt
+      - currency
+      - status
+      - transactionId
+      type: object
+      properties:
+        amount:
+          type: string
+          description: 'Amount to pay, represented in the standard currency unit. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot. Deprecated and will be removed in next version of API. Use summary instead.'
+          examples:
+          - '450.00'
+        cardNumber:
+          type: string
+          description: Last 4 digits in card number (PAN - Personal Account Number)
+          examples:
+          - '0004'
+        createdAt:
+          type: string
+          description: Timestamp for when transaction was first created.
+          format: date-time
+          readOnly: true
+          examples:
+          - '2025-09-30T22:00:00Z'
+        currency:
+          type: string
+          description: 3-letter currency code. (ISO 4217)
+          default: NOK
+          examples:
+          - NOK
+        operationLog:
+          type: array
+          description: Log of each successful operation made on the transaction. Failing operations will not be included.
+          items:
+            $ref: '#/components/schemas/TransactionOperationResponse'
+          examples:
+          - - amount: '450.00'
+              distributionChannelId: ENT:DistributionChannel:Test
+              operation: CREATE
+              pos: '18930345'
+              timestamp: '2025-08-24T14:15:22Z'
+              error:
+                code: '25'
+                source: Netaxept
+                message: Transaction not found.
+        paymentType:
+          $ref: '#/components/schemas/PaymentType'
+        paymentTypeFee:
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/PaymentTypeFee'
+        paymentTypeGroup:
+          $ref: '#/components/schemas/PaymentTypeGroup'
+        paymentId:
+          type: integer
+          description: ID of the payment this transaction belongs to.
+          format: int64
+          examples:
+          - 42
+        paymentAgreementId:
+          type: integer
+          description: ID of the payment agreement associated with this transaction, if any.
+          format: int64
+          examples:
+          - 456
+        recurringPaymentId:
+          type: integer
+          description: Reference to the saved payment agreement this transaction will use, if any was specified.
+          format: int64
+          examples:
+          - 123
+        rrn:
+          type: string
+          description: Reconciliation reference number used to track a transaction through different economy systems.
+          examples:
+          - 000012345678
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        summary:
+          $ref: '#/components/schemas/TransactionSummary'
+        transactionData:
+          type: object
+          additionalProperties:
+            type: string
+          description: Extra transaction data from external client. Only relevant for clients using the import flow.
+          examples:
+          - extraData: any extra data you want to add
+        transactionId:
+          type: integer
+          description: ID of the specific transaction.
+          format: int64
+          examples:
+          - 1
+        updatedAt:
+          type: string
+          description: Timestamp for when transaction was last updated.
+          format: date-time
+          readOnly: true
+          examples:
+          - '2025-09-30T22:00:00Z'
+      description: Payment transaction information
+      examples:
+      - amount: '450.00'
+        cardNumber: '0004'
+        createdAt: '2025-01-12T16:08:03Z'
+        currency: NOK
+        operationLog:
+        - amount: '450.00'
+          distributionChannelId: ENT:DistributionChannel:Test
+          operation: CREATE
+          pos: '18930345'
+          timestamp: '2025-08-24T14:15:22Z'
+          error:
+            code: '25'
+            source: Netaxept
+            message: Transaction not found.
+        paymentType: VISA
+        paymentTypeFee:
+          amount: '450.00'
+          currency: NOK
+          name: ENT:PaymentTypeFee:Collector
+          reason: Walley Invoice
+          taxAmount: '25.00'
+          taxCode: '3'
+          taxRate: '25.00'
+        paymentTypeGroup: PAYMENTCARD
+        paymentId: 42
+        recurringPaymentId: 1
+        rrn: '000123456123'
+        status: CREATED
+        summary:
+          capturedAmount: '450.00'
+          creditedAmount: '450.00'
+          remainingAmountToCapture: '0.00'
+          remainingAmountToCredit: '0.00'
+        transactionData:
+          extraData: any extra data you want to add
+        transactionId: 10
+        updatedAt: '2025-01-12T16:13:13Z'
+    TransactionStatus:
+      type: string
+      description: Current state of the transaction.
+      enum:
+      - CANCELLED
+      - CAPTURED
+      - CREATED
+      - CREDITED
+      - INITIATED
+      - REJECTED
+      examples:
+      - CREATED
+    InvoiceResponse:
+      title: InvoiceResponse
+      required:
+      - invoiceId
+      - paymentId
+      - transactionId
+      type: object
+      properties:
+        invoiceId:
+          type: integer
+          description: ID of the invoice connected to the payment. Used to lookup invoice in the invoice api
+          format: int64
+          examples:
+          - 1
+        paymentId:
+          type: integer
+          description: ID of the payment the transaction belongs to. Used with the transactionId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        terminalUri:
+          type: string
+          description: 'If paymentType is COLLECTOR: Location of the payment terminal, else null'
+          examples:
+          - https://epayment.nets.eu/Terminal/default.aspx?merchantId=1234567&transactionId=77770fb3a53347777071cd6f4a3e7777
+        transactionId:
+          type: integer
+          description: ID of the transaction this terminal belongs to. Used with the paymentId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        expiryDate:
+          type: string
+          description: 'Legacy field, only present on historical Collector B2B invoices: expiry date for when the invoice is no longer payable'
+          format: date-time
+          examples:
+          - '2025-09-30T22:00:00Z'
+        publicToken:
+          type: string
+          description: 'Legacy field, only present on historical Collector B2B invoices: token used in creation of payment iframe'
+          examples:
+          - public-SE-0a94436dba53edc468584935e7da524eb8d5d8feab85ed03
+      description: Information about the invoice payment
+      examples:
+      - invoiceId: 1
+        paymentId: 1
+        terminalUri: https://epayment.nets.eu/Terminal/default.aspx?merchantId=1234567&transactionId=77770fb3a53347777071cd6f4a3e7777
+        transactionId: 10
+        expiryDate: '2025-09-30T22:00:00.000Z'
+        publicToken: public-SE-0a94436dba53edc468584935e7da524eb8d5d8feab85ed03
+    TransactionOperationResponse:
+      title: TransactionOperation
+      required:
+      - amount
+      - operation
+      - pos
+      - timestamp
+      type: object
+      properties:
+        amount:
+          type: string
+          description: 'Amount for this operation, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  '
+          examples:
+          - '450.00'
+        distributionChannelId:
+          type: string
+          description: Distribution Channels controls which organisations can sell, refund or inform on available products or salepoints. The distribution channel id represents a specific distribution channel.
+          examples:
+          - ENT:DistributionChannel:Test
+        operation:
+          $ref: '#/components/schemas/Operation'
+        pos:
+          type: string
+          description: Point-of-sale id which performed this operation.
+          examples:
+          - '18930345'
+        timestamp:
+          type: string
+          description: Time when operation was completed. A date without a time zone in the ISO 8601 calendar system.
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        error:
+          $ref: '#/components/schemas/ErrorResponse'
+      description: Describes an operation performed on a transaction.
+      examples:
+      - amount: '450.00'
+        distributionChannelId: ENT:DistributionChannel:Test
+        operation: CREATE
+        pos: '18930345'
+        timestamp: '2025-08-24T14:15:22Z'
+        error:
+          code: '25'
+          source: Netaxept
+          message: Transaction not found.
+    TransactionRequest:
+      title: TransactionRequest
+      required:
+      - amount
+      type: object
+      properties:
+        amount:
+          type: string
+          description: 'Amount to pay, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  '
+          examples:
+          - '450.00'
+        currency:
+          pattern: '[A-Z]{3}'
+          type: string
+          description: 3-letter ISO 4217 currency code. Default is NOK.
+          default: NOK
+          examples:
+          - NOK
+        isImport:
+          type: boolean
+          description: Import flag. Selects a special payment method for imports.
+          default: false
+          examples:
+          - false
+        paymentType:
+          $ref: '#/components/schemas/PaymentType'
+        paymentTypeGroup:
+          $ref: '#/components/schemas/PaymentTypeGroup'
+        recurringPaymentId:
+          type: integer
+          description: ID of the saved payment method to use for this transaction.
+          format: int64
+          examples:
+          - 123
+        paymentAgreementId:
+          type: integer
+          description: ID of the payment agreement to charge against. Used for Vipps recurring agreement payments. Mutually exclusive with recurringPaymentId.
+          format: int64
+          examples:
+          - 456
+        with3DSecure:
+          type: boolean
+          description: Flag to choose payment methods with or without 3D Secure. This option is only accessible to privileged clients.
+          default: true
+          examples:
+          - true
+        scaExemption:
+          $ref: '#/components/schemas/ScaExemption'
+        createAgreement:
+          type: boolean
+          description: If true, a new FLEXIBLE Vipps agreement is created and the transaction amount becomes the initial charge. The user must approve the agreement before the charge is processed. Use with paymentType VIPPS / paymentTypeGroup MOBILE. Mutually exclusive with paymentAgreementId and recurringPaymentId.
+          default: false
+          examples:
+          - false
+      description: Information used to create a transaction.
+      examples:
+      - amount: '450.00'
+        currency: NOK
+        isImport: false
+        paymentType: VISA
+        paymentTypeGroup: PAYMENTCARD
+        recurringPaymentId: 1
+        with3DSecure: true
+        scaExemption: LOW_VALUE
+    ErrorResponse:
+      title: Error
+      type: object
+      properties:
+        code:
+          type: string
+          description: The error code. Used in combination with the error source to find more information about the error.
+          examples:
+          - '25'
+        source:
+          type: string
+          description: Where the error originates from.
+          examples:
+          - Netaxept
+        message:
+          type: string
+          description: A description of the error that occurred.
+          examples:
+          - Transaction not found.
+      description: Information about an error that occurred.
+      examples:
+      - code: '25'
+        source: Netaxept
+        message: Transaction not found.
+    PaymentType:
+      type: string
+      description: The actual type of payment.
+      enum:
+      - AMEX
+      - BANKAXEPT
+      - COLLECTOR
+      - GIFTCARD
+      - MASTERCARD
+      - PAYPAL
+      - VIPPS
+      - VISA
+      - XLEDGER
+      - COLLECTOR_B2B
+      - TWO_B2B
+      examples:
+      - VISA
+    PaymentResponse:
+      title: Payment
+      required:
+      - createdAt
+      - currency
+      - orderId
+      - orderVersion
+      - organisationId
+      - paymentId
+      - totalAmount
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: 'This is to block any transactions after the corresponding order version is reset. Clients importing transactions need to either cancel or credit each transaction externally, and the credit the transaction directly using the transaction''s credit endpoint. To continue using the same order id, the payment has to be reactivated with the correct total amount before any new actions can be made to this payment. Editable: true'
+          examples:
+          - false
+        createdAt:
+          type: string
+          description: Timestamp for when payment was created.
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        currency:
+          type: string
+          description: 3-letter ISO 4217 currency code. Default is NOK.
+          default: NOK
+          examples:
+          - NOK
+        customerNumber:
+          type: string
+          description: ID of the customer who owns this payment.
+          examples:
+          - '123456789'
+        orderId:
+          type: string
+          description: Id of the order this payment belongs to.
+          examples:
+          - HE8NDS7XY
+        orderVersion:
+          type: integer
+          description: Version of the order this payment belongs to.
+          format: int32
+          examples:
+          - 1
+        organisationId:
+          type: integer
+          description: Id of the organisation who created this payment.
+          format: int64
+          examples:
+          - 1
+        paymentId:
+          type: integer
+          description: Id of payment
+          format: int64
+          examples:
+          - 123
+        settlementId:
+          type: integer
+          description: Supplied to the client by an external system for handling settlements. For Internal Entur Clients this is Entur’s Electronic Journal.
+          format: int64
+          examples:
+          - 18234
+        totalAmount:
+          type: string
+          description: 'Amount to pay, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot. Editable: true'
+          examples:
+          - '450.00'
+        transactionHistory:
+          type: array
+          description: List of all transactions belonging to this payment.
+          items:
+            $ref: '#/components/schemas/TransactionResponse'
+          examples:
+          - - amount: '450.00'
+              cardNumber: '0004'
+              createdAt: '2025-01-12T16:08:03Z'
+              currency: NOK
+              operationLog:
+              - amount: '450.00'
+                distributionChannelId: ENT:DistributionChannel:Test
+                operation: CREATE
+                pos: '18930345'
+                timestamp: '2025-08-24T14:15:22Z'
+                error:
+                  code: '25'
+                  source: Netaxept
+                  message: Transaction not found.
+              paymentType: VISA
+              paymentTypeFee:
+                amount: '450.00'
+                currency: NOK
+                name: ENT:PaymentTypeFee:Collector
+                reason: Walley Invoice
+                taxAmount: '25.00'
+                taxCode: '3'
+                taxRate: '25.00'
+              paymentTypeGroup: PAYMENTCARD
+              recurringPaymentId: 1
+              rrn: '000123456123'
+              status: CREATED
+              summary:
+                capturedAmount: '450.00'
+                creditedAmount: '450.00'
+                remainingAmountToCapture: '0.00'
+                remainingAmountToCredit: '0.00'
+              transactionData:
+                extraData: any extra data you want to add
+              transactionId: 10
+              updatedAt: '2025-01-12T16:13:13Z'
+        updatedAt:
+          type: string
+          description: Timestamp for when payment was last updated.
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+      description: Information about an order's payment.
+      examples:
+      - active: true
+        createdAt: '2025-01-12T16:08:03Z'
+        currency: NOK
+        customerNumber: '123456789'
+        orderId: ABCD1234
+        orderVersion: 1
+        organisationId: 1
+        paymentId: 1
+        settlementId: 1245
+        totalAmount: '450.00'
+        transactionHistory:
+        - amount: '450.00'
+          cardNumber: '0004'
+          createdAt: '2025-01-12T16:08:03Z'
+          currency: NOK
+          operationLog:
+          - amount: '450.00'
+            distributionChannelId: ENT:DistributionChannel:Test
+            operation: CREATE
+            pos: '18930345'
+            timestamp: '2025-08-24T14:15:22Z'
+            error:
+              code: '25'
+              source: Netaxept
+              message: Transaction not found.
+          paymentType: VISA
+          paymentTypeFee:
+            amount: '450.00'
+            currency: NOK
+            name: ENT:PaymentTypeFee:Collector
+            reason: Walley Invoice
+            taxAmount: '25.00'
+            taxCode: '3'
+            taxRate: '25.00'
+          paymentTypeGroup: PAYMENTCARD
+          recurringPaymentId: 1
+          rrn: '000123456123'
+          status: CREATED
+          summary:
+            capturedAmount: '450.00'
+            creditedAmount: '450.00'
+            remainingAmountToCapture: '0.00'
+            remainingAmountToCredit: '0.00'
+          transactionData:
+            extraData: any extra data you want to add
+          transactionId: 10
+          updatedAt: '2025-01-12T16:13:13Z'
+        updatedAt: '2025-01-12T16:13:13Z'
+    AuthorizeResponse:
+      title: AuthorizeResponse
+      required:
+      - paymentId
+      - transactionId
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          description: ID of the payment the transaction belongs to. Used with the transactionId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        transactionId:
+          type: integer
+          description: ID of the transaction this terminal belongs to. Used with the paymentId to later capture transaction.
+          format: int64
+          examples:
+          - 10
+      description: Information about the authorized transaction
+      examples:
+      - paymentId: 1
+        transactionId: 10
+    WalletProvider:
+      type: string
+      description: Examples of providers are ApplePay and GooglePay. Both of these are supported.
+      enum:
+      - APPLE_PAY
+      - GOOGLE_PAY
+      examples:
+      - APPLE_PAY
+    PaymentMethodResponse:
+      title: PaymentMethodResponse
+      required:
+      - distributionChannelId
+      - id
+      - paymentTypeGroup
+      type: object
+      properties:
+        clientId:
+          type: string
+          description: ID of the client this payment method belongs to. This ID is the one found in the client's token.
+          examples:
+          - sS7grDF79fddBFd4=
+        distributionChannelId:
+          type: string
+          description: Distribution Channels controls which organisations can sell, refund or inform on available products or salepoints.
+          examples:
+          - ENT:DistributionChannel:Test
+        id:
+          type: integer
+          description: Unique identifier for a payment method.
+          format: int64
+          examples:
+          - 1
+        paymentConfig:
+          $ref: '#/components/schemas/PaymentConfigurationResponse'
+        paymentType:
+          type: string
+          description: The actual type of payment.
+          examples:
+          - VISA
+        paymentTypeFee:
+          deprecated: true
+          allOf:
+          - $ref: '#/components/schemas/PaymentTypeFee'
+        paymentTypeGroup:
+          type: string
+          description: Group for the payment type. Payment types which are payment cards is in the PAYMENTCARD group.
+          examples:
+          - PAYMENTCARD
+      description: Result from creating a PaymentMethod.
+      examples:
+      - distributionChannelId: ENT:DistributionChannel:Test
+        id: 1
+        paymentConfig:
+          accountName: Entur Test
+          id: 1
+          merchantConfig:
+            someKey:
+              configParam: configValue
+          paymentProvider: NETAXEPT
+        paymentType: VISA
+        paymentTypeFee:
+          amount: '450.00'
+          currency: NOK
+          name: ENT:PaymentTypeFee:Collector
+          reason: Walley Invoice
+          taxAmount: '25.00'
+          taxCode: '3'
+          taxRate: '25.00'
+        paymentTypeGroup: PAYMENTCARD
+    TerminalLanguage:
+      type: string
+      description: Language used in the payment terminal. Default is 'no_NO'.
+      enum:
+      - da_DK
+      - de_DE
+      - en_GB
+      - es_ES
+      - et_EE
+      - fi_FI
+      - fr_FR
+      - it_IT
+      - lt_LT
+      - lv_LV
+      - nl_NL
+      - no_NO
+      - pl_PL
+      - ru_RU
+      - sv_SE
+      examples:
+      - no_NO
+    AuthorizeRequest:
+      title: AuthorizeRequest
+      required:
+      - totalAmount
+      type: object
+      properties:
+        totalAmount:
+          type: string
+          description: 'Amount to pay, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+      description: Information used to update a transaction and payment with correct amount and authorize the new amount to Nets.
+      examples:
+      - totalAmount: '450.00'
+    RegisterWalletTransactionResponse:
+      title: RegisterWalletTransactionResponse
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          description: ID of the payment the transaction belongs to. Used with the transactionId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        transactionId:
+          type: integer
+          description: ID of the transaction this terminal belongs to. Used with the paymentId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        walletProvider:
+          type: string
+          description: Examples of providers are ApplePay and GooglePay. Both are supported.
+          examples:
+          - ApplePay
+        terminalUri:
+          type:
+          - string
+          - 'null'
+          description: Location of the payment terminal for handling 3DS. This will only be returned if the redirectUrl was provided in the request.
+          examples:
+          - https://epayment.nets.eu/epay/default.aspx?merchantId=700000&transactionId=8841532204d4426da913a5abfbg322f0
+      description: Information about registered wallet-transaction.
+      examples:
+      - paymentId: 1
+        transactionId: 1
+        walletProvider: ApplePay
+        redirectUrl: https://your-redirect-url.org/123123
+    RegisterWalletTransactionRequest:
+      title: RegisterWalletTransactionRequest
+      required:
+      - paymentData
+      - walletProvider
+      type: object
+      properties:
+        walletProvider:
+          $ref: '#/components/schemas/WalletProvider'
+        paymentData:
+          minLength: 1
+          type: string
+          description: Contains payment data that will be ECC encrypted. Client should send this as a JSON-string containing the data as described in https://developer.apple.com/documentation/passkit/payment-token-format-reference#Payment-token-format-reference .
+          examples:
+          - '{data:{"version": "EC_v1","data": "CiAgQmFzZTY0IGVueWNyeXB0ZWQgY29udGVudCBvZiB0aGUgdG9rZW4gZGF0YS4uLg==","signature": "MEUCIQDfKf9Zl...FAKE_SIGNATURE...b7Q==","header": {"ephemeralPublicKey": "BCEFAKE_EPHEMERAL_PUBLIC_KEY_BASE64==","publicKeyHash": "FAKE_PUBLIC_KEY_HASH_BASE64==","transactionId": "6B1F2E3A-9C4D-4B1A-8F4C-1234567890AB"}}'
+        redirectUrl:
+          type:
+          - string
+          - 'null'
+          description: Points to where users should be redirected to for 3DS handling after registering payment, according to client. This is optional, and should only be used for GooglePay and if the transaction is being initiated from a web client, and not an app client.
+          examples:
+          - https://your-redirect-url.org/123123
+      description: Request body used to register a wallet transaction with an external payment provider.
+      examples:
+      - walletProvider: APPLE_PAY
+        paymentData: '{data:{"version": "EC_v1","data": "CiAgQmFzZTY0IGVueWNyeXB0ZWQgY29udGVudCBvZiB0aGUgdG9rZW4gZGF0YS4uLg==","signature": "MEUCIQDfKf9Zl...FAKE_SIGNATURE...b7Q==","header": {"ephemeralPublicKey": "BCEFAKE_EPHEMERAL_PUBLIC_KEY_BASE64==","publicKeyHash": "FAKE_PUBLIC_KEY_HASH_BASE64==","transactionId": "6B1F2E3A-9C4D-4B1A-8F4C-1234567890AB"}}'
+        redirectUrl: https://www.entur.org
+    TerminalCountryCode:
+      type: string
+      description: ISO 3166-1 Alpha 2 country code used for certain terminals (PayPal, Collector). Used to decide which country store the customer wants to use. Default is 'NO'
+      default: 'NO'
+      enum:
+      - 'NO'
+      - DK
+      - SE
+      - FI
+      examples:
+      - 'NO'
+    InternalTerminalRequest:
+      title: InternalTerminalRequest
+      required:
+      - redirectUrl
+      type: object
+      properties:
+        redirectUrl:
+          pattern: ^(https?://).{0,1024}
+          type: string
+          description: Location to be redirected to from the payment terminal.
+          examples:
+          - http://www.entur.org
+      description: Information used to customize the payment terminal.
+      examples:
+      - redirectUrl: https://www.entur.org
+    AppClaimResponse:
+      title: AppClaim
+      required:
+      - appClaimUrl
+      - paymentId
+      - transactionId
+      type: object
+      properties:
+        appClaimUrl:
+          type: string
+          description: Location of the payment terminal.
+          examples:
+          - https://landing.vipps.no/?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1Ni
+        paymentId:
+          type: integer
+          description: ID of the payment the transaction belongs to. Used with the transactionId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        transactionId:
+          type: integer
+          description: ID of the transaction this terminal belongs to. Used with the transactionId to later capture transaction.
+          format: int64
+          examples:
+          - 10
+      description: Information about how to access mobile app "terminal".
+      examples:
+      - appClaimUrl: https://landing.vipps.no/?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1Ni
+        paymentId: 1
+        transactionId: 10
+    ScaExemption:
+      title: ScaExemption
+      type: string
+      description: 'The type of SCA (secure customer authentication) Exemption for a transaction. Defaults to NO_EXEMPTION. Other available values are: LOW_VALUE.'
+      examples:
+      - NO_EXEMPTION
+    PageOfPayment:
+      title: PageOfPayment
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items on a specific page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/PaymentResponse'
+        totalItems:
+          type: integer
+          description: Total number of items
+          format: int64
+          readOnly: true
+          examples:
+          - 72
+        totalPages:
+          type: integer
+          description: Total number of pages available to browse
+          format: int64
+          readOnly: true
+          examples:
+          - 9
+      description: Page displays a subset of a list of entities
+      examples:
+      - items:
+        - active: true
+          createdAt: '2025-01-12T16:08:03Z'
+          currency: NOK
+          customerNumber: '123456789'
+          orderId: ABCD1234
+          orderVersion: 1
+          organisationId: 1
+          paymentId: 1
+          settlementId: 1245
+          totalAmount: '450.00'
+          transactionHistory:
+          - amount: '450.00'
+            cardNumber: '0004'
+            createdAt: '2025-01-12T16:08:03Z'
+            currency: NOK
+            operationLog:
+            - amount: '450.00'
+              distributionChannelId: ENT:DistributionChannel:Test
+              operation: CREATE
+              pos: '18930345'
+              timestamp: '2025-08-24T14:15:22Z'
+              error:
+                code: '25'
+                source: Netaxept
+                message: Transaction not found.
+            paymentType: VISA
+            paymentTypeFee:
+              amount: '450.00'
+              currency: NOK
+              name: ENT:PaymentTypeFee:Collector
+              reason: Walley Invoice
+              taxAmount: '25.00'
+              taxCode: '3'
+              taxRate: '25.00'
+            paymentTypeGroup: PAYMENTCARD
+            recurringPaymentId: 1
+            rrn: '000123456123'
+            status: CREATED
+            summary:
+              capturedAmount: '450.00'
+              creditedAmount: '450.00'
+              remainingAmountToCapture: '0.00'
+              remainingAmountToCredit: '0.00'
+            transactionData:
+              extraData: any extra data you want to add
+            transactionId: 10
+            updatedAt: '2025-01-12T16:13:13Z'
+          updatedAt: '2025-01-12T16:13:13Z'
+        totalItems: 1
+        totalPages: 1
+    PaymentMergePatch:
+      title: PaymentMergePatch
+      required:
+      - totalAmount
+      properties:
+        totalAmount:
+          type: string
+          description: 'Amount to pay, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot. Editable: true'
+          examples:
+          - '450.00'
+        active:
+          type: boolean
+          description: Active is used during activation of payment
+          examples:
+          - true
+        settlementId:
+          type: integer
+          description: Id of a settlement used to identify on-site payments i.e. mobile terminals, ticket vending machines and customer service help-desks.
+          examples:
+          - 100123
+      description: Request body udes to update a payment. The properties described here are the only properties that can be updated on a payment.
+      examples:
+      - totalAmount: '450.00'
+        active: true
+    PaymentError:
+      title: PaymentError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error that occurred.
+          examples:
+          - Internal Server Error
+        exception:
+          type: string
+          description: What exception caused the error.
+          examples:
+          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message:
+          type: string
+          description: A message detailing the error.
+          examples:
+          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path:
+          type: string
+          description: The url path that was accessed when the error happenened.
+          examples:
+          - /v1/payments/1/transactions/1/capture
+        status:
+          type: integer
+          description: The http status of the response.
+          format: int32
+          examples:
+          - 500
+        timestamp:
+          type: string
+          description: When the error occurred
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        errorReason:
+          type: string
+          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
+          examples:
+          - SOFT_DECLINE
+      x-examples: {}
+      examples:
+      - error: Internal Server Error
+        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path: /v1/payments/1/transactions/1/capture
+        status: 500
+        timestamp: '2025-08-24T14:15:22Z'
+    PaymentTypeFee:
+      title: PaymentTypeFee
+      required:
+      - amount
+      - currency
+      - name
+      - taxAmount
+      type: object
+      properties:
+        amount:
+          maxLength: 19
+          pattern: ^[1-9][0-9]{0,17}\.[0-9]{1,5}$|^([1-9])[0-9]{0,17}$|^[0]\.[1-9][0-9]{1,5}$
+          type: string
+          description: Total amount including taxes
+          examples:
+          - '100.00'
+        currency:
+          type: string
+          description: The currency in 3-letter ISO-4217 standard codes
+          default: NOK
+          examples:
+          - NOK
+        name:
+          pattern: '[A-Z]{3}:[^:]+:[^:]+'
+          type: string
+          description: Name of the fee in NeTEX format identifying a fee.
+          examples:
+          - ENT:PaymentTypeFee:Collector
+        reason:
+          type: string
+          description: The reason for the fee, if applicable.
+          examples:
+          - Walley Invoice
+        taxAmount:
+          type: string
+          description: The total amount of taxes this fee consists of
+          examples:
+          - '25.00'
+        taxCode:
+          type: string
+          description: The tax code for the tax rate, if applicable
+          examples:
+          - '3'
+        taxRate:
+          type: string
+          description: The tax rate of this fee, if applicable
+          examples:
+          - '25.00'
+      description: Fee related to a payment method.
+      deprecated: true
+      examples:
+      - amount: '450.00'
+        currency: NOK
+        name: ENT:PaymentTypeFee:Collector
+        reason: Walley Invoice
+        taxAmount: '25.00'
+        taxCode: '3'
+        taxRate: '25.00'
+    TerminalResponse:
+      title: Terminal
+      required:
+      - terminalUri
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          description: ID of the payment the transaction belongs to. Used with the transactionId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+        recurringPaymentId:
+          type: integer
+          description: ID of the recurring payment this terminal belongs to.
+          format: int64
+          examples:
+          - 1
+        terminalUri:
+          type: string
+          description: Location of the payment terminal.
+          examples:
+          - https://epayment.nets.eu/Terminal/default.aspx?merchantId=700000&transactionId=8841532204d4426da913a5abfbg322f0
+        transactionId:
+          type: integer
+          description: ID of the transaction this terminal belongs to. Used with the paymentId to later capture transaction.
+          format: int64
+          examples:
+          - 1
+      description: Information about how to access the terminal.
+      examples:
+      - paymentId: 1
+        recurringPaymentId: 1
+        terminalUri: https://epayment.nets.eu/Terminal/default.aspx?merchantId=1234567&transactionId=77770fb3a53347777071cd6f4a3e7777
+        transactionId: 1
+    GiftCardRequest:
+      title: GiftCardRequest
+      required:
+      - giftCardCode
+      type: object
+      properties:
+        giftCardCode:
+          type: string
+          description: The code identifying a gift card.
+          nullable: false
+          examples:
+          - 1927bd54-4cc4
+      description: Information used to create a payment claim with a gift card.
+      examples:
+      - giftCardCode: 1927bd54-4cc4
+    InternalTerminalResponse:
+      title: Internal Terminal
+      required:
+      - terminalUrl
+      type: object
+      properties:
+        paymentId:
+          type: integer
+          description: ID of the payment the transaction belongs to.
+          format: int64
+          examples:
+          - 1
+        transactionId:
+          type: integer
+          description: ID of the transaction this terminal belongs to.
+          format: int64
+          examples:
+          - 1
+        terminalUrl:
+          type: string
+          description: Location of the payment terminal.
+          examples:
+          - https://terminal.entur.no/?data=MTAzNTgzMzoxMDY1NTY4
+      description: Information about how to access the terminal.
+      examples:
+      - paymentId: 1
+        transactionId: 1
+        terminalUrl: https://terminal.staging.entur.no/?data=MTAzNTgzMzoxMDY1NTY4
+    PanHashTerminalRequest:
+      title: PanHashTerminalRequest
+      required:
+      - panHash
+      - recurringType
+      - redirectUrl
+      type: object
+      properties:
+        panHash:
+          type: string
+          description: The pan hash used to execute the payment.
+          examples:
+          - eVHXJzGr4gu1lz9TwGJU
+        recurringType:
+          maxLength: 1
+          minLength: 1
+          pattern: ^R|S$
+          type: string
+          description: The type of the recurring payment. Can be either R og S.
+          examples:
+          - R
+        redirectUrl:
+          pattern: ^(https?://).{0,1024}
+          type: string
+          description: Location to be redirected to from the payment terminal.
+          examples:
+          - http://www.entur.org
+      description: Information used to create a terminal.
+      examples:
+      - panHash: eVHXJzGr4gu1lz9TwGJU
+        recurringType: R
+        redirectUrl: https://www.entur.org
+    TransactionType:
+      type: string
+      description: Set the type of transaction. Only set this field to MIT_UCOF if you want to create a Merchant Initiated Transaction (MIT) which refers to a card payment started by a merchant without the customer being actively involved. If this value is not set, a payment terminal will be created as normal.
+      enum:
+      - MIT_UCOF
+      examples:
+      - MIT_UCOF
+    PaymentTypeGroup:
+      type: string
+      description: A PaymentTypeGroup used to override which kind of method to use for reimbursement, instead of using same as used for the payment transaction.This will only take effect if the payment method on the payment transaction allows for overriding.
+      enum:
+      - AGENT
+      - CASH
+      - ECARD
+      - GIFTCARD
+      - INVOICE
+      - MOBILE
+      - PAYMENTCARD
+      - PAYPAL
+      - REMITTED
+      - REQUISITION
+      examples:
+      - CASH
+    Operation:
+      type: string
+      description: A transaction has a list of operations performed on a transaction. These operations can have one of the values in this enum.
+      enum:
+      - AUTHENTICATE
+      - CANCEL
+      - CAPTURE
+      - CREATE
+      - CREDIT
+      - IMPORT
+      - INITIATE
+      - REJECT
+      - SOFT_DECLINE
+      - ON_HOLD
+      - AUTHORIZE
+      - AUTHORIZE_INCREMENT
+      - AUTHORIZE_REVERSE
+      examples:
+      - CREATE
+    PaymentRequest:
+      title: PaymentRequest
+      required:
+      - orderId
+      - orderVersion
+      - totalAmount
+      type: object
+      properties:
+        currency:
+          pattern: '[A-Z]{3}'
+          type: string
+          description: 3-letter ISO 4217 currency code. Default is NOK.
+          default: NOK
+          examples:
+          - NOK
+        customerNumber:
+          type: string
+          description: Customer who owns this payment. This value is only considered for privileged client (internal and partner tenants.
+          examples:
+          - '123456789'
+        orderId:
+          type: string
+          description: Id of the order this payment belongs to.
+          examples:
+          - HE8NDS7XY
+        orderVersion:
+          type: integer
+          description: Version of the order this payment belongs to.
+          format: int32
+          examples:
+          - 1
+        settlementId:
+          type: integer
+          description: Supplied to the client by an external system for handling settlements. For Internal Entur Clients this is Entur’s Electronic Journal.
+          format: int64
+          examples:
+          - 18234
+        totalAmount:
+          maxLength: 19
+          pattern: ^[1-9][0-9]{0,17}\.[0-9]{1,5}$|^([1-9])[0-9]{0,17}$|^[0]\.[1-9][0-9]{1,5}$
+          type: string
+          description: 'Amount to pay, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+        transaction:
+          $ref: '#/components/schemas/TransactionRequest'
+      description: Information used to create a Payment.
+      examples:
+      - currency: NOK
+        customerNumber: '123456789'
+        orderId: ABCD1234
+        orderVersion: 1
+        settlementId: 1245
+        totalAmount: '450.00'
+        transaction:
+          amount: '450.00'
+          currency: NOK
+          isImport: false
+          paymentType: VISA
+          paymentTypeGroup: PAYMENTCARD
+          recurringPaymentId: 1
+          with3DSecure: true
+          scaExemption: LOW_VALUE
+    InvoiceRequest:
+      title: InvoiceRequest
+      type: object
+      properties:
+        customerIdentificationNumber:
+          type: string
+          description: Customer identification number to identify customer information on electronic banking transactions. Used for penalty fare invoices in Xledger. Has absolutely nothing to do with Entur customers.
+          examples:
+          - '12345678'
+        externalInvoiceNumber:
+          type: string
+          description: An external invoice number that is generated outside the sales system. This number is the invoice number on the written invoice, and must be sent to Xledger
+          examples:
+          - '21000557302577563'
+        languageCode:
+          type: string
+          description: 'Language code to override terminal language and invoice if possible. Overrides customer preferences. ISO 639-3 format. '
+          default: NOB
+          examples:
+          - NOB
+        redirectUrl:
+          pattern: ^(https?://).{0,1024}
+          type: string
+          description: Location to be redirected to from the payment terminal. Required for Collector
+          examples:
+          - https://www.entur.org
+        invoiceId:
+          type: integer
+          description: Id of Invoice. Only set in request for PUT
+          format: int64
+          examples:
+          - 1
+      description: Information used to customize an invoice.
+      examples:
+      - customerIdentificationNumber: '12345678'
+        externalInvoiceNumber: '21000557302577563'
+        languageCode: NOB
+        redirectUrl: https://www.entur.org
+        invoiceId: 1
+    AppClaimRequest:
+      title: AppClaimRequest
+      type: object
+      properties:
+        description:
+          type: string
+          description: Customize the text to be presented to the end-user in the payment app. This often involves some kind of product information.
+          examples:
+          - Train ticket(s) from entur.org
+        phoneNumber:
+          pattern: ^([0-9]{8}|\+?[0-9]{10,15})$
+          type: string
+          description: 'Phone number where the claim should be presented. Accepted formats: 8-digit Norwegian number (country code 47 is added automatically if not provided), MSISDN (digits only, country code included, 10–15 digits), or E.164 (leading +, 10–15 digits). Supported country codes: Norway (47), Denmark (45), Sweden (46), Finland (358).'
+          examples:
+          - '4791234567'
+        redirectUrl:
+          minLength: 1
+          type: string
+          description: Location to be redirected to from the 3rd party landing page/app.
+          examples:
+          - https://www.entur.org or my-app://my-url
+      description: Information used to create a payment claim in a mobile app where end-user can accept payment.
+      examples:
+      - description: Train ticket(s) from entur.org
+        phoneNumber: '12345678'
+        redirectUrl: https://www.entur.org or my-app://my-url
+    ValidationError:
+      title: ValidationError
+      description: An error that is returned when the input from the client was not validated. It's an extension of the PaymentError
+      allOf:
+      - $ref: '#/components/schemas/PaymentError'
+      - type: object
+        properties:
+          errors:
+            type: array
+            items:
+              type: string
+      examples:
+      - error: Bad request
+        exception: org.entur.payment.faulthandling.exceptions.ValidationError
+        message: Payment amount '200.00' does not equal order balance '250.00'
+        path: /v1/payments/
+        status: 400
+        timestamp: '2025-08-24T14:15:22Z'
+        errors:
+        - Payment amount '200.00' does not equal order balance '250.00'
+    PaymentConfigurationResponse:
+      title: PaymentConfigurationResponse
+      required:
+      - accountName
+      - id
+      - paymentProvider
+      type: object
+      properties:
+        accountName:
+          type: string
+          description: Name describing the owner of the configuration. Usually the name of the client.
+          examples:
+          - Entur Test
+        id:
+          type: integer
+          description: Unique identifier of this payment configuration.
+          format: int64
+          examples:
+          - 1
+        merchantConfig:
+          type: object
+          additionalProperties:
+            type: object
+          description: Key/value map of merchant configuration parameters needed for each merchant. See documentation for specific merchant on which parameters are required.
+          examples:
+          - someKey:
+              configParam: configValue
+        paymentProvider:
+          type: string
+          description: The payment service provider this configuration is used for. This is not necessarily a 3rd party provider. This will control the way the API is used.
+          examples:
+          - NETAXEPT
+      description: Current payment configuration set up for psp-client relationship.
+      examples:
+      - accountName: Entur Test
+        id: 1
+        merchantConfig:
+          someKey:
+            configParam: configValue
+        paymentProvider: NETAXEPT
+    TransactionSummary:
+      title: TransactionSummary
+      required:
+      - capturedAmount
+      - creditedAmount
+      - remainingAmountToCapture
+      - remainingAmountToCredit
+      type: object
+      properties:
+        capturedAmount:
+          type: string
+          description: 'Captured amount, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  '
+          examples:
+          - '450.00'
+        creditedAmount:
+          type: string
+          description: 'Credited amount, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  '
+          examples:
+          - '450.00'
+        remainingAmountToCapture:
+          type: string
+          description: 'Remaining amount to capture, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  '
+          examples:
+          - '450.00'
+        remainingAmountToCredit:
+          type: string
+          description: 'Remaining amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.  '
+          examples:
+          - '450.00'
+      description: Aggregated summary of amounts on a transaction.
+      examples:
+      - capturedAmount: '450.00'
+        creditedAmount: '450.00'
+        remainingAmountToCapture: '0.00'
+        remainingAmountToCredit: '0.00'
+  responses:
+    notImplemented:
+      description: Not Implemented
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequestValidationError:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    serviceUnavailableError:
+      description: Service Unavailable Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    conflictValidationError:
+      description: Conflict
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/ValidationError'
+    conflict:
+      description: Conflict
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-payment-partner-openapi.json
+- entur-payment-partner-openapi.yml

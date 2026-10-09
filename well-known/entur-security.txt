@@ -1,0 +1,3 @@
+Contact: mailto:security@entur.org
+Expires: 2027-05-31T23:59:59+01:00
+Preferred-Languages: en, no

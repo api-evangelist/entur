@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-coordinate-distance-response-schema.json",
+  "title": "CoordinateDistanceResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-prdudisapi-openapi.yml#/components/schemas/CoordinateDistanceResponse",
+  "type": "object",
+  "properties": {
+    "from": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "to": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "polylineCoordinates": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "items": {
+        "$ref": "#/$defs/ZoneCoordinate"
+      }
+    },
+    "allZonesCrossed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "orgBasedDistances": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/OrgBasedDistances"
+      }
+    }
+  },
+  "$defs": {
+    "OrgBasedDistances": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "organisation": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "zonesCrossed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "shortestDistance": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "shortestPath": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ZoneCoordinate": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number"
+        },
+        "longitude": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

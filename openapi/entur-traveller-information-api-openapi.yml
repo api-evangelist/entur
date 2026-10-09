@@ -1,0 +1,328 @@
+openapi: 3.2.0
+info:
+  title: Entur Traveller information API
+  version: 2026.10.0
+  contact:
+    name: Entur Team Personalisering
+    url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
+    email: team.personalisering@entur.org
+  termsOfService: https://entur.org
+  description: 'Operations tagged Traveller information across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/customers/v2
+security:
+- jwt: []
+tags:
+- name: Traveller information
+  description: API for retrieving contact info for all travellers on a given journey. Given a serviceJourneyId or, preferably, an originalServiceJourneyId, returns contact info for the travellers on this journey
+paths:
+  /travellerinfo:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Traveller information
+      summary: Get contact info for all travellers on a given DatedServiceJourney
+      description: Get contact info for all travellers on a given DatedServiceJourney.
+      operationId: getTravellerInfos
+      parameters:
+      - name: datedServiceJourneyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: '[A-Z]{3}:DatedServiceJourney:[\da-zA-Z_-]+'
+          type: string
+      - name: originalDatedServiceJourneyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          pattern: '[A-Z]{3}:DatedServiceJourney:[\da-zA-Z_-]+'
+          type: string
+      - name: serviceJourneyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: departureDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: organisationId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: orderId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TravellerInfo'
+        '401':
+          $ref: '#/components/responses/Error401_customers-orchestrator-customers'
+        '403':
+          $ref: '#/components/responses/Error403_customers-orchestrator-customers'
+        '500':
+          $ref: '#/components/responses/Error500_customers-orchestrator-customers'
+      x-entur-permissions:
+        value:
+          any:
+          - customers-orchestrator-traveller-info:les
+          - customers-orchestrator-traveller-info-global:les
+    servers:
+    - url: https://api.entur.io/customers/v2
+components:
+  responses:
+    Error500_customers-orchestrator-customers:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401_customers-orchestrator-customers:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403_customers-orchestrator-customers:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    RefType:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    PurchasedLeg:
+      required:
+      - authorityRef
+      - endTime
+      - fromStopPlaceRef
+      - id
+      - mode
+      - operatorRef
+      - serviceJourneyRef
+      - startTime
+      - toStopPlaceRef
+      type: object
+      properties:
+        id:
+          type: string
+        datedServiceJourneyRef:
+          $ref: '#/components/schemas/RefType'
+        originalDatedServiceJourneyRef:
+          $ref: '#/components/schemas/RefType'
+        startTime:
+          type: string
+          format: date-time
+        fromStopPlaceRef:
+          $ref: '#/components/schemas/RefType'
+        endTime:
+          type: string
+          format: date-time
+        toStopPlaceRef:
+          $ref: '#/components/schemas/RefType'
+        authorityRef:
+          $ref: '#/components/schemas/RefType'
+        operatorRef:
+          $ref: '#/components/schemas/RefType'
+        serviceJourneyRef:
+          $ref: '#/components/schemas/RefType'
+        mode:
+          type: string
+        purchasedFareProducts:
+          type: array
+          description: Reference to Fare Products on this leg
+          items:
+            type: string
+            description: Reference to Fare Products on this leg
+      description: Legs connected to the customer on the journey
+    TravellerInfo:
+      required:
+      - customerNumber
+      - legs
+      - orderId
+      - organisationId
+      type: object
+      properties:
+        customerNumber:
+          type: integer
+          description: Customer number
+          format: int64
+        customerRef:
+          maxLength: 40
+          minLength: 1
+          type: string
+          description: Optional customer reference
+        organisationId:
+          type: integer
+          description: The organisation the customer is registered with
+          format: int64
+        firstName:
+          type: string
+          description: First name of the traveller
+        surname:
+          type: string
+          description: Surname of the traveller
+        languagePreference:
+          type: string
+          description: Language preference of the traveller in ISO 639-3 code format
+        email:
+          maxLength: 80
+          minLength: 1
+          type: string
+          description: Contact email
+        telephoneNumber:
+          maxLength: 20
+          minLength: 1
+          type: string
+          description: Contact telephone number. Includes country code if available
+        orderId:
+          type: string
+          description: ID of Order
+        legs:
+          type: array
+          description: Legs connected to the customer on the journey
+          items:
+            $ref: '#/components/schemas/PurchasedLeg'
+        fromStopPlaceRef:
+          type: string
+          description: Reference to the journey’s starting stop
+        toStopPlaceRef:
+          type: string
+          description: Reference to the journey’s final stop
+      description: Each order on the journey enriched with customer information
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-customers-openapi.json
+- entur-customers-openapi.yml

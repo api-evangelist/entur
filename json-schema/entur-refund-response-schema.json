@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-refund-response-schema.json",
+  "title": "RefundResponse",
+  "description": "A summary about a performed refund.",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-refund-partner-openapi.yml#/components/schemas/RefundResponse",
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "ID of the refunded order."
+    },
+    "affectedOrderLineIds": {
+      "type": "array",
+      "default": [],
+      "description": "List containing the IDs of the affected order lines.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "creditId": {
+      "type": "integer",
+      "format": "int64",
+      "description": "ID of the performed Credit"
+    },
+    "affectedPaymentAndPaymentTransactionIds": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "description": "Map containing one or more payment ids, mapping to its transaction ids that have been affected by the credit operation",
+      "pattern": "\\\\d+"
+    },
+    "disabledTicketIds": {
+      "type": "array",
+      "default": [],
+      "description": "List containing the IDs of the disabled tickets.",
+      "items": {
+        "type": "integer",
+        "format": "int64"
+      }
+    }
+  },
+  "required": [
+    "affectedOrderLineIds",
+    "affectedPaymentAndPaymentTransactionIds",
+    "creditId",
+    "disabledTicketIds",
+    "orderId"
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-sales-offer-package-publication-response-schema.json",
+  "title": "SalesOfferPackagePublicationResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-products-api-openapi.yml#/components/schemas/SalesOfferPackagePublicationResponse",
+  "required": [
+    "salesOfferPackageId",
+    "status",
+    "validFrom",
+    "versionId"
+  ],
+  "type": "object",
+  "properties": {
+    "salesOfferPackageId": {
+      "pattern": "^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "NeTEx ID of the sales package."
+    },
+    "versionId": {
+      "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "NeTEx version ID."
+    },
+    "versionNumber": {
+      "type": "integer",
+      "description": "Version number assigned at publication. Only present for VERSIONED status."
+    },
+    "status": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/VersionStatus"
+        },
+        {
+          "description": "The resulting version status."
+        }
+      ]
+    },
+    "publishedDate": {
+      "type": "string",
+      "description": "System-assigned publication timestamp. Only present for VERSIONED status.",
+      "format": "date-time"
+    },
+    "validFrom": {
+      "type": "string",
+      "description": "Start of the validity period.",
+      "format": "date"
+    },
+    "validTo": {
+      "type": "string",
+      "description": "End of the validity period. No specified date means that the validity period has no end-date.",
+      "format": "date"
+    }
+  },
+  "$defs": {
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    }
+  }
+}

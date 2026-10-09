@@ -1,0 +1,12 @@
+name: Entur Plans and Pricing
+generated: '2026-10-09'
+method: none
+source: https://developer.entur.no/terms-of-service
+audience: unclear
+pricing_basis: none
+published: false
+plan_count: 0
+plans: []
+delivery:
+  delivery: managed
+note: The docs publish no pricing page or plan tiers. Open services and open data are published under NLOD ("NLOD permits free reuse for any purpose, including commercial use, subject to attribution requirements"). Partner API access goes through an agreement with Entur, and the rate-limit page refers to "Entur Partners" getting a "custom policy". No API prices are published.

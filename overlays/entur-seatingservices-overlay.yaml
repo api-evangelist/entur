@@ -1,0 +1,204 @@
+overlay: 1.0.0
+info:
+  title: Entur Seating Services overlay
+  version: 1.0.0
+extends: ../openapi/_original/entur-seatingservices-openapi.yml
+x-generated: '2026-10-09'
+x-method: generated
+actions:
+- target: $.info
+  description: API Evangelist provider metadata.
+  update:
+    x-provider: entur
+    x-provider-name: Entur
+    x-apievangelist-operation-count: 47
+    x-apievangelist-generated: '2026-10-09'
+    x-apievangelist-source: openapi/entur-seatingservices-openapi.yml
+- target: $.paths['/v1/seat-types/{id}'].put
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update seat type
+- target: $.paths['/v1/seat-types/{id}'].delete
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Delete seat type
+- target: $.paths['/v1/reservations/{reservationId}'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get reservation
+- target: $.paths['/v1/reservations/{reservationId}'].put
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update seats reservation
+- target: $.paths['/v1/reservations/{reservationId}/products'].put
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Check product combination
+- target: $.paths['/v1/product-attributes/{attribute-id}'].put
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update product attributes
+- target: $.paths['/v1/product-attributes/{attribute-id}'].delete
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Delete product attributes
+- target: $.paths['/v1/companion-for-seats/{companionMappingId}'].put
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update companion mapping
+- target: $.paths['/v1/companion-for-seats/{companionMappingId}'].delete
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Delete companion mapping
+- target: $.paths['/beta/reservations/{reservationId}'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get reservation_1
+- target: $.paths['/beta/reservations/{reservationId}'].put
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update seats reservation_1
+- target: $.paths['/v1/seat-types'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get seat types
+- target: $.paths['/v1/seat-types'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Create seat type
+- target: $.paths['/v1/reservations/specific-seats'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Reserve specific seats
+- target: $.paths['/v1/reservations/by-seat-types'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Reserve seats by type
+- target: $.paths['/v1/reservations/by-products'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Reserve seats by product with order line id
+- target: $.paths['/v1/product-attributes'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get product attributes
+- target: $.paths['/v1/product-attributes'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Create product attributes
+- target: $.paths['/v1/dated-service-journeys/seat-capacities'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get capacity with product info per departure
+- target: $.paths['/v1/companion-for-seats'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get companion for products
+- target: $.paths['/v1/companion-for-seats'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Create companion mapping
+- target: $.paths['/beta/reservations'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get all reservations beta with criteria
+- target: $.paths['/beta/reservations'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Seats reservation
+- target: $.paths['/beta/reservations/specific-seats'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Reserve specific seats_1
+- target: $.paths['/beta/reservations/by-seat-types'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Reserve seats by type_1
+- target: $.paths['/beta/reservations/by-products'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Reserve seats by product
+- target: $.paths['/beta/dated-service-journeys/seat-capacities'].post
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get capacity with product info per departure_1
+- target: $.paths['/v1/reservations/seats/{seatId}'].patch
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update seat status
+- target: $.paths['/v1/dated-service-journeys/{datedServiceJourneyId}'].patch
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Set dated service journey status
+- target: $.paths['/beta/reservations/seats/{seatId}'].patch
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Update seat
+- target: $.paths['/v2/api-docs'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Swagger
+- target: $.paths['/v1/reservations'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get all reservations with criteria
+- target: $.paths['/v1/dated-service-journeys/{datedServiceJourneyId}/total-seat-capacities'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get total capacity
+- target: $.paths['/v1/dated-service-journeys/{datedServiceJourneyId}/seats'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get available seats in atrain
+- target: $.paths['/v1/dated-service-journeys/{datedServiceJourneyId}/railcars'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get railcars
+- target: $.paths['/v1/dated-service-journeys/{datedServiceJourneyId}/railcars/{railcarNumber}/seats'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get available seats in arailcar
+- target: $.paths['/v1/dated-service-journeys/{datedServiceJourneyId}/railcars/seats'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get available seats in railcar by seat type id
+- target: $.paths['/v1/dated-service-journeys/{datedServiceJourneyId}/railcars/configs'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get railcar group info
+- target: $.paths['/v1/dated-service-journeys/clear-cache/{datedServiceJourneyId}'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Clear cache for dated service journey
+- target: $.paths['/beta/dated-service-journeys/{datedServiceJourneyId}/total-seat-capacities'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get total capacity_1
+- target: $.paths['/beta/dated-service-journeys/{datedServiceJourneyId}/seats'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get available seats in atrain_1
+- target: $.paths['/beta/dated-service-journeys/{datedServiceJourneyId}/railcars'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get railcars_1
+- target: $.paths['/beta/dated-service-journeys/{datedServiceJourneyId}/railcars/{railcarNumber}/seats'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get available seats in arailcar_1
+- target: $.paths['/beta/dated-service-journeys/{datedServiceJourneyId}/railcars/seats'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get available seats in railcar by seat type id_1
+- target: $.paths['/beta/dated-service-journeys/{datedServiceJourneyId}/railcars/configs'].get
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Get railcar group info_1
+- target: $.paths['/v1/reservations/seats'].delete
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Cancel seats
+- target: $.paths['/beta/reservations/seats'].delete
+  description: Add a summary derived from the operationId (spec has none).
+  update:
+    summary: Cancel seats_1

@@ -1,0 +1,1965 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-supplement-product-schema.json",
+  "title": "SupplementProduct",
+  "description": "A SUPPLEMENT PRODUCT consisting of one or several VALIDABLE ELEMENTs, specific to a CHARGING MOMENT and FARE PRODUCT",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-products-openapi.yml#/components/schemas/SupplementProduct",
+  "required": [
+    "accessRightParameterAssignments",
+    "accessRightsInProduct",
+    "changed",
+    "chargingMoment",
+    "created",
+    "fareFrameRef",
+    "fareProductRefs",
+    "fareTableRefs",
+    "id",
+    "modification",
+    "nameOfClass",
+    "organisation",
+    "pricingRuleRef",
+    "status",
+    "validityConditions",
+    "vatGroup",
+    "version"
+  ],
+  "type": "object",
+  "properties": {
+    "accessRightParameterAssignments": {
+      "type": "array",
+      "description": "accessRightParameterAssignments.",
+      "items": {
+        "$ref": "#/$defs/GenericParameterAssignment"
+      }
+    },
+    "accessRightsInProduct": {
+      "type": "array",
+      "description": "accessRightParameterAssignments.",
+      "items": {
+        "$ref": "#/$defs/AccessRightInProduct"
+      }
+    },
+    "activeComparisonOperatorVariant": {
+      "type": "string",
+      "description": "Deprecated: this parameter will be ignored"
+    },
+    "changed": {
+      "type": "string",
+      "description": "Changed datetime."
+    },
+    "chargingMoment": {
+      "$ref": "#/$defs/ChargingMoment"
+    },
+    "chargingMomentType": {
+      "type": "string",
+      "description": "ChargingMomentType. Default value is BEFORE_TRAVEL.",
+      "enum": [
+        "BEFORE_TRAVEL",
+        "ON_START_OF_TRAVEL",
+        "BEFORE_END_OF_TRAVEL",
+        "ON_START_THEN_ADJUST_AT_END_OF_TRAVEL",
+        "ON_START_THEN_ADJUST_AT_END_OF_FARE_DAY",
+        "ON_START_THEN_ADJUST_AT_END_OF_CHARGE_PERIOD",
+        "AT_END_OF_TRAVEL",
+        "AT_END_OF_CHARGE_PERIOD",
+        "FREE",
+        "ANY_TIME",
+        "OTHER"
+      ]
+    },
+    "compatibleWithVersionRef": {
+      "type": "string",
+      "description": "Compatible with version."
+    },
+    "conditionSummary": {
+      "$ref": "#/$defs/ConditionSummary"
+    },
+    "created": {
+      "type": "string",
+      "description": "Created datetime."
+    },
+    "derivedFromVersionRef": {
+      "type": "string",
+      "description": "Derived from version."
+    },
+    "description": {
+      "type": "array",
+      "description": "Description represented in different languages. Language codes are ISO-639.",
+      "items": {
+        "$ref": "#/$defs/TextInLanguage"
+      }
+    },
+    "fareFrameRef": {
+      "$ref": "#/$defs/VersionOfObjectRef"
+    },
+    "fareProductRefs": {
+      "type": "array",
+      "description": "fareProductRef.",
+      "items": {
+        "$ref": "#/$defs/VersionOfObjectRef"
+      }
+    },
+    "fareStructureType": {
+      "type": "string",
+      "description": "FareStructureType",
+      "enum": [
+        "CAPPED_FLAT_FARE",
+        "CAPPED_POINT_TO_POINT_FARE",
+        "CAPPED_ZONAL_FARE",
+        "LINE_FLAT_FARE",
+        "NETWORK_FLAT_FARE",
+        "POINT_TO_POINT_FARE",
+        "POINT_TO_POINT_DISTANCE_FARE",
+        "STAGE_FARE",
+        "ZONE_FLAT_FARE",
+        "ZONE_SEQUENCE_FARE",
+        "ZONE_TO_ZONE_FARE",
+        "ZONE_COUNT_FARE",
+        "PENALTY_FARE",
+        "OTHER"
+      ]
+    },
+    "fareTableRefs": {
+      "type": "array",
+      "description": "Reference to information about the fare.",
+      "items": {
+        "$ref": "#/$defs/VersionOfObjectRef"
+      }
+    },
+    "id": {
+      "minLength": 1,
+      "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "Id."
+    },
+    "modification": {
+      "type": "string",
+      "description": "Modification status.",
+      "enum": [
+        "NEW",
+        "REVISE",
+        "DELETE"
+      ]
+    },
+    "name": {
+      "type": "array",
+      "description": "Name represented in different languages. Language codes are ISO-639.",
+      "items": {
+        "$ref": "#/$defs/TextInLanguage"
+      }
+    },
+    "nameOfClass": {
+      "type": "string",
+      "description": "Name of class."
+    },
+    "operatorRef": {
+      "type": "string",
+      "description": "The reference to the operator."
+    },
+    "organisation": {
+      "type": "string",
+      "description": "Organisation."
+    },
+    "organisationId": {
+      "type": "string",
+      "description": "Organisation related to the userProfile"
+    },
+    "prices": {
+      "type": "array",
+      "description": "Fare prices.",
+      "items": {
+        "$ref": "#/$defs/FarePrice"
+      }
+    },
+    "pricingRuleRef": {
+      "$ref": "#/$defs/VersionOfObjectRef"
+    },
+    "privateCode": {
+      "type": "string",
+      "description": "Privat code."
+    },
+    "status": {
+      "type": "string",
+      "description": "Supplement product status.",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    },
+    "supplementProductType": {
+      "type": "string",
+      "description": "The type of supplement product for which the supplement product belongs to.",
+      "enum": [
+        "SEAT_RESERVATION",
+        "BICYCLE",
+        "DOG",
+        "ANIMAL",
+        "MEAL",
+        "WIFI",
+        "EXTRA_LUGGAGE",
+        "PENALTY",
+        "UPGRADE",
+        "JOURNEY_EXTENSION",
+        "JOURNEY_ADD_ON",
+        "EVENT_ADD_ON",
+        "PARKING"
+      ]
+    },
+    "typeOfFareProduct": {
+      "$ref": "#/$defs/TypeOfFareProduct"
+    },
+    "validityConditions": {
+      "type": "array",
+      "description": "validityConditions.",
+      "items": {
+        "$ref": "#/$defs/ValidityCondition"
+      }
+    },
+    "vatGroup": {
+      "type": "string",
+      "description": "The VAT group for the SupplementProduct.",
+      "enum": [
+        "EXCEPTION_FROM_VAT",
+        "GENERAL_VAT",
+        "FOOD_VAT",
+        "TRANSPORT_AND_TICKETS_VAT"
+      ]
+    },
+    "version": {
+      "minLength": 1,
+      "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "Supplement product version."
+    }
+  },
+  "$defs": {
+    "AccessRightInProduct": {
+      "required": [
+        "fareFrameRef",
+        "id",
+        "preassignedFareProductRef",
+        "validableElementRef",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "accessNumber": {
+          "type": "integer",
+          "description": "The actual access number",
+          "format": "int32"
+        },
+        "accessNumberIsLimited": {
+          "type": "boolean",
+          "description": "Flag indicating if access number is limited"
+        },
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "isFirstInSequence": {
+          "type": "boolean",
+          "description": "Whether element is first in sequence"
+        },
+        "isLastInSequence": {
+          "type": "boolean",
+          "description": "Whether element is last in sequence"
+        },
+        "limitedAccessNumber": {
+          "type": "integer",
+          "description": "Flag indicating whether this rights gives an unlimited number of accesses or not",
+          "format": "int32"
+        },
+        "maximumAccess": {
+          "type": "integer",
+          "description": "Maximum number of times use of this element may occur in a given trip",
+          "format": "int32"
+        },
+        "minimumAccess": {
+          "type": "integer",
+          "description": "Minimum number of times use of this element must occur in a given trip",
+          "format": "int32"
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "orderOfElement": {
+          "type": "integer",
+          "description": "The actual order in the sequence",
+          "format": "int32"
+        },
+        "preassignedFareProductRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "status": {
+          "type": "string",
+          "description": "Access right in product status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "validableElementRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Access right in product version."
+        }
+      },
+      "description": "A VALIDABLE ELEMENT as a part of a PRE-ASSIGNED FARE PRODUCT, including its possible order in the set of all VALIDABLE ELEMENTs grouped together to define the access right assigned to that PRE-ASSIGNED FARE PRODUCT."
+    },
+    "ChargingMoment": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version.",
+          "readOnly": true
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version.",
+          "readOnly": true
+        },
+        "description": {
+          "type": "array",
+          "description": "Description represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Charging moment status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Charging moment version."
+        }
+      },
+      "description": "A classification of FARE PRODUCTs according to the payment method and the account location: pre-payment with cancellation (throw-away), pre-payment with debit on a value card, pre-payment without consumption registration (pass), post-payment etc.",
+      "readOnly": true,
+      "deprecated": true
+    },
+    "ConditionSummary": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "isExchangeable": {
+          "type": "boolean",
+          "description": "Whether the ticket is exchangeable."
+        },
+        "isRefundable": {
+          "type": "boolean",
+          "description": "Whether the ticket is refundable."
+        }
+      },
+      "description": "A summary of a condition."
+    },
+    "FarePrice": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status"
+      ],
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string",
+          "description": "Amount"
+        },
+        "canBeCumulative": {
+          "type": "boolean",
+          "description": "canBeCumulative."
+        },
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency."
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "discountPercentageUsed": {
+          "maximum": 100,
+          "minimum": -100,
+          "type": "integer",
+          "description": "discountPercentageUsed.",
+          "format": "int32"
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Id."
+        },
+        "isAllowed": {
+          "type": "boolean",
+          "description": "isAllowed."
+        },
+        "limitingRule": {
+          "$ref": "#/$defs/LimitingRule"
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "ranking": {
+          "type": "integer",
+          "description": "Ranking.",
+          "format": "int32"
+        },
+        "rounding": {
+          "$ref": "#/$defs/Rounding"
+        },
+        "roundingRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "vatRegisterGroup": {
+          "type": "string",
+          "description": "vatRegisterGroup.",
+          "enum": [
+            "EXCEPTION_FROM_VAT",
+            "GENERAL_VAT",
+            "FOOD_VAT",
+            "TRANSPORT_AND_TICKETS_VAT"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "description": "Version.",
+          "readOnly": true
+        }
+      },
+      "description": "A description of the price and factor for a set fare"
+    },
+    "GenericParameterAssignment": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "canIgnoreInOffering": {
+          "type": "boolean",
+          "description": "Indicates whether gpa leaf node is supposed to be ignored when generating offer."
+        },
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime."
+        },
+        "chargingBasisType": {
+          "type": "string",
+          "description": "ChargingBasisType.",
+          "enum": [
+            "FREE",
+            "DISCOUNTED",
+            "NORMAL",
+            "ANY"
+          ]
+        },
+        "comparisonOperatorVariant": {
+          "type": "string",
+          "description": "Deprecated: this parameter will be ignored"
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "CompatibleWithVersionRef."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime."
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "fareProductRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "fareStructureElementRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "includes": {
+          "type": "array",
+          "description": "Includes genericParameterAssignments.",
+          "items": {
+            "$ref": "#/$defs/GenericParameterAssignment"
+          }
+        },
+        "includesGroupingType": {
+          "type": "string",
+          "description": "Includes grouping type.",
+          "enum": [
+            "AND",
+            "OR",
+            "XOR",
+            "NOT"
+          ]
+        },
+        "limitationGroupingType": {
+          "type": "string",
+          "description": "Limitation grouping type.",
+          "enum": [
+            "AND",
+            "OR",
+            "XOR",
+            "NOT"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "description": "Limitations as UsageParameters.",
+          "items": {
+            "$ref": "#/$defs/VersionOfObjectRef"
+          }
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class"
+        },
+        "parentParameterAssignmentRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "requiredElements": {
+          "type": "array",
+          "description": "Required elements.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "requiredInContext": {
+          "type": "string",
+          "description": "Required in context.",
+          "enum": [
+            "OFFERING",
+            "BOOKING",
+            "RESERVATION",
+            "SALE",
+            "FULFILMENT",
+            "ACTIVATION",
+            "CONSUMPTION",
+            "REVALIDATION"
+          ]
+        },
+        "requiredType": {
+          "type": "string",
+          "description": "Required type.",
+          "enum": [
+            "SERVICE_JOURNEY_REF",
+            "TARIFF_ZONE_REF",
+            "PASSENGER_SEAT_REF",
+            "USER_PROFILE_REF",
+            "USAGE_VALIDITY_PERIOD_REF",
+            "DATED_SERVICE_JOURNEY_REF",
+            "DYNAMIC_DISTANCE_MATRIX_ELEMENT",
+            "USAGE_VALIDITY_PERIOD",
+            "DISTANCE_MATRIX_ELEMENT_REF",
+            "SCHEDULED_STOP_POINT_REF",
+            "GROUP_TICKET_REF",
+            "GROUP_TICKET",
+            "GROUP_OF_TARIFF_ZONES_REF",
+            "FARE_ZONE_REF"
+          ]
+        },
+        "salesPackageRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status",
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "temporalValidityParameters": {
+          "type": "array",
+          "description": "Temporal validity parameter.",
+          "items": {
+            "$ref": "#/$defs/TemporalValidityParameter"
+          }
+        },
+        "typeOfAccessRightAssignment": {
+          "$ref": "#/$defs/TypeOfAccessRightAssignment"
+        },
+        "validableElementRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "validityParameterAssignmentType": {
+          "type": "string",
+          "description": "Validity parameter assignment type.",
+          "enum": [
+            "EQ",
+            "NE",
+            "GT",
+            "LT",
+            "GE",
+            "LE"
+          ]
+        },
+        "validityParameterGroupingType": {
+          "type": "string",
+          "description": "Validity parameter grouping type.",
+          "enum": [
+            "AND",
+            "OR",
+            "XOR",
+            "NOT"
+          ]
+        },
+        "validityParameterSetSelectionType": {
+          "type": "string",
+          "description": "Validity parameter set operator.",
+          "enum": [
+            "ONE_OF_ANY_ONE_SET",
+            "ONE_OF_EACH_SET",
+            "SOME_OF_ANY_SET",
+            "ALL_OF_ONE_SET",
+            "ALL_OF_ALL_SETS"
+          ]
+        },
+        "validityParameters": {
+          "type": "array",
+          "description": "Validity parameters as scoping validity parameters",
+          "items": {
+            "$ref": "#/$defs/ScopingValidityParameter"
+          }
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version"
+        }
+      },
+      "description": "A GenericParameterAssignment"
+    },
+    "GroupOfTimeBands": {
+      "required": [
+        "changed",
+        "created",
+        "id",
+        "members",
+        "modification",
+        "nameOfClass",
+        "status",
+        "validityConditions"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime."
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime."
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "members": {
+          "type": "array",
+          "description": "Members.",
+          "items": {
+            "$ref": "#/$defs/Timeband"
+          }
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status.",
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "validityConditions": {
+          "type": "array",
+          "description": "ValidityConditions sequence.",
+          "items": {
+            "$ref": "#/$defs/ValidityCondition"
+          }
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version."
+        }
+      },
+      "description": "A GroupOfTimeband describe during which the assignments applies"
+    },
+    "LimitingRule": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status"
+      ],
+      "type": "object",
+      "properties": {
+        "canBeCumulative": {
+          "type": "boolean",
+          "description": "CanBeCumulative."
+        },
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "discountAsPercentage": {
+          "type": "number",
+          "description": "DiscountAsPercentage.",
+          "format": "float"
+        },
+        "discountAsValue": {
+          "type": "number",
+          "description": "DiscountAsValue.",
+          "format": "float"
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "maximumPrice": {
+          "type": "string",
+          "description": "MaximumPrice."
+        },
+        "maximumPriceAsPercentage": {
+          "type": "number",
+          "description": "MaximumPriceAsPercentage.",
+          "format": "double"
+        },
+        "minimumLimitPrice": {
+          "type": "string",
+          "description": "MinimumLimitPrice."
+        },
+        "minimumPrice": {
+          "type": "string",
+          "description": "MinimumPrice."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version."
+        }
+      },
+      "description": "A LimitingRule"
+    },
+    "Rounding": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "roundingMethod",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "roundingMethod": {
+          "type": "string",
+          "description": "Type of rounding.",
+          "enum": [
+            "NONE",
+            "DOWN",
+            "UP",
+            "SPLIT",
+            "STEP_TABLE",
+            "FIVE",
+            "NINE",
+            "TEN",
+            "FORTY_NINE"
+          ]
+        },
+        "roundingModulus": {
+          "type": "number",
+          "description": "Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.",
+          "format": "double"
+        },
+        "status": {
+          "type": "string",
+          "description": "Rounding status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Rounding version."
+        }
+      },
+      "description": "A description of how prices are rounded post calculation",
+      "deprecated": true
+    },
+    "ScopingValidityParameter": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "genericParameterAssignmentRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "authorityRef": {
+          "type": "string",
+          "description": "AuthorityRef."
+        },
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime."
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "CompatibleWithVersionRef."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime."
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "distributionChannelRef": {
+          "type": "string",
+          "description": "Distribution channel ref."
+        },
+        "facilitySetRef": {
+          "type": "string",
+          "description": "facilitySetRef."
+        },
+        "fareClasses": {
+          "type": "array",
+          "description": "FareClasses. Enum as string with the following values: FIRST_CLASS, SECOND_CLASS, THIRD_CLASS, ECONOMY_CLASS, BUSINESS_CLASS, TURISTA, PREFERENTE, STANDARD_CLASS, PREMIUM_CLASS, ANY, UNKNOWN",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "fareSectionRef": {
+          "type": "string",
+          "description": "Fare section ref."
+        },
+        "fareZoneRef": {
+          "type": "string",
+          "description": "FareZoneRef."
+        },
+        "genericParameterAssignmentRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "groupOfLinesRef": {
+          "type": "string",
+          "description": "Group of Lines ref."
+        },
+        "groupOfTariffZonesRef": {
+          "type": "string",
+          "description": "Group of Tariff Zones ref."
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "lineRef": {
+          "type": "string",
+          "description": "LineRef."
+        },
+        "lineType": {
+          "type": "string",
+          "description": "LineType.",
+          "enum": [
+            "LOCAL",
+            "URBAN",
+            "LONG_DISTANCE",
+            "EXPRESS",
+            "SEASONAL",
+            "REPLACEMENT",
+            "FLEXIBLE",
+            "CORRIDOR_SERVICE",
+            "MAIN_ROUTE_WITH_FLEXIBLE_ENDS",
+            "FLEXIBLE_AREAS_ONLY",
+            "HAIL_AND_RIDE_SECTIONS",
+            "FIXED_STOP_AREA_WIDE",
+            "FREE_AREA_AREA_WIDE",
+            "MIXED_FLEXIBLE",
+            "MIXED_FLEXIBLE_AND_FIXED",
+            "FIXED",
+            "OTHER"
+          ]
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class."
+        },
+        "operatorRef": {
+          "type": "string",
+          "description": "Operator referance."
+        },
+        "placeUse": {
+          "type": "string",
+          "description": "PlaceUse",
+          "enum": [
+            "START_AT",
+            "END_AT",
+            "VIA",
+            "RESTRICT_TO",
+            "OTHER"
+          ]
+        },
+        "scheduledStopPointRef": {
+          "type": "string",
+          "description": "Scheduled stop Point ref."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status",
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "tariffZoneRef": {
+          "type": "string",
+          "description": "TariffZoneRef. This field is deprecated, please use the field FareZoneRef.",
+          "deprecated": true
+        },
+        "topographicPlaceRef": {
+          "type": "string",
+          "description": "TopographicPlaceRef"
+        },
+        "transportSubmode": {
+          "type": "string",
+          "description": "TransportSubmode.",
+          "enum": [
+            "unknown",
+            "undefined",
+            "internationalFlight",
+            "domesticFlight",
+            "intercontinentalFlight",
+            "domesticScheduledFlight",
+            "shuttleFlight",
+            "intercontinentalCharterFlight",
+            "internationalCharterFlight",
+            "roundTripCharterFlight",
+            "sightseeingFlight",
+            "helicopterService",
+            "domesticCharterFlight",
+            "SchengenAreaFlight",
+            "airshipService",
+            "shortHaulInternationalFlight",
+            "canalBarge",
+            "localBus",
+            "regionalBus",
+            "expressBus",
+            "nightBus",
+            "postBus",
+            "specialNeedsBus",
+            "mobilityBus",
+            "mobilityBusForRegisteredDisabled",
+            "sightseeingBus",
+            "shuttleBus",
+            "highFrequencyBus",
+            "dedicatedLaneBus",
+            "schoolBus",
+            "schoolAndPublicServiceBus",
+            "railReplacementBus",
+            "demandAndResponseBus",
+            "airportLinkBus",
+            "internationalCoach",
+            "nationalCoach",
+            "shuttleCoach",
+            "regionalCoach",
+            "specialCoach",
+            "schoolCoach",
+            "sightseeingCoach",
+            "touristCoach",
+            "commuterCoach",
+            "funicular",
+            "streetCableCar",
+            "allFunicularServices",
+            "undefinedFunicular",
+            "metro",
+            "tube",
+            "urbanRailway",
+            "cityTram",
+            "localTram",
+            "regionalTram",
+            "sightseeingTram",
+            "shuttleTram",
+            "trainTram",
+            "telecabin",
+            "cableCar",
+            "lift",
+            "chairLift",
+            "dragLift",
+            "telecabinLink",
+            "local",
+            "highSpeedRail",
+            "suburbanRailway",
+            "regionalRail",
+            "interregionalRail",
+            "longDistance",
+            "international",
+            "sleeperRailService",
+            "nightRail",
+            "carTransportRailService",
+            "touristRailway",
+            "airportLinkRail",
+            "railShuttle",
+            "replacementRailService",
+            "specialTrain",
+            "crossCountryRail",
+            "rackAndPinionRailway",
+            "internationalCarFerry",
+            "nationalCarFerry",
+            "regionalCarFerry",
+            "localCarFerry",
+            "internationalPassengerFerry",
+            "nationalPassengerFerry",
+            "regionalPassengerFerry",
+            "localPassengerFerry",
+            "postBoat",
+            "trainFerry",
+            "roadFerryLink",
+            "airportBoatLink",
+            "highSpeedVehicleService",
+            "highSpeedPassengerService",
+            "sightseeingService",
+            "schoolBoat",
+            "cableFerry",
+            "riverBus",
+            "scheduledFerry",
+            "shuttleFerryService",
+            "communalTaxi",
+            "charterTaxi",
+            "waterTaxi",
+            "railTaxi",
+            "bikeTaxi",
+            "blackCab",
+            "miniCab",
+            "allTaxiServices",
+            "hireCar",
+            "hireVan",
+            "hireMotorbike",
+            "hireCycle",
+            "allHireVehicles"
+          ]
+        },
+        "vehicleMode": {
+          "type": "string",
+          "description": "VehicleModeRef.",
+          "enum": [
+            "AIR",
+            "BUS",
+            "COACH",
+            "CABLE_WAY",
+            "WATER",
+            "FUNICULAR",
+            "LIFT",
+            "RAIL",
+            "METRO",
+            "TAXI",
+            "TRAM",
+            "UNKNOWN"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version"
+        }
+      },
+      "description": "A ScopingValidityParameter"
+    },
+    "TemporalValidityParameter": {
+      "required": [
+        "changed",
+        "created",
+        "genericParameterAssignmentRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "CompatibleWithVersionRef"
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "dayType": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "genericParameterAssignmentRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "groupOfTimeBands": {
+          "$ref": "#/$defs/GroupOfTimeBands"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "validityCondition": {
+          "$ref": "#/$defs/ValidityCondition"
+        },
+        "validityConditionRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version"
+        }
+      },
+      "description": "A TemporalValidityParameter"
+    },
+    "TextInLanguage": {
+      "required": [
+        "lang",
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "lang": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Language code."
+        },
+        "value": {
+          "minLength": 1,
+          "type": "string",
+          "description": "The text."
+        }
+      },
+      "description": "Text in a specific language."
+    },
+    "Timeband": {
+      "required": [
+        "changed",
+        "created",
+        "dayOffset",
+        "description",
+        "endTime",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "name",
+        "nameOfClass",
+        "startTime",
+        "status"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version.",
+          "readOnly": true
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "dayOffset": {
+          "type": "integer",
+          "description": "Days offset. This will determine if endTime is x number of days from today. ie. 1 is tomorrow 0 is today.",
+          "format": "int32"
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version.",
+          "readOnly": true
+        },
+        "description": {
+          "type": "array",
+          "description": "Description represented in different languages. Language codes are ISO-639",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "endTime": {
+          "type": "string",
+          "description": "End time."
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "The name of the luggage allowance represented in different languages. Language codes are ISO-639",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Start time."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "timeZone": {
+          "type": "string",
+          "description": "Time zone.",
+          "default": "Europe/Oslo"
+        },
+        "validityConditions": {
+          "type": "array",
+          "description": "ValidityConditions sequence.",
+          "items": {
+            "$ref": "#/$defs/ValidityCondition"
+          }
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version."
+        }
+      },
+      "description": "The TimeBand describe during which the assignment applies"
+    },
+    "TypeOfAccessRightAssignment": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Type of access right assignment status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Type of access right assignment version."
+        }
+      },
+      "description": "A classification of Access Right Assignments."
+    },
+    "TypeOfFareProduct": {
+      "required": [
+        "changed",
+        "created",
+        "fareFrameRef",
+        "id",
+        "nameOfClass",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "compatibleWithVersionRef": {
+          "type": "string",
+          "description": "Compatible with version."
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "derivedFromVersionRef": {
+          "type": "string",
+          "description": "Derived from version."
+        },
+        "description": {
+          "type": "array",
+          "description": "Description represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "fareFrameRef": {
+          "$ref": "#/$defs/VersionOfObjectRef"
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "name": {
+          "type": "array",
+          "description": "Name represented in different languages. Language codes are ISO-639.",
+          "items": {
+            "$ref": "#/$defs/TextInLanguage"
+          }
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Type of fare product status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Type of fare product version."
+        }
+      },
+      "description": "A classification of FARE PRODUCTs."
+    },
+    "ValidityCondition": {
+      "required": [
+        "changed",
+        "created",
+        "id",
+        "modification",
+        "nameOfClass",
+        "status",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "changed": {
+          "type": "string",
+          "description": "Changed datetime.",
+          "readOnly": true
+        },
+        "created": {
+          "type": "string",
+          "description": "Created datetime.",
+          "readOnly": true
+        },
+        "fromDate": {
+          "type": "string",
+          "description": "From Date."
+        },
+        "id": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Id."
+        },
+        "modification": {
+          "type": "string",
+          "description": "Modification status.",
+          "readOnly": true,
+          "enum": [
+            "NEW",
+            "REVISE",
+            "DELETE"
+          ]
+        },
+        "nameOfClass": {
+          "type": "string",
+          "description": "Name of class.",
+          "readOnly": true
+        },
+        "status": {
+          "type": "string",
+          "description": "Status.",
+          "readOnly": true,
+          "enum": [
+            "DRAFT",
+            "PROPOSED",
+            "VERSIONED",
+            "DEPRECATED"
+          ]
+        },
+        "toDate": {
+          "type": "string",
+          "description": "To Date."
+        },
+        "version": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "Version."
+        }
+      },
+      "description": "A condition of the validity of the priceable object"
+    },
+    "VersionOfObjectRef": {
+      "required": [
+        "nameOfClass",
+        "ref",
+        "version"
+      ],
+      "type": "object",
+      "properties": {
+        "nameOfClass": {
+          "minLength": 1,
+          "type": "string",
+          "description": "Name of class."
+        },
+        "ref": {
+          "minLength": 1,
+          "pattern": "^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\\-]*)$",
+          "type": "string",
+          "description": "The netex id reference to the object."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version."
+        }
+      },
+      "description": "Fare frame ref."
+    }
+  }
+}

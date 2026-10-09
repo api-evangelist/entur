@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-version-response-schema.json",
+  "title": "VersionResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-pricing-api-openapi.yml#/components/schemas/VersionResponse",
+  "required": [
+    "changed",
+    "created",
+    "id",
+    "startDate",
+    "status"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "pattern": "^([A-Z]{3}):Version:([0-9A-Za-z_\\-]*)$",
+      "type": "string",
+      "description": "The netex id reference to the object."
+    },
+    "number": {
+      "type": "integer",
+      "description": "Version number of the version. Only present when versionStatus is VERSIONED. Starts at 1 for a new product and is incremented by 1 for each new version.",
+      "format": "int64"
+    },
+    "status": {
+      "$ref": "#/$defs/VersionStatus"
+    },
+    "startDate": {
+      "type": "string",
+      "description": "The start date of the version.",
+      "format": "date"
+    },
+    "endDate": {
+      "type": "string",
+      "description": "The end date of the version.",
+      "format": "date"
+    },
+    "published": {
+      "type": "string",
+      "description": "Timestamp for when the version was published (set to status VERSIONED).",
+      "format": "date-time"
+    },
+    "created": {
+      "type": "string",
+      "description": "Created datetime",
+      "format": "date-time"
+    },
+    "changed": {
+      "type": "string",
+      "description": "Changed datetime",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "VersionStatus": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "PROPOSED",
+        "VERSIONED",
+        "DEPRECATED"
+      ]
+    }
+  }
+}

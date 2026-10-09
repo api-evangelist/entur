@@ -1,0 +1,861 @@
+openapi: 3.2.0
+info:
+  title: Entur Payment Agreements API
+  version: 2026.10.2
+  contact:
+    name: Entur
+    url: https://developer.entur.org
+  description: 'Operations tagged Payment Agreements across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io/sales
+  description: Entur's Production environment
+- url: https://api.staging.entur.io/sales
+  description: Entur's Staging environment
+- url: https://api.dev.entur.io/sales
+  description: Entur's Development environment
+security:
+- jwt: []
+tags:
+- name: Payment Agreements
+  description: Register and manage payment agreements for recurring billing.
+paths:
+  /v1/payment-agreements/{agreementId}:
+    parameters:
+    - $ref: '#/components/parameters/agreementIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Payment Agreements
+      summary: Get payment agreement status
+      description: Returns the current status and details of a payment agreement. The Vipps confirmation URL is only included while the agreement is pending customer confirmation (CREATED or PENDING status).
+      operationId: getPaymentAgreement
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentAgreementResponse'
+              examples:
+                vipps-pending:
+                  summary: Vipps-avtale som venter på kundebekreftelse
+                  value:
+                    agreementId: 42
+                    status: PENDING
+                    productName: Månedlig reisekort Oslo
+                    productDescription: Månedlig reisekort gyldig i Oslo-sonen
+                    pricing:
+                      agreementType: FIXED
+                      amount: 49900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 1
+                    providerData:
+                      agreementProvider: VIPPS
+                      confirmationUrl: https://api.vipps.no/dwo-api-application/v1/deeplink/vippsgateway?v=2&token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9
+                vipps-active:
+                  summary: Vipps-avtale som er aktiv (uten signeringslenke)
+                  value:
+                    agreementId: 42
+                    status: ACTIVE
+                    productName: Månedlig reisekort Oslo
+                    pricing:
+                      agreementType: FIXED
+                      amount: 49900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 1
+                    providerData:
+                      agreementProvider: VIPPS
+        '404':
+          $ref: '#/components/responses/notFound'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    patch:
+      tags:
+      - Payment Agreements
+      summary: Update payment agreement
+      description: 'Updates the mutable parts of a payment agreement, both at the provider and locally.
+
+
+        Every field is optional and at least one must be supplied; omitting a field leaves it unchanged.
+
+
+        `pricing` is **not currently supported** — supplying it returns 501. Only FLEXIBLE agreements can be created, and FLEXIBLE pricing has no updatable fields. The `pricing` field and the underlying `FixedPricing`/`VariablePricing` schemas are kept in the spec and reserved for future use; they will be enabled when FIXED and VARIABLE agreement types are introduced.
+
+
+        `productName` and the provider''s `merchantAgreementUrl` can be updated on FLEXIBLE agreements.
+
+
+        The agreement must be in status PENDING or ACTIVE.'
+      operationId: updatePaymentAgreement
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentAgreementRequest'
+            examples:
+              fixed-new-amount:
+                summary: Ny pris på en avtale med fast pris (hele pricing-objektet må sendes)
+                value:
+                  pricing:
+                    agreementType: FIXED
+                    amount: 59900
+                    currency: NOK
+                    interval:
+                      unit: MONTH
+                      count: 1
+              fixed-new-amount-and-interval:
+                summary: Ny pris og nytt intervall på en avtale med fast pris
+                value:
+                  pricing:
+                    agreementType: FIXED
+                    amount: 59900
+                    currency: NOK
+                    interval:
+                      unit: MONTH
+                      count: 3
+              variable-new-suggested-max-amount:
+                summary: Nytt foreslått maksbeløp på en avtale med variabel pris
+                value:
+                  pricing:
+                    agreementType: VARIABLE
+                    amount: 49900
+                    currency: NOK
+                    interval:
+                      unit: MONTH
+                      count: 1
+                    suggestedMaxAmount: 120000
+              product-name-only:
+                summary: Bare nytt produktnavn — gjelder alle avtaletyper
+                value:
+                  productName: Månedlig reisekort Oslo og Viken
+              product-description-only:
+                summary: Bare ny produktbeskrivelse — gjelder alle avtaletyper
+                value:
+                  productDescription: Månedlig reisekort gyldig i Oslo og Viken
+              merchant-agreement-url-only:
+                summary: Bare ny lenke til avtaleadministrasjon — gjelder alle avtaletyper
+                value:
+                  providerData:
+                    agreementProvider: VIPPS
+                    merchantAgreementUrl: https://entur.no/avtaler/456
+              product-name-and-url:
+                summary: Produktnavn og avtalelenke samtidig, uten å røre pricing
+                value:
+                  productName: Månedlig reisekort Oslo og Viken
+                  providerData:
+                    agreementProvider: VIPPS
+                    merchantAgreementUrl: https://entur.no/avtaler/456
+        required: true
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentAgreementResponse'
+              examples:
+                fixed-updated:
+                  summary: Oppdatert avtale med fast pris
+                  value:
+                    agreementId: 42
+                    status: ACTIVE
+                    productName: Månedlig reisekort Oslo
+                    pricing:
+                      agreementType: FIXED
+                      amount: 59900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 3
+                    providerData:
+                      agreementProvider: VIPPS
+                variable-updated:
+                  summary: Oppdatert avtale med variabel pris
+                  value:
+                    agreementId: 43
+                    status: ACTIVE
+                    productName: Fleksibelt reisekort
+                    pricing:
+                      agreementType: VARIABLE
+                      amount: 49900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 1
+                      suggestedMaxAmount: 120000
+                    providerData:
+                      agreementProvider: VIPPS
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '501':
+          $ref: '#/components/responses/notImplemented'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payment-agreements/{agreementId}/stop:
+    parameters:
+    - $ref: '#/components/parameters/agreementIdPathParam'
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    post:
+      tags:
+      - Payment Agreements
+      summary: Stop payment agreement
+      description: 'Stops a payment agreement, both at the provider and locally. The agreement must be in status PENDING or ACTIVE.
+
+
+        **Stopping is irreversible.** A stopped agreement cannot be reactivated — resuming service for the customer requires setting up a new agreement. The provider also cancels any outstanding charges on the agreement as part of the stop, so a charge that has not yet been captured will not be captured afterwards.
+
+
+        Any charge on the agreement that has not yet reached the provider is cancelled as part of the stop, and its transaction ends up CANCELLED. That covers the initial charge of an agreement stopped before the customer confirmed it, and a charge on an ACTIVE agreement that had been created but not yet claimed. Neither can make progress once the agreement is stopped.
+
+
+        The endpoint is idempotent: stopping an already STOPPED agreement returns 200 with the unchanged agreement and does not call the provider. An agreement in status CREATED or EXPIRED cannot be stopped and is rejected with 409.
+
+
+        The request has no body.'
+      operationId: stopPaymentAgreement
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentAgreementResponse'
+              examples:
+                stopped-active-agreement:
+                  summary: Aktiv avtale som er stoppet
+                  value:
+                    agreementId: 42
+                    status: STOPPED
+                    productName: Månedlig reisekort Oslo
+                    pricing:
+                      agreementType: FLEXIBLE
+                      currency: NOK
+                    providerData:
+                      agreementProvider: VIPPS
+                stopped-pending-agreement:
+                  summary: Avtale som ble stoppet før kunden rakk å bekrefte den
+                  value:
+                    agreementId: 43
+                    status: STOPPED
+                    productName: Månedlig reisekort Oslo
+                    pricing:
+                      agreementType: FLEXIBLE
+                      currency: NOK
+                    providerData:
+                      agreementProvider: VIPPS
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '404':
+          $ref: '#/components/responses/notFound'
+        '409':
+          $ref: '#/components/responses/conflict'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+  /v1/payment-agreements:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Payment Agreements
+      summary: Query payment agreements
+      description: Returns payment agreements for a given customer across all organisations the caller has access to. Optionally filter by one or more statuses.
+      operationId: queryPaymentAgreements
+      parameters:
+      - name: customerNumber
+        in: query
+        description: Customer number to query agreements for. Required.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: Optional. Filter by one or more agreement statuses.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - CREATED
+            - PENDING
+            - ACTIVE
+            - STOPPED
+            - EXPIRED
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/hal+json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaymentAgreementResponse'
+              examples:
+                single-active-agreement:
+                  summary: Kunde med én aktiv Vipps-avtale
+                  value:
+                  - agreementId: 42
+                    status: ACTIVE
+                    productName: Månedlig reisekort Oslo
+                    pricing:
+                      agreementType: FIXED
+                      amount: 49900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 1
+                    providerData:
+                      agreementProvider: VIPPS
+                multiple-agreements-mixed-status:
+                  summary: Kunde med flere avtaler i ulike statuser
+                  value:
+                  - agreementId: 42
+                    status: ACTIVE
+                    productName: Månedlig reisekort Oslo
+                    pricing:
+                      agreementType: FIXED
+                      amount: 49900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 1
+                    providerData:
+                      agreementProvider: VIPPS
+                  - agreementId: 51
+                    status: PENDING
+                    productName: Fleksibelt reisekort
+                    pricing:
+                      agreementType: FLEXIBLE
+                      currency: NOK
+                    providerData:
+                      agreementProvider: VIPPS
+                      confirmationUrl: https://api.vipps.no/dwo-api-application/v1/deeplink/vippsgateway?v=2&token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9
+                no-agreements:
+                  summary: Kunde uten avtaler (tom liste)
+                  value: []
+        '500':
+          $ref: '#/components/responses/internalServerError'
+    post:
+      tags:
+      - Payment Agreements
+      summary: Register a new payment agreement
+      description: 'Registers a payment agreement with the specified provider. For Vipps, this drafts the agreement and returns a confirmation URL to redirect the customer to.
+
+
+        Only **FLEXIBLE** pricing is currently supported. Supplying `FixedPricing` or `VariablePricing` returns 501; those agreement types are reserved for future use.'
+      operationId: createPaymentAgreement
+      parameters:
+      - $ref: '#/components/parameters/dciHeader'
+      - $ref: '#/components/parameters/posHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePaymentAgreementRequest'
+            examples:
+              vipps-fixed-pricing:
+                summary: Vipps-avtale med fast pris
+                value:
+                  productName: Månedlig reisekort Oslo
+                  productDescription: Månedlig reisekort gyldig i Oslo-sonen
+                  customerNumber: '12345678'
+                  pricing:
+                    agreementType: FIXED
+                    amount: 49900
+                    currency: NOK
+                    interval:
+                      unit: MONTH
+                      count: 1
+                  providerData:
+                    agreementProvider: VIPPS
+                    merchantRedirectUrl: https://entur.no/avtaler/bekreftelse
+                    merchantAgreementUrl: https://entur.no/avtaler/123
+                    phoneNumber: '4791234567'
+              vipps-variable-pricing:
+                summary: Vipps-avtale med variabel pris
+                value:
+                  productName: Fleksibelt reisekort
+                  customerNumber: '12345678'
+                  pricing:
+                    agreementType: VARIABLE
+                    amount: 49900
+                    currency: NOK
+                    interval:
+                      unit: MONTH
+                      count: 1
+                    suggestedMaxAmount: 100000
+                  providerData:
+                    agreementProvider: VIPPS
+                    merchantRedirectUrl: https://entur.no/avtaler/bekreftelse
+                    merchantAgreementUrl: https://entur.no/avtaler/123
+              vipps-flexible-pricing:
+                summary: Vipps-avtale med fleksibel pris
+                value:
+                  productName: Reisekortkonto
+                  customerNumber: '12345678'
+                  pricing:
+                    agreementType: FLEXIBLE
+                    currency: NOK
+                  providerData:
+                    agreementProvider: VIPPS
+                    merchantRedirectUrl: https://entur.no/avtaler/bekreftelse
+                    merchantAgreementUrl: https://entur.no/avtaler/123
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/hal+json:
+              schema:
+                $ref: '#/components/schemas/PaymentAgreementResponse'
+              examples:
+                vipps-fixed-pricing:
+                  summary: Vipps-avtale opprettet med fast pris
+                  value:
+                    agreementId: 42
+                    status: PENDING
+                    productName: Månedlig reisekort Oslo
+                    productDescription: Månedlig reisekort gyldig i Oslo-sonen
+                    pricing:
+                      agreementType: FIXED
+                      amount: 49900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 1
+                    providerData:
+                      agreementProvider: VIPPS
+                      confirmationUrl: https://api.vipps.no/dwo-api-application/v1/deeplink/vippsgateway?v=2&token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9
+                vipps-variable-pricing:
+                  summary: Vipps-avtale opprettet med variabel pris
+                  value:
+                    agreementId: 43
+                    status: PENDING
+                    productName: Fleksibelt reisekort
+                    pricing:
+                      agreementType: VARIABLE
+                      amount: 49900
+                      currency: NOK
+                      interval:
+                        unit: MONTH
+                        count: 1
+                      suggestedMaxAmount: 100000
+                    providerData:
+                      agreementProvider: VIPPS
+                      confirmationUrl: https://api.vipps.no/dwo-api-application/v1/deeplink/vippsgateway?v=2&token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9
+                vipps-flexible-pricing:
+                  summary: Vipps-avtale opprettet med fleksibel pris
+                  value:
+                    agreementId: 44
+                    status: PENDING
+                    productName: Reisekortkonto
+                    pricing:
+                      agreementType: FLEXIBLE
+                      currency: NOK
+                    providerData:
+                      agreementProvider: VIPPS
+                      confirmationUrl: https://api.vipps.no/dwo-api-application/v1/deeplink/vippsgateway?v=2&token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9
+        '400':
+          $ref: '#/components/responses/badRequestValidationError'
+        '500':
+          $ref: '#/components/responses/internalServerError'
+        '501':
+          $ref: '#/components/responses/notImplemented'
+    servers:
+    - url: https://api.entur.io/sales
+      description: Entur's Production environment
+    - url: https://api.staging.entur.io/sales
+      description: Entur's Staging environment
+    - url: https://api.dev.entur.io/sales
+      description: Entur's Development environment
+components:
+  schemas:
+    VariablePricing:
+      description: Variable pricing charges a varying amount each interval and requires a suggested maximum amount. **Not yet supported** — creating a VARIABLE agreement returns 501. Reserved for future use.
+      allOf:
+      - $ref: '#/components/schemas/AgreementPricing'
+      - required:
+        - amount
+        - currency
+        - interval
+        - suggestedMaxAmount
+        type: object
+        properties:
+          amount:
+            type: integer
+            description: 'The amount to charge per interval, in minor units, e.g: øre.'
+          currency:
+            maxLength: 3
+            minLength: 3
+            type: string
+            description: ISO 4217 currency code.
+          interval:
+            $ref: '#/components/schemas/AgreementInterval'
+          suggestedMaxAmount:
+            type: integer
+            description: A suggested maximum amount per charge, in minor units.
+    FixedPricing:
+      description: Fixed pricing charges a set amount each interval. **Not yet supported** — creating a FIXED agreement returns 501. Reserved for future use.
+      allOf:
+      - $ref: '#/components/schemas/AgreementPricing'
+      - required:
+        - amount
+        - currency
+        - interval
+        type: object
+        properties:
+          amount:
+            type: integer
+            description: 'The fixed amount to charge per interval, in minor units, e.g: øre.'
+          currency:
+            maxLength: 3
+            minLength: 3
+            type: string
+            description: ISO 4217 currency code.
+          interval:
+            $ref: '#/components/schemas/AgreementInterval'
+    AgreementResponseProviderData:
+      required:
+      - agreementProvider
+      type: object
+      properties:
+        agreementProvider:
+          type: string
+          description: The payment provider for the agreement.
+          enum:
+          - VIPPS
+      description: Base provider-specific data in an agreement response.
+      discriminator:
+        propertyName: agreementProvider
+        mapping:
+          VIPPS: '#/components/schemas/VippsAgreementResponseProviderData'
+    AgreementRequestProviderData:
+      required:
+      - agreementProvider
+      type: object
+      properties:
+        agreementProvider:
+          type: string
+          description: The payment provider for the agreement.
+          enum:
+          - VIPPS
+      description: Base provider-specific data for creating an agreement.
+      discriminator:
+        propertyName: agreementProvider
+        mapping:
+          VIPPS: '#/components/schemas/VippsAgreementRequestProviderData'
+    AgreementUpdateProviderData:
+      required:
+      - agreementProvider
+      type: object
+      properties:
+        agreementProvider:
+          type: string
+          description: The payment provider for the agreement. Cannot be changed, and must match the agreement's existing provider.
+          enum:
+          - VIPPS
+      description: Base provider-specific data for updating an agreement. Contains only the fields the provider allows changing after the agreement exists — which is why this is a separate schema from AgreementRequestProviderData.
+      discriminator:
+        propertyName: agreementProvider
+        mapping:
+          VIPPS: '#/components/schemas/VippsAgreementUpdateProviderData'
+    AgreementPricing:
+      required:
+      - agreementType
+      type: object
+      properties:
+        agreementType:
+          type: string
+          description: The pricing model type.
+          enum:
+          - FIXED
+          - VARIABLE
+          - FLEXIBLE
+      description: Base pricing model for a payment agreement.
+      discriminator:
+        propertyName: agreementType
+        mapping:
+          FIXED: '#/components/schemas/FixedPricing'
+          VARIABLE: '#/components/schemas/VariablePricing'
+          FLEXIBLE: '#/components/schemas/FlexiblePricing'
+    PaymentError:
+      title: PaymentError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error that occurred.
+          examples:
+          - Internal Server Error
+        exception:
+          type: string
+          description: What exception caused the error.
+          examples:
+          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message:
+          type: string
+          description: A message detailing the error.
+          examples:
+          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path:
+          type: string
+          description: The url path that was accessed when the error happenened.
+          examples:
+          - /v1/payments/1/transactions/1/capture
+        status:
+          type: integer
+          description: The http status of the response.
+          format: int32
+          examples:
+          - 500
+        timestamp:
+          type: string
+          description: When the error occurred
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        errorReason:
+          type: string
+          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
+          examples:
+          - SOFT_DECLINE
+      x-examples: {}
+      examples:
+      - error: Internal Server Error
+        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path: /v1/payments/1/transactions/1/capture
+        status: 500
+        timestamp: '2025-08-24T14:15:22Z'
+    PaymentAgreementResponse:
+      type: object
+      properties:
+        agreementId:
+          type: integer
+          description: The unique identifier of the payment agreement.
+          format: int64
+        status:
+          type: string
+          description: The current status of the agreement.
+          enum:
+          - CREATED
+          - PENDING
+          - ACTIVE
+          - STOPPED
+          - EXPIRED
+        productName:
+          type: string
+          description: Name of the product or subscription.
+        productDescription:
+          type: string
+          description: Description of the product or subscription, shown to the customer in the provider's app.
+        pricing:
+          $ref: '#/components/schemas/AgreementPricing'
+        providerData:
+          $ref: '#/components/schemas/AgreementResponseProviderData'
+      description: Response containing payment agreement details.
+    CreatePaymentAgreementRequest:
+      required:
+      - customerNumber
+      - pricing
+      - productName
+      - providerData
+      type: object
+      properties:
+        productName:
+          maxLength: 45
+          type: string
+          description: Name of the product or subscription.
+        productDescription:
+          maxLength: 100
+          type: string
+          description: Optional description of the product or subscription, shown to the customer in the provider's app.
+        customerNumber:
+          type: string
+          description: The customer number for the agreement.
+        pricing:
+          $ref: '#/components/schemas/AgreementPricing'
+        providerData:
+          $ref: '#/components/schemas/AgreementRequestProviderData'
+      description: Request to create a new payment agreement.
+    AgreementUpdatePricing:
+      description: Pricing model for updating an agreement. Not yet supported — supplying this field returns 501. FLEXIBLE is absent because its amount is set per charge and has nothing to update; FIXED and VARIABLE are reserved for future use.
+      discriminator:
+        propertyName: agreementType
+        mapping:
+          FIXED: '#/components/schemas/FixedPricing'
+          VARIABLE: '#/components/schemas/VariablePricing'
+      oneOf:
+      - $ref: '#/components/schemas/FixedPricing'
+      - $ref: '#/components/schemas/VariablePricing'
+    AgreementInterval:
+      required:
+      - count
+      - unit
+      type: object
+      properties:
+        unit:
+          type: string
+          description: The time unit for the interval.
+          enum:
+          - WEEK
+          - MONTH
+          - YEAR
+        count:
+          minimum: 1
+          type: integer
+          description: The number of time units per interval.
+      description: Defines the billing interval for a payment agreement.
+    UpdatePaymentAgreementRequest:
+      type: object
+      properties:
+        productName:
+          maxLength: 45
+          type: string
+          description: Name of the product or subscription.
+        productDescription:
+          maxLength: 100
+          type: string
+          description: Description of the product or subscription, shown to the customer in the provider's app.
+        pricing:
+          $ref: '#/components/schemas/AgreementUpdatePricing'
+        providerData:
+          $ref: '#/components/schemas/AgreementUpdateProviderData'
+      description: Request to update a payment agreement. Every field is optional, but at least one must be supplied — omitting a field leaves it unchanged. `pricing` is not currently supported and returns 501; only `productName`, `productDescription`, and `providerData` can be updated on FLEXIBLE agreements.
+  responses:
+    notImplemented:
+      description: Not Implemented
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequestValidationError:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    conflict:
+      description: Conflict
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    agreementIdPathParam:
+      name: agreementId
+      in: path
+      description: agreementId
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-POS
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-payment-partner-openapi.json
+- entur-payment-partner-openapi.yml

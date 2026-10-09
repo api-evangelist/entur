@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-multi-stock-response-schema.json",
+  "title": "MultiStockResponse",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-inventory-openapi.yml#/components/schemas/MultiStockResponse",
+  "type": "object",
+  "properties": {
+    "origin": {
+      "type": "string"
+    },
+    "destination": {
+      "type": "string"
+    },
+    "spannedDatedServiceJourneys": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reservableStock": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/NestingComponentResponseV1"
+          },
+          {
+            "$ref": "#/$defs/SimpleProductResponseV1"
+          },
+          {
+            "$ref": "#/$defs/ProductCollectionResponseV1"
+          },
+          {
+            "$ref": "#/$defs/ProductResponseV1"
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "destination",
+    "origin",
+    "reservableStock",
+    "spannedDatedServiceJourneys"
+  ],
+  "$defs": {
+    "NestingComponentResponseV1": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/StockComponentResponseV1"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "aggregatedAvailability": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nestingGroup": {
+              "type": "string"
+            },
+            "priority": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      ],
+      "required": [
+        "aggregatedAvailability",
+        "nestingGroup",
+        "priority"
+      ]
+    },
+    "ProductCollectionResponseV1": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/NestingComponentResponseV1"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "selectionRule": {
+              "type": "string",
+              "enum": [
+                "COMBINED",
+                "SINGLE"
+              ]
+            },
+            "consumptionRule": {
+              "type": "string",
+              "enum": [
+                "DIRECT",
+                "BY_PRIORITY"
+              ]
+            },
+            "directionRule": {
+              "type": "string",
+              "enum": [
+                "FROM_RIGHT",
+                "FROM_LEFT"
+              ]
+            },
+            "components": {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/ProductCollectionResponseV1"
+                  },
+                  {
+                    "$ref": "#/$defs/ProductResponseV1"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "required": [
+        "aggregatedAvailability",
+        "components",
+        "consumptionRule",
+        "directionRule",
+        "nestingGroup",
+        "priority",
+        "selectionRule"
+      ]
+    },
+    "ProductResponseV1": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/NestingComponentResponseV1"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "leftInQuota": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "purchaseWindowStart": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "purchaseWindowStop": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "closedBy": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "int32"
+              }
+            }
+          }
+        }
+      ],
+      "required": [
+        "aggregatedAvailability",
+        "closedBy",
+        "id",
+        "leftInQuota",
+        "nestingGroup",
+        "priority",
+        "products"
+      ]
+    },
+    "SimpleProductResponseV1": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/StockComponentResponseV1"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "products": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "leftInQuota": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      ],
+      "required": [
+        "leftInQuota",
+        "products"
+      ]
+    },
+    "StockComponentResponseV1": {}
+  }
+}

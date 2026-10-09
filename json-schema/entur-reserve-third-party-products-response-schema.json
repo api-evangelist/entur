@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/entur/main/json-schema/entur-reserve-third-party-products-response-schema.json",
+  "title": "ReserveThirdPartyProductsResponse",
+  "description": "The order lines created when reserving third party product on the given order",
+  "x-generated": "2026-10-09",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/entur-reserve-offers-partner-openapi.yml#/components/schemas/ReserveThirdPartyProductsResponse",
+  "required": [
+    "orderId",
+    "orderLineIds"
+  ],
+  "type": "object",
+  "properties": {
+    "orderId": {
+      "type": "string"
+    },
+    "orderLineIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,488 @@
+openapi: 3.2.0
+info:
+  title: Entur Ticket right holders API
+  version: 2026.08.0
+  contact:
+    name: Entur Team Personalisering
+    email: team.personalisering@entur.org
+  termsOfService: http://entur.org
+  description: 'Operations tagged Ticket right holders across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.entur.io
+security:
+- jwt: []
+tags:
+- name: Ticket right holders
+  description: List generated ticket right holders
+paths:
+  /personnelticket/v2/ticketrightsholders:
+    parameters:
+    - $ref: '#/components/parameters/ET-Client-Name'
+    - $ref: '#/components/parameters/X-Correlation-Id'
+    get:
+      tags:
+      - Ticket right holders
+      summary: Find ticket rights holders by params
+      operationId: findTicketRightsHolders
+      parameters:
+      - name: employeeNo
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: companyId
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int64
+      - name: fromDate
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      - name: perPage
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageTicketRightsHolderResponse'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '500':
+          $ref: '#/components/responses/Error500'
+      x-entur-permissions:
+        value: Personalbillett-Rettighetshaver:les
+    servers:
+    - url: https://api.entur.io
+components:
+  schemas:
+    TicketTypeResponse:
+      required:
+      - canHaveStationPairs
+      - code
+      - countryCode
+      - description
+      - generatesTicketRights
+      - id
+      - isDeleted
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Ticket type id
+          format: int64
+        code:
+          type: string
+          description: Ticket type
+        description:
+          type: string
+          description: Ticket type description
+        countryCode:
+          type: string
+          description: Country code
+        generatesTicketRights:
+          type: boolean
+          description: Whether or not this this ticket type is relevant for sending as input to a Manual order. If this = false (the default), it will not generate new tickets rights by manual order.
+        canHaveStationPairs:
+          type: boolean
+          description: 'Whether or not this ticket type is compatible with station pairs when placing a manual order. The default = false. '
+        isDeleted:
+          type: boolean
+          description: Whether the ticket type is deleted.
+      description: The Ticket type informs of which country it is valid in and what train class it covers.
+    SimpleRule:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Rule id
+          format: int64
+        name:
+          type: string
+          description: Rule name
+      description: Rule describing who are eligible for what ticket right
+    PageTicketRightsHolderResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          items:
+            $ref: '#/components/schemas/TicketRightsHolderResponse'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int64
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int64
+          examples:
+          - 1
+      description: Paged content
+    TicketRightResponse:
+      required:
+      - calculationTimestamp
+      - employeeId
+      - ticketHolderId
+      - ticketType
+      - ticketrightId
+      - validFrom
+      - validUntil
+      type: object
+      properties:
+        ticketrightId:
+          type: integer
+          description: The ticket right id
+          format: int64
+        ticketHolderId:
+          type: integer
+          description: The id of the ticket holder, either an employee or a family member
+          format: int64
+        employeeId:
+          type: integer
+          description: The id of the employee who is responsible
+          format: int64
+        validFrom:
+          type: string
+          description: The date from when the ticket right is valid
+          format: date
+          examples:
+          - '2019-03-13'
+        validUntil:
+          type: string
+          description: The date from when the ticket right stops being valid
+          format: date
+          examples:
+          - '2019-06-13'
+        ticketType:
+          $ref: '#/components/schemas/TicketTypeResponse'
+        note:
+          type: string
+          description: Any additional information
+        canSendTicket:
+          type: boolean
+          description: This field will be discontinued in the next vesion of the API.
+          deprecated: true
+        ticketCreated:
+          type: string
+          description: This field will be discontinued in the next vesion of the API.
+          format: date-time
+          deprecated: true
+        errorMessage:
+          type: string
+          description: This field will be discontinued in the next vesion of the API.
+          deprecated: true
+        createdByRule:
+          $ref: '#/components/schemas/SimpleRule'
+        calculationTimestamp:
+          type: string
+          description: When the ticketright was calculated
+          format: date-time
+        ticketRightsHolder:
+          $ref: '#/components/schemas/TicketRightsHolderResponse'
+        legacySyncStatus:
+          $ref: '#/components/schemas/SyncStatus'
+        essSyncStatus:
+          $ref: '#/components/schemas/SyncStatus'
+        manualOrder:
+          $ref: '#/components/schemas/ManualOrderResponse'
+      description: A ticket right granted to an employee or a family member
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    TicketRightsHolderResponse:
+      required:
+      - id
+      - ticketHolderCode
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ticket right holder id
+          format: int64
+        ticketHolderCode:
+          type: string
+          description: The personnel ticket code for the ticket rights holder
+        ticketRight:
+          $ref: '#/components/schemas/TicketRightResponse'
+        firstName:
+          type: string
+          description: Unused. This field is populated by employee / family member data and will be removed in future versions.
+          deprecated: true
+        surname:
+          type: string
+          description: Unused. This field is populated by employee / family member data and will be removed in future versions.
+          deprecated: true
+        addressLine:
+          type: string
+          description: Unused. This field is populated by employee / family member data and will be removed in future versions.
+          deprecated: true
+        postalCode:
+          type: string
+          description: Unused. This field is populated by employee / family member data and will be removed in future versions.
+          deprecated: true
+        postalPlace:
+          type: string
+          description: Unused. This field is populated by employee / family member data and will be removed in future versions.
+          deprecated: true
+        countryCode:
+          type: string
+          description: Unused. This field is populated by employee / family member data and will be removed in future versions.
+          deprecated: true
+        dateOfBirth:
+          type: string
+          description: Unused. This field is populated by employee / family member data and will be removed in future versions.
+          format: date
+          deprecated: true
+          examples:
+          - '2023-01-01'
+      description: All items for this page
+    ManualOrderResponse:
+      required:
+      - fromDate
+      - id
+      - isDeleted
+      - issueDate
+      - ticketType
+      - toDate
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id of this manual order.
+          format: int64
+        ticketType:
+          $ref: '#/components/schemas/TicketTypeResponse'
+        issueDate:
+          type: string
+          description: When this manual order was first issued.
+          format: date-time
+        fromDate:
+          type: string
+          description: First date the ticket right should be available.
+          format: date
+          examples:
+          - '2023-01-01'
+        toDate:
+          type: string
+          description: Last date the ticket right should be available.
+          format: date
+          examples:
+          - '2023-01-01'
+        stations:
+          uniqueItems: true
+          type: array
+          description: Any station pairs for this manual order.
+          items:
+            $ref: '#/components/schemas/StationPairResponse'
+        isDeleted:
+          type: boolean
+          description: Whether this manual order is deleted or not.
+      description: A manual order. This may contain a list of station pairs.
+    StationPairResponse:
+      required:
+      - fromStation
+      - id
+      - toStation
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id of this station pair
+          format: int64
+        fromStation:
+          $ref: '#/components/schemas/StationResponse'
+        toStation:
+          $ref: '#/components/schemas/StationResponse'
+      description: A set of stations on NetEX format.
+    StationResponse:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Station in NetEX format.
+        name:
+          type: string
+          description: Station name
+      description: Station with NetEX and name
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
+    SyncStatus:
+      type: object
+      properties:
+        isReadyToSync:
+          type: boolean
+          description: Whether the ticket right is ready to be sent to the ticketing system
+        syncTimestamp:
+          type: string
+          description: When the ticket right was sync'ed
+          format: date-time
+          examples:
+          - '2019-06-13T12:34:56+01:00'
+        errorMessage:
+          type: string
+          description: If the system has failed in sending the ticket right to the ticketing system, this will hold the error message. Default is null
+      description: Status fields related to synchronization with other services
+  responses:
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+x-refined-from:
+- entur-personnel-tickets-openapi.json
+- entur-personnel-tickets-openapi.yml
