@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Fare Structure Elements API
+  title: Products Fare Structure Elements API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged fare-structure-elements across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -170,13 +170,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /fare-structure-elements/count:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -277,13 +270,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /fare-structure-elements/pages:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -420,13 +406,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /fare-structure-elements/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -521,13 +500,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /fare-structure-elements/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -703,13 +675,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /fare-structure-elements/{id}/{version}/distance-matrix-elements:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -819,13 +784,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /fare-structure-elements/{id}/{version}/geographical-intervals:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -933,13 +891,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v1/fare-structure-elements/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1072,120 +1023,35 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
-    SeqStatusFilterEnum:
-      type: object
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
-    TextInLanguage:
+    VersionOfObjectRef:
       required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
-    GroupOfTimeBands:
-      required:
-      - changed
-      - created
-      - id
-      - members
-      - modification
       - nameOfClass
-      - status
-      - validityConditions
+      - ref
+      - version
       type: object
       properties:
-        changed:
-          type: string
-          description: Changed datetime.
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-        members:
-          type: array
-          description: Members.
-          items:
-            $ref: '#/components/schemas/Timeband'
-        modification:
-          type: string
-          description: Modification status.
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
         nameOfClass:
+          minLength: 1
           type: string
           description: Name of class.
-          examples:
-          - FareStructureElement
-        status:
-          type: string
-          description: Status.
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        validityConditions:
-          type: array
-          description: ValidityConditions sequence.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
+        ref:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
           description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A GroupOfTimeband describe during which the assignments applies
-    Rounding:
+      description: Fare frame ref.
+    DistanceMatrixElement:
       required:
       - changed
       - created
       - fareFrameRef
       - id
-      - modification
       - nameOfClass
-      - roundingMethod
-      - status
       - version
       type: object
       properties:
@@ -1193,22 +1059,45 @@ components:
           type: string
           description: Changed datetime.
           readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
         created:
           type: string
           description: Created datetime.
           readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
         description:
           type: array
-          description: Description.
+          description: Description represented in different languages. Language codes are ISO-639.
           items:
             $ref: '#/components/schemas/TextInLanguage'
+        distance:
+          type: number
+          description: Distance.
+          format: double
+          examples:
+          - 16.4
+        endFareZoneRef:
+          type: string
+          description: End fare zone reference.
+        endScheduledStopPointId:
+          type: string
+          description: End scheduled stop point netexId.
+        endTariffZoneId:
+          type: string
+          description: End tariff zone reference. This field is deprecated, please use the field endFareZoneRef.
+          deprecated: true
         fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables that provide prices or discounts for the user profile.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        groupId:
+          type: integer
+          description: Group id.
+          format: int64
+          examples:
+          - 4
+        groupRef:
           $ref: '#/components/schemas/VersionOfObjectRef'
         id:
           minLength: 1
@@ -1216,7 +1105,133 @@ components:
           type: string
           description: Id.
           examples:
-          - NSB:Rounding:Ordinary
+          - NSB:DistanceMatrixElement:NSR167ToNSR359
+        inverseAllowed:
+          type: boolean
+          description: Inverse is allowed.
+          examples:
+          - true
+        isDirect:
+          type: boolean
+          description: Is a direct route.
+          examples:
+          - true
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        name:
+          type: array
+          description: DistanceMatrixElement Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - DistanceMatrixElement
+        prices:
+          type: array
+          description: Fare prices for the user profile.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        relativeRanking:
+          type: integer
+          description: Relative ranking.
+          format: int32
+          examples:
+          - 2
+        startFareZoneRef:
+          type: string
+          description: Start fare zone reference.
+        startScheduledStopPointId:
+          type: string
+          description: Start scheduled stop point netexId.
+        startTariffZoneId:
+          type: string
+          description: Start tariff zone reference. This field is deprecated, please use the field startFareZoneRef.
+          deprecated: true
+        tariffId:
+          type: integer
+          description: Tariff id.
+          format: int64
+        tariffRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        validityConditions:
+          type: array
+          description: Validity conditions for the user profile.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: DistanceMatrixElement version.
+          examples:
+          - NSB:Version:V1
+      description: A DistanceMatrixElement
+    FarePrice:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          maximum: 100
+          minimum: -100
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
         modification:
           type: string
           description: Modification status.
@@ -1237,27 +1252,20 @@ components:
           description: Name of class.
           readOnly: true
           examples:
-          - Rounding
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
+          - FarePrice
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/Rounding'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
         status:
           type: string
-          description: Rounding status.
+          description: Status.
           readOnly: true
           enum:
           - DRAFT
@@ -1266,15 +1274,23 @@ components:
           - DEPRECATED
           examples:
           - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        vatRegisterGroup:
           type: string
-          description: Rounding version.
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+          description: Version.
+          readOnly: true
           examples:
           - NSB:Version:V1
-      description: A description of how prices are rounded post calculation
-      deprecated: true
+      description: A description of the price and factor for a set fare
     GenericParameterAssignment:
       required:
       - changed
@@ -1494,79 +1510,48 @@ components:
           examples:
           - NSB:Version:V2
       description: A GenericParameterAssignment
-    VersionOfObjectRef:
-      required:
-      - nameOfClass
-      - ref
-      - version
+    SeqStatusFilterEnum:
       type: object
       properties:
-        nameOfClass:
-          minLength: 1
-          type: string
-          description: Name of class.
-        ref:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: The netex id reference to the object.
-        version:
-          type: string
-          description: Version.
-      description: Fare frame ref.
-    DistanceMatrixElement:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    FarePriceInsert:
       required:
-      - changed
-      - created
       - fareFrameRef
       - id
-      - nameOfClass
-      - version
+      - name
       type: object
       properties:
-        changed:
+        amount:
           type: string
-          description: Changed datetime.
-          readOnly: true
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        description:
-          type: array
-          description: Description represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        distance:
-          type: number
-          description: Distance.
-          format: double
+          description: Amount.
           examples:
-          - 16.4
-        endFareZoneRef:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        compatibleWithVersionRef:
           type: string
-          description: End fare zone reference.
-        endScheduledStopPointId:
+          description: Compatible with version.
+        currency:
           type: string
-          description: End scheduled stop point netexId.
-        endTariffZoneId:
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
           type: string
-          description: End tariff zone reference. This field is deprecated, please use the field endFareZoneRef.
-          deprecated: true
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: References to fare tables that provide prices or discounts for the user profile.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        groupId:
+          description: Derived from version.
+        discountPercentageUsed:
           type: integer
-          description: Group id.
-          format: int64
+          description: discountPercentageUsed.
+          format: int32
           examples:
-          - 4
-        groupRef:
+          - 5
+        fareFrameRef:
           $ref: '#/components/schemas/VersionOfObjectRef'
         id:
           minLength: 1
@@ -1574,70 +1559,260 @@ components:
           type: string
           description: Id.
           examples:
-          - NSB:DistanceMatrixElement:NSR167ToNSR359
-        inverseAllowed:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
           type: boolean
-          description: Inverse is allowed.
+          description: isAllowed.
           examples:
           - true
-        isDirect:
-          type: boolean
-          description: Is a direct route.
-          examples:
-          - true
-        limitingRuleRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
         name:
           type: array
-          description: DistanceMatrixElement Name represented in different languages. Language codes are ISO-639.
+          description: Name.
           items:
             $ref: '#/components/schemas/TextInLanguage'
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/RoundingInsert'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+    GroupOfTimeBands:
+      required:
+      - changed
+      - created
+      - id
+      - members
+      - modification
+      - nameOfClass
+      - status
+      - validityConditions
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        members:
+          type: array
+          description: Members.
+          items:
+            $ref: '#/components/schemas/Timeband'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
         nameOfClass:
           type: string
           description: Name of class.
-          readOnly: true
           examples:
-          - DistanceMatrixElement
-        prices:
-          type: array
-          description: Fare prices for the user profile.
-          items:
-            $ref: '#/components/schemas/FarePrice'
-        relativeRanking:
-          type: integer
-          description: Relative ranking.
-          format: int32
+          - FareStructureElement
+        status:
+          type: string
+          description: Status.
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
           examples:
-          - 2
-        startFareZoneRef:
-          type: string
-          description: Start fare zone reference.
-        startScheduledStopPointId:
-          type: string
-          description: Start scheduled stop point netexId.
-        startTariffZoneId:
-          type: string
-          description: Start tariff zone reference. This field is deprecated, please use the field startFareZoneRef.
-          deprecated: true
-        tariffId:
-          type: integer
-          description: Tariff id.
-          format: int64
-        tariffRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
+          - DRAFT
         validityConditions:
           type: array
-          description: Validity conditions for the user profile.
+          description: ValidityConditions sequence.
           items:
             $ref: '#/components/schemas/ValidityCondition'
         version:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: DistanceMatrixElement version.
+          description: Version.
           examples:
           - NSB:Version:V1
-      description: A DistanceMatrixElement
+      description: A GroupOfTimeband describe during which the assignments applies
+    FareStructureElement:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - fareTableRefs
+      - geographicalIntervalRefs
+      - geographicalStructureFactorRefs
+      - id
+      - modification
+      - nameOfClass
+      - parameterAssignments
+      - pointToPointFareRefs
+      - qualityStructureFactorRefs
+      - status
+      - validityConditions
+      type: object
+      properties:
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        changed:
+          type: string
+          description: Changed datetime.
+          format: date-time
+        created:
+          type: string
+          description: Created datetime.
+          format: date-time
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: fare table reference
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        geographicalIntervalRefs:
+          type: array
+          description: geographical interval sequence
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        geographicalStructureFactorRefs:
+          type: array
+          description: geographical structure factor refs
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FareStructureElement:TENInterval
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - FareStructureElement
+        organisationId:
+          type: string
+          description: Organisation related to the userProfile
+          readOnly: true
+        parameterAssignments:
+          type: array
+          description: Access Right Parameter assignments.
+          items:
+            $ref: '#/components/schemas/GenericParameterAssignment'
+        pointToPointFareRefs:
+          type: array
+          description: Field is deprecated. Distance matrix elements should be connected by a 'geographical structure factor'
+          deprecated: true
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        prices:
+          type: array
+          description: Fare prices.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        qualityStructureFactorRefs:
+          type: array
+          description: quality structure factor refs
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        status:
+          type: string
+          description: Status.
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        tariffBasis:
+          type: string
+          description: Tariff basis.
+          enum:
+          - FLAT
+          - DISTANCE
+          - UNIT_SECTION
+          - ZONE
+          - ZONE_TO_ZONE
+          - POINT_TO_POINT
+          - ROUTE
+          - TOUR
+          - GROUP
+          - DISCOUNT
+          - PERIOD
+          - FREE
+          - OTHER
+          examples:
+          - DISTANCE
+        validityConditions:
+          type: array
+          description: ValidityConditions sequence.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A element describing the response structure of the fare
     LimitingRule:
       required:
       - changed
@@ -1745,6 +1920,243 @@ components:
           examples:
           - NSB:Version:V1
       description: A LimitingRule
+    TypeOfAccessRightAssignment:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - ENT:TypeOfAccessRightAssignment:ActivationPolicyAssignment
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - TypeOfAccessRightAssignment
+        status:
+          type: string
+          description: Type of access right assignment status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Type of access right assignment version.
+          examples:
+          - NSB:Version:V1
+      description: A classification of Access Right Assignments.
+    ValidityCondition:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        fromDate:
+          type: string
+          description: From Date.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ValidBetween:2018
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ValidBetween
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        toDate:
+          type: string
+          description: To Date.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A condition of the validity of the priceable object
+    FareStructureElementInsert:
+      required:
+      - fareFrameRef
+      - fareTableRefs
+      - geographicalIntervalRefs
+      - id
+      - parameterAssignmentRefs
+      type: object
+      properties:
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: fare table reference
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        geographicalIntervalRefs:
+          type: array
+          description: geographical interval sequence
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        geographicalStructureFactorId:
+          type: string
+          description: Geographical structure factor id
+          examples:
+          - NSB:GeographicalStructureFactor:TENPrices
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FareStructureElement:TENInterval
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        parameterAssignmentRefs:
+          type: array
+          description: Access Right Parameter assignments.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        pointToPointFareRefs:
+          type: array
+          description: Field is deprecated. Use 'geographical structure factor' instead to connect 'distance matrix elements' to 'fare structure element'
+          deprecated: true
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        prices:
+          type: array
+          description: Fare prices.
+          items:
+            $ref: '#/components/schemas/FarePriceInsert'
+        tariffBasis:
+          type: string
+          description: Tariff basis.
+          enum:
+          - FLAT
+          - DISTANCE
+          - UNIT_SECTION
+          - ZONE
+          - ZONE_TO_ZONE
+          - POINT_TO_POINT
+          - ROUTE
+          - TOUR
+          - GROUP
+          - DISCOUNT
+          - PERIOD
+          - FREE
+          - OTHER
+          examples:
+          - DISTANCE
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
     Timeband:
       required:
       - changed
@@ -1858,7 +2270,142 @@ components:
           examples:
           - NSB:Version:V1
       description: The TimeBand describe during which the assignment applies
-    TypeOfAccessRightAssignment:
+    GeographicalInterval:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        endGeographicalValue:
+          type: integer
+          description: endGeographicalValue.
+          format: int64
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: Reference to fare table.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:GeographicalInterval:1364TEN
+        intervalType:
+          type: string
+          description: intervalType.
+          enum:
+          - STOP
+          - TARIFF_ZONE
+          - DISTANCE
+          - COUPON
+          - OTHER
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - GeographicalInterval
+        numberOfUnits:
+          type: number
+          description: numberOfUnits.
+          format: double
+        prices:
+          type: array
+          description: Prices for the fare.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        startGeographicalValue:
+          type: integer
+          description: startGeographicalValue.
+          format: int64
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validityConditions:
+          type: array
+          description: validityConditions.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: GeographicalInterval
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    Count:
+      required:
+      - numberOfElements
+      type: object
+      properties:
+        numberOfElements:
+          type: integer
+          description: number of elements
+          format: int32
+          examples:
+          - 369
+      description: Count
+    Rounding:
       required:
       - changed
       - created
@@ -1866,6 +2413,7 @@ components:
       - id
       - modification
       - nameOfClass
+      - roundingMethod
       - status
       - version
       type: object
@@ -1886,7 +2434,7 @@ components:
           description: Derived from version.
         description:
           type: array
-          description: Description represented in different languages. Language codes are ISO-639.
+          description: Description.
           items:
             $ref: '#/components/schemas/TextInLanguage'
         fareFrameRef:
@@ -1897,7 +2445,7 @@ components:
           type: string
           description: Id.
           examples:
-          - ENT:TypeOfAccessRightAssignment:ActivationPolicyAssignment
+          - NSB:Rounding:Ordinary
         modification:
           type: string
           description: Modification status.
@@ -1910,7 +2458,7 @@ components:
           - NEW
         name:
           type: array
-          description: Name represented in different languages. Language codes are ISO-639.
+          description: Name.
           items:
             $ref: '#/components/schemas/TextInLanguage'
         nameOfClass:
@@ -1918,10 +2466,27 @@ components:
           description: Name of class.
           readOnly: true
           examples:
-          - TypeOfAccessRightAssignment
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
         status:
           type: string
-          description: Type of access right assignment status.
+          description: Rounding status.
           readOnly: true
           enum:
           - DRAFT
@@ -1934,10 +2499,64 @@ components:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: Type of access right assignment version.
+          description: Rounding version.
           examples:
           - NSB:Version:V1
-      description: A classification of Access Right Assignments.
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+    RoundingInsert:
+      required:
+      - fareFrameRef
+      - id
+      - roundingMethod
+      - version
+      type: object
+      properties:
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: Rounding.
+      deprecated: true
     ScopingValidityParameter:
       required:
       - changed
@@ -2226,715 +2845,6 @@ components:
           examples:
           - NSB:Version:V1
       description: A ScopingValidityParameter
-    ValidityCondition:
-      required:
-      - changed
-      - created
-      - id
-      - modification
-      - nameOfClass
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        fromDate:
-          type: string
-          description: From Date.
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:ValidBetween:2018
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - ValidBetween
-        status:
-          type: string
-          description: Status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        toDate:
-          type: string
-          description: To Date.
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A condition of the validity of the priceable object
-    FareStructureElementInsert:
-      required:
-      - fareFrameRef
-      - fareTableRefs
-      - geographicalIntervalRefs
-      - id
-      - parameterAssignmentRefs
-      type: object
-      properties:
-        activeComparisonOperatorVariant:
-          type: string
-          description: 'Deprecated: this parameter will be ignored'
-          examples:
-          - E
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: fare table reference
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        geographicalIntervalRefs:
-          type: array
-          description: geographical interval sequence
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        geographicalStructureFactorId:
-          type: string
-          description: Geographical structure factor id
-          examples:
-          - NSB:GeographicalStructureFactor:TENPrices
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FareStructureElement:TENInterval
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        parameterAssignmentRefs:
-          type: array
-          description: Access Right Parameter assignments.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        pointToPointFareRefs:
-          type: array
-          description: Field is deprecated. Use 'geographical structure factor' instead to connect 'distance matrix elements' to 'fare structure element'
-          deprecated: true
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        prices:
-          type: array
-          description: Fare prices.
-          items:
-            $ref: '#/components/schemas/FarePriceInsert'
-        tariffBasis:
-          type: string
-          description: Tariff basis.
-          enum:
-          - FLAT
-          - DISTANCE
-          - UNIT_SECTION
-          - ZONE
-          - ZONE_TO_ZONE
-          - POINT_TO_POINT
-          - ROUTE
-          - TOUR
-          - GROUP
-          - DISCOUNT
-          - PERIOD
-          - FREE
-          - OTHER
-          examples:
-          - DISTANCE
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-    RoundingInsert:
-      required:
-      - fareFrameRef
-      - id
-      - roundingMethod
-      - version
-      type: object
-      properties:
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:Rounding:Ordinary
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Rounding version.
-          examples:
-          - NSB:Version:V1
-      description: Rounding.
-      deprecated: true
-    FarePriceInsert:
-      required:
-      - fareFrameRef
-      - id
-      - name
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount.
-          examples:
-          - '164.0'
-        canBeCumulative:
-          type: boolean
-          description: canBeCumulative.
-          examples:
-          - true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        currency:
-          type: string
-          description: Currency.
-          examples:
-          - NOK
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        discountPercentageUsed:
-          type: integer
-          description: discountPercentageUsed.
-          format: int32
-          examples:
-          - 5
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FarePrice:1005TEN
-        isAllowed:
-          type: boolean
-          description: isAllowed.
-          examples:
-          - true
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        ranking:
-          type: integer
-          description: Ranking.
-          format: int32
-          examples:
-          - 1
-        rounding:
-          $ref: '#/components/schemas/RoundingInsert'
-        roundingRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        vatRegisterGroup:
-          type: string
-          description: vatRegisterGroup.
-          enum:
-          - EXCEPTION_FROM_VAT
-          - GENERAL_VAT
-          - FOOD_VAT
-          - TRANSPORT_AND_TICKETS_VAT
-          examples:
-          - TRANSPORT_AND_TICKETS_VAT
-        version:
-          type: string
-    FareStructureElement:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - fareTableRefs
-      - geographicalIntervalRefs
-      - geographicalStructureFactorRefs
-      - id
-      - modification
-      - nameOfClass
-      - parameterAssignments
-      - pointToPointFareRefs
-      - qualityStructureFactorRefs
-      - status
-      - validityConditions
-      type: object
-      properties:
-        activeComparisonOperatorVariant:
-          type: string
-          description: 'Deprecated: this parameter will be ignored'
-          examples:
-          - E
-        changed:
-          type: string
-          description: Changed datetime.
-          format: date-time
-        created:
-          type: string
-          description: Created datetime.
-          format: date-time
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: fare table reference
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        geographicalIntervalRefs:
-          type: array
-          description: geographical interval sequence
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        geographicalStructureFactorRefs:
-          type: array
-          description: geographical structure factor refs
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FareStructureElement:TENInterval
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        modification:
-          type: string
-          description: Modification status.
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          examples:
-          - FareStructureElement
-        organisationId:
-          type: string
-          description: Organisation related to the userProfile
-          readOnly: true
-        parameterAssignments:
-          type: array
-          description: Access Right Parameter assignments.
-          items:
-            $ref: '#/components/schemas/GenericParameterAssignment'
-        pointToPointFareRefs:
-          type: array
-          description: Field is deprecated. Distance matrix elements should be connected by a 'geographical structure factor'
-          deprecated: true
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        prices:
-          type: array
-          description: Fare prices.
-          items:
-            $ref: '#/components/schemas/FarePrice'
-        qualityStructureFactorRefs:
-          type: array
-          description: quality structure factor refs
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        status:
-          type: string
-          description: Status.
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        tariffBasis:
-          type: string
-          description: Tariff basis.
-          enum:
-          - FLAT
-          - DISTANCE
-          - UNIT_SECTION
-          - ZONE
-          - ZONE_TO_ZONE
-          - POINT_TO_POINT
-          - ROUTE
-          - TOUR
-          - GROUP
-          - DISCOUNT
-          - PERIOD
-          - FREE
-          - OTHER
-          examples:
-          - DISTANCE
-        validityConditions:
-          type: array
-          description: ValidityConditions sequence.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A element describing the response structure of the fare
-    FarePrice:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - status
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount
-          examples:
-          - '164.0'
-        canBeCumulative:
-          type: boolean
-          description: canBeCumulative.
-          examples:
-          - true
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        currency:
-          type: string
-          description: Currency.
-          examples:
-          - NOK
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        discountPercentageUsed:
-          maximum: 100
-          minimum: -100
-          type: integer
-          description: discountPercentageUsed.
-          format: int32
-          examples:
-          - 5
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          type: string
-          description: Id.
-          examples:
-          - NSB:FarePrice:1005TEN
-        isAllowed:
-          type: boolean
-          description: isAllowed.
-          examples:
-          - true
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - FarePrice
-        ranking:
-          type: integer
-          description: Ranking.
-          format: int32
-          examples:
-          - 1
-        rounding:
-          $ref: '#/components/schemas/Rounding'
-        roundingRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        status:
-          type: string
-          description: Status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        vatRegisterGroup:
-          type: string
-          description: vatRegisterGroup.
-          enum:
-          - EXCEPTION_FROM_VAT
-          - GENERAL_VAT
-          - FOOD_VAT
-          - TRANSPORT_AND_TICKETS_VAT
-          examples:
-          - TRANSPORT_AND_TICKETS_VAT
-        version:
-          type: string
-          description: Version.
-          readOnly: true
-          examples:
-          - NSB:Version:V1
-      description: A description of the price and factor for a set fare
-    FareStructureElementPageWrapper:
-      required:
-      - items
-      - requestedPageNumber
-      - totalNumberOfItems
-      - totalNumberOfPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: Fare structure elements for the given page
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/FareStructureElement'
-        requestedPageNumber:
-          type: integer
-          description: Number of the requested page. In case state is lost
-          format: int32
-          examples:
-          - 369
-        totalNumberOfItems:
-          type: integer
-          description: Total number of items.
-          format: int32
-          examples:
-          - 369
-        totalNumberOfPages:
-          type: integer
-          description: Number of pages needed to traverse all items.
-          format: int32
-          readOnly: true
-          examples:
-          - 15
-      description: FareTablePageWrapper
-    Count:
-      required:
-      - numberOfElements
-      type: object
-      properties:
-        numberOfElements:
-          type: integer
-          description: number of elements
-          format: int32
-          examples:
-          - 369
-      description: Count
-    GeographicalInterval:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        endGeographicalValue:
-          type: integer
-          description: endGeographicalValue.
-          format: int64
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: Reference to fare table.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:GeographicalInterval:1364TEN
-        intervalType:
-          type: string
-          description: intervalType.
-          enum:
-          - STOP
-          - TARIFF_ZONE
-          - DISTANCE
-          - COUPON
-          - OTHER
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - GeographicalInterval
-        numberOfUnits:
-          type: number
-          description: numberOfUnits.
-          format: double
-        prices:
-          type: array
-          description: Prices for the fare.
-          items:
-            $ref: '#/components/schemas/FarePrice'
-        startGeographicalValue:
-          type: integer
-          description: startGeographicalValue.
-          format: int64
-        status:
-          type: string
-          description: Status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        validityConditions:
-          type: array
-          description: validityConditions.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: GeographicalInterval
     TemporalValidityParameter:
       required:
       - changed
@@ -3012,16 +2922,41 @@ components:
           examples:
           - NSB:Version:V1
       description: A TemporalValidityParameter
+    FareStructureElementPageWrapper:
+      required:
+      - items
+      - requestedPageNumber
+      - totalNumberOfItems
+      - totalNumberOfPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Fare structure elements for the given page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/FareStructureElement'
+        requestedPageNumber:
+          type: integer
+          description: Number of the requested page. In case state is lost
+          format: int32
+          examples:
+          - 369
+        totalNumberOfItems:
+          type: integer
+          description: Total number of items.
+          format: int32
+          examples:
+          - 369
+        totalNumberOfPages:
+          type: integer
+          description: Number of pages needed to traverse all items.
+          format: int32
+          readOnly: true
+          examples:
+          - 15
+      description: FareTablePageWrapper
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -3037,11 +2972,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

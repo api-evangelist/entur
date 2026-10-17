@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Skoleskyss API
+  title: Skoleskyss API
+  description: API for å opprette og slette skyssrettigheter for elever i Skoleskyss, Enturs løsning for skoleskyss for fylkeskommuner.
   version: 2026.10.0
-  description: 'Operations tagged Skoleskyss across 2 of this provider''s published API definitions: entur-skoleskyss-openapi.json, entur-skoleskyss-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io
   description: Production
@@ -154,94 +154,8 @@ paths:
       x-entur-permissions:
         value: skoleskyss.full-access:endre
         description: Gir full tilgang til å opprette skyssrettigheter og mottakere, samt slette en mottaker via API-et til Skoleskyss for organisasjonen definert i responsibilityType.
-    servers:
-    - url: https://api.entur.io
-      description: Production
-    - url: https://api.staging.entur.io
-      description: Staging
 components:
   schemas:
-    DeleteSkoleskyssResponse:
-      type: object
-      additionalProperties: false
-      example:
-        customerAccountId: CAI:CustomerAccount:1234567
-        fareContractIds:
-        - FCI:FareContract:1234567
-        fareContractId: FCI:FareContract:1234567
-      properties:
-        customerAccountId:
-          type: string
-        fareContractIds:
-          type: array
-          deprecated: true
-          description: Bruk fareContractId i stedet. Beholdes for bakoverkompatibilitet; inneholder 0 eller 1 element.
-          items:
-            type: string
-        fareContractId:
-          type: string
-      required:
-      - customerAccountId
-      - fareContractIds
-    PostSkoleskyssRequest:
-      type: object
-      example:
-        studentId: '12312311'
-        applicationId: '6783'
-        organisationId: 39
-        name: Skolekort 2025 - 2026
-        validity:
-          startDate: '2025-08-16'
-          endDate: '2026-08-31'
-          calendar:
-            id: INN:FareDayType:SchoolDayDefaultSchool20252026
-          tripDurationMinutes: 180
-          maxTripsPerDay: 2
-          travelWindow:
-            fromHour: 6
-            toHour: 9
-          zones:
-          - groupOfTariffZoneId: INN:GroupOfTariffZones:1
-        studentDetails:
-          firstName: Kent
-          surname: Andersen
-          school:
-            id: '123'
-            name: Gausdal Videregående
-          class:
-            id: '456'
-            name: 1MK
-          phone:
-            number: '97722052'
-            countryCode: '+47'
-      properties:
-        organisationId:
-          type: number
-        studentId:
-          $ref: '#/components/schemas/NumberOrString'
-        applicationId:
-          $ref: '#/components/schemas/NumberOrString'
-        name:
-          type: string
-          description: Navnet på skyssretten. For eksempel 'Skoleskort 2025-2026'.
-        schoolName:
-          type: string
-          description: Navnet på skolen
-        validity:
-          $ref: '#/components/schemas/ValidityRequest'
-        studentDetails:
-          $ref: '#/components/schemas/StudentDetailsRequest'
-      required:
-      - applicationId
-      - studentId
-      - validity
-    TravelRightOutcome:
-      type: string
-      description: '"created" = ny skyssrett. "replaced" = eksisterende skyssrett ble erstattet fordi noe var endret. "unchanged" = skyssretten var allerede lik forespørselen og ble beholdt; kun mottakeropplysninger ble oppdatert.'
-      enum:
-      - created
-      - replaced
-      - unchanged
     Zone:
       anyOf:
       - $ref: '#/components/schemas/PrivateCodeZone'
@@ -255,66 +169,6 @@ components:
           pattern: ^[A-Z]{3}:GroupOfTariffZones:\d+$
       required:
       - groupOfTariffZoneId
-    StudentDetailsRequest:
-      type: object
-      properties:
-        firstName:
-          type: string
-        surname:
-          type: string
-        school:
-          $ref: '#/components/schemas/IdAndName'
-        class:
-          $ref: '#/components/schemas/IdAndName'
-        email:
-          type: string
-          format: email
-          pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
-        phone:
-          type: object
-          description: Ved landskode +47 må number starte med 4 eller 9 og bestå av 8 siffer.
-          properties:
-            number:
-              type: string
-              pattern: \d+
-            countryCode:
-              type: string
-              default: '+47'
-              pattern: ^\+?\d{1,3}$
-          required:
-          - number
-    InvalidRequestError:
-      type: object
-      additionalProperties: false
-      description: Kastes ved ugyldig kalender (InvalidCalendarError) eller ukjent sone (PrivateCodeNotFoundZoneError).
-      properties:
-        error:
-          type: string
-        message:
-          type: string
-      required:
-      - error
-      - message
-    TransferDetails:
-      type: object
-      additionalProperties: false
-      properties:
-        pickupCode:
-          type: string
-        expiresAt:
-          type: string
-      required:
-      - pickupCode
-    IdAndName:
-      type: object
-      properties:
-        id:
-          $ref: '#/components/schemas/NumberOrString'
-        name:
-          type: string
-      required:
-      - id
-      - name
     ValidityRequest:
       type: object
       description: endDate må være samme dag som eller etter startDate, og kan ikke ha passert.
@@ -393,11 +247,106 @@ components:
       - endDate
       - startDate
       - zones
-    NumberOrString:
-      anyOf:
-      - type: string
-        minLength: 1
-      - type: number
+    TransferDetails:
+      type: object
+      additionalProperties: false
+      properties:
+        pickupCode:
+          type: string
+        expiresAt:
+          type: string
+      required:
+      - pickupCode
+    InternalError:
+      type: object
+      additionalProperties: false
+      example:
+        error: Internal
+      properties:
+        error:
+          type: string
+          const: Internal
+      required:
+      - error
+    IdAndName:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/NumberOrString'
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PrivateCodeZone:
+      type: object
+      properties:
+        fromPrivateCode:
+          $ref: '#/components/schemas/NumberOrString'
+        toPrivateCode:
+          $ref: '#/components/schemas/NumberOrString'
+      required:
+      - fromPrivateCode
+      - toPrivateCode
+    StudentDetailsRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        surname:
+          type: string
+        school:
+          $ref: '#/components/schemas/IdAndName'
+        class:
+          $ref: '#/components/schemas/IdAndName'
+        email:
+          type: string
+          format: email
+          pattern: ^(?:[A-Za-z0-9_'+\-]+\.)*[A-Za-z0-9_'+\-]*[A-Za-z0-9_+-]@(?:[A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$
+        phone:
+          type: object
+          description: Ved landskode +47 må number starte med 4 eller 9 og bestå av 8 siffer.
+          properties:
+            number:
+              type: string
+              pattern: \d+
+            countryCode:
+              type: string
+              default: '+47'
+              pattern: ^\+?\d{1,3}$
+          required:
+          - number
+    InvalidRequestError:
+      type: object
+      additionalProperties: false
+      description: Kastes ved ugyldig kalender (InvalidCalendarError) eller ukjent sone (PrivateCodeNotFoundZoneError).
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+      - error
+      - message
+    TravelRightOutcome:
+      type: string
+      description: '"created" = ny skyssrett. "replaced" = eksisterende skyssrett ble erstattet fordi noe var endret. "unchanged" = skyssretten var allerede lik forespørselen og ble beholdt; kun mottakeropplysninger ble oppdatert.'
+      enum:
+      - created
+      - replaced
+      - unchanged
+    FareZoneIds:
+      type: object
+      properties:
+        fromZoneId:
+          type: string
+          pattern: ^[A-Z]{3}:FareZone:\d+$
+        toZoneId:
+          type: string
+          pattern: ^[A-Z]{3}:FareZone:\d+$
+      required:
+      - fromZoneId
+      - toZoneId
     ValidationIssue:
       type: object
       additionalProperties: false
@@ -416,39 +365,49 @@ components:
       - code
       - message
       - path
-    InternalError:
+    DeleteSkoleskyssRequest:
+      type: object
+      example:
+        studentId: '12312312'
+        applicationId: '6784'
+        organisationId: 39
+      properties:
+        organisationId:
+          type: number
+        studentId:
+          $ref: '#/components/schemas/NumberOrString'
+        applicationId:
+          $ref: '#/components/schemas/NumberOrString'
+      required:
+      - applicationId
+      - studentId
+    DeleteSkoleskyssResponse:
       type: object
       additionalProperties: false
       example:
-        error: Internal
+        customerAccountId: CAI:CustomerAccount:1234567
+        fareContractIds:
+        - FCI:FareContract:1234567
+        fareContractId: FCI:FareContract:1234567
       properties:
-        error:
+        customerAccountId:
           type: string
-          const: Internal
-      required:
-      - error
-    PrivateCodeZone:
-      type: object
-      properties:
-        fromPrivateCode:
-          $ref: '#/components/schemas/NumberOrString'
-        toPrivateCode:
-          $ref: '#/components/schemas/NumberOrString'
-      required:
-      - fromPrivateCode
-      - toPrivateCode
-    FareZoneIds:
-      type: object
-      properties:
-        fromZoneId:
+        fareContractIds:
+          type: array
+          deprecated: true
+          description: Bruk fareContractId i stedet. Beholdes for bakoverkompatibilitet; inneholder 0 eller 1 element.
+          items:
+            type: string
+        fareContractId:
           type: string
-          pattern: ^[A-Z]{3}:FareZone:\d+$
-        toZoneId:
-          type: string
-          pattern: ^[A-Z]{3}:FareZone:\d+$
       required:
-      - fromZoneId
-      - toZoneId
+      - customerAccountId
+      - fareContractIds
+    NumberOrString:
+      anyOf:
+      - type: string
+        minLength: 1
+      - type: number
     PostSkoleskyssResponse:
       type: object
       additionalProperties: false
@@ -494,12 +453,37 @@ components:
       required:
       - fareContract
       - recipient
-    DeleteSkoleskyssRequest:
+    PostSkoleskyssRequest:
       type: object
       example:
-        studentId: '12312312'
-        applicationId: '6784'
+        studentId: '12312311'
+        applicationId: '6783'
         organisationId: 39
+        name: Skolekort 2025 - 2026
+        validity:
+          startDate: '2025-08-16'
+          endDate: '2026-08-31'
+          calendar:
+            id: INN:FareDayType:SchoolDayDefaultSchool20252026
+          tripDurationMinutes: 180
+          maxTripsPerDay: 2
+          travelWindow:
+            fromHour: 6
+            toHour: 9
+          zones:
+          - groupOfTariffZoneId: INN:GroupOfTariffZones:1
+        studentDetails:
+          firstName: Kent
+          surname: Andersen
+          school:
+            id: '123'
+            name: Gausdal Videregående
+          class:
+            id: '456'
+            name: 1MK
+          phone:
+            number: '97722052'
+            countryCode: '+47'
       properties:
         organisationId:
           type: number
@@ -507,19 +491,21 @@ components:
           $ref: '#/components/schemas/NumberOrString'
         applicationId:
           $ref: '#/components/schemas/NumberOrString'
+        name:
+          type: string
+          description: Navnet på skyssretten. For eksempel 'Skoleskort 2025-2026'.
+        schoolName:
+          type: string
+          description: Navnet på skolen
+        validity:
+          $ref: '#/components/schemas/ValidityRequest'
+        studentDetails:
+          $ref: '#/components/schemas/StudentDetailsRequest'
       required:
       - applicationId
       - studentId
+      - validity
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -535,11 +521,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-skoleskyss-openapi.json
-- entur-skoleskyss-openapi.yml

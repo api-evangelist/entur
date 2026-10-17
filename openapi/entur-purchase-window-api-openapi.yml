@@ -466,296 +466,68 @@ paths:
       x-entur-permissions:
         value: product-api-access:endre
 components:
-  examples:
-    advance-2:
-      summary: Purchase up to 90 days before, at least 1 hour before departure
-      value:
-        id: ENT:PurchaseWindow:90days
-        versionId: ENT:Version:8f1b2c3d
-        versionNumber: 1
-        ownerOrganisationId: 1
-        names:
-        - lang: nb-NO
-          value: Inntil 90 dager før avgang
-        startDate: '2026-08-01'
-        status: VERSIONED
-        purchaseWhen: ADVANCE_AND_DAY_OF_TRAVEL
-        minimumPeriodBeforeDeparture: PT1H
-        maximumPeriodBeforeDeparture: P90D
-        purchaseMoments: []
-    withDeprecated:
-      summary: List with includeDeprecated=true
-      value:
-        purchaseWindows:
-        - id: ENT:PurchaseWindow:48H
-          ownerOrganisationId: 1
-          versions:
-          - versionId: ENT:Version:PW-48H-3
-            names:
-            - lang: nb-NO
-              value: Kjøpsvindu 48 timer
-            startDate: '2023-01-01'
-            status: DRAFT
-          - versionId: ENT:Version:PW-48H-2
-            versionNumber: 2
-            names:
-            - lang: nb-NO
-              value: Kjøpsvindu 48 timer
-            startDate: '2024-04-05'
-            status: VERSIONED
-          - versionId: ENT:Version:PW-48H-1
-            versionNumber: 1
-            names:
-            - lang: nb-NO
-              value: Kjøpsvindu 48 timer
-            startDate: '2019-04-01'
-            endDate: '2024-03-14'
-            status: DEPRECATED
-        - id: ENT:PurchaseWindow:c5d7e80d
-          ownerOrganisationId: 1
-          versions:
-          - versionId: ENT:Version:c5d7e80d-1
-            versionNumber: 1
-            names:
-            - lang: nb-NO
-              value: 120 dager
-            startDate: '2024-09-25'
-            status: VERSIONED
-        - id: MAL:PurchaseWindow:80d9a2c3
-          ownerOrganisationId: 2
-          versions:
-          - versionId: MAL:Version:80d9a2c3-1
-            versionNumber: 1
-            names:
-            - lang: nb-NO
-              value: 90 dager før avgang
-            startDate: '2022-01-10'
-            endDate: '2022-02-06'
-            status: DEPRECATED
-        totalCount: 3
-        page: 0
-        size: 100
-    advance:
-      summary: Purchase up to 90 days before, at least 1 hour before departure
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: nb-NO
-          value: Inntil 90 dager før avgang
-        startDate: '2026-08-01'
-        status: DRAFT
-        purchaseWhen: ADVANCE_AND_DAY_OF_TRAVEL
-        minimumPeriodBeforeDeparture: PT1H
-        maximumPeriodBeforeDeparture: P90D
-    versionHistory:
-      summary: Example version history
-      value:
-      - id: EXA:Version:853a7d14-794e-4af5-b569-301711a26e26
-        status: VERSIONED
-        startDate: '2025-01-01'
-        endDate: '2025-12-31'
-        created: '2024-12-01T10:00:00Z'
-        changed: '2024-12-01T10:00:00Z'
-        published: '2024-12-30T10:00:00Z'
-        number: 1
-      - id: EXA:Version:e7104d26-16a5-4db5-aa42-b32ae0a3f684
-        status: VERSIONED
-        startDate: '2026-01-01'
-        created: '2025-12-01T10:00:00Z'
-        changed: '2025-12-01T10:00:00Z'
-        published: '2025-12-01T13:00:00Z'
-        number: 2
-      - id: EXA:Version:6be856a5-dd98-496b-b3f2-ad9939270ec3
-        status: PROPOSED
-        startDate: '2026-07-01'
-        created: '2026-06-01T10:00:00Z'
-        changed: '2026-06-01T10:00:00Z'
-    untilPreviousDay:
-      summary: Purchase until the day before travel
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: nb-NO
-          value: Opp til en dag før reisen
-        startDate: '2026-08-01'
-        status: DRAFT
-        purchaseWhen: UNTIL_PREVIOUS_DAY
-        latestTime: '23:59:59'
-  parameters:
-    version:
-      name: version
-      in: path
-      description: The netex ID or sequence number of the version to retrieve
-      required: true
-      style: simple
-      explode: false
-      schema:
-        pattern: ^(([A-Z]{3}):Version:([0-9A-Za-z_\-]*)|[1-9][0-9]*)$
-        type: string
-      examples:
-        default:
-          value: ENT:Version:001
-    page:
-      name: page
-      in: query
-      description: Zero-based page number. Defaults to 0.
-      required: false
-      style: form
-      explode: true
-      schema:
-        minimum: 0
-        type: integer
-        default: 0
-      examples:
-        default:
-          value: 0
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    validOnDate:
-      name: validOnDate
-      in: query
-      description: 'The date that the element should be valid for, e.g. the travel date.
-
-        Defaults to the current date.
-
-        '
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: string
-        format: date
-      examples:
-        default:
-          value: '2026-12-01'
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    size:
-      name: size
-      in: query
-      description: Number of instances per page. Defaults to 100.
-      required: false
-      style: form
-      explode: true
-      schema:
-        maximum: 1000
-        minimum: 1
-        type: integer
-        default: 100
-      examples:
-        default:
-          value: 100
-    id:
-      name: id
-      in: path
-      description: The netex ID of the element to retrieve
-      required: true
-      style: simple
-      explode: false
-      schema:
-        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-        type: string
-      examples:
-        default:
-          value: ENT:PreassignedFareProduct:001
-  responses:
-    BadRequestError:
-      description: Bad request - Invalid data or schema violation
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            schemaViolation:
-              summary: Request does not match schema
-              value:
-                type: https://developer.entur.org/errors/bad-request
-                title: Bad Request
-                status: 400
-                detail: Field 'name' is required.
-            purchaseWindowNotFound:
-              summary: Referenced purchase window not found
-              value:
-                type: https://developer.entur.org/errors/bad-request
-                title: Bad Request
-                status: 400
-                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
-    ForbiddenError:
-      description: Forbidden - Insufficient permissions
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            forbidden:
-              summary: Access forbidden
-              value:
-                type: https://example.com/probs/forbidden
-                title: Forbidden
-                status: 403
-                detail: You do not have permission to access this resource.
-    UnauthorizedError:
-      description: Unauthorized - Authentication required
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            unauthorized:
-              summary: Authentication required
-              value:
-                type: https://example.com/probs/unauthorized
-                title: Unauthorized
-                status: 401
-                detail: Authentication credentials were missing or invalid.
   schemas:
-    PurchaseWhen:
+    VersionResponse:
+      required:
+      - changed
+      - created
+      - id
+      - startDate
+      - status
+      type: object
+      properties:
+        id:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+          examples:
+          - EXA:Version:001
+        number:
+          type: integer
+          description: Version number of the version. Only present when versionStatus is VERSIONED. Starts at 1 for a new product and is incremented by 1 for each new version.
+          format: int64
+          examples:
+          - 1
+        status:
+          $ref: '#/components/schemas/VersionStatus'
+        startDate:
+          type: string
+          description: The start date of the version.
+          format: date
+        endDate:
+          type: string
+          description: The end date of the version.
+          format: date
+        published:
+          type: string
+          description: Timestamp for when the version was published (set to status VERSIONED).
+          format: date-time
+        created:
+          type: string
+          description: Created datetime
+          format: date-time
+        changed:
+          type: string
+          description: Changed datetime
+          format: date-time
+    PurchaseMoment:
       type: string
-      description: 'When a purchase can be made relative to the time of travel.
-
-
-        - **ADVANCE_ONLY** - Only in advance of the day of travel.
-
-        - **UNTIL_PREVIOUS_DAY** - Until the end of the day before travel.
-
-        - **DAY_OF_TRAVEL_ONLY** - Only on the day of travel.
-
-        - **ADVANCE_AND_DAY_OF_TRAVEL** - In advance or on the day of travel.
-
-        - **TIME_OF_TRAVEL_ONLY** - Only at the time of travel.
-
-        - **SUBSCRIPTION_CHARGE_MOMENT** - At the charge moment of a subscription.
-
-        - **OTHER** - Other rule.
+      description: 'A moment at which a purchase can be made.
 
         '
       enum:
-      - ADVANCE_ONLY
-      - UNTIL_PREVIOUS_DAY
-      - DAY_OF_TRAVEL_ONLY
-      - ADVANCE_AND_DAY_OF_TRAVEL
-      - TIME_OF_TRAVEL_ONLY
-      - SUBSCRIPTION_CHARGE_MOMENT
+      - ON_RESERVATION
+      - IN_ADVANCE
+      - IN_ADVANCE_ONLY
+      - BEFORE_BOARDING
+      - BEFORE_BOARDING_ONLY
+      - ON_BOARDING
+      - ON_BOARDING_ONLY
+      - AFTER_BOARDING
+      - ON_CHECK_IN
+      - ON_CHECK_OUT
+      - SUBSCRIPTION_ONLY
+      - NO_TICKET_REQUIRED
       - OTHER
     ProblemDetails:
       required:
@@ -794,61 +566,6 @@ components:
           examples:
           - https://api.example.com/requests/12345
       description: RFC 9457 Problem Details
-    LocalizedString:
-      type: array
-      items:
-        required:
-        - lang
-        - value
-        type: object
-        properties:
-          lang:
-            pattern: ^[a-z]{2}-[A-Z]{2}$
-            type: string
-            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
-            examples:
-            - nb-NO
-          value:
-            type: string
-            description: The localized string value for the specified lang.
-    VersionedElementSummary:
-      required:
-      - id
-      - ownerOrganisationId
-      - versions
-      type: object
-      properties:
-        id:
-          pattern: ^([A-Z]{3}):([A-Za-z]+):([0-9A-Za-z_\-]*)$
-          type: string
-          description: NeTEx id of the element.
-          examples:
-          - ENT:PurchaseWindow:90days
-        ownerOrganisationId:
-          type: integer
-          description: Internal organisation id owning the element.
-          format: int64
-          examples:
-          - 1
-        versions:
-          type: array
-          items:
-            $ref: '#/components/schemas/VersionSummary'
-      description: 'A versioned element with the versions relevant today, as shown in lists. Shared by the list
-
-        endpoints of all element types. The versions are:
-
-
-        - VERSIONED versions valid today or in the future (no end date, or an end date after today)
-
-        - DRAFT and PROPOSED versions, regardless of date
-
-        - when deprecated versions are requested, the most recent DEPRECATED version (latest start date)
-
-
-        ordered by status (DRAFT, PROPOSED, VERSIONED, DEPRECATED) and then by start date, newest first.
-
-        '
     VersionSummary:
       required:
       - names
@@ -890,6 +607,151 @@ components:
         endpoints of all element types.
 
         '
+    PurchaseWindowRequest:
+      required:
+      - names
+      - startDate
+      - status
+      type: object
+      properties:
+        ownerOrganisationId:
+          minimum: 1
+          type: integer
+          description: Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.
+          format: int64
+          examples:
+          - 1
+        names:
+          $ref: '#/components/schemas/LocalizedString'
+        descriptions:
+          $ref: '#/components/schemas/LocalizedString'
+        startDate:
+          type: string
+          description: First day this purchase window version is valid.
+          format: date
+          examples:
+          - '2026-08-01'
+        endDate:
+          type: string
+          description: Last day this purchase window version is valid (optional). Omit for an open-ended version.
+          format: date
+          examples:
+          - '2026-12-31'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Status of the purchase window version. Required; on create only DRAFT or
+
+              PROPOSED is accepted — a new version cannot be published directly.
+
+              '
+            examples:
+            - DRAFT
+        purchaseWhen:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseWhen'
+          - description: 'When a purchase can be made relative to the time of travel. Optional: when omitted, the
+
+              purchase window sets no restriction on when the purchase can be made, only the periods
+
+              before departure (if set) apply.
+
+              '
+        latestTime:
+          pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$
+          type: string
+          description: Latest time of day a purchase can be made (NeTEx `LatestTime`), formatted `HH:mm:ss`.
+          examples:
+          - '23:59:59'
+        minimumPeriodBeforeDeparture:
+          type: string
+          description: 'Minimum period before departure that a purchase must be made (NeTEx
+
+            `MinimumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.
+
+            '
+          examples:
+          - PT1H
+        maximumPeriodBeforeDeparture:
+          type: string
+          description: 'Maximum period before departure that a purchase can be made (NeTEx
+
+            `MaximumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.
+
+            Must not be shorter than `minimumPeriodBeforeDeparture`.
+
+            '
+          examples:
+          - P90D
+        purchaseAction:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseAction'
+          - description: 'The purchase action this window applies to (NeTEx `PurchaseAction`).
+
+              '
+        purchaseMoments:
+          uniqueItems: true
+          type: array
+          description: 'The moments at which a purchase can be made (NeTEx `PurchaseMoment`, a list).
+
+            '
+          items:
+            $ref: '#/components/schemas/PurchaseMoment'
+      description: 'A purchase window (NeTEx `PurchaseWindow`, a `UsageParameter`) defines when a product can be
+
+        purchased relative to the time of travel. Products reference it through `purchaseWindowRef`;
+
+        the underlying NeTEx `GenericParameterAssignment` is managed by the backend.
+
+        '
+    PurchaseAction:
+      type: string
+      description: 'The type of purchase action the window applies to.
+
+        '
+      enum:
+      - PURCHASE
+      - ORDER_WITHOUT_PAYMENT
+      - RESERVE
+      - PAY_FOR_PREVIOUS_ORDER
+      - SUBSCRIBE
+      - PAY_INSTALLMENT
+      - OTHER
+    PurchaseWhen:
+      type: string
+      description: 'When a purchase can be made relative to the time of travel.
+
+
+        - **ADVANCE_ONLY** - Only in advance of the day of travel.
+
+        - **UNTIL_PREVIOUS_DAY** - Until the end of the day before travel.
+
+        - **DAY_OF_TRAVEL_ONLY** - Only on the day of travel.
+
+        - **ADVANCE_AND_DAY_OF_TRAVEL** - In advance or on the day of travel.
+
+        - **TIME_OF_TRAVEL_ONLY** - Only at the time of travel.
+
+        - **SUBSCRIPTION_CHARGE_MOMENT** - At the charge moment of a subscription.
+
+        - **OTHER** - Other rule.
+
+        '
+      enum:
+      - ADVANCE_ONLY
+      - UNTIL_PREVIOUS_DAY
+      - DAY_OF_TRAVEL_ONLY
+      - ADVANCE_AND_DAY_OF_TRAVEL
+      - TIME_OF_TRAVEL_ONLY
+      - SUBSCRIPTION_CHARGE_MOMENT
+      - OTHER
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
     PurchaseWindowResponse:
       required:
       - id
@@ -1002,68 +864,6 @@ components:
           examples:
           - 100
       description: Paging information shared by all paginated list responses.
-    PurchaseMoment:
-      type: string
-      description: 'A moment at which a purchase can be made.
-
-        '
-      enum:
-      - ON_RESERVATION
-      - IN_ADVANCE
-      - IN_ADVANCE_ONLY
-      - BEFORE_BOARDING
-      - BEFORE_BOARDING_ONLY
-      - ON_BOARDING
-      - ON_BOARDING_ONLY
-      - AFTER_BOARDING
-      - ON_CHECK_IN
-      - ON_CHECK_OUT
-      - SUBSCRIPTION_ONLY
-      - NO_TICKET_REQUIRED
-      - OTHER
-    VersionResponse:
-      required:
-      - changed
-      - created
-      - id
-      - startDate
-      - status
-      type: object
-      properties:
-        id:
-          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
-          type: string
-          description: The netex id reference to the object.
-          examples:
-          - EXA:Version:001
-        number:
-          type: integer
-          description: Version number of the version. Only present when versionStatus is VERSIONED. Starts at 1 for a new product and is incremented by 1 for each new version.
-          format: int64
-          examples:
-          - 1
-        status:
-          $ref: '#/components/schemas/VersionStatus'
-        startDate:
-          type: string
-          description: The start date of the version.
-          format: date
-        endDate:
-          type: string
-          description: The end date of the version.
-          format: date
-        published:
-          type: string
-          description: Timestamp for when the version was published (set to status VERSIONED).
-          format: date-time
-        created:
-          type: string
-          description: Created datetime
-          format: date-time
-        changed:
-          type: string
-          description: Changed datetime
-          format: date-time
     PurchaseWindowListResponse:
       description: A page of purchase windows, each with the versions relevant today.
       allOf:
@@ -1077,123 +877,323 @@ components:
             description: The purchase windows on this page, ordered by id.
             items:
               $ref: '#/components/schemas/VersionedElementSummary'
-    PurchaseWindowRequest:
+    VersionedElementSummary:
       required:
-      - names
-      - startDate
-      - status
+      - id
+      - ownerOrganisationId
+      - versions
       type: object
       properties:
+        id:
+          pattern: ^([A-Z]{3}):([A-Za-z]+):([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx id of the element.
+          examples:
+          - ENT:PurchaseWindow:90days
         ownerOrganisationId:
-          minimum: 1
           type: integer
-          description: Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.
+          description: Internal organisation id owning the element.
           format: int64
           examples:
           - 1
-        names:
-          $ref: '#/components/schemas/LocalizedString'
-        descriptions:
-          $ref: '#/components/schemas/LocalizedString'
-        startDate:
-          type: string
-          description: First day this purchase window version is valid.
-          format: date
-          examples:
-          - '2026-08-01'
-        endDate:
-          type: string
-          description: Last day this purchase window version is valid (optional). Omit for an open-ended version.
-          format: date
-          examples:
-          - '2026-12-31'
-        status:
-          allOf:
-          - $ref: '#/components/schemas/VersionStatus'
-          - description: 'Status of the purchase window version. Required; on create only DRAFT or
-
-              PROPOSED is accepted — a new version cannot be published directly.
-
-              '
-            examples:
-            - DRAFT
-        purchaseWhen:
-          allOf:
-          - $ref: '#/components/schemas/PurchaseWhen'
-          - description: 'When a purchase can be made relative to the time of travel. Optional: when omitted, the
-
-              purchase window sets no restriction on when the purchase can be made, only the periods
-
-              before departure (if set) apply.
-
-              '
-        latestTime:
-          pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$
-          type: string
-          description: Latest time of day a purchase can be made (NeTEx `LatestTime`), formatted `HH:mm:ss`.
-          examples:
-          - '23:59:59'
-        minimumPeriodBeforeDeparture:
-          type: string
-          description: 'Minimum period before departure that a purchase must be made (NeTEx
-
-            `MinimumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.
-
-            '
-          examples:
-          - PT1H
-        maximumPeriodBeforeDeparture:
-          type: string
-          description: 'Maximum period before departure that a purchase can be made (NeTEx
-
-            `MaximumPeriodBeforeDeparture`). ISO 8601 duration with days, hours, minutes and/or seconds.
-
-            Must not be shorter than `minimumPeriodBeforeDeparture`.
-
-            '
-          examples:
-          - P90D
-        purchaseAction:
-          allOf:
-          - $ref: '#/components/schemas/PurchaseAction'
-          - description: 'The purchase action this window applies to (NeTEx `PurchaseAction`).
-
-              '
-        purchaseMoments:
-          uniqueItems: true
+        versions:
           type: array
-          description: 'The moments at which a purchase can be made (NeTEx `PurchaseMoment`, a list).
-
-            '
           items:
-            $ref: '#/components/schemas/PurchaseMoment'
-      description: 'A purchase window (NeTEx `PurchaseWindow`, a `UsageParameter`) defines when a product can be
+            $ref: '#/components/schemas/VersionSummary'
+      description: 'A versioned element with the versions relevant today, as shown in lists. Shared by the list
 
-        purchased relative to the time of travel. Products reference it through `purchaseWindowRef`;
+        endpoints of all element types. The versions are:
 
-        the underlying NeTEx `GenericParameterAssignment` is managed by the backend.
 
-        '
-    VersionStatus:
-      type: string
-      enum:
-      - DRAFT
-      - PROPOSED
-      - VERSIONED
-      - DEPRECATED
-    PurchaseAction:
-      type: string
-      description: 'The type of purchase action the window applies to.
+        - VERSIONED versions valid today or in the future (no end date, or an end date after today)
+
+        - DRAFT and PROPOSED versions, regardless of date
+
+        - when deprecated versions are requested, the most recent DEPRECATED version (latest start date)
+
+
+        ordered by status (DRAFT, PROPOSED, VERSIONED, DEPRECATED) and then by start date, newest first.
 
         '
-      enum:
-      - PURCHASE
-      - ORDER_WITHOUT_PAYMENT
-      - RESERVE
-      - PAY_FOR_PREVIOUS_ORDER
-      - SUBSCRIBE
-      - PAY_INSTALLMENT
-      - OTHER
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+  responses:
+    BadRequestError:
+      description: Bad request - Invalid data or schema violation
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            schemaViolation:
+              summary: Request does not match schema
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: Field 'name' is required.
+            purchaseWindowNotFound:
+              summary: Referenced purchase window not found
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+  parameters:
+    version:
+      name: version
+      in: path
+      description: The netex ID or sequence number of the version to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^(([A-Z]{3}):Version:([0-9A-Za-z_\-]*)|[1-9][0-9]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:Version:001
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    size:
+      name: size
+      in: query
+      description: Number of instances per page. Defaults to 100.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 1000
+        minimum: 1
+        type: integer
+        default: 100
+      examples:
+        default:
+          value: 100
+    validOnDate:
+      name: validOnDate
+      in: query
+      description: 'The date that the element should be valid for, e.g. the travel date.
+
+        Defaults to the current date.
+
+        '
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date
+      examples:
+        default:
+          value: '2026-12-01'
+    page:
+      name: page
+      in: query
+      description: Zero-based page number. Defaults to 0.
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        default: 0
+      examples:
+        default:
+          value: 0
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  examples:
+    versionHistory:
+      summary: Example version history
+      value:
+      - id: EXA:Version:853a7d14-794e-4af5-b569-301711a26e26
+        status: VERSIONED
+        startDate: '2025-01-01'
+        endDate: '2025-12-31'
+        created: '2024-12-01T10:00:00Z'
+        changed: '2024-12-01T10:00:00Z'
+        published: '2024-12-30T10:00:00Z'
+        number: 1
+      - id: EXA:Version:e7104d26-16a5-4db5-aa42-b32ae0a3f684
+        status: VERSIONED
+        startDate: '2026-01-01'
+        created: '2025-12-01T10:00:00Z'
+        changed: '2025-12-01T10:00:00Z'
+        published: '2025-12-01T13:00:00Z'
+        number: 2
+      - id: EXA:Version:6be856a5-dd98-496b-b3f2-ad9939270ec3
+        status: PROPOSED
+        startDate: '2026-07-01'
+        created: '2026-06-01T10:00:00Z'
+        changed: '2026-06-01T10:00:00Z'
+    withDeprecated:
+      summary: List with includeDeprecated=true
+      value:
+        purchaseWindows:
+        - id: ENT:PurchaseWindow:48H
+          ownerOrganisationId: 1
+          versions:
+          - versionId: ENT:Version:PW-48H-3
+            names:
+            - lang: nb-NO
+              value: Kjøpsvindu 48 timer
+            startDate: '2023-01-01'
+            status: DRAFT
+          - versionId: ENT:Version:PW-48H-2
+            versionNumber: 2
+            names:
+            - lang: nb-NO
+              value: Kjøpsvindu 48 timer
+            startDate: '2024-04-05'
+            status: VERSIONED
+          - versionId: ENT:Version:PW-48H-1
+            versionNumber: 1
+            names:
+            - lang: nb-NO
+              value: Kjøpsvindu 48 timer
+            startDate: '2019-04-01'
+            endDate: '2024-03-14'
+            status: DEPRECATED
+        - id: ENT:PurchaseWindow:c5d7e80d
+          ownerOrganisationId: 1
+          versions:
+          - versionId: ENT:Version:c5d7e80d-1
+            versionNumber: 1
+            names:
+            - lang: nb-NO
+              value: 120 dager
+            startDate: '2024-09-25'
+            status: VERSIONED
+        - id: MAL:PurchaseWindow:80d9a2c3
+          ownerOrganisationId: 2
+          versions:
+          - versionId: MAL:Version:80d9a2c3-1
+            versionNumber: 1
+            names:
+            - lang: nb-NO
+              value: 90 dager før avgang
+            startDate: '2022-01-10'
+            endDate: '2022-02-06'
+            status: DEPRECATED
+        totalCount: 3
+        page: 0
+        size: 100
+    advance-2:
+      summary: Purchase up to 90 days before, at least 1 hour before departure
+      value:
+        id: ENT:PurchaseWindow:90days
+        versionId: ENT:Version:8f1b2c3d
+        versionNumber: 1
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Inntil 90 dager før avgang
+        startDate: '2026-08-01'
+        status: VERSIONED
+        purchaseWhen: ADVANCE_AND_DAY_OF_TRAVEL
+        minimumPeriodBeforeDeparture: PT1H
+        maximumPeriodBeforeDeparture: P90D
+        purchaseMoments: []
+    untilPreviousDay:
+      summary: Purchase until the day before travel
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Opp til en dag før reisen
+        startDate: '2026-08-01'
+        status: DRAFT
+        purchaseWhen: UNTIL_PREVIOUS_DAY
+        latestTime: '23:59:59'
+    advance:
+      summary: Purchase up to 90 days before, at least 1 hour before departure
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Inntil 90 dager før avgang
+        startDate: '2026-08-01'
+        status: DRAFT
+        purchaseWhen: ADVANCE_AND_DAY_OF_TRAVEL
+        minimumPeriodBeforeDeparture: PT1H
+        maximumPeriodBeforeDeparture: P90D
   securitySchemes:
     jwt:
       type: http

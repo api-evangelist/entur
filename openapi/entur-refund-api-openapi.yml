@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Refund API
+  title: Refunds Refund API
+  description: Check refundable options and perform refunds or compensations on customer orders. This API allows partners to preview refund outcomes, execute refunds, and apply price reductions when compensation is sufficient.
   version: 2026.09.0
-  description: 'Operations tagged Refund across 2 of this provider''s published API definitions: entur-refund-partner-openapi.json, entur-refund-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/sales
   description: production
@@ -71,13 +71,6 @@ paths:
           $ref: '#/components/responses/badRequest'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
   /v1/refunds/{orderId}:
     parameters:
     - $ref: '#/components/parameters/authHeader'
@@ -116,13 +109,6 @@ paths:
         '500':
           $ref: '#/components/responses/internalServerError'
       deprecated: false
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
   /v1/refunds/{orderId}/dry-run:
     parameters:
     - $ref: '#/components/parameters/authHeader'
@@ -161,33 +147,84 @@ paths:
         '500':
           $ref: '#/components/responses/internalServerError'
       deprecated: false
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
 components:
   schemas:
-    DryRunRefundFee:
+    ProductElementIdentifier:
       type: object
+      description: A type for depicting where an element resides in a sales package tree
       properties:
-        feeRef:
-          $ref: '#/components/schemas/ProductsElementWrapper'
-        amount:
-          type: string
-          description: The amount of the fee
-          example: '12.34'
-        type:
-          type: string
-          description: The type of a Fee that will be added. REFUNDING or MANUAL
-          example: REFUNDING
+        fareStructureElementIndex:
+          type: integer
+          format: int32
+          description: The index of the element on the farestructure element level
+          example: 0
+        fareproductIndex:
+          type: integer
+          format: int32
+          description: The index of the element on the fareproduct level
+          example: 1
+        level:
+          $ref: '#/components/schemas/ProductLevel'
+        validableElementIndex:
+          type: integer
+          format: int32
+          description: The index of the element on the validable element level
+          example: 2
       required:
-      - amount
-      - feeRef
-      - type
-      title: DryRunRefundFee
+      - level
+      title: ProductElementIdentifier
+    RefundResponse:
+      type: object
+      description: A summary about a performed refund.
+      properties:
+        orderId:
+          type: string
+          description: ID of the refunded order.
+          example: NTA2JGR7
+        affectedOrderLineIds:
+          type: array
+          default: []
+          description: List containing the IDs of the affected order lines.
+          example:
+          - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+          - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+          items:
+            type: string
+        creditId:
+          type: integer
+          format: int64
+          description: ID of the performed Credit
+          example: 123456
+        affectedPaymentAndPaymentTransactionIds:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: integer
+              format: int64
+          description: Map containing one or more payment ids, mapping to its transaction ids that have been affected by the credit operation
+          example:
+            '286535':
+            - 6784139
+            - 6784140
+          pattern: \\d+
+        disabledTicketIds:
+          type: array
+          default: []
+          description: List containing the IDs of the disabled tickets.
+          example:
+          - 987654321
+          - 123456789
+          items:
+            type: integer
+            format: int64
+      required:
+      - affectedOrderLineIds
+      - affectedPaymentAndPaymentTransactionIds
+      - creditId
+      - disabledTicketIds
+      - orderId
+      title: RefundResponse
     RefundError:
       type: object
       properties:
@@ -258,194 +295,6 @@ components:
       - id
       - version
       title: OrderReference
-    PerformRefundEntry:
-      type: object
-      description: A refund 'operation' that describes which order line, and which elements in that order line product tree that is to be refunded
-      properties:
-        orderLineRef:
-          $ref: '#/components/schemas/OrderReference'
-        refundOperations:
-          type: array
-          description: A list of identifiers for which element(s) in the order lines product tree that is to be refunded
-          items:
-            $ref: '#/components/schemas/ProductElementIdentifier'
-        refundRule:
-          $ref: '#/components/schemas/ProductsElementWrapper'
-          description: The refund rule that is to be used with this entry.
-      required:
-      - orderLineRef
-      - refundOperations
-      title: PerformRefundEntry
-    RefundRequest:
-      type: object
-      description: A request for performing a refund
-      properties:
-        refundOperations:
-          type: array
-          description: A list of refund operations which will specify order line, optionally where in the product tree the change occurs, and how much money should be refunded with this change
-          items:
-            $ref: '#/components/schemas/PerformRefundEntry'
-        additionalTerminalData:
-          $ref: '#/components/schemas/TerminalRefundingData'
-        includesCancelledOrderLines:
-          type: boolean
-          description: Lets refund know that the request will include already cancelled order lines, and to handle them accordingly
-      required:
-      - refundOperations
-      title: RefundRequest
-    RefundResponse:
-      type: object
-      description: A summary about a performed refund.
-      properties:
-        orderId:
-          type: string
-          description: ID of the refunded order.
-          example: NTA2JGR7
-        affectedOrderLineIds:
-          type: array
-          default: []
-          description: List containing the IDs of the affected order lines.
-          example:
-          - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
-          - 26b02145-7dbf-4be9-8600-ff4a570d83d5
-          items:
-            type: string
-        creditId:
-          type: integer
-          format: int64
-          description: ID of the performed Credit
-          example: 123456
-        affectedPaymentAndPaymentTransactionIds:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: integer
-              format: int64
-          description: Map containing one or more payment ids, mapping to its transaction ids that have been affected by the credit operation
-          example:
-            '286535':
-            - 6784139
-            - 6784140
-          pattern: \\d+
-        disabledTicketIds:
-          type: array
-          default: []
-          description: List containing the IDs of the disabled tickets.
-          example:
-          - 987654321
-          - 123456789
-          items:
-            type: integer
-            format: int64
-      required:
-      - affectedOrderLineIds
-      - affectedPaymentAndPaymentTransactionIds
-      - creditId
-      - disabledTicketIds
-      - orderId
-      title: RefundResponse
-    ProductElementIdentifier:
-      type: object
-      description: A type for depicting where an element resides in a sales package tree
-      properties:
-        fareStructureElementIndex:
-          type: integer
-          format: int32
-          description: The index of the element on the farestructure element level
-          example: 0
-        fareproductIndex:
-          type: integer
-          format: int32
-          description: The index of the element on the fareproduct level
-          example: 1
-        level:
-          $ref: '#/components/schemas/ProductLevel'
-        validableElementIndex:
-          type: integer
-          format: int32
-          description: The index of the element on the validable element level
-          example: 2
-      required:
-      - level
-      title: ProductElementIdentifier
-    RefundOptionResponse:
-      type: object
-      description: A response detailing all refundable options for an order
-      properties:
-        optionIdsThatCanBePerformedTogether:
-          type: array
-          description: A set of option ids that are possible to refund together. If only one option is returned, this will be empty. Ids are only valid inside the scope of a RefundOptionResponse
-          items:
-            type: array
-            example:
-            - 26b02145-7dbf-4be9-8600-ff4a570d83d5
-            - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
-            items:
-              type: string
-              format: uuid
-            uniqueItems: true
-          uniqueItems: true
-        options:
-          type: array
-          default: []
-          description: All the refundable options for a given order, or options for requested order lines
-          items:
-            $ref: '#/components/schemas/RefundOption'
-        orderRef:
-          $ref: '#/components/schemas/OrderReference'
-      required:
-      - optionIdsThatCanBePerformedTogether
-      - options
-      - orderRef
-      title: RefundOptionResponse
-    AffectedPaymentTransaction:
-      type: object
-      description: A composition of payment transaction data that is affected, including the amount that will be subtracted if used in a refund
-      properties:
-        amount:
-          type: string
-          description: The amount that will be subtracted from the transaction if used in a refund
-          example: '123.45'
-        generalType:
-          type: string
-          description: The general type of payment
-          example: PAYMENTCARD
-        import:
-          type: boolean
-        paymentId:
-          type: integer
-          format: int64
-          description: The id of a payment
-          example: 286535
-        rrn:
-          type: string
-          description: The Retrieval Reference Number for the affected transaction
-          example: '000000016575'
-        specificType:
-          type: string
-          description: If available, a more specific payment type
-          example: VISA
-        transactionId:
-          type: integer
-          format: int64
-          description: The id of the payment transaction
-          example: 6784139
-      required:
-      - amount
-      - generalType
-      - import
-      - paymentId
-      - transactionId
-      title: AffectedPaymentTransaction
-    ProductLevel:
-      type: string
-      description: The level the element resides
-      enum:
-      - SALE_PACKAGE
-      - FARE_PRODUCT
-      - VALIDABLE_ELEMENT
-      - FARESTRUCTURE_ELEMENT
     DryRunRefundResponse:
       type: object
       description: A representation of a complete refundable option
@@ -474,6 +323,14 @@ components:
       - orderId
       - totalRefundAmount
       title: DryRunRefundResponse
+    ProductLevel:
+      type: string
+      description: The level the element resides
+      enum:
+      - SALE_PACKAGE
+      - FARE_PRODUCT
+      - VALIDABLE_ELEMENT
+      - FARESTRUCTURE_ELEMENT
     TerminalRefundingData:
       type: object
       description: Holder for data that needs to be provided when performing a refund on an external terminal
@@ -516,6 +373,36 @@ components:
       - terminalId
       - transactionConfirmedAt
       title: TerminalRefundingData
+    RefundOptionResponse:
+      type: object
+      description: A response detailing all refundable options for an order
+      properties:
+        optionIdsThatCanBePerformedTogether:
+          type: array
+          description: A set of option ids that are possible to refund together. If only one option is returned, this will be empty. Ids are only valid inside the scope of a RefundOptionResponse
+          items:
+            type: array
+            example:
+            - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+            - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+            items:
+              type: string
+              format: uuid
+            uniqueItems: true
+          uniqueItems: true
+        options:
+          type: array
+          default: []
+          description: All the refundable options for a given order, or options for requested order lines
+          items:
+            $ref: '#/components/schemas/RefundOption'
+        orderRef:
+          $ref: '#/components/schemas/OrderReference'
+      required:
+      - optionIdsThatCanBePerformedTogether
+      - options
+      - orderRef
+      title: RefundOptionResponse
     RefundOption:
       type: object
       description: A representation of a complete refundable option
@@ -568,35 +455,174 @@ components:
       - refundRule
       - transientId
       title: RefundOption
+    DryRunRefundFee:
+      type: object
+      properties:
+        feeRef:
+          $ref: '#/components/schemas/ProductsElementWrapper'
+        amount:
+          type: string
+          description: The amount of the fee
+          example: '12.34'
+        type:
+          type: string
+          description: The type of a Fee that will be added. REFUNDING or MANUAL
+          example: REFUNDING
+      required:
+      - amount
+      - feeRef
+      - type
+      title: DryRunRefundFee
+    AffectedPaymentTransaction:
+      type: object
+      description: A composition of payment transaction data that is affected, including the amount that will be subtracted if used in a refund
+      properties:
+        amount:
+          type: string
+          description: The amount that will be subtracted from the transaction if used in a refund
+          example: '123.45'
+        generalType:
+          type: string
+          description: The general type of payment
+          example: PAYMENTCARD
+        import:
+          type: boolean
+        paymentId:
+          type: integer
+          format: int64
+          description: The id of a payment
+          example: 286535
+        rrn:
+          type: string
+          description: The Retrieval Reference Number for the affected transaction
+          example: '000000016575'
+        specificType:
+          type: string
+          description: If available, a more specific payment type
+          example: VISA
+        transactionId:
+          type: integer
+          format: int64
+          description: The id of the payment transaction
+          example: 6784139
+      required:
+      - amount
+      - generalType
+      - import
+      - paymentId
+      - transactionId
+      title: AffectedPaymentTransaction
+    RefundRequest:
+      type: object
+      description: A request for performing a refund
+      properties:
+        refundOperations:
+          type: array
+          description: A list of refund operations which will specify order line, optionally where in the product tree the change occurs, and how much money should be refunded with this change
+          items:
+            $ref: '#/components/schemas/PerformRefundEntry'
+        additionalTerminalData:
+          $ref: '#/components/schemas/TerminalRefundingData'
+        includesCancelledOrderLines:
+          type: boolean
+          description: Lets refund know that the request will include already cancelled order lines, and to handle them accordingly
+      required:
+      - refundOperations
+      title: RefundRequest
+    PerformRefundEntry:
+      type: object
+      description: A refund 'operation' that describes which order line, and which elements in that order line product tree that is to be refunded
+      properties:
+        orderLineRef:
+          $ref: '#/components/schemas/OrderReference'
+        refundOperations:
+          type: array
+          description: A list of identifiers for which element(s) in the order lines product tree that is to be refunded
+          items:
+            $ref: '#/components/schemas/ProductElementIdentifier'
+        refundRule:
+          $ref: '#/components/schemas/ProductsElementWrapper'
+          description: The refund rule that is to be used with this entry.
+      required:
+      - orderLineRef
+      - refundOperations
+      title: PerformRefundEntry
+  parameters:
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: ENT:DistributionChannel:App
+    authHeader:
+      name: Authorization
+      in: header
+      description: Authorization header
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    settlementHeader:
+      name: Entur-Settlement-Id
+      in: header
+      description: An id for connecting a credit to a settlement
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: '12345'
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 1000600-abc
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    orderIdPathParam:
+      name: orderId
+      in: path
+      description: The id of the order that one would like to get or perform refund operations on
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: NTA2JGR7
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   responses:
-    notFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RefundError'
-          example:
-            timestamp: '2025-11-13T10:15:30+01:00'
-            status: 404
-            title: Not Found
-            error: Not Found
-            exception: NotFoundException
-            message: This orderId does not have any options
-            path: /v1/refunds/options/{orderId}
-    badRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RefundError'
-          example:
-            timestamp: '2025-11-13T10:15:30+01:00'
-            status: 400
-            title: Bad Request
-            error: Bad Request
-            exception: BAD_REQUEST
-            message: Required parameter 'xx' is not present.
-            path: /v1/refunds
     internalServerError:
       description: Internal Server Error
       content:
@@ -625,81 +651,31 @@ components:
             exception: ConflictException
             message: Order with orderId 1 already refunded.
             path: /v1/refunds/admin/{orderId}
-  parameters:
-    settlementHeader:
-      name: Entur-Settlement-Id
-      in: header
-      description: An id for connecting a credit to a settlement
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: '12345'
-    orderIdPathParam:
-      name: orderId
-      in: path
-      description: The id of the order that one would like to get or perform refund operations on
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: NTA2JGR7
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    dciHeader:
-      name: Entur-Distribution-Channel
-      in: header
-      description: Distribution channel identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: ENT:DistributionChannel:App
-    posHeader:
-      name: Entur-Pos
-      in: header
-      description: Point-of-sale identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: 1000600-abc
-    authHeader:
-      name: Authorization
-      in: header
-      description: Authorization header
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-x-refined-from:
-- entur-refund-partner-openapi.json
-- entur-refund-partner-openapi.yml
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 400
+            title: Bad Request
+            error: Bad Request
+            exception: BAD_REQUEST
+            message: Required parameter 'xx' is not present.
+            path: /v1/refunds
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 404
+            title: Not Found
+            error: Not Found
+            exception: NotFoundException
+            message: This orderId does not have any options
+            path: /v1/refunds/options/{orderId}

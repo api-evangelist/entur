@@ -184,16 +184,6 @@ paths:
           description: pid/endpointId not found
 components:
   schemas:
-    endpoint:
-      allOf:
-      - required:
-        - endpointId
-      - properties:
-          endpointId:
-            type: integer
-            format: int64
-            example: 1
-      - $ref: '#/components/schemas/endpointCall'
     endpointCall:
       type: object
       required:
@@ -246,6 +236,16 @@ components:
             data:
               type: string
               pattern: ^(([0-9A-Fa-f]){2})+$
+    endpoint:
+      allOf:
+      - required:
+        - endpointId
+      - properties:
+          endpointId:
+            type: integer
+            format: int64
+            example: 1
+      - $ref: '#/components/schemas/endpointCall'
   securitySchemes:
     Pop:
       description: OAuth 2.0 Proof-of-possession (pop) Token

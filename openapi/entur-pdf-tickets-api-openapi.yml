@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur PDF Tickets API
+  title: Ticket Distributions PDF Tickets API
+  description: Easy way to manage and distribute new tickets to ticketing systems.
   version: 2026.10.0
-  description: 'Operations tagged PDF Tickets across 2 of this provider''s published API definitions: entur-ticket-distribution-partner-openapi.json, entur-ticket-distribution-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.staging.entur.io/sales
   description: Staging test environment
@@ -57,13 +57,6 @@ paths:
           $ref: '#/components/responses/badRequest'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
   /v1/pdf-tickets/{orderId}/createOrGet:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -102,13 +95,6 @@ paths:
         '500':
           $ref: '#/components/responses/internalServerError'
       deprecated: true
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
   /v1/pdf-tickets/{orderId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -146,13 +132,6 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
   /v1/pdf-tickets/{orderId}/send:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -188,15 +167,82 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
 components:
   schemas:
+    EmailAttachment:
+      title: EmailAttachment
+      required:
+      - content
+      - filename
+      - mimeType
+      type: object
+      properties:
+        content:
+          type: string
+        disposition:
+          type: string
+          enum:
+          - ATTACHMENT
+          - INLINE
+        filename:
+          type: string
+        mimeType:
+          type: string
+    TicketPdfSendRequest:
+      title: TicketPdfSendRequest
+      description: Request for generating and sending pdf-ticket by email
+      allOf:
+      - $ref: '#/components/schemas/TicketPdfCreateRequest'
+      - required:
+        - email
+        type: object
+        properties:
+          email:
+            type: string
+            description: Email-address for the receiver of pdf-ticket
+      examples:
+      - email: test@mail.com
+        orderVersion: 2
+        pdfLanguage: nob
+        travellers:
+        - ticketDistributionId: 123456789
+          name: John Doe
+        - ticketDistributionId: 123456790
+          name: Karen Smith
+        shouldGroupTravellers: true
+    TicketPdfTraveller:
+      title: TicketPdfTraveller
+      required:
+      - name
+      - ticketDistributionId
+      type: object
+      properties:
+        ticketDistributionId:
+          type: integer
+          description: TicketDistributionIds for this traveller
+          format: int64
+        name:
+          type: string
+          description: Full names of the traveller
+      description: Travellers who will be written on the pdf-ticket
+    LanguageCode:
+      type: string
+      description: 'Desired language. Makes display text appear in defined language - if available. Default: nob'
+      default: nob
+      enum:
+      - nob
+      - nno
+      - eng
+    EmailAddress:
+      title: EmailAddress
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
     PdfTicket:
       title: PdfTicket
       required:
@@ -249,57 +295,6 @@ components:
         organisationId: 1234
         pdf: JVBERi0xLjQKJcfsj6IKNSAwIG9iago8PC9UeXBlIC9QYWdlL1BhcmVudCA0IDAgUi9SZXNvdXJjZXMgNiAwIFIvTWVkaWFCb3ggWzAgMCA2MTIgNzkyXT4+CmVuZG9iago2IDAgb2JqCjw8L0ZvbnQgNyAwIFIvUHJvY1NldCBbL1BERiAvVGV4dF0+PgplbmRvYmoK
         ticketDistributionId: 67890
-    PageOfPdfTicket:
-      title: PageOfPdfTicket
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: Items on a specific page
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/PdfTicket'
-        totalItems:
-          type: integer
-          description: Total number of items
-          format: int64
-          readOnly: true
-          examples:
-          - 72
-        totalPages:
-          type: integer
-          description: Total number of pages available to browse
-          format: int64
-          readOnly: true
-          examples:
-          - 9
-      description: Page displays a subset of a list of entities
-    TicketPdfSendRequest:
-      title: TicketPdfSendRequest
-      description: Request for generating and sending pdf-ticket by email
-      allOf:
-      - $ref: '#/components/schemas/TicketPdfCreateRequest'
-      - required:
-        - email
-        type: object
-        properties:
-          email:
-            type: string
-            description: Email-address for the receiver of pdf-ticket
-      examples:
-      - email: test@mail.com
-        orderVersion: 2
-        pdfLanguage: nob
-        travellers:
-        - ticketDistributionId: 123456789
-          name: John Doe
-        - ticketDistributionId: 123456790
-          name: Karen Smith
-        shouldGroupTravellers: true
     ApiError:
       title: ApiError
       required:
@@ -345,76 +340,6 @@ components:
         exception: ValidationException
         message: Validation failed
         path: /v1/ticket-distributions/XYZ123
-    Email:
-      title: Email
-      required:
-      - body
-      - from
-      - subject
-      - to
-      type: object
-      properties:
-        attachments:
-          type: array
-          items:
-            $ref: '#/components/schemas/EmailAttachment'
-        bcc:
-          type: array
-          items:
-            $ref: '#/components/schemas/EmailAddress'
-        body:
-          type: string
-        cc:
-          type: array
-          items:
-            $ref: '#/components/schemas/EmailAddress'
-        from:
-          $ref: '#/components/schemas/EmailAddress'
-        replyTo:
-          $ref: '#/components/schemas/EmailAddress'
-        subject:
-          type: string
-        to:
-          type: array
-          items:
-            $ref: '#/components/schemas/EmailAddress'
-    EmailAttachment:
-      title: EmailAttachment
-      required:
-      - content
-      - filename
-      - mimeType
-      type: object
-      properties:
-        content:
-          type: string
-        disposition:
-          type: string
-          enum:
-          - ATTACHMENT
-          - INLINE
-        filename:
-          type: string
-        mimeType:
-          type: string
-    LanguageCode:
-      type: string
-      description: 'Desired language. Makes display text appear in defined language - if available. Default: nob'
-      default: nob
-      enum:
-      - nob
-      - nno
-      - eng
-    EmailAddress:
-      title: EmailAddress
-      required:
-      - email
-      type: object
-      properties:
-        email:
-          type: string
-        name:
-          type: string
     TicketPdfCreateRequest:
       title: TicketPdfCreateRequest
       required:
@@ -454,22 +379,83 @@ components:
         - ticketDistributionId: 123456790
           name: Karen Smith
         shouldGroupTravellers: true
-    TicketPdfTraveller:
-      title: TicketPdfTraveller
+    PageOfPdfTicket:
+      title: PageOfPdfTicket
       required:
-      - name
-      - ticketDistributionId
+      - items
+      - totalItems
+      - totalPages
       type: object
       properties:
-        ticketDistributionId:
+        items:
+          type: array
+          description: Items on a specific page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/PdfTicket'
+        totalItems:
           type: integer
-          description: TicketDistributionIds for this traveller
+          description: Total number of items
           format: int64
-        name:
+          readOnly: true
+          examples:
+          - 72
+        totalPages:
+          type: integer
+          description: Total number of pages available to browse
+          format: int64
+          readOnly: true
+          examples:
+          - 9
+      description: Page displays a subset of a list of entities
+    Email:
+      title: Email
+      required:
+      - body
+      - from
+      - subject
+      - to
+      type: object
+      properties:
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAttachment'
+        bcc:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAddress'
+        body:
           type: string
-          description: Full names of the traveller
-      description: Travellers who will be written on the pdf-ticket
+        cc:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAddress'
+        from:
+          $ref: '#/components/schemas/EmailAddress'
+        replyTo:
+          $ref: '#/components/schemas/EmailAddress'
+        subject:
+          type: string
+        to:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAddress'
   parameters:
+    paginationPerPageParam:
+      name: perPage
+      in: query
+      description: Specifies the number of entries returned in a page. Maximum allowed value is 100.
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 100
+        type: integer
+        format: int32
+        default: 30
+        examples:
+        - 20
     orderIdQueryParam:
       name: orderId
       in: query
@@ -484,54 +470,17 @@ components:
         default: []
         examples:
         - - NTA2JGR7
-    orderIdPathParam:
-      name: orderId
-      in: path
-      description: orderId
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: A header containing a point-of-sale reference
       required: true
       style: simple
       explode: false
       schema:
         type: string
         examples:
-        - NTA2JGR7
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ticketDistributionIdQueryParam:
-      name: ticketDistributionId
-      in: query
-      description: Filters by ticket distribution id
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: array
-        items:
-          type: string
-        default: []
-        examples:
-        - - '1234'
-    organisationIdQueryParam:
-      name: organisationId
-      in: query
-      description: Filters by organisation if the user has correct privileges
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: array
-        items:
-          type: string
-        default: []
-        examples:
-        - - '1'
+        - MyApplication
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -560,20 +509,17 @@ components:
         default: 1
         examples:
         - 2
-    paginationPerPageParam:
-      name: perPage
-      in: query
-      description: Specifies the number of entries returned in a page. Maximum allowed value is 100.
-      required: false
-      style: form
-      explode: true
+    orderIdPathParam:
+      name: orderId
+      in: path
+      description: orderId
+      required: true
+      style: simple
+      explode: false
       schema:
-        maximum: 100
-        type: integer
-        format: int32
-        default: 30
+        type: string
         examples:
-        - 20
+        - NTA2JGR7
     orderLineIdQueryParam:
       name: orderLineId
       in: query
@@ -588,50 +534,44 @@ components:
         default: []
         examples:
         - - 26b02145-7dbf-4be9-8600-ff4a570d83d5
-    posHeader:
-      name: Entur-Pos
+    ticketDistributionIdQueryParam:
+      name: ticketDistributionId
+      in: query
+      description: Filters by ticket distribution id
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+        default: []
+        examples:
+        - - '1234'
+    organisationIdQueryParam:
+      name: organisationId
+      in: query
+      description: Filters by organisation if the user has correct privileges
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+        default: []
+        examples:
+        - - '1'
+    X-Correlation-Id:
+      name: X-Correlation-Id
       in: header
-      description: A header containing a point-of-sale reference
-      required: true
+      description: Correlation id
+      required: false
       style: simple
       explode: false
       schema:
         type: string
-        examples:
-        - MyApplication
   responses:
-    notFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-          examples:
-            default:
-              value:
-                timestamp: '2025-01-01T12:00:00Z'
-                status: 404
-                title: Not Found
-                error: Not Found
-                exception: EntityNotFoundException
-                message: Ticket distribution with id 'XYZ123' not found
-                path: /v1/ticket-distributions/XYZ123/distribute
-    badRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-          examples:
-            default:
-              value:
-                timestamp: '2025-01-01T12:00:00Z'
-                status: 400
-                title: Bad Request
-                error: Bad Request
-                exception: ValidationException
-                message: Validation failed
-                path: /v1/ticket-distributions/XYZ123/distribute
     internalServerError:
       description: Internal Server Error
       content:
@@ -664,6 +604,35 @@ components:
                 exception: ConflictException
                 message: Ticket distribution with id 'XYZ123' is already distributed
                 path: /v1/ticket-distributions/XYZ123/distribute
-x-refined-from:
-- entur-ticket-distribution-partner-openapi.json
-- entur-ticket-distribution-partner-openapi.yml
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-01-01T12:00:00Z'
+                status: 400
+                title: Bad Request
+                error: Bad Request
+                exception: ValidationException
+                message: Validation failed
+                path: /v1/ticket-distributions/XYZ123/distribute
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-01-01T12:00:00Z'
+                status: 404
+                title: Not Found
+                error: Not Found
+                exception: EntityNotFoundException
+                message: Ticket distribution with id 'XYZ123' not found
+                path: /v1/ticket-distributions/XYZ123/distribute

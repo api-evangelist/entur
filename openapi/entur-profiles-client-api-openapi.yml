@@ -1,13 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Entur Profiles client API
-  version: 2026.10.0
+  title: Customers Profiles client API
+  description: Documentation of the Customers API
+  termsOfService: https://entur.org
   contact:
     name: Entur Team Personalisering
     url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
     email: team.personalisering@entur.org
-  termsOfService: https://entur.org
-  description: 'Operations tagged Profiles client across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.10.0
 servers:
 - url: https://api.entur.io/customers/v2
 security:
@@ -137,8 +137,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/restore:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -181,8 +179,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/preferences:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -313,8 +309,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/preferences/{preferenceId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -459,8 +453,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/postal-addresses/{postalAddressId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -559,8 +551,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/merge-personnel-ticket-profile/{pticketCustomerNumber}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -611,8 +601,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/ecard-ownerships/{ecardOperator}/{ecardNumber}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -731,8 +719,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/delete:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -786,8 +772,6 @@ paths:
           - customers-profile:slett
           - customers-profile-global:slett
           - customers-profile-jdir:slett
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -988,8 +972,6 @@ paths:
           - customers-profile:opprett
           - customers-profile-global:opprett
           - customers-profile-jdir:opprett
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/related-customer-numbers:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1036,8 +1018,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/postal-addresses:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1084,8 +1064,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/ecard-ownerships:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1172,8 +1150,6 @@ paths:
           - customers-profile:endre
           - customers-profile-global:endre
           - customers-profile-jdir:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/get-by/bulk:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1211,8 +1187,6 @@ paths:
           - customers-profile:les
           - customers-profile-global:les
           - customers-profile-jdir:les
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/get-by/bulk/contact-details:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1250,8 +1224,6 @@ paths:
           - customers-profile:les
           - customers-profile-global:les
           - customers-profile-jdir:les
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{uuid}/by-uuid:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1328,8 +1300,6 @@ paths:
           - customers-profile:les
           - customers-profile-global:les
           - customers-profile-jdir:les
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{organisationId}/{username}/by-org-and-email:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1379,8 +1349,6 @@ paths:
           - customers-profile:les
           - customers-profile-global:les
           - customers-profile-jdir:les
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{ecardNumber}/by-ecard:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1457,8 +1425,6 @@ paths:
           - customers-profile:les
           - customers-profile-global:les
           - customers-profile-jdir:les
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerReference}/by-customer-reference:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1543,8 +1509,6 @@ paths:
           - customers-profile:les
           - customers-profile-global:les
           - customers-profile-jdir:les
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles-search:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1760,180 +1724,88 @@ paths:
           - customers-profile:les
           - customers-profile-global:les
           - customers-profile-jdir:les
-    servers:
-    - url: https://api.entur.io/customers/v2
 components:
   schemas:
-    CustomerConsent:
+    CustomerConnectRequest:
+      required:
+      - changedByChannel
       type: object
       properties:
-        changedAt:
+        changedByChannel:
           type: string
-          description: When the customer consent was last changed.
-          format: date-time
-        consentChoice:
-          type: boolean
-          description: Whether the customer has approved or declined this consent.
-        consentCode:
-          maxLength: 20
-          type: string
-          description: The consent code.
-        createdAt:
-          type: string
-          description: When the customer consent was created.
-          format: date-time
-        customerId:
+          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
+        customerNumberToConnect:
           type: integer
-          description: Id of the customer.
+          description: Customer number of the profile to connect
           format: int64
-      description: Legacy consents for a customer
-    CustomerAccountResponse:
+          examples:
+          - 123456
+        temporaryCustomerNumber:
+          type: integer
+          description: Customer number of temporary customer to connect
+          format: int64
+          deprecated: true
+          examples:
+          - 123456
+      description: Request to connect a profile to another profile
+    NoteResponse:
       required:
+      - changedAt
+      - changedBy
       - createdAt
       - createdBy
-      - customerAccountId
-      - customerNumber
+      - customerId
       - id
+      - text
       type: object
       properties:
-        alias:
-          type: string
-          description: Alias for the customer account
-          examples:
-          - Tommy
         changedAt:
           type: string
-          description: When the customer account was last changed. ISO 8601 date format
+          description: When the note was last changed. ISO 8601 date format
           format: date-time
           examples:
           - '2019-04-05T14:30:30+02:00'
         changedBy:
+          maxLength: 100
           type: string
-          description: Who changed the customer account.
+          description: Who last changed the note.
         createdAt:
           type: string
-          description: When the customer account was created. ISO 8601 date format
+          description: When the note was created. ISO 8601 date format
           format: date-time
           examples:
           - '2019-04-05T14:30:30+02:00'
         createdBy:
+          maxLength: 100
           type: string
-          description: Who created the customer account.
-        customerAccountId:
-          type: string
-          description: Customer account id string
-          examples:
-          - ATB:CustomerAccount:abc58673cde-1c82-4bc5-989c-9d5eaa7ea866
-        customerNumber:
+          description: Who created the note.
+        customerId:
           type: integer
-          description: Unique customer number
+          description: Id of the customer connected to the note.
           format: int64
         id:
           type: integer
-          description: Customer account unique id.
+          description: Note id.
           format: int64
-        isDefault:
-          type: boolean
-          description: True if the account is the default account for the customer
-      description: Customer account connected to a customer
-    ErrorMessage:
+        text:
+          maxLength: 4000
+          type: string
+          description: Note content.
+      description: Deprecated
+    CustomerPreferenceRequest:
       required:
-      - errorCode
-      - longEnglish
-      - longNorwegian
-      - shortEnglish
-      - shortNorwegian
+      - preferenceId
       type: object
       properties:
-        errorCode:
+        preferenceId:
           type: integer
-          description: The error code.
-          format: int32
-        longEnglish:
-          type: string
-          description: Long error message (English).
-        longNorwegian:
-          type: string
-          description: Long error message (Norwegian).
-        shortEnglish:
-          type: string
-          description: Short error message (English).
-        shortNorwegian:
-          type: string
-          description: Short error message (Norwegian).
-      description: 'An Error message. '
-    EcardOwnershipRequest:
-      required:
-      - ecardNumber
-      - ecardOperator
-      - startOfOwnership
-      type: object
-      properties:
-        bookingDate:
-          type: string
-          description: When the physical ecard was booked. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        ecardName:
+          description: Id of the preference
+          format: int64
+        preferenceValue:
           maxLength: 100
           type: string
-          description: Customer defined ecard alias.
-        ecardNumber:
-          type: integer
-          description: Ecard number.
-          format: int64
-        ecardNumber16digits:
-          maxLength: 16
-          minLength: 16
-          type: string
-          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
-        ecardOperator:
-          type: integer
-          description: Ecard operator.
-          format: int32
-        endOfOwnership:
-          type: string
-          description: When the customer removed the ecard connection. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        expirationDate:
-          type: string
-          description: When the physical ecard expires. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        shippingDate:
-          type: string
-          description: When the physical ecard was shipped to the customer. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        startOfOwnership:
-          type: string
-          description: When the ecard was first connected to the customer. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-      description: Ecards connected to a customer
-    CustomerContactDetailsResponse:
-      type: object
-      properties:
-        countryCode:
-          type: string
-          description: The customer's telephone country code (e.g. '+47'), if set.
-        customerNumber:
-          type: integer
-          description: The customer's customer number.
-          format: int64
-        email:
-          type: string
-          description: The customer's email address, if set.
-        telephoneNumberNoCountryCode:
-          type: string
-          description: The customer's telephone number without country code, if set.
-      description: Contact details for a customer.
+          description: Value of the preference. This can be things like membership number.
+      description: Preferences request for a customer
     LocalDateResponse:
       required:
       - day
@@ -1954,72 +1826,6 @@ components:
           description: year
           format: int32
       description: Date as object
-    PostalAddressRequest:
-      required:
-      - countryCode
-      - postCode
-      - town
-      - typeOfAddress
-      type: object
-      properties:
-        addressLine1:
-          maxLength: 80
-          type: string
-          description: Address line 1.
-        addressLine2:
-          maxLength: 80
-          type: string
-          description: Address line 2, often used for c/o information.
-        countryCode:
-          maxLength: 3
-          minLength: 3
-          type: string
-          description: The address country code. ISO 3166-1 alpha-3 format
-          examples:
-          - NOR
-        id:
-          type: integer
-          description: Unique id for postal address. This value is exclusively used when updating a full customer, to identify which of the addresses to update. Otherwise it is ignored.
-          format: int64
-        postCode:
-          maxLength: 10
-          type: string
-          description: The address post code. Only 4 digits for Norwegian addresses.
-        town:
-          type: string
-          description: The address post town. Will be required
-        typeOfAddress:
-          type: string
-          description: 'The type of address. Types supported: ''P'' = Private, ''I'' = Invoice, ''S'' = Shadow.'
-          enum:
-          - P
-          - I
-          - S
-        verifiedAt:
-          type: string
-          description: When the address was verified. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-      description: Postal address connected to a customer
-    CustomerPreferenceRequest:
-      required:
-      - preferenceId
-      type: object
-      properties:
-        preferenceId:
-          type: integer
-          description: Id of the preference
-          format: int64
-        preferenceValue:
-          maxLength: 100
-          type: string
-          description: Value of the preference. This can be things like membership number.
-      description: Preferences request for a customer
-    ListCustomerResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/CustomerResponse'
     CustomerPostRequest:
       required:
       - createdBy
@@ -2148,6 +1954,221 @@ components:
           examples:
           - c06c4afe-d9e1-4c5d-939a-177d752a0944
       description: A registered customer post request
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: 'An Error message. '
+    EcardOwnershipResponse:
+      required:
+      - changedAt
+      - createdAt
+      - customerId
+      - ecardNumber
+      - ecardNumber16digits
+      - ecardOperator
+      - id
+      - startOfOwnership
+      type: object
+      properties:
+        bookingDate:
+          type: string
+          description: When the physical ecard was booked. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedAt:
+          type: string
+          description: When the ecard was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the ecard was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: The customer connected to the ecard. Deprecated
+          format: int64
+          deprecated: true
+        ecardName:
+          maxLength: 100
+          type: string
+          description: Customer defined ecard alias.
+        ecardNumber:
+          type: integer
+          description: Ecard number.
+          format: int64
+        ecardNumber16digits:
+          maxLength: 16
+          minLength: 16
+          type: string
+          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
+        ecardOperator:
+          type: integer
+          description: Ecard operator.
+          format: int32
+        endOfOwnership:
+          type: string
+          description: When the customer removed the ecard connection. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: When the physical ecard expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Ecard id.
+          format: int64
+        shippingDate:
+          type: string
+          description: When the physical ecard was shipped to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        startOfOwnership:
+          type: string
+          description: When the ecard was first connected to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Ecards connected to a customer
+    ContactDetailsBulkRequest:
+      type: object
+      properties:
+        customerNumbers:
+          type: array
+          description: Customer numbers to look up. Max 1000 numbers at a time.
+          items:
+            type: integer
+            description: Customer numbers to look up. Max 1000 numbers at a time.
+            format: int64
+      description: A request for contact details for multiple customers.
+    PostalAddressRequest:
+      required:
+      - countryCode
+      - postCode
+      - town
+      - typeOfAddress
+      type: object
+      properties:
+        addressLine1:
+          maxLength: 80
+          type: string
+          description: Address line 1.
+        addressLine2:
+          maxLength: 80
+          type: string
+          description: Address line 2, often used for c/o information.
+        countryCode:
+          maxLength: 3
+          minLength: 3
+          type: string
+          description: The address country code. ISO 3166-1 alpha-3 format
+          examples:
+          - NOR
+        id:
+          type: integer
+          description: Unique id for postal address. This value is exclusively used when updating a full customer, to identify which of the addresses to update. Otherwise it is ignored.
+          format: int64
+        postCode:
+          maxLength: 10
+          type: string
+          description: The address post code. Only 4 digits for Norwegian addresses.
+        town:
+          type: string
+          description: The address post town. Will be required
+        typeOfAddress:
+          type: string
+          description: 'The type of address. Types supported: ''P'' = Private, ''I'' = Invoice, ''S'' = Shadow.'
+          enum:
+          - P
+          - I
+          - S
+        verifiedAt:
+          type: string
+          description: When the address was verified. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Postal address connected to a customer
+    CustomerAccountResponse:
+      required:
+      - createdAt
+      - createdBy
+      - customerAccountId
+      - customerNumber
+      - id
+      type: object
+      properties:
+        alias:
+          type: string
+          description: Alias for the customer account
+          examples:
+          - Tommy
+        changedAt:
+          type: string
+          description: When the customer account was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          type: string
+          description: Who changed the customer account.
+        createdAt:
+          type: string
+          description: When the customer account was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          type: string
+          description: Who created the customer account.
+        customerAccountId:
+          type: string
+          description: Customer account id string
+          examples:
+          - ATB:CustomerAccount:abc58673cde-1c82-4bc5-989c-9d5eaa7ea866
+        customerNumber:
+          type: integer
+          description: Unique customer number
+          format: int64
+        id:
+          type: integer
+          description: Customer account unique id.
+          format: int64
+        isDefault:
+          type: boolean
+          description: True if the account is the default account for the customer
+      description: Customer account connected to a customer
     PostalAddressResponse:
       required:
       - changedAt
@@ -2217,6 +2238,34 @@ components:
           examples:
           - '2019-04-05T14:30:30+02:00'
       description: Postal address connected to a customer
+    ListCustomerContactDetailsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomerContactDetailsResponse'
+    ListCustomerPreferenceResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomerPreferenceResponse'
+    CustomerConnectResponse:
+      required:
+      - changedAt
+      - relatedCustomerNumbers
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the list of connected profiles was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        relatedCustomerNumbers:
+          type: array
+          description: Customer numbers for temporary profiles that is connected to a profile
+          items:
+            type: integer
+            description: Customer numbers for temporary profiles that is connected to a profile
+            format: int64
+      description: Connected temporary profiles for a profile
     CustomerResponse:
       required:
       - changedAt
@@ -2453,77 +2502,6 @@ components:
           format: uuid
           deprecated: true
       description: A registered customer response
-    ListCustomerContactDetailsResponse:
-      type: array
-      items:
-        $ref: '#/components/schemas/CustomerContactDetailsResponse'
-    ListCustomerPreferenceRequest:
-      type: array
-      items:
-        $ref: '#/components/schemas/CustomerPreferenceRequest'
-    NoteResponse:
-      required:
-      - changedAt
-      - changedBy
-      - createdAt
-      - createdBy
-      - customerId
-      - id
-      - text
-      type: object
-      properties:
-        changedAt:
-          type: string
-          description: When the note was last changed. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        changedBy:
-          maxLength: 100
-          type: string
-          description: Who last changed the note.
-        createdAt:
-          type: string
-          description: When the note was created. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        createdBy:
-          maxLength: 100
-          type: string
-          description: Who created the note.
-        customerId:
-          type: integer
-          description: Id of the customer connected to the note.
-          format: int64
-        id:
-          type: integer
-          description: Note id.
-          format: int64
-        text:
-          maxLength: 4000
-          type: string
-          description: Note content.
-      description: Deprecated
-    PersonnelTicketBearer:
-      type: object
-      properties:
-        bearerCustomerId:
-          type: integer
-          format: int64
-        changedAt:
-          type: string
-          format: date-time
-        createdAt:
-          type: string
-          format: date-time
-        isSelfServedRetrieval:
-          type: boolean
-        ticketRightBearer:
-          type: string
-        ticketRightOwner:
-          type: string
-      description: The personnel tickets connected to the customer. Deprecated. Does not contain updated information.
     ProfilesBulkRequest:
       type: object
       properties:
@@ -2544,26 +2522,6 @@ components:
           type: boolean
           description: Optional flag to include profile preferences
       description: A request for multiple customers.
-    CustomerConnectResponse:
-      required:
-      - changedAt
-      - relatedCustomerNumbers
-      type: object
-      properties:
-        changedAt:
-          type: string
-          description: When the list of connected profiles was last changed. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        relatedCustomerNumbers:
-          type: array
-          description: Customer numbers for temporary profiles that is connected to a profile
-          items:
-            type: integer
-            description: Customer numbers for temporary profiles that is connected to a profile
-            format: int64
-      description: Connected temporary profiles for a profile
     CustomerPutRequest:
       required:
       - changedBy
@@ -2683,6 +2641,113 @@ components:
           examples:
           - c06c4afe-d9e1-4c5d-939a-177d752a0944
       description: A registered customer put request. Required fields are firstName, surname, password, organizationId, changedBy and changedByChannel.
+    PageCustomerResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items on a specific page
+          items:
+            $ref: '#/components/schemas/CustomerResponse'
+        totalItems:
+          type: integer
+          description: Total number of items
+          format: int64
+          examples:
+          - 72
+        totalPages:
+          type: integer
+          description: Total number of pages available to browse
+          format: int64
+          examples:
+          - 9
+      description: Page displays a subset of a list of entities
+    ListCustomerPreferenceRequest:
+      type: array
+      items:
+        $ref: '#/components/schemas/CustomerPreferenceRequest'
+    EcardOwnershipRequest:
+      required:
+      - ecardNumber
+      - ecardOperator
+      - startOfOwnership
+      type: object
+      properties:
+        bookingDate:
+          type: string
+          description: When the physical ecard was booked. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        ecardName:
+          maxLength: 100
+          type: string
+          description: Customer defined ecard alias.
+        ecardNumber:
+          type: integer
+          description: Ecard number.
+          format: int64
+        ecardNumber16digits:
+          maxLength: 16
+          minLength: 16
+          type: string
+          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
+        ecardOperator:
+          type: integer
+          description: Ecard operator.
+          format: int32
+        endOfOwnership:
+          type: string
+          description: When the customer removed the ecard connection. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: When the physical ecard expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        shippingDate:
+          type: string
+          description: When the physical ecard was shipped to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        startOfOwnership:
+          type: string
+          description: When the ecard was first connected to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Ecards connected to a customer
+    CustomerConsent:
+      type: object
+      properties:
+        changedAt:
+          type: string
+          description: When the customer consent was last changed.
+          format: date-time
+        consentChoice:
+          type: boolean
+          description: Whether the customer has approved or declined this consent.
+        consentCode:
+          maxLength: 20
+          type: string
+          description: The consent code.
+        createdAt:
+          type: string
+          description: When the customer consent was created.
+          format: date-time
+        customerId:
+          type: integer
+          description: Id of the customer.
+          format: int64
+      description: Legacy consents for a customer
     PreferenceResponse:
       required:
       - changedAt
@@ -2726,32 +2791,10 @@ components:
           type: string
           description: Type of preference.
       description: Preference
-    ListCustomerPreferenceResponse:
+    ListCustomerResponse:
       type: array
       items:
-        $ref: '#/components/schemas/CustomerPreferenceResponse'
-    CustomerConnectRequest:
-      required:
-      - changedByChannel
-      type: object
-      properties:
-        changedByChannel:
-          type: string
-          description: Which sales channel or system who last changed the customer. Used for traceability in accordance with GDPR
-        customerNumberToConnect:
-          type: integer
-          description: Customer number of the profile to connect
-          format: int64
-          examples:
-          - 123456
-        temporaryCustomerNumber:
-          type: integer
-          description: Customer number of temporary customer to connect
-          format: int64
-          deprecated: true
-          examples:
-          - 123456
-      description: Request to connect a profile to another profile
+        $ref: '#/components/schemas/CustomerResponse'
     CustomerPreferenceResponse:
       required:
       - changedAt
@@ -2789,123 +2832,42 @@ components:
           type: string
           description: Value of the preference. This can be things like membership number.
       description: Preferences response for a customer
-    EcardOwnershipResponse:
-      required:
-      - changedAt
-      - createdAt
-      - customerId
-      - ecardNumber
-      - ecardNumber16digits
-      - ecardOperator
-      - id
-      - startOfOwnership
+    CustomerContactDetailsResponse:
       type: object
       properties:
-        bookingDate:
+        countryCode:
           type: string
-          description: When the physical ecard was booked. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
+          description: The customer's telephone country code (e.g. '+47'), if set.
+        customerNumber:
+          type: integer
+          description: The customer's customer number.
+          format: int64
+        email:
+          type: string
+          description: The customer's email address, if set.
+        telephoneNumberNoCountryCode:
+          type: string
+          description: The customer's telephone number without country code, if set.
+      description: Contact details for a customer.
+    PersonnelTicketBearer:
+      type: object
+      properties:
+        bearerCustomerId:
+          type: integer
+          format: int64
         changedAt:
           type: string
-          description: When the ecard was last changed. ISO 8601 date format
           format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
         createdAt:
           type: string
-          description: When the ecard was created. ISO 8601 date format
           format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        customerId:
-          type: integer
-          description: The customer connected to the ecard. Deprecated
-          format: int64
-          deprecated: true
-        ecardName:
-          maxLength: 100
+        isSelfServedRetrieval:
+          type: boolean
+        ticketRightBearer:
           type: string
-          description: Customer defined ecard alias.
-        ecardNumber:
-          type: integer
-          description: Ecard number.
-          format: int64
-        ecardNumber16digits:
-          maxLength: 16
-          minLength: 16
+        ticketRightOwner:
           type: string
-          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
-        ecardOperator:
-          type: integer
-          description: Ecard operator.
-          format: int32
-        endOfOwnership:
-          type: string
-          description: When the customer removed the ecard connection. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        expirationDate:
-          type: string
-          description: When the physical ecard expires. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        id:
-          type: integer
-          description: Ecard id.
-          format: int64
-        shippingDate:
-          type: string
-          description: When the physical ecard was shipped to the customer. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        startOfOwnership:
-          type: string
-          description: When the ecard was first connected to the customer. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-      description: Ecards connected to a customer
-    ContactDetailsBulkRequest:
-      type: object
-      properties:
-        customerNumbers:
-          type: array
-          description: Customer numbers to look up. Max 1000 numbers at a time.
-          items:
-            type: integer
-            description: Customer numbers to look up. Max 1000 numbers at a time.
-            format: int64
-      description: A request for contact details for multiple customers.
-    PageCustomerResponse:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: Items on a specific page
-          items:
-            $ref: '#/components/schemas/CustomerResponse'
-        totalItems:
-          type: integer
-          description: Total number of items
-          format: int64
-          examples:
-          - 72
-        totalPages:
-          type: integer
-          description: Total number of pages available to browse
-          format: int64
-          examples:
-          - 9
-      description: Page displays a subset of a list of entities
+      description: The personnel tickets connected to the customer. Deprecated. Does not contain updated information.
   responses:
     Error400:
       description: Bad request
@@ -2919,14 +2881,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
-    Error500:
-      description: Internal server error
+    Error404:
+      description: Not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
-    Error404:
-      description: Not found
+    Error500:
+      description: Internal server error
       content:
         application/json:
           schema:
@@ -2938,15 +2900,6 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -2962,11 +2915,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-customers-openapi.json
-- entur-customers-openapi.yml

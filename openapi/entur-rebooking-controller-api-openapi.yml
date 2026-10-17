@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Rebooking Controller API
+  title: Seating manager Rebooking Controller API
+  description: Seating manager generates seating offers and keeps track of what seats are reserved and/or blocked
   version: 2026.09.0
-  description: 'Operations tagged rebooking-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seating-manager
 security:
@@ -35,8 +35,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReservationResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/rebookings/{reference}/rebook:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -67,8 +65,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RebookedReservationResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/rebookings:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -137,8 +133,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RebookedReservationResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/rebookings/dated-service-journeys:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -197,8 +191,6 @@ paths:
                   $ref: '#/components/schemas/RebookingOverviewResponse'
       summary: Get dated service journeys with rebookings stats
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/rebookings/dated-service-journeys/history:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -230,74 +222,122 @@ paths:
                   $ref: '#/components/schemas/RebookingHistoryOverviewResponse'
       summary: Get service journey with rebooking history
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seating-manager
 components:
   schemas:
-    ReservationLineResponse:
+    RebookedReservationResponse:
       required:
+      - createdAt
+      - datedServiceJourneyId
+      - destinationStopPlace
+      - organisationId
+      - originStopPlace
+      - rebookedReservationLines
+      - rebookingStatus
       - reference
-      - requestedProperties
-      - requestedSeatingProperties
-      - reservedProperties
-      - reservedSeatingProperties
-      - type
+      - reservationStatus
+      - updatedAt
+      - version
+      - versionedAt
       type: object
       properties:
         reference:
           type: string
-          description: Reference for this reservation line`
+          description: The reference for this reservation, this is a randomly generated UUID
           format: uuid
-        reservedProperties:
-          type: array
-          items:
-            minLength: 1
-            type: string
-            description: The properties reserved by the reservation line.
-            examples:
-            - '[FareClass_STANDARD_CLASS]'
-        reservedSeatingProperties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-        requestedProperties:
-          type: array
-          items:
-            minLength: 1
-            type: string
-            description: The properties required by the traveller.
-            examples:
-            - '[FareClass_STANDARD_CLASS]'
-        requestedSeatingProperties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-        orderLineId:
-          type: string
-          description: OrderLine ID for this reservation line.
           examples:
-          - d4a599f6-6b0b-473f-a182-79f87a4a8689
-        numberOfTravellers:
+          - 123e4567-e89b-12d3-a456-426614174000
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: The `orderId` of the connected order where the creating client provided it. There are reservations without a connected order.
+          examples:
+          - ZGMCDSVS
+        version:
           type: integer
-          description: Number of travellers on the reservation line.
+          description: The highest/newest `version` of this reservation. The initial version number is `1`.
           format: int32
           examples:
-          - 2
-        type:
+          - 1
+        originStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        previousOriginStopPlace:
+          anyOf:
+          - $ref: '#/components/schemas/StopPlaceResponseV1'
+          - type: 'null'
+        destinationStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        previousDestinationStopPlace:
+          anyOf:
+          - $ref: '#/components/schemas/StopPlaceResponseV1'
+          - type: 'null'
+        datedServiceJourneyId:
           type: string
-          description: The type of reservation line.
+          description: Id of the dated service journey
+        previousDatedServiceJourneyId:
+          type:
+          - string
+          - 'null'
+          description: Id of the previous dated service journey if the dated service journey has been changed
+        organisationId:
+          type: integer
+          description: The organisation id of the order which the `reservation` belongs to.This id is determined by the authentication used by the client.
+          format: int64
           examples:
-          - SINGLE_SEAT
-      discriminator:
-        propertyName: type
-        mapping:
-          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineResponse'
-          COMPARTMENT: '#/components/schemas/CompartmentReservationLineResponse'
-          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineResponse'
-          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineResponse'
-    SeatingPropertiesRequestV1:
-      required:
-      - baggageType
-      - mobilityFacilities
-      - nuisanceFacilities
-      - passengerCommsFacilities
-      - sanitaryFacilities
+          - 20
+        createdAt:
+          type: string
+          description: When this reservation was initially created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        versionedAt:
+          type: string
+          description: When this version of this reservation was created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        updatedAt:
+          type: string
+          description: When this was previously updated. This includes status changes, reservation line changes and so on.
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        reservationStatus:
+          type: string
+          description: Describes the `reservation` status.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        rebookingStatus:
+          type: string
+          description: Describes the `rebooking` status of the reservation.
+          enum:
+          - ACCEPTED
+          - MANUAL
+          - SUGGESTED
+          - REBOOKED_DRAFT
+          - REJECTED
+          examples:
+          - ACCEPTED
+        rebookedReservationLines:
+          minItems: 1
+          type: array
+          description: Reservation lines that are rebooked for this reservation, including previous reservation line.
+          items:
+            $ref: '#/components/schemas/RebookedReservationLineResponse'
+        info:
+          type:
+          - string
+          - 'null'
+          description: Additional free text information about the reservation.
+          examples:
+          - Unable to rebook this reservation due to no available seats.
+    SeatingPropertiesResponseV1:
       type: object
       properties:
         fareClass:
@@ -538,6 +578,285 @@ components:
           examples:
           - 0
       description: Destination `StopPlace` of the `reservation`
+    RebookToSeatTypeRequest:
+      required:
+      - datedServiceJourneyId
+      - mustReserveWholeCompartment
+      - reservationReferences
+      - seatingProperties
+      type: object
+      properties:
+        datedServiceJourneyId:
+          type: string
+          description: The datedServiceJourney whose reservations should be rebooked
+        reservationReferences:
+          type: array
+          description: References of reservations that should be moved
+          items:
+            type: string
+            description: References of reservations that should be moved
+            format: uuid
+        seatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesRequestV1'
+        mustReserveWholeCompartment:
+          type: boolean
+          description: If accommodation is COUCHETTE or SLEEPER, should the whole compartment be reserved (true) or can strangers be seated together (false)?
+    ReservationLineResponse:
+      required:
+      - reference
+      - requestedProperties
+      - requestedSeatingProperties
+      - reservedProperties
+      - reservedSeatingProperties
+      - type
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference for this reservation line`
+          format: uuid
+        reservedProperties:
+          type: array
+          items:
+            minLength: 1
+            type: string
+            description: The properties reserved by the reservation line.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        reservedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        requestedProperties:
+          type: array
+          items:
+            minLength: 1
+            type: string
+            description: The properties required by the traveller.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        requestedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line.
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        numberOfTravellers:
+          type: integer
+          description: Number of travellers on the reservation line.
+          format: int32
+          examples:
+          - 2
+        type:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+      discriminator:
+        propertyName: type
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineResponse'
+          COMPARTMENT: '#/components/schemas/CompartmentReservationLineResponse'
+          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineResponse'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineResponse'
+    RebookingOverviewResponse:
+      required:
+      - amountOfAcceptedRebookings
+      - amountOfManualRebookings
+      - amountOfSuggestedRebookings
+      - datedServiceJourneyId
+      type: object
+      properties:
+        datedServiceJourneyId:
+          minLength: 1
+          type: string
+          description: Id of the dated service journey
+        amountOfSuggestedRebookings:
+          type: integer
+          description: Number of rebookings suggested
+          format: int32
+          examples:
+          - 1
+        amountOfManualRebookings:
+          type: integer
+          description: Number of rebookings ready for manual handling
+          format: int32
+          examples:
+          - 2
+        amountOfAcceptedRebookings:
+          type: integer
+          description: Number of rebookings accepted
+          format: int32
+          examples:
+          - 0
+    ReservationResponse:
+      required:
+      - createdAt
+      - createdBy
+      - datedServiceJourneyId
+      - destinationStopPlace
+      - organisationId
+      - originStopPlace
+      - reference
+      - reservationLines
+      - status
+      - updatedAt
+      - version
+      - versionedAt
+      type: object
+      properties:
+        version:
+          type: integer
+          description: The `version` of the reservation. Starts with `1`.
+          format: int32
+          examples:
+          - 1
+        originStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        destinationStopPlace:
+          $ref: '#/components/schemas/StopPlaceResponseV1'
+        datedServiceJourneyId:
+          minLength: 1
+          type: string
+          description: Id of the dated service journey
+        status:
+          minLength: 1
+          type: string
+          description: Describes the `reservation` status.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        reference:
+          minLength: 1
+          type: string
+          description: The reference for this reservation
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        organisationId:
+          type: integer
+          description: The organisation id of the order which the `reservation` belongs to.
+          format: int64
+          examples:
+          - 20
+        createdAt:
+          minLength: 1
+          type: string
+          description: When this reservation was initially created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        rebookingStatus:
+          type:
+          - string
+          - 'null'
+          description: Describes the `rebooking` status of the reservation.
+          enum:
+          - ACCEPTED
+          - MANUAL
+          - SUGGESTED
+          - REBOOKED_DRAFT
+          - REJECTED
+          examples:
+          - ACCEPTED
+        versionedAt:
+          minLength: 1
+          type: string
+          description: When this version of this reservation was created
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        updatedAt:
+          minLength: 1
+          type: string
+          description: When this was previously updated. This includes status changes, reservation line changes and so on.
+          format: YYYY-MM-DDThh:mm:ssZ
+          examples:
+          - '2011-12-03T10:15:30+01:00'
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLineResponse'
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: The 'id' of the order the reservation belongs to
+          examples:
+          - A1B2C3D4
+        createdBy:
+          type: integer
+          description: The organisation id this version of the `reservation` was created by.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        updatedBy:
+          type:
+          - integer
+          - 'null'
+          description: The organisation id of the organisation that last updated this `reservation`.This id is determined by the authentication used by the client.
+          format: int64
+          examples:
+          - 20
+        info:
+          type:
+          - string
+          - 'null'
+          description: Additional free text information about the reservation.
+          examples:
+          - Unable to rebook this reservation due to no available seats.
+    RebookedReservationLineResponse:
+      required:
+      - rebookedReservationLine
+      - reference
+      type: object
+      properties:
+        reference:
+          type: string
+          description: The reference for this reservation line, this is a randomly generated UUID
+          format: uuid
+          examples:
+          - 123e4567-e89b-12d3-a456-426614174000
+        orderLineId:
+          type:
+          - string
+          - 'null'
+          description: OrderLine ID for this reservation line`
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        previousReservationLine:
+          anyOf:
+          - $ref: '#/components/schemas/RebookedReservationLineDataResponse'
+          - type: 'null'
+        rebookedReservationLine:
+          $ref: '#/components/schemas/RebookedReservationLineDataResponse'
+      description: Reservation lines that are rebooked for this reservation, including previous reservation line.
+    RebookingHistoryOverviewResponse:
+      required:
+      - amountOfConfirmed
+      - amountOfRejected
+      - datedServiceJourneyId
+      type: object
+      properties:
+        datedServiceJourneyId:
+          minLength: 1
+          type: string
+          description: Id of the dated service journey
+        amountOfRejected:
+          type: integer
+          description: Number of rejected rebooked reservations
+          format: int32
+          examples:
+          - 1
+        amountOfConfirmed:
+          type: integer
+          description: Number of confirmed rebooked reservations
+          format: int32
+          examples:
+          - 2
     RebookedReservationLineDataResponse:
       required:
       - reservationLineType
@@ -563,7 +882,13 @@ components:
           COMPARTMENT: '#/components/schemas/CompartmentDataResponse'
           FREE_SEATING: '#/components/schemas/FreeSeatingDataResponse'
           FAILED_REBOOKING: '#/components/schemas/FailedRebookingDataResponse'
-    SeatingPropertiesResponseV1:
+    SeatingPropertiesRequestV1:
+      required:
+      - baggageType
+      - mobilityFacilities
+      - nuisanceFacilities
+      - passengerCommsFacilities
+      - sanitaryFacilities
       type: object
       properties:
         fareClass:
@@ -786,351 +1111,7 @@ components:
           examples:
           - HANDBAG,SUITCASE
       description: Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class.
-    RebookingOverviewResponse:
-      required:
-      - amountOfAcceptedRebookings
-      - amountOfManualRebookings
-      - amountOfSuggestedRebookings
-      - datedServiceJourneyId
-      type: object
-      properties:
-        datedServiceJourneyId:
-          minLength: 1
-          type: string
-          description: Id of the dated service journey
-        amountOfSuggestedRebookings:
-          type: integer
-          description: Number of rebookings suggested
-          format: int32
-          examples:
-          - 1
-        amountOfManualRebookings:
-          type: integer
-          description: Number of rebookings ready for manual handling
-          format: int32
-          examples:
-          - 2
-        amountOfAcceptedRebookings:
-          type: integer
-          description: Number of rebookings accepted
-          format: int32
-          examples:
-          - 0
-    RebookedReservationResponse:
-      required:
-      - createdAt
-      - datedServiceJourneyId
-      - destinationStopPlace
-      - organisationId
-      - originStopPlace
-      - rebookedReservationLines
-      - rebookingStatus
-      - reference
-      - reservationStatus
-      - updatedAt
-      - version
-      - versionedAt
-      type: object
-      properties:
-        reference:
-          type: string
-          description: The reference for this reservation, this is a randomly generated UUID
-          format: uuid
-          examples:
-          - 123e4567-e89b-12d3-a456-426614174000
-        orderId:
-          type:
-          - string
-          - 'null'
-          description: The `orderId` of the connected order where the creating client provided it. There are reservations without a connected order.
-          examples:
-          - ZGMCDSVS
-        version:
-          type: integer
-          description: The highest/newest `version` of this reservation. The initial version number is `1`.
-          format: int32
-          examples:
-          - 1
-        originStopPlace:
-          $ref: '#/components/schemas/StopPlaceResponseV1'
-        previousOriginStopPlace:
-          anyOf:
-          - $ref: '#/components/schemas/StopPlaceResponseV1'
-          - type: 'null'
-        destinationStopPlace:
-          $ref: '#/components/schemas/StopPlaceResponseV1'
-        previousDestinationStopPlace:
-          anyOf:
-          - $ref: '#/components/schemas/StopPlaceResponseV1'
-          - type: 'null'
-        datedServiceJourneyId:
-          type: string
-          description: Id of the dated service journey
-        previousDatedServiceJourneyId:
-          type:
-          - string
-          - 'null'
-          description: Id of the previous dated service journey if the dated service journey has been changed
-        organisationId:
-          type: integer
-          description: The organisation id of the order which the `reservation` belongs to.This id is determined by the authentication used by the client.
-          format: int64
-          examples:
-          - 20
-        createdAt:
-          type: string
-          description: When this reservation was initially created
-          format: YYYY-MM-DDThh:mm:ssZ
-          examples:
-          - '2011-12-03T10:15:30+01:00'
-        versionedAt:
-          type: string
-          description: When this version of this reservation was created
-          format: YYYY-MM-DDThh:mm:ssZ
-          examples:
-          - '2011-12-03T10:15:30+01:00'
-        updatedAt:
-          type: string
-          description: When this was previously updated. This includes status changes, reservation line changes and so on.
-          format: YYYY-MM-DDThh:mm:ssZ
-          examples:
-          - '2011-12-03T10:15:30+01:00'
-        reservationStatus:
-          type: string
-          description: Describes the `reservation` status.
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - CANCELLED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        rebookingStatus:
-          type: string
-          description: Describes the `rebooking` status of the reservation.
-          enum:
-          - ACCEPTED
-          - MANUAL
-          - SUGGESTED
-          - REBOOKED_DRAFT
-          - REJECTED
-          examples:
-          - ACCEPTED
-        rebookedReservationLines:
-          minItems: 1
-          type: array
-          description: Reservation lines that are rebooked for this reservation, including previous reservation line.
-          items:
-            $ref: '#/components/schemas/RebookedReservationLineResponse'
-        info:
-          type:
-          - string
-          - 'null'
-          description: Additional free text information about the reservation.
-          examples:
-          - Unable to rebook this reservation due to no available seats.
-    ReservationResponse:
-      required:
-      - createdAt
-      - createdBy
-      - datedServiceJourneyId
-      - destinationStopPlace
-      - organisationId
-      - originStopPlace
-      - reference
-      - reservationLines
-      - status
-      - updatedAt
-      - version
-      - versionedAt
-      type: object
-      properties:
-        version:
-          type: integer
-          description: The `version` of the reservation. Starts with `1`.
-          format: int32
-          examples:
-          - 1
-        originStopPlace:
-          $ref: '#/components/schemas/StopPlaceResponseV1'
-        destinationStopPlace:
-          $ref: '#/components/schemas/StopPlaceResponseV1'
-        datedServiceJourneyId:
-          minLength: 1
-          type: string
-          description: Id of the dated service journey
-        status:
-          minLength: 1
-          type: string
-          description: Describes the `reservation` status.
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - CANCELLED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        reference:
-          minLength: 1
-          type: string
-          description: The reference for this reservation
-          format: uuid
-          examples:
-          - c129cc9c-76e4-4f28-a4e2-5af96550627a
-        organisationId:
-          type: integer
-          description: The organisation id of the order which the `reservation` belongs to.
-          format: int64
-          examples:
-          - 20
-        createdAt:
-          minLength: 1
-          type: string
-          description: When this reservation was initially created
-          format: YYYY-MM-DDThh:mm:ssZ
-          examples:
-          - '2011-12-03T10:15:30+01:00'
-        rebookingStatus:
-          type:
-          - string
-          - 'null'
-          description: Describes the `rebooking` status of the reservation.
-          enum:
-          - ACCEPTED
-          - MANUAL
-          - SUGGESTED
-          - REBOOKED_DRAFT
-          - REJECTED
-          examples:
-          - ACCEPTED
-        versionedAt:
-          minLength: 1
-          type: string
-          description: When this version of this reservation was created
-          format: YYYY-MM-DDThh:mm:ssZ
-          examples:
-          - '2011-12-03T10:15:30+01:00'
-        updatedAt:
-          minLength: 1
-          type: string
-          description: When this was previously updated. This includes status changes, reservation line changes and so on.
-          format: YYYY-MM-DDThh:mm:ssZ
-          examples:
-          - '2011-12-03T10:15:30+01:00'
-        reservationLines:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReservationLineResponse'
-        orderId:
-          type:
-          - string
-          - 'null'
-          description: The 'id' of the order the reservation belongs to
-          examples:
-          - A1B2C3D4
-        createdBy:
-          type: integer
-          description: The organisation id this version of the `reservation` was created by.This id is determined by the authentication used by the client.
-          format: int64
-          examples:
-          - 20
-        updatedBy:
-          type:
-          - integer
-          - 'null'
-          description: The organisation id of the organisation that last updated this `reservation`.This id is determined by the authentication used by the client.
-          format: int64
-          examples:
-          - 20
-        info:
-          type:
-          - string
-          - 'null'
-          description: Additional free text information about the reservation.
-          examples:
-          - Unable to rebook this reservation due to no available seats.
-    RebookToSeatTypeRequest:
-      required:
-      - datedServiceJourneyId
-      - mustReserveWholeCompartment
-      - reservationReferences
-      - seatingProperties
-      type: object
-      properties:
-        datedServiceJourneyId:
-          type: string
-          description: The datedServiceJourney whose reservations should be rebooked
-        reservationReferences:
-          type: array
-          description: References of reservations that should be moved
-          items:
-            type: string
-            description: References of reservations that should be moved
-            format: uuid
-        seatingProperties:
-          $ref: '#/components/schemas/SeatingPropertiesRequestV1'
-        mustReserveWholeCompartment:
-          type: boolean
-          description: If accommodation is COUCHETTE or SLEEPER, should the whole compartment be reserved (true) or can strangers be seated together (false)?
-    RebookingHistoryOverviewResponse:
-      required:
-      - amountOfConfirmed
-      - amountOfRejected
-      - datedServiceJourneyId
-      type: object
-      properties:
-        datedServiceJourneyId:
-          minLength: 1
-          type: string
-          description: Id of the dated service journey
-        amountOfRejected:
-          type: integer
-          description: Number of rejected rebooked reservations
-          format: int32
-          examples:
-          - 1
-        amountOfConfirmed:
-          type: integer
-          description: Number of confirmed rebooked reservations
-          format: int32
-          examples:
-          - 2
-    RebookedReservationLineResponse:
-      required:
-      - rebookedReservationLine
-      - reference
-      type: object
-      properties:
-        reference:
-          type: string
-          description: The reference for this reservation line, this is a randomly generated UUID
-          format: uuid
-          examples:
-          - 123e4567-e89b-12d3-a456-426614174000
-        orderLineId:
-          type:
-          - string
-          - 'null'
-          description: OrderLine ID for this reservation line`
-          examples:
-          - d4a599f6-6b0b-473f-a182-79f87a4a8689
-        previousReservationLine:
-          anyOf:
-          - $ref: '#/components/schemas/RebookedReservationLineDataResponse'
-          - type: 'null'
-        rebookedReservationLine:
-          $ref: '#/components/schemas/RebookedReservationLineDataResponse'
-      description: Reservation lines that are rebooked for this reservation, including previous reservation line.
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1146,11 +1127,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seating-manager-openapi.json
-- entur-seating-manager-openapi.yml

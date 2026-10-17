@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Payment Agreements API
-  version: 2026.10.2
+  title: Payments Payment Agreements API
+  description: The Payments API acts as a gateway to external payment service providers and provides endpoints to create, process and credit payment transactions.
   contact:
     name: Entur
     url: https://developer.entur.org
-  description: 'Operations tagged Payment Agreements across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.10.2
 servers:
 - url: https://api.entur.io/sales
   description: Entur's Production environment
@@ -206,13 +206,6 @@ paths:
           $ref: '#/components/responses/internalServerError'
         '501':
           $ref: '#/components/responses/notImplemented'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
   /v1/payment-agreements/{agreementId}/stop:
     parameters:
     - $ref: '#/components/parameters/agreementIdPathParam'
@@ -277,13 +270,6 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
   /v1/payment-agreements:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -499,123 +485,24 @@ paths:
           $ref: '#/components/responses/internalServerError'
         '501':
           $ref: '#/components/responses/notImplemented'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
 components:
   schemas:
-    VariablePricing:
-      description: Variable pricing charges a varying amount each interval and requires a suggested maximum amount. **Not yet supported** — creating a VARIABLE agreement returns 501. Reserved for future use.
-      allOf:
-      - $ref: '#/components/schemas/AgreementPricing'
-      - required:
-        - amount
-        - currency
-        - interval
-        - suggestedMaxAmount
-        type: object
-        properties:
-          amount:
-            type: integer
-            description: 'The amount to charge per interval, in minor units, e.g: øre.'
-          currency:
-            maxLength: 3
-            minLength: 3
-            type: string
-            description: ISO 4217 currency code.
-          interval:
-            $ref: '#/components/schemas/AgreementInterval'
-          suggestedMaxAmount:
-            type: integer
-            description: A suggested maximum amount per charge, in minor units.
-    FixedPricing:
-      description: Fixed pricing charges a set amount each interval. **Not yet supported** — creating a FIXED agreement returns 501. Reserved for future use.
-      allOf:
-      - $ref: '#/components/schemas/AgreementPricing'
-      - required:
-        - amount
-        - currency
-        - interval
-        type: object
-        properties:
-          amount:
-            type: integer
-            description: 'The fixed amount to charge per interval, in minor units, e.g: øre.'
-          currency:
-            maxLength: 3
-            minLength: 3
-            type: string
-            description: ISO 4217 currency code.
-          interval:
-            $ref: '#/components/schemas/AgreementInterval'
-    AgreementResponseProviderData:
-      required:
-      - agreementProvider
+    UpdatePaymentAgreementRequest:
       type: object
       properties:
-        agreementProvider:
+        productName:
+          maxLength: 45
           type: string
-          description: The payment provider for the agreement.
-          enum:
-          - VIPPS
-      description: Base provider-specific data in an agreement response.
-      discriminator:
-        propertyName: agreementProvider
-        mapping:
-          VIPPS: '#/components/schemas/VippsAgreementResponseProviderData'
-    AgreementRequestProviderData:
-      required:
-      - agreementProvider
-      type: object
-      properties:
-        agreementProvider:
+          description: Name of the product or subscription.
+        productDescription:
+          maxLength: 100
           type: string
-          description: The payment provider for the agreement.
-          enum:
-          - VIPPS
-      description: Base provider-specific data for creating an agreement.
-      discriminator:
-        propertyName: agreementProvider
-        mapping:
-          VIPPS: '#/components/schemas/VippsAgreementRequestProviderData'
-    AgreementUpdateProviderData:
-      required:
-      - agreementProvider
-      type: object
-      properties:
-        agreementProvider:
-          type: string
-          description: The payment provider for the agreement. Cannot be changed, and must match the agreement's existing provider.
-          enum:
-          - VIPPS
-      description: Base provider-specific data for updating an agreement. Contains only the fields the provider allows changing after the agreement exists — which is why this is a separate schema from AgreementRequestProviderData.
-      discriminator:
-        propertyName: agreementProvider
-        mapping:
-          VIPPS: '#/components/schemas/VippsAgreementUpdateProviderData'
-    AgreementPricing:
-      required:
-      - agreementType
-      type: object
-      properties:
-        agreementType:
-          type: string
-          description: The pricing model type.
-          enum:
-          - FIXED
-          - VARIABLE
-          - FLEXIBLE
-      description: Base pricing model for a payment agreement.
-      discriminator:
-        propertyName: agreementType
-        mapping:
-          FIXED: '#/components/schemas/FixedPricing'
-          VARIABLE: '#/components/schemas/VariablePricing'
-          FLEXIBLE: '#/components/schemas/FlexiblePricing'
+          description: Description of the product or subscription, shown to the customer in the provider's app.
+        pricing:
+          $ref: '#/components/schemas/AgreementUpdatePricing'
+        providerData:
+          $ref: '#/components/schemas/AgreementUpdateProviderData'
+      description: Request to update a payment agreement. Every field is optional, but at least one must be supplied — omitting a field leaves it unchanged. `pricing` is not currently supported and returns 501; only `productName`, `productDescription`, and `providerData` can be updated on FLEXIBLE agreements.
     PaymentError:
       title: PaymentError
       required:
@@ -672,6 +559,99 @@ components:
         path: /v1/payments/1/transactions/1/capture
         status: 500
         timestamp: '2025-08-24T14:15:22Z'
+    AgreementUpdateProviderData:
+      required:
+      - agreementProvider
+      type: object
+      properties:
+        agreementProvider:
+          type: string
+          description: The payment provider for the agreement. Cannot be changed, and must match the agreement's existing provider.
+          enum:
+          - VIPPS
+      description: Base provider-specific data for updating an agreement. Contains only the fields the provider allows changing after the agreement exists — which is why this is a separate schema from AgreementRequestProviderData.
+      discriminator:
+        propertyName: agreementProvider
+        mapping:
+          VIPPS: '#/components/schemas/VippsAgreementUpdateProviderData'
+    FixedPricing:
+      description: Fixed pricing charges a set amount each interval. **Not yet supported** — creating a FIXED agreement returns 501. Reserved for future use.
+      allOf:
+      - $ref: '#/components/schemas/AgreementPricing'
+      - required:
+        - amount
+        - currency
+        - interval
+        type: object
+        properties:
+          amount:
+            type: integer
+            description: 'The fixed amount to charge per interval, in minor units, e.g: øre.'
+          currency:
+            maxLength: 3
+            minLength: 3
+            type: string
+            description: ISO 4217 currency code.
+          interval:
+            $ref: '#/components/schemas/AgreementInterval'
+    AgreementPricing:
+      required:
+      - agreementType
+      type: object
+      properties:
+        agreementType:
+          type: string
+          description: The pricing model type.
+          enum:
+          - FIXED
+          - VARIABLE
+          - FLEXIBLE
+      description: Base pricing model for a payment agreement.
+      discriminator:
+        propertyName: agreementType
+        mapping:
+          FIXED: '#/components/schemas/FixedPricing'
+          VARIABLE: '#/components/schemas/VariablePricing'
+          FLEXIBLE: '#/components/schemas/FlexiblePricing'
+    CreatePaymentAgreementRequest:
+      required:
+      - customerNumber
+      - pricing
+      - productName
+      - providerData
+      type: object
+      properties:
+        productName:
+          maxLength: 45
+          type: string
+          description: Name of the product or subscription.
+        productDescription:
+          maxLength: 100
+          type: string
+          description: Optional description of the product or subscription, shown to the customer in the provider's app.
+        customerNumber:
+          type: string
+          description: The customer number for the agreement.
+        pricing:
+          $ref: '#/components/schemas/AgreementPricing'
+        providerData:
+          $ref: '#/components/schemas/AgreementRequestProviderData'
+      description: Request to create a new payment agreement.
+    AgreementRequestProviderData:
+      required:
+      - agreementProvider
+      type: object
+      properties:
+        agreementProvider:
+          type: string
+          description: The payment provider for the agreement.
+          enum:
+          - VIPPS
+      description: Base provider-specific data for creating an agreement.
+      discriminator:
+        propertyName: agreementProvider
+        mapping:
+          VIPPS: '#/components/schemas/VippsAgreementRequestProviderData'
     PaymentAgreementResponse:
       type: object
       properties:
@@ -699,30 +679,45 @@ components:
         providerData:
           $ref: '#/components/schemas/AgreementResponseProviderData'
       description: Response containing payment agreement details.
-    CreatePaymentAgreementRequest:
+    VariablePricing:
+      description: Variable pricing charges a varying amount each interval and requires a suggested maximum amount. **Not yet supported** — creating a VARIABLE agreement returns 501. Reserved for future use.
+      allOf:
+      - $ref: '#/components/schemas/AgreementPricing'
+      - required:
+        - amount
+        - currency
+        - interval
+        - suggestedMaxAmount
+        type: object
+        properties:
+          amount:
+            type: integer
+            description: 'The amount to charge per interval, in minor units, e.g: øre.'
+          currency:
+            maxLength: 3
+            minLength: 3
+            type: string
+            description: ISO 4217 currency code.
+          interval:
+            $ref: '#/components/schemas/AgreementInterval'
+          suggestedMaxAmount:
+            type: integer
+            description: A suggested maximum amount per charge, in minor units.
+    AgreementResponseProviderData:
       required:
-      - customerNumber
-      - pricing
-      - productName
-      - providerData
+      - agreementProvider
       type: object
       properties:
-        productName:
-          maxLength: 45
+        agreementProvider:
           type: string
-          description: Name of the product or subscription.
-        productDescription:
-          maxLength: 100
-          type: string
-          description: Optional description of the product or subscription, shown to the customer in the provider's app.
-        customerNumber:
-          type: string
-          description: The customer number for the agreement.
-        pricing:
-          $ref: '#/components/schemas/AgreementPricing'
-        providerData:
-          $ref: '#/components/schemas/AgreementRequestProviderData'
-      description: Request to create a new payment agreement.
+          description: The payment provider for the agreement.
+          enum:
+          - VIPPS
+      description: Base provider-specific data in an agreement response.
+      discriminator:
+        propertyName: agreementProvider
+        mapping:
+          VIPPS: '#/components/schemas/VippsAgreementResponseProviderData'
     AgreementUpdatePricing:
       description: Pricing model for updating an agreement. Not yet supported — supplying this field returns 501. FLEXIBLE is absent because its amount is set per charge and has nothing to update; FIXED and VARIABLE are reserved for future use.
       discriminator:
@@ -751,59 +746,31 @@ components:
           type: integer
           description: The number of time units per interval.
       description: Defines the billing interval for a payment agreement.
-    UpdatePaymentAgreementRequest:
-      type: object
-      properties:
-        productName:
-          maxLength: 45
-          type: string
-          description: Name of the product or subscription.
-        productDescription:
-          maxLength: 100
-          type: string
-          description: Description of the product or subscription, shown to the customer in the provider's app.
-        pricing:
-          $ref: '#/components/schemas/AgreementUpdatePricing'
-        providerData:
-          $ref: '#/components/schemas/AgreementUpdateProviderData'
-      description: Request to update a payment agreement. Every field is optional, but at least one must be supplied — omitting a field leaves it unchanged. `pricing` is not currently supported and returns 501; only `productName`, `productDescription`, and `providerData` can be updated on FLEXIBLE agreements.
-  responses:
-    notImplemented:
-      description: Not Implemented
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/PaymentError'
-    notFound:
-      description: Not Found
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/PaymentError'
-    badRequestValidationError:
-      description: Bad Request
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/PaymentError'
-    internalServerError:
-      description: Internal Server Error
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/PaymentError'
-    conflict:
-      description: Conflict
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/PaymentError'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
+    dciHeader:
+      name: Entur-Distribution-Channel
       in: header
-      description: Correlation id
+      description: Distribution channel identifier.
       required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    agreementIdPathParam:
+      name: agreementId
+      in: path
+      description: agreementId
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: integer
+        format: int64
+    posHeader:
+      name: Entur-POS
+      in: header
+      description: Point-of-sale identifier.
+      required: true
       style: simple
       explode: false
       schema:
@@ -823,39 +790,48 @@ components:
       explode: false
       schema:
         type: string
-    agreementIdPathParam:
-      name: agreementId
-      in: path
-      description: agreementId
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: integer
-        format: int64
-    dciHeader:
-      name: Entur-Distribution-Channel
+    X-Correlation-Id:
+      name: X-Correlation-Id
       in: header
-      description: Distribution channel identifier.
+      description: Correlation id
       required: false
       style: simple
       explode: false
       schema:
         type: string
-    posHeader:
-      name: Entur-POS
-      in: header
-      description: Point-of-sale identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notImplemented:
+      description: Not Implemented
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    conflict:
+      description: Conflict
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    badRequestValidationError:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-payment-partner-openapi.json
-- entur-payment-partner-openapi.yml

@@ -207,66 +207,118 @@ paths:
       x-entur-permissions:
         value: product-api-access:endre
 components:
-  schemas:
-    SalesOfferPackageAssignmentResponse:
-      required:
-      - results
-      type: object
-      properties:
+  examples:
+    allSuccess:
+      summary: All assignments succeeded
+      value:
         results:
-          type: array
-          description: Per-sales-offer-package result. Best-effort — failure on one sales package does not stop others.
-          items:
-            $ref: '#/components/schemas/SalesOfferPackageAssignmentResultItem'
-    SalesOfferPackageAssignmentListItem:
-      required:
-      - fareProductId
-      - fareProductVersionId
-      - salesOfferPackageId
-      type: object
-      properties:
-        salesOfferPackageId:
-          pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
-          type: string
-          description: NeTEx ID of the sales package.
-          examples:
-          - VYG:SalesOfferPackage:07c4332c
+        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+          status: SUCCESS
+          versionStatus: VERSIONED
+          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+          versionNumber: 14
+    assignParkingAsDraft:
+      summary: Assign parking supplement as draft (requires manual publication)
+      value:
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+        salesOfferPackageIds:
+        - TOG:SalesOfferPackage:a1b2c3d4
+        status: DRAFT
+    assignmentList:
+      summary: List of sales package assignments for a fare product
+      value:
+      - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
         salesOfferPackageName:
-          $ref: '#/components/schemas/LocalizedString'
-        fareProductId:
-          type: string
-          description: NeTEx ID of the fare product.
+        - lang: nb-NO
+          value: Salgspakke tog + parkering
+        fareProductId: FJO:SupplementProduct:f9e8d7c6
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+      - salesOfferPackageId: KYS:SalesOfferPackage:t4u5v6
+        salesOfferPackageName:
+        - lang: nb-NO
+          value: Salgspakke buss + parkering
+        fareProductId: FJO:SupplementProduct:f9e8d7c6
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+    multiStatus:
+      summary: Mixed success and failure response
+      value:
+        results:
+        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+          status: SUCCESS
+          versionStatus: VERSIONED
+          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+          versionNumber: 14
+        - salesOfferPackageId: KYS:SalesOfferPackage:q7r8s9
+          status: FAILED
+          error:
+            code: NO_AGREEMENT
+            message: Ingen avtale med KYS for denne salgspakka
+    assignParking:
+      summary: Assign parking supplement to two sales packages
+      value:
+        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
+        salesOfferPackageIds:
+        - TOG:SalesOfferPackage:a1b2c3d4
+        - KYS:SalesOfferPackage:q7r8s9
+    draftCreated:
+      summary: Draft version created (no version number)
+      value:
+        results:
+        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+          status: SUCCESS
+          versionStatus: DRAFT
+          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
+  responses:
+    BadRequestError:
+      description: Bad request - Invalid data or schema violation
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
           examples:
-          - EXA:SupplementProduct:e006fb5c
-        fareProductVersionId:
-          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
-          type: string
-          description: NeTEx version ID of the assigned fare product version.
+            schemaViolation:
+              summary: Request does not match schema
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: Field 'name' is required.
+            purchaseWindowNotFound:
+              summary: Referenced purchase window not found
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
           examples:
-          - EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef
-    AssignmentError:
-      required:
-      - code
-      - message
-      type: object
-      properties:
-        code:
-          type: string
-          description: Machine-readable error code.
-          enum:
-          - NO_AGREEMENT
-          - NOT_FOUND
-          - ACCESS_DENIED
-          - VALIDITY_CONFLICT
-          - DRAFT_IN_PROGRESS
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
           examples:
-          - NO_AGREEMENT
-        message:
-          type: string
-          description: Human-readable error message.
-          examples:
-          - Ingen avtale med SJN for denne salgspakka
-      description: Error details for a failed assignment.
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+  schemas:
     ProblemDetails:
       required:
       - detail
@@ -304,23 +356,46 @@ components:
           examples:
           - https://api.example.com/requests/12345
       description: RFC 9457 Problem Details
-    LocalizedString:
-      type: array
-      items:
-        required:
-        - lang
-        - value
-        type: object
-        properties:
-          lang:
-            pattern: ^[a-z]{2}-[A-Z]{2}$
-            type: string
-            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
-            examples:
-            - nb-NO
-          value:
-            type: string
-            description: The localized string value for the specified lang.
+    SalesOfferPackageAssignmentResponse:
+      required:
+      - results
+      type: object
+      properties:
+        results:
+          type: array
+          description: Per-sales-offer-package result. Best-effort — failure on one sales package does not stop others.
+          items:
+            $ref: '#/components/schemas/SalesOfferPackageAssignmentResultItem'
+    AssignmentError:
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: Machine-readable error code.
+          enum:
+          - NO_AGREEMENT
+          - NOT_FOUND
+          - ACCESS_DENIED
+          - VALIDITY_CONFLICT
+          - DRAFT_IN_PROGRESS
+          examples:
+          - NO_AGREEMENT
+        message:
+          type: string
+          description: Human-readable error message.
+          examples:
+          - Ingen avtale med SJN for denne salgspakka
+      description: Error details for a failed assignment.
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
     SalesOfferPackageAssignmentRequest:
       required:
       - fareProductVersionId
@@ -397,134 +472,63 @@ components:
           - 14
         error:
           $ref: '#/components/schemas/AssignmentError'
-    VersionStatus:
-      type: string
-      enum:
-      - DRAFT
-      - PROPOSED
-      - VERSIONED
-      - DEPRECATED
-  responses:
-    BadRequestError:
-      description: Bad request - Invalid data or schema violation
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
+    SalesOfferPackageAssignmentListItem:
+      required:
+      - fareProductId
+      - fareProductVersionId
+      - salesOfferPackageId
+      type: object
+      properties:
+        salesOfferPackageId:
+          pattern: ^([A-Z]{3}):SalesOfferPackage:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx ID of the sales package.
           examples:
-            schemaViolation:
-              summary: Request does not match schema
-              value:
-                type: https://developer.entur.org/errors/bad-request
-                title: Bad Request
-                status: 400
-                detail: Field 'name' is required.
-            purchaseWindowNotFound:
-              summary: Referenced purchase window not found
-              value:
-                type: https://developer.entur.org/errors/bad-request
-                title: Bad Request
-                status: 400
-                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
-    ForbiddenError:
-      description: Forbidden - Insufficient permissions
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            forbidden:
-              summary: Access forbidden
-              value:
-                type: https://example.com/probs/forbidden
-                title: Forbidden
-                status: 403
-                detail: You do not have permission to access this resource.
-    UnauthorizedError:
-      description: Unauthorized - Authentication required
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            unauthorized:
-              summary: Authentication required
-              value:
-                type: https://example.com/probs/unauthorized
-                title: Unauthorized
-                status: 401
-                detail: Authentication credentials were missing or invalid.
-  examples:
-    assignmentList:
-      summary: List of sales package assignments for a fare product
-      value:
-      - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
+          - VYG:SalesOfferPackage:07c4332c
         salesOfferPackageName:
-        - lang: nb-NO
-          value: Salgspakke tog + parkering
-        fareProductId: FJO:SupplementProduct:f9e8d7c6
-        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
-      - salesOfferPackageId: KYS:SalesOfferPackage:t4u5v6
-        salesOfferPackageName:
-        - lang: nb-NO
-          value: Salgspakke buss + parkering
-        fareProductId: FJO:SupplementProduct:f9e8d7c6
-        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
-    draftCreated:
-      summary: Draft version created (no version number)
-      value:
-        results:
-        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
-          status: SUCCESS
-          versionStatus: DRAFT
-          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
-    allSuccess:
-      summary: All assignments succeeded
-      value:
-        results:
-        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
-          status: SUCCESS
-          versionStatus: VERSIONED
-          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
-          versionNumber: 14
-    assignParkingAsDraft:
-      summary: Assign parking supplement as draft (requires manual publication)
-      value:
-        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
-        salesOfferPackageIds:
-        - TOG:SalesOfferPackage:a1b2c3d4
-        status: DRAFT
-    assignParking:
-      summary: Assign parking supplement to two sales packages
-      value:
-        fareProductVersionId: FJO:Version:FP-d7e8f9a0-abcd-1234-efgh-112233aabbcc
-        salesOfferPackageIds:
-        - TOG:SalesOfferPackage:a1b2c3d4
-        - KYS:SalesOfferPackage:q7r8s9
-    multiStatus:
-      summary: Mixed success and failure response
-      value:
-        results:
-        - salesOfferPackageId: TOG:SalesOfferPackage:a1b2c3d4
-          status: SUCCESS
-          versionStatus: VERSIONED
-          createdVersionId: TOG:Version:SP-b3c4d5e6-abcd-1234-efgh-112233aabbcc
-          versionNumber: 14
-        - salesOfferPackageId: KYS:SalesOfferPackage:q7r8s9
-          status: FAILED
-          error:
-            code: NO_AGREEMENT
-            message: Ingen avtale med KYS for denne salgspakka
+          $ref: '#/components/schemas/LocalizedString'
+        fareProductId:
+          type: string
+          description: NeTEx ID of the fare product.
+          examples:
+          - EXA:SupplementProduct:e006fb5c
+        fareProductVersionId:
+          pattern: ^([A-Z]{3}):Version:([0-9A-Za-z_\-]*)$
+          type: string
+          description: NeTEx version ID of the assigned fare product version.
+          examples:
+          - EXA:Version:FP-4725c71a-abcd-1234-efgh-567890abcdef
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
       style: simple
       explode: false
       schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
         type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -540,19 +544,15 @@ components:
       explode: false
       schema:
         type: string
-    id:
-      name: id
-      in: path
-      description: The netex ID of the element to retrieve
-      required: true
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
       style: simple
       explode: false
       schema:
-        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
         type: string
-      examples:
-        default:
-          value: ENT:PreassignedFareProduct:001
   securitySchemes:
     jwt:
       type: http

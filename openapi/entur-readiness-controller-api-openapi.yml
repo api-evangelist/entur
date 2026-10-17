@@ -2,7 +2,7 @@ openapi: 3.2.0
 info:
   title: Entur Readiness Controller API
   version: 2026.09.0
-  description: 'Operations tagged readiness-controller across 4 of this provider''s published API definitions: entur-inventory-openapi.json, entur-seating-manager-openapi.json, entur-inventory-openapi.yml, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged readiness-controller across 2 of this provider''s published API definitions: entur-inventory-openapi.json, entur-seating-manager-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/inventory
 - url: https://api.entur.io/seating-manager
@@ -60,5 +60,3 @@ components:
 x-refined-from:
 - entur-inventory-openapi.json
 - entur-seating-manager-openapi.json
-- entur-inventory-openapi.yml
-- entur-seating-manager-openapi.yml

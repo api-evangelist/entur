@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Compensation API
+  title: Refunds Compensation API
+  description: Check refundable options and perform refunds or compensations on customer orders. This API allows partners to preview refund outcomes, execute refunds, and apply price reductions when compensation is sufficient.
   version: 2026.09.0
-  description: 'Operations tagged Compensation across 2 of this provider''s published API definitions: entur-refund-partner-openapi.json, entur-refund-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/sales
   description: production
@@ -52,13 +52,6 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
   /v1/compensations/{orderId}:
     parameters:
     - $ref: '#/components/parameters/authHeader'
@@ -97,124 +90,83 @@ paths:
         '500':
           $ref: '#/components/responses/internalServerError'
       deprecated: false
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
 components:
+  parameters:
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: ENT:DistributionChannel:App
+    authHeader:
+      name: Authorization
+      in: header
+      description: Authorization header
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+    settlementHeader:
+      name: Entur-Settlement-Id
+      in: header
+      description: An id for connecting a credit to a settlement
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: '12345'
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: 1000600-abc
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    orderIdPathParam:
+      name: orderId
+      in: path
+      description: The id of the order that one would like to get or perform refund operations on
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+      example: NTA2JGR7
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   schemas:
-    RefundError:
-      type: object
-      properties:
-        title:
-          type: string
-          example: Bad Request
-        error:
-          type: string
-        exception:
-          type: string
-        message:
-          type: string
-          example: Validation Failed
-        path:
-          type: string
-          example: /v1/refunds/NTA2JGR7
-        status:
-          type: integer
-          format: int32
-          example: 400
-        timestamp:
-          type: string
-          format: date-time
-          example: '2020-07-21T17:32:28Z'
-      required:
-      - error
-      - exception
-      - message
-      - path
-      - status
-      - timestamp
-      - title
-      title: RefundError
-    CompensationDetails:
-      type: object
-      description: The summary of a CompensationElement' outcome
-      properties:
-        orderLineIds:
-          type: array
-          description: Optional list of order line ids that have been compensated. If empty the whole order was compensated
-          example:
-          - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
-          - 26b02145-7dbf-4be9-8600-ff4a570d83d5
-          items:
-            type: string
-        feeId:
-          type: string
-          description: ID of the resulting REDUCTION fee for the compensation
-          example: fd894a04-bfa5-4e04-92e5-fd235449ea7d
-        involvedAuthorityIds:
-          type: array
-          description: A list of all the Authority ids associated with the compensated operation
-          example:
-          - ENT:Authority:Test
-          items:
-            type: string
-      required:
-      - feeId
-      - involvedAuthorityIds
-      title: CompensationDetails
-    CompensationRequest:
-      type: object
-      description: A request performing compensation operations in batch
-      properties:
-        compensationOperations:
-          type: array
-          description: A required list of one or more compensation operations
-          items:
-            $ref: '#/components/schemas/CompensationOperation'
-      required:
-      - compensationOperations
-      title: CompensationRequest
-    CompensationOperation:
-      type: object
-      description: An entry describing a compensation operation
-      properties:
-        orderId:
-          type: string
-          description: The order id referencing the order to be compensated
-          example: NTA2JGR7
-        elements:
-          type: array
-          description: A list of compensation elements
-          items:
-            $ref: '#/components/schemas/CompensationElement'
-      required:
-      - elements
-      - orderId
-      title: CompensationOperation
-    CompensationResponse:
-      type: object
-      description: The response from performing one or more compensation operations
-      properties:
-        operationResults:
-          type: array
-          items:
-            $ref: '#/components/schemas/CompensationResult'
-      required:
-      - operationResults
-      title: CompensationResponse
-    CompensationOperationResponse:
-      type: object
-      description: The response from performing a single compensation operation
-      properties:
-        operationResult:
-          $ref: '#/components/schemas/CompensationResult'
-      required:
-      - operationResult
-      title: CompensationOperationResponse
     CompensationResult:
       type: object
       description: The response from performing one or more compensation operations
@@ -251,24 +203,71 @@ components:
       - details
       - orderId
       title: CompensationResult
-    CompensationOperationRequest:
+    CompensationRequest:
       type: object
-      description: A request performing an single compensation operation
+      description: A request performing compensation operations in batch
       properties:
-        elements:
+        compensationOperations:
           type: array
-          description: A list of compensation elements
+          description: A required list of one or more compensation operations
           items:
-            $ref: '#/components/schemas/CompensationElement'
-        additionalTerminalData:
-          $ref: '#/components/schemas/TerminalRefundingData'
-        overrideReimbursementType:
-          type: string
-          description: 'Used to override the payment method that the refund operations will be registered as. All refund operations that will target a payment transaction that is imported, will be overridden. Available types: CASH'
-          example: CASH
+            $ref: '#/components/schemas/CompensationOperation'
       required:
-      - compensationElements
-      title: CompensationOperationRequest
+      - compensationOperations
+      title: CompensationRequest
+    RefundError:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Bad Request
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+          example: Validation Failed
+        path:
+          type: string
+          example: /v1/refunds/NTA2JGR7
+        status:
+          type: integer
+          format: int32
+          example: 400
+        timestamp:
+          type: string
+          format: date-time
+          example: '2020-07-21T17:32:28Z'
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      title: RefundError
+    CompensationOperationResponse:
+      type: object
+      description: The response from performing a single compensation operation
+      properties:
+        operationResult:
+          $ref: '#/components/schemas/CompensationResult'
+      required:
+      - operationResult
+      title: CompensationOperationResponse
+    CompensationResponse:
+      type: object
+      description: The response from performing one or more compensation operations
+      properties:
+        operationResults:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompensationResult'
+      required:
+      - operationResults
+      title: CompensationResponse
     TerminalRefundingData:
       type: object
       description: Holder for data that needs to be provided when performing a refund on an external terminal
@@ -311,6 +310,68 @@ components:
       - terminalId
       - transactionConfirmedAt
       title: TerminalRefundingData
+    CompensationOperation:
+      type: object
+      description: An entry describing a compensation operation
+      properties:
+        orderId:
+          type: string
+          description: The order id referencing the order to be compensated
+          example: NTA2JGR7
+        elements:
+          type: array
+          description: A list of compensation elements
+          items:
+            $ref: '#/components/schemas/CompensationElement'
+      required:
+      - elements
+      - orderId
+      title: CompensationOperation
+    CompensationDetails:
+      type: object
+      description: The summary of a CompensationElement' outcome
+      properties:
+        orderLineIds:
+          type: array
+          description: Optional list of order line ids that have been compensated. If empty the whole order was compensated
+          example:
+          - a3d7bfeb-c76c-4ded-8253-dbd04da15c13
+          - 26b02145-7dbf-4be9-8600-ff4a570d83d5
+          items:
+            type: string
+        feeId:
+          type: string
+          description: ID of the resulting REDUCTION fee for the compensation
+          example: fd894a04-bfa5-4e04-92e5-fd235449ea7d
+        involvedAuthorityIds:
+          type: array
+          description: A list of all the Authority ids associated with the compensated operation
+          example:
+          - ENT:Authority:Test
+          items:
+            type: string
+      required:
+      - feeId
+      - involvedAuthorityIds
+      title: CompensationDetails
+    CompensationOperationRequest:
+      type: object
+      description: A request performing an single compensation operation
+      properties:
+        elements:
+          type: array
+          description: A list of compensation elements
+          items:
+            $ref: '#/components/schemas/CompensationElement'
+        additionalTerminalData:
+          $ref: '#/components/schemas/TerminalRefundingData'
+        overrideReimbursementType:
+          type: string
+          description: 'Used to override the payment method that the refund operations will be registered as. All refund operations that will target a payment transaction that is imported, will be overridden. Available types: CASH'
+          example: CASH
+      required:
+      - compensationElements
+      title: CompensationOperationRequest
     CompensationElement:
       type: object
       description: A element that wraps a sub operation on a given order. Typically when different
@@ -335,34 +396,6 @@ components:
       - compensationAmount
       title: CompensationElement
   responses:
-    notFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RefundError'
-          example:
-            timestamp: '2025-11-13T10:15:30+01:00'
-            status: 404
-            title: Not Found
-            error: Not Found
-            exception: NotFoundException
-            message: This orderId does not have any options
-            path: /v1/refunds/options/{orderId}
-    badRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/RefundError'
-          example:
-            timestamp: '2025-11-13T10:15:30+01:00'
-            status: 400
-            title: Bad Request
-            error: Bad Request
-            exception: BAD_REQUEST
-            message: Required parameter 'xx' is not present.
-            path: /v1/refunds
     internalServerError:
       description: Internal Server Error
       content:
@@ -391,81 +424,31 @@ components:
             exception: ConflictException
             message: Order with orderId 1 already refunded.
             path: /v1/refunds/admin/{orderId}
-  parameters:
-    settlementHeader:
-      name: Entur-Settlement-Id
-      in: header
-      description: An id for connecting a credit to a settlement
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: '12345'
-    orderIdPathParam:
-      name: orderId
-      in: path
-      description: The id of the order that one would like to get or perform refund operations on
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: NTA2JGR7
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    dciHeader:
-      name: Entur-Distribution-Channel
-      in: header
-      description: Distribution channel identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: ENT:DistributionChannel:App
-    posHeader:
-      name: Entur-Pos
-      in: header
-      description: Point-of-sale identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: 1000600-abc
-    authHeader:
-      name: Authorization
-      in: header
-      description: Authorization header
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-      example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-x-refined-from:
-- entur-refund-partner-openapi.json
-- entur-refund-partner-openapi.yml
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 400
+            title: Bad Request
+            error: Bad Request
+            exception: BAD_REQUEST
+            message: Required parameter 'xx' is not present.
+            path: /v1/refunds
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RefundError'
+          example:
+            timestamp: '2025-11-13T10:15:30+01:00'
+            status: 404
+            title: Not Found
+            error: Not Found
+            exception: NotFoundException
+            message: This orderId does not have any options
+            path: /v1/refunds/options/{orderId}

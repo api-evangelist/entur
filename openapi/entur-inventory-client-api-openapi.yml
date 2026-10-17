@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Inventory Client API
-  version: 2026.09.0
+  title: Inventory Client API
+  description: API exposing services to handle stock
   contact:
     name: Entur Team Varelager
-  description: 'Operations tagged Inventory Client across 2 of this provider''s published API definitions: entur-inventory-openapi.json, entur-inventory-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.0
 servers:
 - url: https://api.entur.io/inventory
 security:
@@ -102,8 +102,6 @@ paths:
                 created: '2024-01-01T10:00:00Z'
                 changed: '2024-01-01T10:00:00Z'
                 status: CONFIRMED
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/reservations/{reservationId}/reservation-lines/{reservationLineId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -146,8 +144,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReservationLineResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/stock/query:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -175,8 +171,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MultiStockResponse'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/reservations:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -307,8 +301,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReservationResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/reservations/batch:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -345,8 +337,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ReservationResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/stock:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -386,8 +376,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StockResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/reservations/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -415,33 +403,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReservationResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
 components:
   schemas:
-    ReservationLine:
-      type: object
-      description: Updated spec of reservation line
-      properties:
-        productId:
-          type: string
-        amount:
-          type: integer
-          format: int32
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - EXPIRED
-          - CANCELLED
-          - DRAFT_CANCELLATION
-          - CONFIRMED_CANCELLATION
-          - RELEASING
+    ProductResponseV1:
+      allOf:
+      - $ref: '#/components/schemas/NestingComponentResponseV1'
+      - type: object
+        properties:
+          id:
+            type: integer
+            format: int32
+          products:
+            type: array
+            items:
+              type: string
+          leftInQuota:
+            type: integer
+            format: int32
+          purchaseWindowStart:
+            type: string
+            format: date-time
+          purchaseWindowStop:
+            type: string
+            format: date-time
+          closedBy:
+            type: array
+            items:
+              type: integer
+              format: int32
       required:
-      - amount
-      - productId
-      - status
+      - aggregatedAvailability
+      - closedBy
+      - id
+      - leftInQuota
+      - nestingGroup
+      - priority
+      - products
+    StockQuery:
+      type: object
+      properties:
+        datedServiceJourney:
+          type: string
+        origin:
+          type: string
+        destination:
+          type: string
+      required:
+      - datedServiceJourney
+      - destination
+      - origin
+    StockComponentResponseV1: {}
     SimpleProductResponseV1:
       allOf:
       - $ref: '#/components/schemas/StockComponentResponseV1'
@@ -457,151 +468,6 @@ components:
       required:
       - leftInQuota
       - products
-    ProductCollectionResponseV1:
-      allOf:
-      - $ref: '#/components/schemas/NestingComponentResponseV1'
-      - type: object
-        properties:
-          selectionRule:
-            type: string
-            enum:
-            - COMBINED
-            - SINGLE
-          consumptionRule:
-            type: string
-            enum:
-            - DIRECT
-            - BY_PRIORITY
-          directionRule:
-            type: string
-            enum:
-            - FROM_RIGHT
-            - FROM_LEFT
-          components:
-            type: array
-            items:
-              oneOf:
-              - $ref: '#/components/schemas/ProductCollectionResponseV1'
-              - $ref: '#/components/schemas/ProductResponseV1'
-      required:
-      - aggregatedAvailability
-      - components
-      - consumptionRule
-      - directionRule
-      - nestingGroup
-      - priority
-      - selectionRule
-    MultiStockResponse:
-      type: object
-      properties:
-        origin:
-          type: string
-        destination:
-          type: string
-        spannedDatedServiceJourneys:
-          type: array
-          items:
-            type: string
-        reservableStock:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/NestingComponentResponseV1'
-            - $ref: '#/components/schemas/SimpleProductResponseV1'
-            - $ref: '#/components/schemas/ProductCollectionResponseV1'
-            - $ref: '#/components/schemas/ProductResponseV1'
-      required:
-      - destination
-      - origin
-      - reservableStock
-      - spannedDatedServiceJourneys
-    StockResponseV1:
-      type: object
-      properties:
-        datedServiceJourney:
-          type: string
-        origin:
-          type: string
-        destination:
-          type: string
-        organisationId:
-          type: string
-        stock:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/NestingComponentResponseV1'
-            - $ref: '#/components/schemas/SimpleProductResponseV1'
-            - $ref: '#/components/schemas/ProductCollectionResponseV1'
-            - $ref: '#/components/schemas/ProductResponseV1'
-      required:
-      - datedServiceJourney
-      - destination
-      - organisationId
-      - origin
-      - stock
-    UpdatedReservationLine:
-      type: object
-      description: ' Updated reservation line specification'
-      properties:
-        id:
-          type: integer
-          format: int64
-        productId:
-          type: string
-        amount:
-          type: integer
-          format: int32
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - EXPIRED
-          - CANCELLED
-          - DRAFT_CANCELLATION
-          - CONFIRMED_CANCELLATION
-          - RELEASING
-      required:
-      - amount
-      - id
-      - productId
-      - status
-    StockQuery:
-      type: object
-      properties:
-        datedServiceJourney:
-          type: string
-        origin:
-          type: string
-        destination:
-          type: string
-      required:
-      - datedServiceJourney
-      - destination
-      - origin
-    Reservation:
-      type: object
-      description: Specifies what should be reserved, in what quantity, and across what distance
-      properties:
-        origin:
-          type: string
-        destination:
-          type: string
-        datedServiceJourneyId:
-          type: string
-        orderId:
-          type: string
-        reservationLines:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReservationLine'
-      required:
-      - datedServiceJourneyId
-      - destination
-      - origin
-      - reservationLines
-    StockComponentResponseV1: {}
     ReservationResponseV1:
       type: object
       properties:
@@ -637,40 +503,6 @@ components:
       - id
       - origin
       - reservationLines
-    ProductResponseV1:
-      allOf:
-      - $ref: '#/components/schemas/NestingComponentResponseV1'
-      - type: object
-        properties:
-          id:
-            type: integer
-            format: int32
-          products:
-            type: array
-            items:
-              type: string
-          leftInQuota:
-            type: integer
-            format: int32
-          purchaseWindowStart:
-            type: string
-            format: date-time
-          purchaseWindowStop:
-            type: string
-            format: date-time
-          closedBy:
-            type: array
-            items:
-              type: integer
-              format: int32
-      required:
-      - aggregatedAvailability
-      - closedBy
-      - id
-      - leftInQuota
-      - nestingGroup
-      - priority
-      - products
     ReservationLineResponseV1:
       type: object
       properties:
@@ -705,6 +537,40 @@ components:
       - id
       - productId
       - status
+    ProductCollectionResponseV1:
+      allOf:
+      - $ref: '#/components/schemas/NestingComponentResponseV1'
+      - type: object
+        properties:
+          selectionRule:
+            type: string
+            enum:
+            - COMBINED
+            - SINGLE
+          consumptionRule:
+            type: string
+            enum:
+            - DIRECT
+            - BY_PRIORITY
+          directionRule:
+            type: string
+            enum:
+            - FROM_RIGHT
+            - FROM_LEFT
+          components:
+            type: array
+            items:
+              oneOf:
+              - $ref: '#/components/schemas/ProductCollectionResponseV1'
+              - $ref: '#/components/schemas/ProductResponseV1'
+      required:
+      - aggregatedAvailability
+      - components
+      - consumptionRule
+      - directionRule
+      - nestingGroup
+      - priority
+      - selectionRule
     NestingComponentResponseV1:
       allOf:
       - $ref: '#/components/schemas/StockComponentResponseV1'
@@ -722,16 +588,127 @@ components:
       - aggregatedAvailability
       - nestingGroup
       - priority
+    MultiStockResponse:
+      type: object
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+        spannedDatedServiceJourneys:
+          type: array
+          items:
+            type: string
+        reservableStock:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/NestingComponentResponseV1'
+            - $ref: '#/components/schemas/SimpleProductResponseV1'
+            - $ref: '#/components/schemas/ProductCollectionResponseV1'
+            - $ref: '#/components/schemas/ProductResponseV1'
+      required:
+      - destination
+      - origin
+      - reservableStock
+      - spannedDatedServiceJourneys
+    UpdatedReservationLine:
+      type: object
+      description: ' Updated reservation line specification'
+      properties:
+        id:
+          type: integer
+          format: int64
+        productId:
+          type: string
+        amount:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - EXPIRED
+          - CANCELLED
+          - DRAFT_CANCELLATION
+          - CONFIRMED_CANCELLATION
+          - RELEASING
+      required:
+      - amount
+      - id
+      - productId
+      - status
+    ReservationLine:
+      type: object
+      description: Updated spec of reservation line
+      properties:
+        productId:
+          type: string
+        amount:
+          type: integer
+          format: int32
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - EXPIRED
+          - CANCELLED
+          - DRAFT_CANCELLATION
+          - CONFIRMED_CANCELLATION
+          - RELEASING
+      required:
+      - amount
+      - productId
+      - status
+    Reservation:
+      type: object
+      description: Specifies what should be reserved, in what quantity, and across what distance
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+        datedServiceJourneyId:
+          type: string
+        orderId:
+          type: string
+        reservationLines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReservationLine'
+      required:
+      - datedServiceJourneyId
+      - destination
+      - origin
+      - reservationLines
+    StockResponseV1:
+      type: object
+      properties:
+        datedServiceJourney:
+          type: string
+        origin:
+          type: string
+        destination:
+          type: string
+        organisationId:
+          type: string
+        stock:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/NestingComponentResponseV1'
+            - $ref: '#/components/schemas/SimpleProductResponseV1'
+            - $ref: '#/components/schemas/ProductCollectionResponseV1'
+            - $ref: '#/components/schemas/ProductResponseV1'
+      required:
+      - datedServiceJourney
+      - destination
+      - organisationId
+      - origin
+      - stock
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -747,11 +724,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-inventory-openapi.json
-- entur-inventory-openapi.yml

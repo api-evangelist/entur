@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Validable Elements API
+  title: Products Validable Elements API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged validable-elements across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -140,13 +140,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /validable-elements:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -320,13 +313,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /validable-elements/count:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -428,13 +414,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /validable-elements/pages:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -569,13 +548,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /validable-elements/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -678,13 +650,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /validable-elements/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -853,252 +818,33 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
-    ValidableElement:
-      required:
-      - accessRightParameterAssignments
-      - changed
-      - created
-      - fareFrameRef
-      - fareTableRefs
-      - id
-      - modification
-      - nameOfClass
-      - status
-      - version
-      type: object
-      properties:
-        accessRightParameterAssignments:
-          type: array
-          description: The references to access right parameter assignments.
-          items:
-            $ref: '#/components/schemas/GenericParameterAssignment'
-        activeComparisonOperatorVariant:
-          type: string
-          description: 'Deprecated: this parameter will be ignored'
-          examples:
-          - E
-        areaValidity:
-          $ref: '#/components/schemas/AreaValidity'
-        changed:
-          type: string
-          description: Changed datetime.
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        description:
-          type: array
-          description: Description represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareStructureElementsInSequence:
-          type: array
-          description: The fare structure elements in sequence
-          items:
-            $ref: '#/components/schemas/FareStructureElementInSequence'
-        fareStructureElementsRef:
-          type: array
-          description: The reference to the fare divided into a sequence.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: References for associated fare table.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:ValidableElement:Ordinary
-        modification:
-          type: string
-          description: Modification status.
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          examples:
-          - ValidableElement
-        organisationId:
-          type: string
-          description: Organisation related to the userProfile
-        prices:
-          type: array
-          description: Fare prices.
-          items:
-            $ref: '#/components/schemas/FarePrice'
-        pricingRuleRef:
-          type: string
-          description: Pricing rule reference.
-          examples:
-          - unused
-        status:
-          type: string
-          description: Status.
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        validityConditions:
-          type: array
-          description: Gives a sequence of conditions for validity.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Validable element version.
-          examples:
-          - NSB:Version:V1
-      description: A ValidationElement
-    TextInLanguage:
-      required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
-    GroupOfTimeBands:
-      required:
-      - changed
-      - created
-      - id
-      - members
-      - modification
-      - nameOfClass
-      - status
-      - validityConditions
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-        members:
-          type: array
-          description: Members.
-          items:
-            $ref: '#/components/schemas/Timeband'
-        modification:
-          type: string
-          description: Modification status.
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        nameOfClass:
-          type: string
-          description: Name of class.
-          examples:
-          - FareStructureElement
-        status:
-          type: string
-          description: Status.
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        validityConditions:
-          type: array
-          description: ValidityConditions sequence.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A GroupOfTimeband describe during which the assignments applies
-    Rounding:
+    FareStructureElementInSequence:
       required:
       - changed
       - created
       - fareFrameRef
+      - fareStructureElementId
+      - fareStructureElementRef
       - id
-      - modification
       - nameOfClass
-      - roundingMethod
-      - status
       - version
       type: object
       properties:
+        accessNumber:
+          type: integer
+          description: 'Deprecated: Historically always null and omitted from the response. In NeTEx this field is optional and has been superseded by the minimumAccess/maximumAccess range (introduced in NeTEx v1.1), available on AccessRightInProduct.'
+          format: int32
+          deprecated: true
         changed:
           type: string
           description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
+          format: date-time
         created:
           type: string
           description: Created datetime.
-          readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
+          format: date-time
         description:
           type: array
           description: Description.
@@ -1106,13 +852,133 @@ components:
             $ref: '#/components/schemas/TextInLanguage'
         fareFrameRef:
           $ref: '#/components/schemas/VersionOfObjectRef'
+        fareStructureElementId:
+          type: string
+          description: Fare structure element ref
+        fareStructureElementRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
         id:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
           description: Id.
           examples:
-          - NSB:Rounding:Ordinary
+          - NSB:FareStructureElementInSequence:MiniPriceTENInterval
+        isFirstInSequence:
+          type: boolean
+          description: Gives information if this sequence first or not
+        isLastInSequence:
+          type: boolean
+          description: Gives information if this sequence last or not
+        limitedAccessNumber:
+          type: integer
+          description: Flag indicating whether this rights gives an unlimited number of accesses or not
+          format: int32
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - FareStructureElementInSequence
+        orderOfElement:
+          type: integer
+          description: Access quality structure factor refs
+          format: int32
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Fare structure element in sequence version.
+          examples:
+          - NSB:Version:V1
+      description: A description of a fare structure element in sequence
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    FarePrice:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          maximum: 100
+          minimum: -100
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
         modification:
           type: string
           description: Modification status.
@@ -1133,27 +999,20 @@ components:
           description: Name of class.
           readOnly: true
           examples:
-          - Rounding
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
+          - FarePrice
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/Rounding'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
         status:
           type: string
-          description: Rounding status.
+          description: Status.
           readOnly: true
           enum:
           - DRAFT
@@ -1162,15 +1021,90 @@ components:
           - DEPRECATED
           examples:
           - DRAFT
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+          description: Version.
+          readOnly: true
+          examples:
+          - NSB:Version:V1
+      description: A description of the price and factor for a set fare
+    ValidableElementInsert:
+      required:
+      - description
+      - fareFrameRef
+      - id
+      - name
+      - version
+      type: object
+      properties:
+        accessRightParameterAssignments:
+          type: array
+          description: The references to access right parameter assignments.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        areaValidity:
+          $ref: '#/components/schemas/AreaValidity'
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareStructureElementsInSequence:
+          type: array
+          description: Fare structure elements in sequence
+          items:
+            $ref: '#/components/schemas/FareStructureElementInSequenceInsert'
+        fareStructureElementsRef:
+          type: array
+          description: The reference to the fare divided into a sequence.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables that provide prices or discounts for the user profile.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id
+          examples:
+          - NSB:ValidableElement:Child
+        name:
+          type: array
+          description: ValidableElement Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        prices:
+          type: array
+          description: Fare prices.
+          items:
+            $ref: '#/components/schemas/FarePriceInsert'
         version:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: Rounding version.
+          description: ValidableElement version.
           examples:
           - NSB:Version:V1
-      description: A description of how prices are rounded post calculation
-      deprecated: true
     GenericParameterAssignment:
       required:
       - changed
@@ -1390,77 +1324,120 @@ components:
           examples:
           - NSB:Version:V2
       description: A GenericParameterAssignment
-    VersionOfObjectRef:
+    FarePriceInsert:
       required:
-      - nameOfClass
-      - ref
-      - version
-      type: object
-      properties:
-        nameOfClass:
-          minLength: 1
-          type: string
-          description: Name of class.
-        ref:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: The netex id reference to the object.
-        version:
-          type: string
-          description: Version.
-      description: Fare frame ref.
-    AreaValidity:
-      required:
-      - changed
-      - created
+      - fareFrameRef
       - id
-      - minimumZonesForAreaValidity
-      - modification
-      - nameOfClass
-      - status
-      - typeOfAreaValidity
-      - version
+      - name
       type: object
       properties:
-        changed:
+        amount:
           type: string
-          description: Changed datetime.
-          readOnly: true
+          description: Amount.
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
         compatibleWithVersionRef:
           type: string
           description: Compatible with version.
-          readOnly: true
-        created:
+        currency:
           type: string
-          description: Created datetime.
-          readOnly: true
+          description: Currency.
+          examples:
+          - NOK
         derivedFromVersionRef:
           type: string
           description: Derived from version.
-          readOnly: true
-        groupOfTariffZoneRef:
-          type: string
-          description: Group of tariff zone
+        discountPercentageUsed:
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
           examples:
-          - ENT:GroupOfTariffZone:abcdef
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
         id:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
           description: Id.
           examples:
-          - RUT:AreaValidity:RuterSingleTicket
-        minimumZonesForAreaValidity:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        ranking:
           type: integer
-          description: Minimum no. of zones for area validity.
+          description: Ranking.
           format: int32
           examples:
-          - 5
+          - 1
+        rounding:
+          $ref: '#/components/schemas/RoundingInsert'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
+    GroupOfTimeBands:
+      required:
+      - changed
+      - created
+      - id
+      - members
+      - modification
+      - nameOfClass
+      - status
+      - validityConditions
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+        members:
+          type: array
+          description: Members.
+          items:
+            $ref: '#/components/schemas/Timeband'
         modification:
           type: string
           description: Modification status.
-          readOnly: true
           enum:
           - NEW
           - REVISE
@@ -1470,13 +1447,11 @@ components:
         nameOfClass:
           type: string
           description: Name of class.
-          readOnly: true
           examples:
-          - AreaValidity
+          - FareStructureElement
         status:
           type: string
-          description: Status
-          readOnly: true
+          description: Status.
           enum:
           - DRAFT
           - PROPOSED
@@ -1484,81 +1459,19 @@ components:
           - DEPRECATED
           examples:
           - DRAFT
-        typeOfAreaValidity:
-          type: string
-          description: Type of area validity
-          deprecated: true
-          enum:
-          - POINT_TO_POINT
-          - RING
-          examples:
-          - RING
+        validityConditions:
+          type: array
+          description: ValidityConditions sequence.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
         version:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
           description: Version.
-          readOnly: true
-          examples:
-          - RUT:Version:V1
-      description: Requirements for area validity.
-    FareStructureElementInSequenceInsert:
-      required:
-      - fareFrameRef
-      - fareStructureElementId
-      - id
-      - version
-      type: object
-      properties:
-        accessNumber:
-          type: integer
-          description: The actual access number
-          format: int32
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareStructureElementId:
-          type: string
-          description: Fare structure element id
-          examples:
-          - NSB:FareStructureElement:TENInterval
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FareStructureElementInSequence:MiniPriceTENInterval
-        isFirstInSequence:
-          type: boolean
-          description: Whether element is first in sequence
-        isLastInSequence:
-          type: boolean
-          description: Whether element is last in sequence
-        limitedAccessNumber:
-          type: integer
-          description: Flag indicating whether this rights gives an unlimited number of accesses or not
-          format: int32
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        orderOfElement:
-          type: integer
-          description: Access quality structure factor refs
-          format: int32
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version
           examples:
           - NSB:Version:V1
+      description: A GroupOfTimeband describe during which the assignments applies
     LimitingRule:
       required:
       - changed
@@ -1666,6 +1579,153 @@ components:
           examples:
           - NSB:Version:V1
       description: A LimitingRule
+    TypeOfAccessRightAssignment:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - ENT:TypeOfAccessRightAssignment:ActivationPolicyAssignment
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - TypeOfAccessRightAssignment
+        status:
+          type: string
+          description: Type of access right assignment status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Type of access right assignment version.
+          examples:
+          - NSB:Version:V1
+      description: A classification of Access Right Assignments.
+    ValidityCondition:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        fromDate:
+          type: string
+          description: From Date.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ValidBetween:2018
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ValidBetween
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        toDate:
+          type: string
+          description: To Date.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A condition of the validity of the priceable object
     Timeband:
       required:
       - changed
@@ -1779,11 +1839,121 @@ components:
           examples:
           - NSB:Version:V1
       description: The TimeBand describe during which the assignment applies
-    TypeOfAccessRightAssignment:
+    TextInLanguage:
       required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    ValidableElementPageWrapper:
+      required:
+      - items
+      - requestedPageNumber
+      - totalNumberOfItems
+      - totalNumberOfPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: Validable elements for the given page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ValidableElement'
+        requestedPageNumber:
+          type: integer
+          description: Number of the requested page. In case state is lost
+          format: int32
+          examples:
+          - 1
+        totalNumberOfItems:
+          type: integer
+          description: Total number of items.
+          format: int32
+          examples:
+          - 369
+        totalNumberOfPages:
+          type: integer
+          description: Number of pages needed to traverse all items.
+          format: int32
+          readOnly: true
+          examples:
+          - 15
+      description: Validable Element Page Wrapper
+    FareStructureElementInSequenceInsert:
+      required:
+      - fareFrameRef
+      - fareStructureElementId
+      - id
+      - version
+      type: object
+      properties:
+        accessNumber:
+          type: integer
+          description: The actual access number
+          format: int32
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareStructureElementId:
+          type: string
+          description: Fare structure element id
+          examples:
+          - NSB:FareStructureElement:TENInterval
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FareStructureElementInSequence:MiniPriceTENInterval
+        isFirstInSequence:
+          type: boolean
+          description: Whether element is first in sequence
+        isLastInSequence:
+          type: boolean
+          description: Whether element is last in sequence
+        limitedAccessNumber:
+          type: integer
+          description: Flag indicating whether this rights gives an unlimited number of accesses or not
+          format: int32
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        orderOfElement:
+          type: integer
+          description: Access quality structure factor refs
+          format: int32
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+    ValidableElement:
+      required:
+      - accessRightParameterAssignments
       - changed
       - created
       - fareFrameRef
+      - fareTableRefs
       - id
       - modification
       - nameOfClass
@@ -1791,17 +1961,27 @@ components:
       - version
       type: object
       properties:
+        accessRightParameterAssignments:
+          type: array
+          description: The references to access right parameter assignments.
+          items:
+            $ref: '#/components/schemas/GenericParameterAssignment'
+        activeComparisonOperatorVariant:
+          type: string
+          description: 'Deprecated: this parameter will be ignored'
+          examples:
+          - E
+        areaValidity:
+          $ref: '#/components/schemas/AreaValidity'
         changed:
           type: string
           description: Changed datetime.
-          readOnly: true
         compatibleWithVersionRef:
           type: string
           description: Compatible with version.
         created:
           type: string
           description: Created datetime.
-          readOnly: true
         derivedFromVersionRef:
           type: string
           description: Derived from version.
@@ -1812,17 +1992,31 @@ components:
             $ref: '#/components/schemas/TextInLanguage'
         fareFrameRef:
           $ref: '#/components/schemas/VersionOfObjectRef'
+        fareStructureElementsInSequence:
+          type: array
+          description: The fare structure elements in sequence
+          items:
+            $ref: '#/components/schemas/FareStructureElementInSequence'
+        fareStructureElementsRef:
+          type: array
+          description: The reference to the fare divided into a sequence.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References for associated fare table.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
         id:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
           description: Id.
           examples:
-          - ENT:TypeOfAccessRightAssignment:ActivationPolicyAssignment
+          - NSB:ValidableElement:Ordinary
         modification:
           type: string
           description: Modification status.
-          readOnly: true
           enum:
           - NEW
           - REVISE
@@ -1837,12 +2031,163 @@ components:
         nameOfClass:
           type: string
           description: Name of class.
-          readOnly: true
           examples:
-          - TypeOfAccessRightAssignment
+          - ValidableElement
+        organisationId:
+          type: string
+          description: Organisation related to the userProfile
+        prices:
+          type: array
+          description: Fare prices.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        pricingRuleRef:
+          type: string
+          description: Pricing rule reference.
+          examples:
+          - unused
         status:
           type: string
-          description: Type of access right assignment status.
+          description: Status.
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        validityConditions:
+          type: array
+          description: Gives a sequence of conditions for validity.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Validable element version.
+          examples:
+          - NSB:Version:V1
+      description: A ValidationElement
+    RoundingInsert:
+      required:
+      - fareFrameRef
+      - id
+      - roundingMethod
+      - version
+      type: object
+      properties:
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: Rounding.
+      deprecated: true
+    AreaValidity:
+      required:
+      - changed
+      - created
+      - id
+      - minimumZonesForAreaValidity
+      - modification
+      - nameOfClass
+      - status
+      - typeOfAreaValidity
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+          readOnly: true
+        groupOfTariffZoneRef:
+          type: string
+          description: Group of tariff zone
+          examples:
+          - ENT:GroupOfTariffZone:abcdef
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - RUT:AreaValidity:RuterSingleTicket
+        minimumZonesForAreaValidity:
+          type: integer
+          description: Minimum no. of zones for area validity.
+          format: int32
+          examples:
+          - 5
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - AreaValidity
+        status:
+          type: string
+          description: Status
           readOnly: true
           enum:
           - DRAFT
@@ -1851,14 +2196,24 @@ components:
           - DEPRECATED
           examples:
           - DRAFT
+        typeOfAreaValidity:
+          type: string
+          description: Type of area validity
+          deprecated: true
+          enum:
+          - POINT_TO_POINT
+          - RING
+          examples:
+          - RING
         version:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: Type of access right assignment version.
+          description: Version.
+          readOnly: true
           examples:
-          - NSB:Version:V1
-      description: A classification of Access Right Assignments.
+          - RUT:Version:V1
+      description: Requirements for area validity.
     ScopingValidityParameter:
       required:
       - changed
@@ -2147,156 +2502,15 @@ components:
           examples:
           - NSB:Version:V1
       description: A ScopingValidityParameter
-    ValidableElementInsert:
-      required:
-      - description
-      - fareFrameRef
-      - id
-      - name
-      - version
-      type: object
-      properties:
-        accessRightParameterAssignments:
-          type: array
-          description: The references to access right parameter assignments.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        activeComparisonOperatorVariant:
-          type: string
-          description: 'Deprecated: this parameter will be ignored'
-          examples:
-          - E
-        areaValidity:
-          $ref: '#/components/schemas/AreaValidity'
-        description:
-          type: array
-          description: Description represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareStructureElementsInSequence:
-          type: array
-          description: Fare structure elements in sequence
-          items:
-            $ref: '#/components/schemas/FareStructureElementInSequenceInsert'
-        fareStructureElementsRef:
-          type: array
-          description: The reference to the fare divided into a sequence.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: References to fare tables that provide prices or discounts for the user profile.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id
-          examples:
-          - NSB:ValidableElement:Child
-        name:
-          type: array
-          description: ValidableElement Name represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        prices:
-          type: array
-          description: Fare prices.
-          items:
-            $ref: '#/components/schemas/FarePriceInsert'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: ValidableElement version.
-          examples:
-          - NSB:Version:V1
-    FareStructureElementInSequence:
+    Rounding:
       required:
       - changed
       - created
       - fareFrameRef
-      - fareStructureElementId
-      - fareStructureElementRef
-      - id
-      - nameOfClass
-      - version
-      type: object
-      properties:
-        accessNumber:
-          type: integer
-          description: 'Deprecated: Historically always null and omitted from the response. In NeTEx this field is optional and has been superseded by the minimumAccess/maximumAccess range (introduced in NeTEx v1.1), available on AccessRightInProduct.'
-          format: int32
-          deprecated: true
-        changed:
-          type: string
-          description: Changed datetime.
-          format: date-time
-        created:
-          type: string
-          description: Created datetime.
-          format: date-time
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareStructureElementId:
-          type: string
-          description: Fare structure element ref
-        fareStructureElementRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FareStructureElementInSequence:MiniPriceTENInterval
-        isFirstInSequence:
-          type: boolean
-          description: Gives information if this sequence first or not
-        isLastInSequence:
-          type: boolean
-          description: Gives information if this sequence last or not
-        limitedAccessNumber:
-          type: integer
-          description: Flag indicating whether this rights gives an unlimited number of accesses or not
-          format: int32
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          examples:
-          - FareStructureElementInSequence
-        orderOfElement:
-          type: integer
-          description: Access quality structure factor refs
-          format: int32
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Fare structure element in sequence version.
-          examples:
-          - NSB:Version:V1
-      description: A description of a fare structure element in sequence
-    ValidityCondition:
-      required:
-      - changed
-      - created
       - id
       - modification
       - nameOfClass
+      - roundingMethod
       - status
       - version
       type: object
@@ -2305,66 +2519,16 @@ components:
           type: string
           description: Changed datetime.
           readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
         created:
           type: string
           description: Created datetime.
           readOnly: true
-        fromDate:
+        derivedFromVersionRef:
           type: string
-          description: From Date.
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:ValidBetween:2018
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - ValidBetween
-        status:
-          type: string
-          description: Status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        toDate:
-          type: string
-          description: To Date.
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A condition of the validity of the priceable object
-    RoundingInsert:
-      required:
-      - fareFrameRef
-      - id
-      - roundingMethod
-      - version
-      type: object
-      properties:
+          description: Derived from version.
         description:
           type: array
           description: Description.
@@ -2379,11 +2543,27 @@ components:
           description: Id.
           examples:
           - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
         name:
           type: array
           description: Name.
           items:
             $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
         roundingMethod:
           type: string
           description: Type of rounding.
@@ -2401,189 +2581,9 @@ components:
           type: number
           description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
           format: double
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Rounding version.
-          examples:
-          - NSB:Version:V1
-      description: Rounding.
-      deprecated: true
-    FarePriceInsert:
-      required:
-      - fareFrameRef
-      - id
-      - name
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount.
-          examples:
-          - '164.0'
-        canBeCumulative:
-          type: boolean
-          description: canBeCumulative.
-          examples:
-          - true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        currency:
-          type: string
-          description: Currency.
-          examples:
-          - NOK
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        discountPercentageUsed:
-          type: integer
-          description: discountPercentageUsed.
-          format: int32
-          examples:
-          - 5
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FarePrice:1005TEN
-        isAllowed:
-          type: boolean
-          description: isAllowed.
-          examples:
-          - true
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        ranking:
-          type: integer
-          description: Ranking.
-          format: int32
-          examples:
-          - 1
-        rounding:
-          $ref: '#/components/schemas/RoundingInsert'
-        roundingRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        vatRegisterGroup:
-          type: string
-          description: vatRegisterGroup.
-          enum:
-          - EXCEPTION_FROM_VAT
-          - GENERAL_VAT
-          - FOOD_VAT
-          - TRANSPORT_AND_TICKETS_VAT
-          examples:
-          - TRANSPORT_AND_TICKETS_VAT
-        version:
-          type: string
-    FarePrice:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - status
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount
-          examples:
-          - '164.0'
-        canBeCumulative:
-          type: boolean
-          description: canBeCumulative.
-          examples:
-          - true
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        currency:
-          type: string
-          description: Currency.
-          examples:
-          - NOK
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        discountPercentageUsed:
-          maximum: 100
-          minimum: -100
-          type: integer
-          description: discountPercentageUsed.
-          format: int32
-          examples:
-          - 5
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          type: string
-          description: Id.
-          examples:
-          - NSB:FarePrice:1005TEN
-        isAllowed:
-          type: boolean
-          description: isAllowed.
-          examples:
-          - true
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - FarePrice
-        ranking:
-          type: integer
-          description: Ranking.
-          format: int32
-          examples:
-          - 1
-        rounding:
-          $ref: '#/components/schemas/Rounding'
-        roundingRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
         status:
           type: string
-          description: Status.
+          description: Rounding status.
           readOnly: true
           enum:
           - DRAFT
@@ -2592,57 +2592,15 @@ components:
           - DEPRECATED
           examples:
           - DRAFT
-        vatRegisterGroup:
-          type: string
-          description: vatRegisterGroup.
-          enum:
-          - EXCEPTION_FROM_VAT
-          - GENERAL_VAT
-          - FOOD_VAT
-          - TRANSPORT_AND_TICKETS_VAT
-          examples:
-          - TRANSPORT_AND_TICKETS_VAT
         version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: Version.
-          readOnly: true
+          description: Rounding version.
           examples:
           - NSB:Version:V1
-      description: A description of the price and factor for a set fare
-    ValidableElementPageWrapper:
-      required:
-      - items
-      - requestedPageNumber
-      - totalNumberOfItems
-      - totalNumberOfPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: Validable elements for the given page
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/ValidableElement'
-        requestedPageNumber:
-          type: integer
-          description: Number of the requested page. In case state is lost
-          format: int32
-          examples:
-          - 1
-        totalNumberOfItems:
-          type: integer
-          description: Total number of items.
-          format: int32
-          examples:
-          - 369
-        totalNumberOfPages:
-          type: integer
-          description: Number of pages needed to traverse all items.
-          format: int32
-          readOnly: true
-          examples:
-          - 15
-      description: Validable Element Page Wrapper
+      description: A description of how prices are rounded post calculation
+      deprecated: true
     TemporalValidityParameter:
       required:
       - changed
@@ -2721,15 +2679,6 @@ components:
           - NSB:Version:V1
       description: A TemporalValidityParameter
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -2745,11 +2694,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

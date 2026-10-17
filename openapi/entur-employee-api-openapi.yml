@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Employee API
-  version: 2026.08.0
+  title: Personnel tickets Employee API
+  description: Personnel tickets are a Norwegian railway discount scheme providing reduced fares for employees, pensioners, and eligible family members in participating companies.
+  termsOfService: http://entur.org
   contact:
     name: Entur Team Personalisering
     email: team.personalisering@entur.org
-  termsOfService: http://entur.org
-  description: 'Operations tagged Employee across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io
 security:
@@ -105,8 +105,6 @@ paths:
           all:
           - Personalbillett-Rettighetshaver:les
           - Personalbillett-Rettighetshaver-Sensitiv:les
-    servers:
-    - url: https://api.entur.io
   /personnelticket/v2/employees/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -160,44 +158,22 @@ paths:
           - Personalbillett-Rettighetshaver.employeeId:les
           - Personalbillett-Rettighetshaver-Sensitiv.employeeId:les
           - Personalbillett-Billettrettigheter.employeeId:les
-    servers:
-    - url: https://api.entur.io
 components:
   schemas:
-    TicketTypeResponse:
+    SimpleRule:
       required:
-      - canHaveStationPairs
-      - code
-      - countryCode
-      - description
-      - generatesTicketRights
       - id
-      - isDeleted
+      - name
       type: object
       properties:
         id:
           type: integer
-          description: Ticket type id
+          description: Rule id
           format: int64
-        code:
+        name:
           type: string
-          description: Ticket type
-        description:
-          type: string
-          description: Ticket type description
-        countryCode:
-          type: string
-          description: Country code
-        generatesTicketRights:
-          type: boolean
-          description: Whether or not this this ticket type is relevant for sending as input to a Manual order. If this = false (the default), it will not generate new tickets rights by manual order.
-        canHaveStationPairs:
-          type: boolean
-          description: 'Whether or not this ticket type is compatible with station pairs when placing a manual order. The default = false. '
-        isDeleted:
-          type: boolean
-          description: Whether the ticket type is deleted.
-      description: The Ticket type informs of which country it is valid in and what train class it covers.
+          description: Rule name
+      description: Rule describing who are eligible for what ticket right
     TicketRightsHolderResponse:
       required:
       - id
@@ -245,6 +221,169 @@ components:
           examples:
           - '2023-01-01'
       description: All items for this page
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    EmployeeDisabilityProofResponse:
+      required:
+      - isRegistered
+      - year
+      type: object
+      properties:
+        year:
+          type: integer
+          description: The year this information is valid for
+          format: int32
+          examples:
+          - 2020
+        isRegistered:
+          type: boolean
+          description: Whether a disability proof has been registered this year
+          examples:
+          - true
+      description: Yearly disability proof information
+    PageEmployeeResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          items:
+            $ref: '#/components/schemas/EmployeeResponse'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int64
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int64
+          examples:
+          - 1
+      description: Paged content
+    TicketRightResponse:
+      required:
+      - calculationTimestamp
+      - employeeId
+      - ticketHolderId
+      - ticketType
+      - ticketrightId
+      - validFrom
+      - validUntil
+      type: object
+      properties:
+        ticketrightId:
+          type: integer
+          description: The ticket right id
+          format: int64
+        ticketHolderId:
+          type: integer
+          description: The id of the ticket holder, either an employee or a family member
+          format: int64
+        employeeId:
+          type: integer
+          description: The id of the employee who is responsible
+          format: int64
+        validFrom:
+          type: string
+          description: The date from when the ticket right is valid
+          format: date
+          examples:
+          - '2019-03-13'
+        validUntil:
+          type: string
+          description: The date from when the ticket right stops being valid
+          format: date
+          examples:
+          - '2019-06-13'
+        ticketType:
+          $ref: '#/components/schemas/TicketTypeResponse'
+        note:
+          type: string
+          description: Any additional information
+        canSendTicket:
+          type: boolean
+          description: This field will be discontinued in the next vesion of the API.
+          deprecated: true
+        ticketCreated:
+          type: string
+          description: This field will be discontinued in the next vesion of the API.
+          format: date-time
+          deprecated: true
+        errorMessage:
+          type: string
+          description: This field will be discontinued in the next vesion of the API.
+          deprecated: true
+        createdByRule:
+          $ref: '#/components/schemas/SimpleRule'
+        calculationTimestamp:
+          type: string
+          description: When the ticketright was calculated
+          format: date-time
+        ticketRightsHolder:
+          $ref: '#/components/schemas/TicketRightsHolderResponse'
+        legacySyncStatus:
+          $ref: '#/components/schemas/SyncStatus'
+        essSyncStatus:
+          $ref: '#/components/schemas/SyncStatus'
+        manualOrder:
+          $ref: '#/components/schemas/ManualOrderResponse'
+      description: A ticket right granted to an employee or a family member
+    EmployeeYearlyFeeResponse:
+      required:
+      - isPaid
+      - year
+      type: object
+      properties:
+        year:
+          type: integer
+          description: The year this fee is valid
+          format: int32
+          examples:
+          - 2020
+        isPaid:
+          type: boolean
+          description: Whether this yearly fee has been paid
+          examples:
+          - true
+      description: Yearly fee information
+    FamilyMemberLowIncomeResponse:
+      required:
+      - isRegistered
+      - year
+      type: object
+      properties:
+        year:
+          type: integer
+          description: Year of registered low income
+          format: int32
+          examples:
+          - 2015
+        isRegistered:
+          type: boolean
+          description: Whether low income is registered
+          examples:
+          - true
+      description: Low income information
     FamilyMemberResponse:
       required:
       - employeeId
@@ -327,6 +466,79 @@ components:
           examples:
           - 1337370
       description: A family member must be connected to an employee
+    CompanyResponse:
+      required:
+      - addressLine
+      - allowETickets
+      - allowLocalEmployees
+      - companyId
+      - employeeNoPrefix
+      - isDeleted
+      - name
+      - postalCode
+      - reportSeparator
+      type: object
+      properties:
+        companyId:
+          type: integer
+          description: The company ID
+          format: int64
+        name:
+          type: string
+          description: The company name
+        addressLine:
+          type: string
+          description: The company postal address
+        postalCode:
+          type: string
+          description: The company postal code
+        employeeNoPrefix:
+          type: string
+          description: A prefix to be prepended to all employee numbers connected to this company
+        allowLocalEmployees:
+          type: boolean
+          description: Whether local employees are allowed
+        allowETickets:
+          type: boolean
+          description: Whether the company allows the usage of e-tickets for its personnel tickets
+        isDeleted:
+          type: boolean
+          description: Whether the company is deleted
+        reportSeparator:
+          type: string
+          description: 'Which character to separate elements within tax report: '',''(default) or '';'''
+        deleted:
+          type: boolean
+          writeOnly: true
+      description: Companies are where employees are hired
+    Product:
+      required:
+      - id
+      - name
+      - validFrom
+      - validUntil
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The product id
+          format: int64
+        name:
+          type: string
+          description: Human readable product name
+        validFrom:
+          type: string
+          description: When the product is valid from
+          format: date
+          examples:
+          - '2023-01-01'
+        validUntil:
+          type: string
+          description: When the product is valid to
+          format: date
+          examples:
+          - '2023-01-01'
+      description: A personnel ticket product
     ErrorResponse:
       required:
       - correlationId
@@ -380,100 +592,52 @@ components:
           items:
             $ref: '#/components/schemas/ErrorSpecification'
       description: Response object for errors occurring in the customers API
-    CompanyResponse:
+    TicketTypeResponse:
       required:
-      - addressLine
-      - allowETickets
-      - allowLocalEmployees
-      - companyId
-      - employeeNoPrefix
-      - isDeleted
-      - name
-      - postalCode
-      - reportSeparator
-      type: object
-      properties:
-        companyId:
-          type: integer
-          description: The company ID
-          format: int64
-        name:
-          type: string
-          description: The company name
-        addressLine:
-          type: string
-          description: The company postal address
-        postalCode:
-          type: string
-          description: The company postal code
-        employeeNoPrefix:
-          type: string
-          description: A prefix to be prepended to all employee numbers connected to this company
-        allowLocalEmployees:
-          type: boolean
-          description: Whether local employees are allowed
-        allowETickets:
-          type: boolean
-          description: Whether the company allows the usage of e-tickets for its personnel tickets
-        isDeleted:
-          type: boolean
-          description: Whether the company is deleted
-        reportSeparator:
-          type: string
-          description: 'Which character to separate elements within tax report: '',''(default) or '';'''
-        deleted:
-          type: boolean
-          writeOnly: true
-      description: Companies are where employees are hired
-    FamilyRelation:
-      required:
+      - canHaveStationPairs
       - code
+      - countryCode
       - description
+      - generatesTicketRights
+      - id
+      - isDeleted
       type: object
       properties:
+        id:
+          type: integer
+          description: Ticket type id
+          format: int64
         code:
           type: string
-          description: The code used for input
-          readOnly: true
+          description: Ticket type
         description:
           type: string
-          description: A description of the particular code's meaning
-          readOnly: true
-      description: The relation a family member has to an employee
-    ErrorSpecification:
-      required:
-      - defaultMessage
-      - field
-      type: object
-      properties:
-        field:
+          description: Ticket type description
+        countryCode:
           type: string
-          description: The field of the associated object in the request related to the error.
-        defaultMessage:
-          type: string
-          description: The message explaining why the error occurred.
-        rejectedValues:
-          type: object
-          description: A list of rejected values.
-      description: Optional list of error specifications.
-    EmployeeDisabilityProofResponse:
-      required:
-      - isRegistered
-      - year
-      type: object
-      properties:
-        year:
-          type: integer
-          description: The year this information is valid for
-          format: int32
-          examples:
-          - 2020
-        isRegistered:
+          description: Country code
+        generatesTicketRights:
           type: boolean
-          description: Whether a disability proof has been registered this year
-          examples:
-          - true
-      description: Yearly disability proof information
+          description: Whether or not this this ticket type is relevant for sending as input to a Manual order. If this = false (the default), it will not generate new tickets rights by manual order.
+        canHaveStationPairs:
+          type: boolean
+          description: 'Whether or not this ticket type is compatible with station pairs when placing a manual order. The default = false. '
+        isDeleted:
+          type: boolean
+          description: Whether the ticket type is deleted.
+      description: The Ticket type informs of which country it is valid in and what train class it covers.
+    StationResponse:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Station in NetEX format.
+        name:
+          type: string
+          description: Station name
+      description: Station with NetEX and name
     SyncStatus:
       type: object
       properties:
@@ -490,148 +654,6 @@ components:
           type: string
           description: If the system has failed in sending the ticket right to the ticketing system, this will hold the error message. Default is null
       description: Status fields related to synchronization with other services
-    FamilyMemberLowIncomeResponse:
-      required:
-      - isRegistered
-      - year
-      type: object
-      properties:
-        year:
-          type: integer
-          description: Year of registered low income
-          format: int32
-          examples:
-          - 2015
-        isRegistered:
-          type: boolean
-          description: Whether low income is registered
-          examples:
-          - true
-      description: Low income information
-    SimpleRule:
-      required:
-      - id
-      - name
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Rule id
-          format: int64
-        name:
-          type: string
-          description: Rule name
-      description: Rule describing who are eligible for what ticket right
-    StationResponse:
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: string
-          description: Station in NetEX format.
-        name:
-          type: string
-          description: Station name
-      description: Station with NetEX and name
-    ManualOrderResponse:
-      required:
-      - fromDate
-      - id
-      - isDeleted
-      - issueDate
-      - ticketType
-      - toDate
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Id of this manual order.
-          format: int64
-        ticketType:
-          $ref: '#/components/schemas/TicketTypeResponse'
-        issueDate:
-          type: string
-          description: When this manual order was first issued.
-          format: date-time
-        fromDate:
-          type: string
-          description: First date the ticket right should be available.
-          format: date
-          examples:
-          - '2023-01-01'
-        toDate:
-          type: string
-          description: Last date the ticket right should be available.
-          format: date
-          examples:
-          - '2023-01-01'
-        stations:
-          uniqueItems: true
-          type: array
-          description: Any station pairs for this manual order.
-          items:
-            $ref: '#/components/schemas/StationPairResponse'
-        isDeleted:
-          type: boolean
-          description: Whether this manual order is deleted or not.
-      description: A manual order. This may contain a list of station pairs.
-    StationPairResponse:
-      required:
-      - fromStation
-      - id
-      - toStation
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Id of this station pair
-          format: int64
-        fromStation:
-          $ref: '#/components/schemas/StationResponse'
-        toStation:
-          $ref: '#/components/schemas/StationResponse'
-      description: A set of stations on NetEX format.
-    EmploymentType:
-      required:
-      - code
-      - description
-      type: object
-      properties:
-        code:
-          type: string
-          description: The code used for input
-          readOnly: true
-        description:
-          type: string
-          description: A description of the particular code's meaning
-          readOnly: true
-      description: Employment type. Examples include Employee, Part time, Temp
-    PageEmployeeResponse:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: All items for this page
-          items:
-            $ref: '#/components/schemas/EmployeeResponse'
-        totalItems:
-          type: integer
-          description: Total items which could be returned
-          format: int64
-          examples:
-          - 1
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int64
-          examples:
-          - 1
-      description: Paged content
     EmployeeCategoryResponse:
       required:
       - year
@@ -646,34 +668,21 @@ components:
         category:
           $ref: '#/components/schemas/Product'
       description: Category information
-    Product:
+    FamilyRelation:
       required:
-      - id
-      - name
-      - validFrom
-      - validUntil
+      - code
+      - description
       type: object
       properties:
-        id:
-          type: integer
-          description: The product id
-          format: int64
-        name:
+        code:
           type: string
-          description: Human readable product name
-        validFrom:
+          description: The code used for input
+          readOnly: true
+        description:
           type: string
-          description: When the product is valid from
-          format: date
-          examples:
-          - '2023-01-01'
-        validUntil:
-          type: string
-          description: When the product is valid to
-          format: date
-          examples:
-          - '2023-01-01'
-      description: A personnel ticket product
+          description: A description of the particular code's meaning
+          readOnly: true
+      description: The relation a family member has to an employee
     EmployeeResponse:
       required:
       - employeeNo
@@ -873,102 +882,105 @@ components:
           examples:
           - 1337370
       description: All items for this page
-    TicketRightResponse:
+    EmploymentType:
       required:
-      - calculationTimestamp
-      - employeeId
-      - ticketHolderId
-      - ticketType
-      - ticketrightId
-      - validFrom
-      - validUntil
+      - code
+      - description
       type: object
       properties:
-        ticketrightId:
-          type: integer
-          description: The ticket right id
-          format: int64
-        ticketHolderId:
-          type: integer
-          description: The id of the ticket holder, either an employee or a family member
-          format: int64
-        employeeId:
-          type: integer
-          description: The id of the employee who is responsible
-          format: int64
-        validFrom:
+        code:
           type: string
-          description: The date from when the ticket right is valid
-          format: date
-          examples:
-          - '2019-03-13'
-        validUntil:
+          description: The code used for input
+          readOnly: true
+        description:
           type: string
-          description: The date from when the ticket right stops being valid
-          format: date
-          examples:
-          - '2019-06-13'
+          description: A description of the particular code's meaning
+          readOnly: true
+      description: Employment type. Examples include Employee, Part time, Temp
+    ManualOrderResponse:
+      required:
+      - fromDate
+      - id
+      - isDeleted
+      - issueDate
+      - ticketType
+      - toDate
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id of this manual order.
+          format: int64
         ticketType:
           $ref: '#/components/schemas/TicketTypeResponse'
-        note:
+        issueDate:
           type: string
-          description: Any additional information
-        canSendTicket:
+          description: When this manual order was first issued.
+          format: date-time
+        fromDate:
+          type: string
+          description: First date the ticket right should be available.
+          format: date
+          examples:
+          - '2023-01-01'
+        toDate:
+          type: string
+          description: Last date the ticket right should be available.
+          format: date
+          examples:
+          - '2023-01-01'
+        stations:
+          uniqueItems: true
+          type: array
+          description: Any station pairs for this manual order.
+          items:
+            $ref: '#/components/schemas/StationPairResponse'
+        isDeleted:
           type: boolean
-          description: This field will be discontinued in the next vesion of the API.
-          deprecated: true
-        ticketCreated:
-          type: string
-          description: This field will be discontinued in the next vesion of the API.
-          format: date-time
-          deprecated: true
-        errorMessage:
-          type: string
-          description: This field will be discontinued in the next vesion of the API.
-          deprecated: true
-        createdByRule:
-          $ref: '#/components/schemas/SimpleRule'
-        calculationTimestamp:
-          type: string
-          description: When the ticketright was calculated
-          format: date-time
-        ticketRightsHolder:
-          $ref: '#/components/schemas/TicketRightsHolderResponse'
-        legacySyncStatus:
-          $ref: '#/components/schemas/SyncStatus'
-        essSyncStatus:
-          $ref: '#/components/schemas/SyncStatus'
-        manualOrder:
-          $ref: '#/components/schemas/ManualOrderResponse'
-      description: A ticket right granted to an employee or a family member
-    EmployeeYearlyFeeResponse:
+          description: Whether this manual order is deleted or not.
+      description: A manual order. This may contain a list of station pairs.
+    StationPairResponse:
       required:
-      - isPaid
-      - year
+      - fromStation
+      - id
+      - toStation
       type: object
       properties:
-        year:
+        id:
           type: integer
-          description: The year this fee is valid
-          format: int32
-          examples:
-          - 2020
-        isPaid:
-          type: boolean
-          description: Whether this yearly fee has been paid
-          examples:
-          - true
-      description: Yearly fee information
+          description: Id of this station pair
+          format: int64
+        fromStation:
+          $ref: '#/components/schemas/StationResponse'
+        toStation:
+          $ref: '#/components/schemas/StationResponse'
+      description: A set of stations on NetEX format.
+  responses:
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -984,36 +996,17 @@ components:
       explode: false
       schema:
         type: string
-  responses:
-    Error401:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error403:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-personnel-tickets-openapi.json
-- entur-personnel-tickets-openapi.yml

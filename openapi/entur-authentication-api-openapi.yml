@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Authentication API
-  version: 2026.10.0
+  title: Sales v2 Authentication API
+  description: Entur's sales API, based on the Open Mobility Sales API (OMSA) standard, for searching, selecting, and purchasing public transport tickets.
   contact:
     name: Team Selgerintegrasjoner
     url: https://github.com/entur/omsa
+  version: 2026.10.0
   x-stability-level: draft
-  description: 'Operations tagged authentication across 2 of this provider''s published API definitions: entur-omsa-openapi.json, entur-omsa-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/omsa/v1
   description: Production environment
@@ -84,13 +84,6 @@ paths:
           description: 'Unauthorized: Invalid client ID or secret.'
         '500':
           description: 'Internal Server Error: Something went wrong.'
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
 components:
   parameters:
     X-Correlation-Id:
@@ -144,6 +137,3 @@ components:
           tokenUrl: /oauth/token
           scopes:
             processes: Access to /processes/
-x-refined-from:
-- entur-omsa-openapi.json
-- entur-omsa-openapi.yml

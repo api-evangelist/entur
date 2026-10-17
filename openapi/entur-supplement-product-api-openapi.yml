@@ -370,395 +370,13 @@ paths:
       x-entur-permissions:
         value: product-api-access:endre
 components:
-  examples:
-    dog:
-      summary: Dog onboard
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: en-GB
-          value: Dog
-        - lang: nb-NO
-          value: Hund
-        descriptions:
-        - lang: en-GB
-          value: Bring your dog onboard the train.
-        - lang: nb-NO
-          value: Ta med hunden din ombord på toget.
-        status: DRAFT
-        startDate: '2025-01-01'
-        supplementProductType: DOG
-        chargingMomentType: BEFORE_TRAVEL
-        conditionsSummary:
-          exchangeable: true
-          refundable: true
-          fareStructureType: POINT_TO_POINT_FARE
-        vatGroup: TRANSPORT_AND_TICKETS_VAT
-        purchaseWindowRef: EXA:PurchaseWindow:90days
-        usageValidityPeriodRef: EXA:UsageValidityPeriod:60minutes
-        entitlementRequiredRefs:
-        - EXA:EntitlementRequired:StandardTicket
-        validityParameters:
-        - groupingType: OR
-          validityParameterType: ZONE
-          validityParameterRefs:
-          - EXA:FareZone:A
-          - EXA:FareZone:B
-    seatReservation:
-      summary: Seat reservation
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: en-GB
-          value: Seat reservation
-        - lang: nb-NO
-          value: Setereservasjon
-        descriptions:
-        - lang: en-GB
-          value: Mandatory seat reservation for all passengers on Bergensbanen.
-        - lang: nb-NO
-          value: Obligatorisk setereservasjon for alle passasjerer på Bergensbanen.
-        status: DRAFT
-        startDate: '2025-01-01'
-        endDate: '2025-12-31'
-        supplementProductType: SEAT_RESERVATION
-        chargingMomentType: BEFORE_TRAVEL
-        conditionsSummary:
-          exchangeable: true
-          refundable: false
-          fareStructureType: NETWORK_FLAT_FARE
-        vatGroup: TRANSPORT_AND_TICKETS_VAT
-        purchaseWindowRef: EXA:PurchaseWindow:120days
-        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
-        entitlementRequiredRefs:
-        - EXA:EntitlementRequired:StandardTicket
-        - EXA:EntitlementRequired:FlexibleTicket
-        validityParameters:
-        - groupingType: OR
-          validityParameterType: LINE
-          validityParameterRefs:
-          - EXA:Line:X1
-    luggage:
-      summary: Extra luggage
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: en-GB
-          value: Extra luggage
-        - lang: nb-NO
-          value: Ekstra bagasje
-        descriptions:
-        - lang: en-GB
-          value: Bring additional luggage beyond the standard allowance.
-        - lang: nb-NO
-          value: Ta med ekstra bagasje utover standard bagasjemengde.
-        status: DRAFT
-        startDate: '2025-01-01'
-        endDate: '2025-12-31'
-        supplementProductType: EXTRA_LUGGAGE
-        chargingMomentType: BEFORE_TRAVEL
-        conditionsSummary:
-          exchangeable: true
-          refundable: true
-          fareStructureType: POINT_TO_POINT_FARE
-        vatGroup: TRANSPORT_AND_TICKETS_VAT
-        purchaseWindowRef: EXA:PurchaseWindow:120days
-        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
-        entitlementRequiredRefs:
-        - EXA:EntitlementRequired:StandardTicket
-        - EXA:EntitlementRequired:FlexibleTicket
-        validityParameters:
-        - groupingType: OR
-          validityParameterType: LINE
-          validityParameterRefs:
-          - EXA:Line:X1
-    parking:
-      summary: Parking reservation
-      value:
-        privateCodes:
-        - '123'
-        ownerOrganisationId: 47
-        names:
-        - lang: en-GB
-          value: Parking reservation
-        - lang: nb-NO
-          value: Parkeringsreservasjon
-        descriptions:
-        - lang: en-GB
-          value: Reserve a parking spot at the station.
-        - lang: nb-NO
-          value: Reserver parkeringsplass på stasjonen.
-        status: DRAFT
-        startDate: '2025-01-01'
-        supplementProductType: PARKING
-        chargingMomentType: BEFORE_TRAVEL
-        conditionsSummary:
-          exchangeable: false
-          refundable: false
-          fareStructureType: NETWORK_FLAT_FARE
-        vatGroup: TRANSPORT_AND_TICKETS_VAT
-        purchaseWindowRef: EXA:PurchaseWindow:120days
-        usageValidityPeriodRef: EXA:UsageValidityPeriod:30days
-        entitlementRequiredRefs:
-        - EXA:EntitlementRequired:PeriodTicket30days
-        validityParameters:
-        - groupingType: OR
-          validityParameterType: PARKING
-          validityParameterRefs:
-          - NSR:Parking:P01
-          - NSR:Parking:P02
-          - NSR:Parking:P03
-    upgrade:
-      summary: First class upgrade with entitlement requirement
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: en-GB
-          value: First Class Upgrade
-        - lang: nb-NO
-          value: Oppgradering til 1. klasse
-        descriptions:
-        - lang: en-GB
-          value: Valid on the given departure and require a valid ticket.
-        - lang: nb-NO
-          value: Gyldig på en gitt avgang og krever gyldig billett.
-        status: DRAFT
-        startDate: '2025-01-01'
-        supplementProductType: UPGRADE
-        chargingMomentType: BEFORE_TRAVEL
-        conditionsSummary:
-          exchangeable: false
-          refundable: false
-          fareStructureType: NETWORK_FLAT_FARE
-        vatGroup: TRANSPORT_AND_TICKETS_VAT
-        purchaseWindowRef: EXA:PurchaseWindow:120days
-        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
-        entitlementRequiredRefs:
-        - EXA:EntitlementRequired:StandardTicket
-        - EXA:EntitlementRequired:FlexibleTicket
-        validityParameters:
-        - groupingType: OR
-          validityParameterType: LINE
-          validityParameterRefs:
-          - EXA:Line:X1
-    bicycle:
-      summary: Bicycle reservation
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: en-GB
-          value: Bike reservation
-        - lang: nb-NO
-          value: Sykkelreservasjon
-        descriptions:
-        - lang: en-GB
-          value: Valid on the given departure and require a valid ticket for traveller who brings the bike.
-        - lang: nb-NO
-          value: Gyldig på en gitt avgang og krever gyldig billett for den reisende som reiser med sykkel.
-        status: DRAFT
-        startDate: '2025-01-01'
-        supplementProductType: BICYCLE
-        chargingMomentType: BEFORE_TRAVEL
-        conditionsSummary:
-          exchangeable: true
-          refundable: true
-          fareStructureType: NETWORK_FLAT_FARE
-        vatGroup: TRANSPORT_AND_TICKETS_VAT
-        purchaseWindowRef: EXA:PurchaseWindow:120days
-        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
-        entitlementRequiredRefs:
-        - EXA:EntitlementRequired:SingleTicket
-        - EXA:EntitlementRequired:PeriodTicket
-        validityParameters:
-        - groupingType: OR
-          validityParameterType: LINE
-          validityParameterRefs:
-          - EXA:Line:X1
-    parking-2:
-      summary: Parking reservation response
-      value:
-        privateCodes:
-        - '123'
-        id: EXA:SupplementProduct:456
-        versionId: EXA:Version:07ce871e-b84d-47c0-99ba-c7fdb5fa4df9
-        versionNumber: 1
-        ownerOrganisationId: 47
-        datasource:
-          id: some-client-system
-        status: VERSIONED
-        startDate: '2025-01-01'
-        names:
-        - lang: en-GB
-          value: Parking reservation
-        - lang: nb-NO
-          value: Parkeringsreservasjon
-        descriptions:
-        - lang: en-GB
-          value: Reserve a parking spot at the station.
-        - lang: nb-NO
-          value: Reserver parkeringsplass på stasjonen.
-        supplementProductType: PARKING
-        chargingMomentType: BEFORE_TRAVEL
-        conditionsSummary:
-          exchangeable: false
-          refundable: false
-          fareStructureType: NETWORK_FLAT_FARE
-        vatGroup: TRANSPORT_AND_TICKETS_VAT
-        purchaseWindowRef: EXA:PurchaseWindow:120days
-        usageValidityPeriodRef: EXA:UsageValidityPeriod:30days
-        entitlementRequiredRefs:
-        - EXA:EntitlementRequired:PeriodTicket30days
-        validityParameters:
-        - groupingType: OR
-          validityParameterType: PARKING
-          validityParameterRefs:
-          - NSR:Parking:P01
-          - NSR:Parking:P02
-          - NSR:Parking:P03
-        fareTableRefs:
-        - EXA:FareTable:parking-2025
-    versionHistory:
-      summary: Example version history
-      value:
-      - id: EXA:Version:853a7d14-794e-4af5-b569-301711a26e26
-        status: VERSIONED
-        startDate: '2025-01-01'
-        endDate: '2025-12-31'
-        created: '2024-12-01T10:00:00Z'
-        changed: '2024-12-01T10:00:00Z'
-        published: '2024-12-30T10:00:00Z'
-        number: 1
-      - id: EXA:Version:e7104d26-16a5-4db5-aa42-b32ae0a3f684
-        status: VERSIONED
-        startDate: '2026-01-01'
-        created: '2025-12-01T10:00:00Z'
-        changed: '2025-12-01T10:00:00Z'
-        published: '2025-12-01T13:00:00Z'
-        number: 2
-      - id: EXA:Version:6be856a5-dd98-496b-b3f2-ad9939270ec3
-        status: PROPOSED
-        startDate: '2026-07-01'
-        created: '2026-06-01T10:00:00Z'
-        changed: '2026-06-01T10:00:00Z'
-  parameters:
-    version:
-      name: version
-      in: path
-      description: The netex ID or sequence number of the version to retrieve
-      required: true
-      style: simple
-      explode: false
-      schema:
-        pattern: ^(([A-Z]{3}):Version:([0-9A-Za-z_\-]*)|[1-9][0-9]*)$
-        type: string
-      examples:
-        default:
-          value: ENT:Version:001
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    validOnDate:
-      name: validOnDate
-      in: query
-      description: 'The date that the element should be valid for, e.g. the travel date.
-
-        Defaults to the current date.
-
-        '
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: string
-        format: date
-      examples:
-        default:
-          value: '2026-12-01'
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    id:
-      name: id
-      in: path
-      description: The netex ID of the element to retrieve
-      required: true
-      style: simple
-      explode: false
-      schema:
-        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-        type: string
-      examples:
-        default:
-          value: ENT:PreassignedFareProduct:001
-  responses:
-    BadRequestError:
-      description: Bad request - Invalid data or schema violation
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            schemaViolation:
-              summary: Request does not match schema
-              value:
-                type: https://developer.entur.org/errors/bad-request
-                title: Bad Request
-                status: 400
-                detail: Field 'name' is required.
-            purchaseWindowNotFound:
-              summary: Referenced purchase window not found
-              value:
-                type: https://developer.entur.org/errors/bad-request
-                title: Bad Request
-                status: 400
-                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
-    ForbiddenError:
-      description: Forbidden - Insufficient permissions
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            forbidden:
-              summary: Access forbidden
-              value:
-                type: https://example.com/probs/forbidden
-                title: Forbidden
-                status: 403
-                detail: You do not have permission to access this resource.
-    UnauthorizedError:
-      description: Unauthorized - Authentication required
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            unauthorized:
-              summary: Authentication required
-              value:
-                type: https://example.com/probs/unauthorized
-                title: Unauthorized
-                status: 401
-                detail: Authentication credentials were missing or invalid.
   schemas:
+    GenericParameterAssignmentGroupingType:
+      type: string
+      description: How multiple GPA parameters should be combined (AND/OR)
+      enum:
+      - AND
+      - OR
     SupplementProductType:
       type: string
       description: The type of the supplement product. This can be used to determine which parameters are relevant for the product.
@@ -776,69 +394,6 @@ components:
       - JOURNEY_ADD_ON
       - EVENT_ADD_ON
       - PARKING
-    VatGrpupType:
-      type: string
-      description: VAT group type. This is used to determine which VAT rate applies to a product. The VAT group type is determined by the product type and the country of sale. For example, in Norway, food products are subject to a reduced VAT rate of 15%, while other products are subject to the standard VAT rate of 25%. In this case, food products would be classified as FOOD_VAT, while other products would be classified as GENERAL_VAT.
-      default: TRANSPORT_AND_TICKETS_VAT
-      enum:
-      - EXCEPTION_FROM_VAT
-      - GENERAL_VAT
-      - FOOD_VAT
-      - TRANSPORT_AND_TICKETS_VAT
-    ProblemDetails:
-      required:
-      - detail
-      - status
-      - title
-      - type
-      type: object
-      properties:
-        type:
-          type: string
-          description: A URI reference that identifies the problem type.
-          format: uri
-          examples:
-          - https://developer.entur.org/errors/bad-request
-        title:
-          type: string
-          description: Short, human-readable summary of the problem type.
-          examples:
-          - Bad Request
-        status:
-          type: integer
-          description: The HTTP status code.
-          format: int32
-          examples:
-          - 400
-        detail:
-          type: string
-          description: Human-readable explanation specific to this occurrence.
-          examples:
-          - The supplied ruleId is not a valid UUID.
-        instance:
-          type: string
-          description: A URI reference that identifies the specific occurrence.
-          format: uri
-          examples:
-          - https://api.example.com/requests/12345
-      description: RFC 9457 Problem Details
-    LocalizedString:
-      type: array
-      items:
-        required:
-        - lang
-        - value
-        type: object
-        properties:
-          lang:
-            pattern: ^[a-z]{2}-[A-Z]{2}$
-            type: string
-            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
-            examples:
-            - nb-NO
-          value:
-            type: string
-            description: The localized string value for the specified lang.
     FareTableRef:
       required:
       - ref
@@ -863,25 +418,6 @@ components:
         pin the exact fare table the link resolves to.
 
         '
-    ConditionsSummary:
-      required:
-      - exchangeable
-      - fareStructureType
-      - refundable
-      type: object
-      properties:
-        exchangeable:
-          type: boolean
-          description: Whether the supplement product is exchangeable.
-          examples:
-          - true
-        refundable:
-          type: boolean
-          description: Whether the supplement product is refundable.
-          examples:
-          - false
-        fareStructureType:
-          $ref: '#/components/schemas/FareStructureType'
     VersionResponse:
       required:
       - changed
@@ -925,12 +461,87 @@ components:
           type: string
           description: Changed datetime
           format: date-time
-    GenericParameterAssignmentGroupingType:
+    ConditionsSummary:
+      required:
+      - exchangeable
+      - fareStructureType
+      - refundable
+      type: object
+      properties:
+        exchangeable:
+          type: boolean
+          description: Whether the supplement product is exchangeable.
+          examples:
+          - true
+        refundable:
+          type: boolean
+          description: Whether the supplement product is refundable.
+          examples:
+          - false
+        fareStructureType:
+          $ref: '#/components/schemas/FareStructureType'
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+    FareStructureType:
       type: string
-      description: How multiple GPA parameters should be combined (AND/OR)
+      description: The type of fare structure. This indicates the method by which the fare is calculated, e.g. flat fare, zonal fare, point-to-point fare, etc.
       enum:
-      - AND
-      - OR
+      - CAPPED_FLAT_FARE
+      - CAPPED_POINT_TO_POINT_FARE
+      - CAPPED_ZONAL_FARE
+      - LINE_FLAT_FARE
+      - NETWORK_FLAT_FARE
+      - POINT_TO_POINT_FARE
+      - POINT_TO_POINT_DISTANCE_FARE
+      - STAGE_FARE
+      - ZONE_FLAT_FARE
+      - ZONE_SEQUENCE_FARE
+      - ZONE_TO_ZONE_FARE
+      - ZONE_COUNT_FARE
+      - PENALTY_FARE
+      - OTHER
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
     SupplementProductRequest:
       required:
       - chargingMomentType
@@ -1086,6 +697,45 @@ components:
       - FREE
       - ANY_TIME
       - OTHER
+    ValidityParameters:
+      required:
+      - groupingType
+      - validityParameterRefs
+      - validityParameterType
+      type: object
+      properties:
+        groupingType:
+          $ref: '#/components/schemas/GenericParameterAssignmentGroupingType'
+        validityParameterType:
+          type: string
+          enum:
+          - LINE
+          - ZONE
+          - ZONE_GROUP
+          - STOP_PLACE
+          - PARKING
+          - ROUTE_SECTION
+          - TARIFF_AUTHORITY
+          - OPERATOR
+          - TRANSPORT_MODE
+          - FLEXIBLE_LINE
+          - CLASS_OF_USE
+          - FACILITY
+          - SALES_CHANNEL
+          - AUTHORITY
+        validityParameterRefs:
+          type: array
+          description: List of references for the validity parameters
+          items:
+            pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+            type: string
+            description: NeTEx reference to validity parameter
+      examples:
+      - groupingType: OR
+        validityParameterType: LINE
+        validityParameterRefs:
+        - VYG:Line:L1
+        - VYG:Line:L2
     SupplementProductResponse:
       required:
       - chargingMomentType
@@ -1252,70 +902,420 @@ components:
             examples:
             - ENT:FareTable:123
           default: []
-    FareStructureType:
-      type: string
-      description: The type of fare structure. This indicates the method by which the fare is calculated, e.g. flat fare, zonal fare, point-to-point fare, etc.
-      enum:
-      - CAPPED_FLAT_FARE
-      - CAPPED_POINT_TO_POINT_FARE
-      - CAPPED_ZONAL_FARE
-      - LINE_FLAT_FARE
-      - NETWORK_FLAT_FARE
-      - POINT_TO_POINT_FARE
-      - POINT_TO_POINT_DISTANCE_FARE
-      - STAGE_FARE
-      - ZONE_FLAT_FARE
-      - ZONE_SEQUENCE_FARE
-      - ZONE_TO_ZONE_FARE
-      - ZONE_COUNT_FARE
-      - PENALTY_FARE
-      - OTHER
-    ValidityParameters:
-      required:
-      - groupingType
-      - validityParameterRefs
-      - validityParameterType
-      type: object
-      properties:
-        groupingType:
-          $ref: '#/components/schemas/GenericParameterAssignmentGroupingType'
-        validityParameterType:
-          type: string
-          enum:
-          - LINE
-          - ZONE
-          - ZONE_GROUP
-          - STOP_PLACE
-          - PARKING
-          - ROUTE_SECTION
-          - TARIFF_AUTHORITY
-          - OPERATOR
-          - TRANSPORT_MODE
-          - FLEXIBLE_LINE
-          - CLASS_OF_USE
-          - FACILITY
-          - SALES_CHANNEL
-          - AUTHORITY
-        validityParameterRefs:
-          type: array
-          description: List of references for the validity parameters
-          items:
-            pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
             type: string
-            description: NeTEx reference to validity parameter
-      examples:
-      - groupingType: OR
-        validityParameterType: LINE
-        validityParameterRefs:
-        - VYG:Line:L1
-        - VYG:Line:L2
-    VersionStatus:
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+    VatGrpupType:
       type: string
+      description: VAT group type. This is used to determine which VAT rate applies to a product. The VAT group type is determined by the product type and the country of sale. For example, in Norway, food products are subject to a reduced VAT rate of 15%, while other products are subject to the standard VAT rate of 25%. In this case, food products would be classified as FOOD_VAT, while other products would be classified as GENERAL_VAT.
+      default: TRANSPORT_AND_TICKETS_VAT
       enum:
-      - DRAFT
-      - PROPOSED
-      - VERSIONED
-      - DEPRECATED
+      - EXCEPTION_FROM_VAT
+      - GENERAL_VAT
+      - FOOD_VAT
+      - TRANSPORT_AND_TICKETS_VAT
+  responses:
+    BadRequestError:
+      description: Bad request - Invalid data or schema violation
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            schemaViolation:
+              summary: Request does not match schema
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: Field 'name' is required.
+            purchaseWindowNotFound:
+              summary: Referenced purchase window not found
+              value:
+                type: https://developer.entur.org/errors/bad-request
+                title: Bad Request
+                status: 400
+                detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
+  parameters:
+    version:
+      name: version
+      in: path
+      description: The netex ID or sequence number of the version to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^(([A-Z]{3}):Version:([0-9A-Za-z_\-]*)|[1-9][0-9]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:Version:001
+    id:
+      name: id
+      in: path
+      description: The netex ID of the element to retrieve
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+        type: string
+      examples:
+        default:
+          value: ENT:PreassignedFareProduct:001
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    validOnDate:
+      name: validOnDate
+      in: query
+      description: 'The date that the element should be valid for, e.g. the travel date.
+
+        Defaults to the current date.
+
+        '
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date
+      examples:
+        default:
+          value: '2026-12-01'
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  examples:
+    bicycle:
+      summary: Bicycle reservation
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: en-GB
+          value: Bike reservation
+        - lang: nb-NO
+          value: Sykkelreservasjon
+        descriptions:
+        - lang: en-GB
+          value: Valid on the given departure and require a valid ticket for traveller who brings the bike.
+        - lang: nb-NO
+          value: Gyldig på en gitt avgang og krever gyldig billett for den reisende som reiser med sykkel.
+        status: DRAFT
+        startDate: '2025-01-01'
+        supplementProductType: BICYCLE
+        chargingMomentType: BEFORE_TRAVEL
+        conditionsSummary:
+          exchangeable: true
+          refundable: true
+          fareStructureType: NETWORK_FLAT_FARE
+        vatGroup: TRANSPORT_AND_TICKETS_VAT
+        purchaseWindowRef: EXA:PurchaseWindow:120days
+        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
+        entitlementRequiredRefs:
+        - EXA:EntitlementRequired:SingleTicket
+        - EXA:EntitlementRequired:PeriodTicket
+        validityParameters:
+        - groupingType: OR
+          validityParameterType: LINE
+          validityParameterRefs:
+          - EXA:Line:X1
+    versionHistory:
+      summary: Example version history
+      value:
+      - id: EXA:Version:853a7d14-794e-4af5-b569-301711a26e26
+        status: VERSIONED
+        startDate: '2025-01-01'
+        endDate: '2025-12-31'
+        created: '2024-12-01T10:00:00Z'
+        changed: '2024-12-01T10:00:00Z'
+        published: '2024-12-30T10:00:00Z'
+        number: 1
+      - id: EXA:Version:e7104d26-16a5-4db5-aa42-b32ae0a3f684
+        status: VERSIONED
+        startDate: '2026-01-01'
+        created: '2025-12-01T10:00:00Z'
+        changed: '2025-12-01T10:00:00Z'
+        published: '2025-12-01T13:00:00Z'
+        number: 2
+      - id: EXA:Version:6be856a5-dd98-496b-b3f2-ad9939270ec3
+        status: PROPOSED
+        startDate: '2026-07-01'
+        created: '2026-06-01T10:00:00Z'
+        changed: '2026-06-01T10:00:00Z'
+    upgrade:
+      summary: First class upgrade with entitlement requirement
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: en-GB
+          value: First Class Upgrade
+        - lang: nb-NO
+          value: Oppgradering til 1. klasse
+        descriptions:
+        - lang: en-GB
+          value: Valid on the given departure and require a valid ticket.
+        - lang: nb-NO
+          value: Gyldig på en gitt avgang og krever gyldig billett.
+        status: DRAFT
+        startDate: '2025-01-01'
+        supplementProductType: UPGRADE
+        chargingMomentType: BEFORE_TRAVEL
+        conditionsSummary:
+          exchangeable: false
+          refundable: false
+          fareStructureType: NETWORK_FLAT_FARE
+        vatGroup: TRANSPORT_AND_TICKETS_VAT
+        purchaseWindowRef: EXA:PurchaseWindow:120days
+        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
+        entitlementRequiredRefs:
+        - EXA:EntitlementRequired:StandardTicket
+        - EXA:EntitlementRequired:FlexibleTicket
+        validityParameters:
+        - groupingType: OR
+          validityParameterType: LINE
+          validityParameterRefs:
+          - EXA:Line:X1
+    dog:
+      summary: Dog onboard
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: en-GB
+          value: Dog
+        - lang: nb-NO
+          value: Hund
+        descriptions:
+        - lang: en-GB
+          value: Bring your dog onboard the train.
+        - lang: nb-NO
+          value: Ta med hunden din ombord på toget.
+        status: DRAFT
+        startDate: '2025-01-01'
+        supplementProductType: DOG
+        chargingMomentType: BEFORE_TRAVEL
+        conditionsSummary:
+          exchangeable: true
+          refundable: true
+          fareStructureType: POINT_TO_POINT_FARE
+        vatGroup: TRANSPORT_AND_TICKETS_VAT
+        purchaseWindowRef: EXA:PurchaseWindow:90days
+        usageValidityPeriodRef: EXA:UsageValidityPeriod:60minutes
+        entitlementRequiredRefs:
+        - EXA:EntitlementRequired:StandardTicket
+        validityParameters:
+        - groupingType: OR
+          validityParameterType: ZONE
+          validityParameterRefs:
+          - EXA:FareZone:A
+          - EXA:FareZone:B
+    parking:
+      summary: Parking reservation
+      value:
+        privateCodes:
+        - '123'
+        ownerOrganisationId: 47
+        names:
+        - lang: en-GB
+          value: Parking reservation
+        - lang: nb-NO
+          value: Parkeringsreservasjon
+        descriptions:
+        - lang: en-GB
+          value: Reserve a parking spot at the station.
+        - lang: nb-NO
+          value: Reserver parkeringsplass på stasjonen.
+        status: DRAFT
+        startDate: '2025-01-01'
+        supplementProductType: PARKING
+        chargingMomentType: BEFORE_TRAVEL
+        conditionsSummary:
+          exchangeable: false
+          refundable: false
+          fareStructureType: NETWORK_FLAT_FARE
+        vatGroup: TRANSPORT_AND_TICKETS_VAT
+        purchaseWindowRef: EXA:PurchaseWindow:120days
+        usageValidityPeriodRef: EXA:UsageValidityPeriod:30days
+        entitlementRequiredRefs:
+        - EXA:EntitlementRequired:PeriodTicket30days
+        validityParameters:
+        - groupingType: OR
+          validityParameterType: PARKING
+          validityParameterRefs:
+          - NSR:Parking:P01
+          - NSR:Parking:P02
+          - NSR:Parking:P03
+    seatReservation:
+      summary: Seat reservation
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: en-GB
+          value: Seat reservation
+        - lang: nb-NO
+          value: Setereservasjon
+        descriptions:
+        - lang: en-GB
+          value: Mandatory seat reservation for all passengers on Bergensbanen.
+        - lang: nb-NO
+          value: Obligatorisk setereservasjon for alle passasjerer på Bergensbanen.
+        status: DRAFT
+        startDate: '2025-01-01'
+        endDate: '2025-12-31'
+        supplementProductType: SEAT_RESERVATION
+        chargingMomentType: BEFORE_TRAVEL
+        conditionsSummary:
+          exchangeable: true
+          refundable: false
+          fareStructureType: NETWORK_FLAT_FARE
+        vatGroup: TRANSPORT_AND_TICKETS_VAT
+        purchaseWindowRef: EXA:PurchaseWindow:120days
+        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
+        entitlementRequiredRefs:
+        - EXA:EntitlementRequired:StandardTicket
+        - EXA:EntitlementRequired:FlexibleTicket
+        validityParameters:
+        - groupingType: OR
+          validityParameterType: LINE
+          validityParameterRefs:
+          - EXA:Line:X1
+    parking-2:
+      summary: Parking reservation response
+      value:
+        privateCodes:
+        - '123'
+        id: EXA:SupplementProduct:456
+        versionId: EXA:Version:07ce871e-b84d-47c0-99ba-c7fdb5fa4df9
+        versionNumber: 1
+        ownerOrganisationId: 47
+        datasource:
+          id: some-client-system
+        status: VERSIONED
+        startDate: '2025-01-01'
+        names:
+        - lang: en-GB
+          value: Parking reservation
+        - lang: nb-NO
+          value: Parkeringsreservasjon
+        descriptions:
+        - lang: en-GB
+          value: Reserve a parking spot at the station.
+        - lang: nb-NO
+          value: Reserver parkeringsplass på stasjonen.
+        supplementProductType: PARKING
+        chargingMomentType: BEFORE_TRAVEL
+        conditionsSummary:
+          exchangeable: false
+          refundable: false
+          fareStructureType: NETWORK_FLAT_FARE
+        vatGroup: TRANSPORT_AND_TICKETS_VAT
+        purchaseWindowRef: EXA:PurchaseWindow:120days
+        usageValidityPeriodRef: EXA:UsageValidityPeriod:30days
+        entitlementRequiredRefs:
+        - EXA:EntitlementRequired:PeriodTicket30days
+        validityParameters:
+        - groupingType: OR
+          validityParameterType: PARKING
+          validityParameterRefs:
+          - NSR:Parking:P01
+          - NSR:Parking:P02
+          - NSR:Parking:P03
+        fareTableRefs:
+        - EXA:FareTable:parking-2025
+    luggage:
+      summary: Extra luggage
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: en-GB
+          value: Extra luggage
+        - lang: nb-NO
+          value: Ekstra bagasje
+        descriptions:
+        - lang: en-GB
+          value: Bring additional luggage beyond the standard allowance.
+        - lang: nb-NO
+          value: Ta med ekstra bagasje utover standard bagasjemengde.
+        status: DRAFT
+        startDate: '2025-01-01'
+        endDate: '2025-12-31'
+        supplementProductType: EXTRA_LUGGAGE
+        chargingMomentType: BEFORE_TRAVEL
+        conditionsSummary:
+          exchangeable: true
+          refundable: true
+          fareStructureType: POINT_TO_POINT_FARE
+        vatGroup: TRANSPORT_AND_TICKETS_VAT
+        purchaseWindowRef: EXA:PurchaseWindow:120days
+        usageValidityPeriodRef: EXA:UsageValidityPeriod:DuringTravel
+        entitlementRequiredRefs:
+        - EXA:EntitlementRequired:StandardTicket
+        - EXA:EntitlementRequired:FlexibleTicket
+        validityParameters:
+        - groupingType: OR
+          validityParameterType: LINE
+          validityParameterRefs:
+          - EXA:Line:X1
   securitySchemes:
     jwt:
       type: http

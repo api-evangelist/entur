@@ -1,14 +1,14 @@
 openapi: 3.2.0
 info:
-  title: Entur Reverse API
-  version: 2026.09.1
+  title: Geocoder Reverse API
+  description: Geocoding and reverse geocoding for Norwegian addresses and points of interest.
   contact:
     name: Team Ruter og reiseplanlegging
     url: https://developer.entur.org
   license:
     name: EUPL-1.2
     url: https://opensource.org/licenses/EUPL-1.2
-  description: 'Operations tagged Reverse across 2 of this provider''s published API definitions: entur-geocoder-openapi.json, entur-geocoder-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.1
 servers:
 - url: https://api.entur.io/geocoder
 security:
@@ -89,67 +89,405 @@ paths:
                     status: 400
                     title: Bad Request
                     detail: Parameter 'lat' is required
-    servers:
-    - url: https://api.entur.io/geocoder
 components:
-  schemas:
-    Layer:
-      type: string
-      enum:
-      - address
-      - street
-      - stopPlace
-      - groupOfStopPlaces
-      - poi
-      - place
+  parameters:
+    StopPlaceTypes:
+      name: stopPlaceTypes
+      in: query
+      description: Select stop places of these NeTEx types. Without `layers`, returns only these stop places and excludes other layers. With `layers`, constrains the `stopPlace` layer while other requested layers are returned additively (e.g. `layers=stopPlace,groupOfStopPlaces&stopPlaceTypes=railStation` returns rail stations plus groups). Ignored when `layers` is set but omits `stopPlace`.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - onstreetBus
+          - onstreetTram
+          - airport
+          - railStation
+          - metroStation
+          - busStation
+          - coachStation
+          - tramStation
+          - harbourPort
+          - ferryPort
+          - ferryStop
+          - liftStation
+          - vehicleRailInterchange
+          - other
       examples:
-      - stopPlace
-    Feature:
+        default:
+          value:
+          - railStation
+          - metroStation
+    Countries:
+      name: countries
+      in: query
+      description: ISO 3166-1 alpha-2 country code filter
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      examples:
+        default:
+          value:
+          - 'no'
+    Radius:
+      name: radius
+      in: query
+      description: Search radius in kilometres (decimals accepted). If omitted, no radius limit is applied.
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: number
+        format: double
+      examples:
+        default:
+          value: 0.5
+    Language:
+      name: lang
+      in: query
+      description: Language code for result names
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        default: 'no'
+      examples:
+        default:
+          value: 'no'
+    Counties:
+      name: counties
+      in: query
+      description: County IDs filter
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      examples:
+        default:
+          value:
+          - KVE:TopographicPlace:03
+    DistanceSort:
+      name: distanceSort
+      in: query
+      description: Sort reverse results by distance from the query point (default) or by relevance when false.
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: boolean
+        default: true
+      examples:
+        default:
+          value: true
+    Localities:
+      name: localities
+      in: query
+      description: Locality IDs filter
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      examples:
+        default:
+          value:
+          - KVE:TopographicPlace:0301
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    FareZoneAuthorities:
+      name: fareZoneAuthorities
+      in: query
+      description: Fare zone authorities filter
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      examples:
+        default:
+          value:
+          - RUT:Authority:RUT
+    FareZones:
+      name: fareZones
+      in: query
+      description: Fare zone IDs filter. Refs must be FareZone-shaped (e.g. `RUT:FareZone:1`); legacy `TariffZone` refs are not supported. A multimodal parent matches if any of its child stops is in the zone.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+      examples:
+        default:
+          value:
+          - RUT:FareZone:1
+    Multimodal:
+      name: multimodal
+      in: query
+      description: 'Multimodal stop place filter. Standalone (monomodal) stop places always appear; this only decides whether multimodal parents, children, or both appear alongside them: `parent` (default) hides multimodal children, `child` hides multimodal parents, `all` shows both'
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        default: parent
+        enum:
+        - parent
+        - child
+        - all
+      examples:
+        default:
+          value: parent
+    Layers:
+      name: layers
+      in: query
+      description: Layer filter. See `stopPlaceTypes` for how the two compose.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - address
+          - street
+          - stopPlace
+          - groupOfStopPlaces
+          - poi
+          - place
+      examples:
+        default:
+          value:
+          - stopPlace
+          - address
+    Sources:
+      name: sources
+      in: query
+      description: Data source filter. These are v3 names; v2 source values (`whosonfirst`, `geonames`, `openaddresses`) are not accepted and match nothing. Omit the parameter to search all sources. Use `layers` to filter by result type.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - openstreetmap
+          - kartverket-matrikkelenadresse
+          - kartverket-stedsnavn
+          - nsr
+          - custom-poi
+      examples:
+        default:
+          value:
+          - openstreetmap
+    Longitude:
+      name: lon
+      in: query
+      description: Longitude
+      required: true
+      style: form
+      explode: true
+      schema:
+        maximum: 180
+        minimum: -180
+        type: number
+        format: double
+      examples:
+        default:
+          value: 10.7522
+    Latitude:
+      name: lat
+      in: query
+      description: Latitude
+      required: true
+      style: form
+      explode: true
+      schema:
+        maximum: 90
+        minimum: -90
+        type: number
+        format: double
+      examples:
+        default:
+          value: 59.911
+    Limit:
+      name: limit
+      in: query
+      description: Maximum number of results
+      required: false
+      style: form
+      explode: true
+      schema:
+        maximum: 100
+        minimum: 1
+        type: integer
+        default: 10
+      examples:
+        default:
+          value: 10
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  schemas:
+    Address:
+      type: object
+      properties:
+        streetName:
+          type: string
+          examples:
+          - Jernbanetorget
+        houseNumber:
+          type: string
+          examples:
+          - '1'
+        postalCode:
+          type: string
+          examples:
+          - '0154'
+        locality:
+          type: string
+          examples:
+          - Oslo
+        localityId:
+          type: string
+          examples:
+          - KVE:TopographicPlace:0301
+        borough:
+          type: string
+          examples:
+          - Sentrum
+        boroughId:
+          type: string
+          examples:
+          - KVE:Borough:34200502
+        county:
+          type: string
+          examples:
+          - Oslo
+        countyId:
+          type: string
+          examples:
+          - KVE:TopographicPlace:03
+        countryCode:
+          type: string
+          examples:
+          - 'no'
+    Error:
       required:
-      - geometry
-      - properties
+      - status
+      - title
+      type: object
+      properties:
+        status:
+          type: integer
+          examples:
+          - 400
+        title:
+          type: string
+          examples:
+          - Bad Request
+        detail:
+          type: string
+          examples:
+          - Parameter 'lat' is required
+    QueryInfo:
+      required:
+      - lang
+      - limit
+      type: object
+      properties:
+        text:
+          type: string
+          examples:
+          - Oslo S
+        lat:
+          type: number
+          format: double
+          examples:
+          - 59.911
+        lon:
+          type: number
+          format: double
+          examples:
+          - 10.7522
+        limit:
+          type: integer
+          examples:
+          - 10
+        lang:
+          type: string
+          examples:
+          - 'no'
+        filters:
+          $ref: '#/components/schemas/Filters'
+    Result:
+      required:
+      - features
+      - metadata
       - type
       type: object
       properties:
         type:
           type: string
           enum:
-          - Feature
-        geometry:
-          $ref: '#/components/schemas/Geometry'
-        properties:
-          $ref: '#/components/schemas/Place'
+          - FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
         bbox:
           maxItems: 4
           minItems: 4
           type: array
-          description: GeoJSON bounding box `[minLon, minLat, maxLon, maxLat]`. Present for features with a real extent (streets, groups of stop places); omitted for point features.
+          description: '[minLon, minLat, maxLon, maxLat]'
           items:
             type: number
           examples:
-          - - 10.73
-            - 59.91
-            - 10.76
-            - 59.92
-    Metadata:
-      required:
-      - query
-      - resultCount
-      - timestamp
-      type: object
-      properties:
-        query:
-          $ref: '#/components/schemas/QueryInfo'
-        resultCount:
-          type: integer
-          examples:
-          - 5
-        timestamp:
-          type: string
-          description: Response generation time as an ISO 8601 instant (UTC).
-          format: date-time
-          examples:
-          - '2025-03-04T11:00:00Z'
+          - - 10.7335
+            - 59.911
+            - 10.7522
+            - 59.9144
     Filters:
       type: object
       properties:
@@ -192,37 +530,47 @@ components:
           - child
           - all
       description: Echoes the request filters as sent, not the effective filter set.
-    TransportMode:
+    Geometry:
       required:
-      - mode
+      - coordinates
+      - type
       type: object
       properties:
-        mode:
+        type:
           type: string
+          enum:
+          - Point
+        coordinates:
+          maxItems: 2
+          minItems: 2
+          type: array
+          description: '[longitude, latitude]'
+          items:
+            type: number
           examples:
-          - bus
-        subMode:
-          type: string
-          examples:
-          - localBus
-    Error:
+          - - 10.7522
+            - 59.911
+    Names:
       required:
-      - status
-      - title
+      - default
+      - display
       type: object
       properties:
-        status:
-          type: integer
-          examples:
-          - 400
-        title:
+        default:
           type: string
+          description: Official name
           examples:
-          - Bad Request
-        detail:
+          - Oslo S
+        label:
           type: string
+          description: Common or colloquial name
           examples:
-          - Parameter 'lat' is required
+          - Oslo Sentralstasjon
+        display:
+          type: string
+          description: Formatted name with locality context, suitable for display
+          examples:
+          - Oslo S, Oslo
     Place:
       required:
       - id
@@ -299,429 +647,76 @@ components:
           examples:
           - nor: Norges nasjonalteater
             eng: Norway's national theatre
-    Result:
+    Feature:
       required:
-      - features
-      - metadata
+      - geometry
+      - properties
       - type
       type: object
       properties:
         type:
           type: string
           enum:
-          - FeatureCollection
-        features:
-          type: array
-          items:
-            $ref: '#/components/schemas/Feature'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
+          - Feature
+        geometry:
+          $ref: '#/components/schemas/Geometry'
+        properties:
+          $ref: '#/components/schemas/Place'
         bbox:
           maxItems: 4
           minItems: 4
           type: array
-          description: '[minLon, minLat, maxLon, maxLat]'
+          description: GeoJSON bounding box `[minLon, minLat, maxLon, maxLat]`. Present for features with a real extent (streets, groups of stop places); omitted for point features.
           items:
             type: number
           examples:
-          - - 10.7335
-            - 59.911
-            - 10.7522
-            - 59.9144
-    QueryInfo:
+          - - 10.73
+            - 59.91
+            - 10.76
+            - 59.92
+    Layer:
+      type: string
+      enum:
+      - address
+      - street
+      - stopPlace
+      - groupOfStopPlaces
+      - poi
+      - place
+      examples:
+      - stopPlace
+    Metadata:
       required:
-      - lang
-      - limit
+      - query
+      - resultCount
+      - timestamp
       type: object
       properties:
-        text:
-          type: string
-          examples:
-          - Oslo S
-        lat:
-          type: number
-          format: double
-          examples:
-          - 59.911
-        lon:
-          type: number
-          format: double
-          examples:
-          - 10.7522
-        limit:
+        query:
+          $ref: '#/components/schemas/QueryInfo'
+        resultCount:
           type: integer
           examples:
-          - 10
-        lang:
+          - 5
+        timestamp:
           type: string
+          description: Response generation time as an ISO 8601 instant (UTC).
+          format: date-time
           examples:
-          - 'no'
-        filters:
-          $ref: '#/components/schemas/Filters'
-    Names:
+          - '2025-03-04T11:00:00Z'
+    TransportMode:
       required:
-      - default
-      - display
+      - mode
       type: object
       properties:
-        default:
-          type: string
-          description: Official name
-          examples:
-          - Oslo S
-        label:
-          type: string
-          description: Common or colloquial name
-          examples:
-          - Oslo Sentralstasjon
-        display:
-          type: string
-          description: Formatted name with locality context, suitable for display
-          examples:
-          - Oslo S, Oslo
-    Address:
-      type: object
-      properties:
-        streetName:
+        mode:
           type: string
           examples:
-          - Jernbanetorget
-        houseNumber:
+          - bus
+        subMode:
           type: string
           examples:
-          - '1'
-        postalCode:
-          type: string
-          examples:
-          - '0154'
-        locality:
-          type: string
-          examples:
-          - Oslo
-        localityId:
-          type: string
-          examples:
-          - KVE:TopographicPlace:0301
-        borough:
-          type: string
-          examples:
-          - Sentrum
-        boroughId:
-          type: string
-          examples:
-          - KVE:Borough:34200502
-        county:
-          type: string
-          examples:
-          - Oslo
-        countyId:
-          type: string
-          examples:
-          - KVE:TopographicPlace:03
-        countryCode:
-          type: string
-          examples:
-          - 'no'
-    Geometry:
-      required:
-      - coordinates
-      - type
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - Point
-        coordinates:
-          maxItems: 2
-          minItems: 2
-          type: array
-          description: '[longitude, latitude]'
-          items:
-            type: number
-          examples:
-          - - 10.7522
-            - 59.911
-  parameters:
-    Sources:
-      name: sources
-      in: query
-      description: Data source filter. These are v3 names; v2 source values (`whosonfirst`, `geonames`, `openaddresses`) are not accepted and match nothing. Omit the parameter to search all sources. Use `layers` to filter by result type.
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-          - openstreetmap
-          - kartverket-matrikkelenadresse
-          - kartverket-stedsnavn
-          - nsr
-          - custom-poi
-      examples:
-        default:
-          value:
-          - openstreetmap
-    StopPlaceTypes:
-      name: stopPlaceTypes
-      in: query
-      description: Select stop places of these NeTEx types. Without `layers`, returns only these stop places and excludes other layers. With `layers`, constrains the `stopPlace` layer while other requested layers are returned additively (e.g. `layers=stopPlace,groupOfStopPlaces&stopPlaceTypes=railStation` returns rail stations plus groups). Ignored when `layers` is set but omits `stopPlace`.
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-          - onstreetBus
-          - onstreetTram
-          - airport
-          - railStation
-          - metroStation
-          - busStation
-          - coachStation
-          - tramStation
-          - harbourPort
-          - ferryPort
-          - ferryStop
-          - liftStation
-          - vehicleRailInterchange
-          - other
-      examples:
-        default:
-          value:
-          - railStation
-          - metroStation
-    Language:
-      name: lang
-      in: query
-      description: Language code for result names
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: string
-        default: 'no'
-      examples:
-        default:
-          value: 'no'
-    Layers:
-      name: layers
-      in: query
-      description: Layer filter. See `stopPlaceTypes` for how the two compose.
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-          enum:
-          - address
-          - street
-          - stopPlace
-          - groupOfStopPlaces
-          - poi
-          - place
-      examples:
-        default:
-          value:
-          - stopPlace
-          - address
-    DistanceSort:
-      name: distanceSort
-      in: query
-      description: Sort reverse results by distance from the query point (default) or by relevance when false.
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: boolean
-        default: true
-      examples:
-        default:
-          value: true
-    Multimodal:
-      name: multimodal
-      in: query
-      description: 'Multimodal stop place filter. Standalone (monomodal) stop places always appear; this only decides whether multimodal parents, children, or both appear alongside them: `parent` (default) hides multimodal children, `child` hides multimodal parents, `all` shows both'
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: string
-        default: parent
-        enum:
-        - parent
-        - child
-        - all
-      examples:
-        default:
-          value: parent
-    Countries:
-      name: countries
-      in: query
-      description: ISO 3166-1 alpha-2 country code filter
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-      examples:
-        default:
-          value:
-          - 'no'
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    Radius:
-      name: radius
-      in: query
-      description: Search radius in kilometres (decimals accepted). If omitted, no radius limit is applied.
-      required: false
-      style: form
-      explode: true
-      schema:
-        minimum: 0
-        type: number
-        format: double
-      examples:
-        default:
-          value: 0.5
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    Limit:
-      name: limit
-      in: query
-      description: Maximum number of results
-      required: false
-      style: form
-      explode: true
-      schema:
-        maximum: 100
-        minimum: 1
-        type: integer
-        default: 10
-      examples:
-        default:
-          value: 10
-    FareZoneAuthorities:
-      name: fareZoneAuthorities
-      in: query
-      description: Fare zone authorities filter
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-      examples:
-        default:
-          value:
-          - RUT:Authority:RUT
-    Latitude:
-      name: lat
-      in: query
-      description: Latitude
-      required: true
-      style: form
-      explode: true
-      schema:
-        maximum: 90
-        minimum: -90
-        type: number
-        format: double
-      examples:
-        default:
-          value: 59.911
-    Counties:
-      name: counties
-      in: query
-      description: County IDs filter
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-      examples:
-        default:
-          value:
-          - KVE:TopographicPlace:03
-    Longitude:
-      name: lon
-      in: query
-      description: Longitude
-      required: true
-      style: form
-      explode: true
-      schema:
-        maximum: 180
-        minimum: -180
-        type: number
-        format: double
-      examples:
-        default:
-          value: 10.7522
-    Localities:
-      name: localities
-      in: query
-      description: Locality IDs filter
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-      examples:
-        default:
-          value:
-          - KVE:TopographicPlace:0301
-    FareZones:
-      name: fareZones
-      in: query
-      description: Fare zone IDs filter. Refs must be FareZone-shaped (e.g. `RUT:FareZone:1`); legacy `TariffZone` refs are not supported. A multimodal parent matches if any of its child stops is in the zone.
-      required: false
-      style: form
-      explode: false
-      schema:
-        type: array
-        items:
-          type: string
-      examples:
-        default:
-          value:
-          - RUT:FareZone:1
+          - localBus
 externalDocs:
   description: Geocoder documentation and v3 migration guide
   url: https://developer.entur.no/docs/open-services/geocoder
-x-refined-from:
-- entur-geocoder-openapi.json
-- entur-geocoder-openapi.yml

@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Purchase Windows API
+  title: Products Purchase Windows API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged purchase-windows across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -157,13 +157,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /purchase-windows/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -250,13 +243,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /purchase-windows/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -417,13 +403,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v1/purchase-windows/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -542,76 +521,8 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
-    PurchaseWindowInsert:
-      required:
-      - fareFrameRef
-      - id
-      - name
-      - version
-      type: object
-      properties:
-        description:
-          type: array
-          description: Description represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:PurchaseWindow:90days
-        latestTime:
-          type: string
-          description: Latest time.
-          examples:
-          - '23:59:59'
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        maxmumPeriodBeforeDeparture:
-          type: string
-          description: Maximum period before departure.
-          examples:
-          - PT2160H
-        minimumPeriodBeforeDeparture:
-          type: string
-          description: Minimum period before departure.
-          examples:
-          - PT2160H
-        name:
-          type: array
-          description: PurchaseWindow Name represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        purchaseWhen:
-          type: string
-          description: When to purchase.
-          enum:
-          - TIME_OF_TRAVEL_ONLY
-          - DAY_OF_TRAVEL_ONLY
-          - ADVANCE_ONLY
-          - UNTIL_PREVIOUS_DAY
-          - ADVANCE_AND_DAY_OF_TRAVEL
-          - OTHER
-          examples:
-          - ADVANCE_AND_DAY_OF_TRAVEL
-        version:
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: PurchaseWindow version.
-          examples:
-          - NSB:Version:V1
     VersionOfObjectRef:
       required:
       - nameOfClass
@@ -738,6 +649,84 @@ components:
           examples:
           - NSB:Version:V1
       description: A PurchaseWindow
+    PurchaseWindowInsert:
+      required:
+      - fareFrameRef
+      - id
+      - name
+      - version
+      type: object
+      properties:
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:PurchaseWindow:90days
+        latestTime:
+          type: string
+          description: Latest time.
+          examples:
+          - '23:59:59'
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        maxmumPeriodBeforeDeparture:
+          type: string
+          description: Maximum period before departure.
+          examples:
+          - PT2160H
+        minimumPeriodBeforeDeparture:
+          type: string
+          description: Minimum period before departure.
+          examples:
+          - PT2160H
+        name:
+          type: array
+          description: PurchaseWindow Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        purchaseWhen:
+          type: string
+          description: When to purchase.
+          enum:
+          - TIME_OF_TRAVEL_ONLY
+          - DAY_OF_TRAVEL_ONLY
+          - ADVANCE_ONLY
+          - UNTIL_PREVIOUS_DAY
+          - ADVANCE_AND_DAY_OF_TRAVEL
+          - OTHER
+          examples:
+          - ADVANCE_AND_DAY_OF_TRAVEL
+        version:
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: PurchaseWindow version.
+          examples:
+          - NSB:Version:V1
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
     LimitingRule:
       required:
       - changed
@@ -845,33 +834,7 @@ components:
           examples:
           - NSB:Version:V1
       description: A LimitingRule
-    TextInLanguage:
-      required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -887,11 +850,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Dated Service Journey Controller V 1 API
+  title: Seating Services Dated Service Journey Controller V 1 API
+  description: API exposing services to handle seat reservations
   version: 2026.09.0
-  description: 'Operations tagged dated-service-journey-controller-v-1 across 2 of this provider''s published API definitions: entur-seatingservices-openapi.json, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seatingservices
 tags:
@@ -39,8 +39,6 @@ paths:
                 $ref: '#/components/schemas/DatedServiceJourneyResponse'
       summary: Set dated service journey status
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /v1/dated-service-journeys/{datedServiceJourneyId}/seats:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -88,8 +86,6 @@ paths:
                 $ref: '#/components/schemas/SeqRailcarResponseV1'
       summary: Get available seats in ATrain
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /v1/dated-service-journeys/{datedServiceJourneyId}/railcars:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -138,8 +134,6 @@ paths:
       deprecated: true
       summary: Get railcars
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /v1/dated-service-journeys/{datedServiceJourneyId}/railcars/{railcarNumber}/seats:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -194,8 +188,6 @@ paths:
                 $ref: '#/components/schemas/RailcarResponseV1'
       summary: Get available seats in ARailcar
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /v1/dated-service-journeys/{datedServiceJourneyId}/railcars/seats:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -251,8 +243,6 @@ paths:
       deprecated: true
       summary: Get available seats in railcar by seat type id
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /v1/dated-service-journeys/{datedServiceJourneyId}/railcars/configs:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -278,17 +268,29 @@ paths:
                 $ref: '#/components/schemas/SeqRailcarTypeInfoResponseV1'
       summary: Get railcar group info
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
 components:
   schemas:
     RailcarResponseV1: {}
+    SeqRailcarTypeResponseV1:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
+    SeqRailcarTypeInfoResponseV1:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
     UpdateDatedServiceJourneyRequest:
       type: object
       properties:
         closed:
           type: boolean
-    SeqRailcarTypeResponseV1:
+    SeqRailcarResponseV1:
       type: object
       properties:
         traversableAgain:
@@ -300,30 +302,7 @@ components:
       properties:
         closed:
           type: boolean
-    SeqRailcarTypeInfoResponseV1:
-      type: object
-      properties:
-        traversableAgain:
-          type: boolean
-        empty:
-          type: boolean
-    SeqRailcarResponseV1:
-      type: object
-      properties:
-        traversableAgain:
-          type: boolean
-        empty:
-          type: boolean
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -339,11 +318,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seatingservices-openapi.json
-- entur-seatingservices-openapi.yml

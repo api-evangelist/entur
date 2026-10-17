@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Distribution Channel Usages API
+  title: Products Distribution Channel Usages API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged distribution-channel-usages across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -85,14 +85,37 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
+  schemas:
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    ElementUsages:
+      type: object
+      properties:
+        elementRefs:
+          type: array
+          description: Parameters usages mapped to the requested parameter.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+      description: ParameterUsages
   parameters:
     X-Correlation-Id:
       name: X-Correlation-Id
@@ -118,41 +141,8 @@ components:
       explode: false
       schema:
         type: string
-  schemas:
-    ElementUsages:
-      type: object
-      properties:
-        elementRefs:
-          type: array
-          description: Parameters usages mapped to the requested parameter.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-      description: ParameterUsages
-    VersionOfObjectRef:
-      required:
-      - nameOfClass
-      - ref
-      - version
-      type: object
-      properties:
-        nameOfClass:
-          minLength: 1
-          type: string
-          description: Name of class.
-        ref:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: The netex id reference to the object.
-        version:
-          type: string
-          description: Version.
-      description: Fare frame ref.
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

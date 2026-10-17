@@ -1,13 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Entur Traveller information API
-  version: 2026.10.0
+  title: Customers Traveller information API
+  description: Documentation of the Customers API
+  termsOfService: https://entur.org
   contact:
     name: Entur Team Personalisering
     url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
     email: team.personalisering@entur.org
-  termsOfService: https://entur.org
-  description: 'Operations tagged Traveller information across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.10.0
 servers:
 - url: https://api.entur.io/customers/v2
 security:
@@ -93,123 +93,8 @@ paths:
           any:
           - customers-orchestrator-traveller-info:les
           - customers-orchestrator-traveller-info-global:les
-    servers:
-    - url: https://api.entur.io/customers/v2
 components:
-  responses:
-    Error500_customers-orchestrator-customers:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error401_customers-orchestrator-customers:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error403_customers-orchestrator-customers:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
-    RefType:
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: string
-        version:
-          type: string
-    ErrorSpecification:
-      required:
-      - defaultMessage
-      - field
-      type: object
-      properties:
-        field:
-          type: string
-          description: The field of the associated object in the request related to the error.
-        defaultMessage:
-          type: string
-          description: The message explaining why the error occurred.
-        rejectedValues:
-          type: object
-          description: A list of rejected values.
-      description: Optional list of error specifications.
-    PurchasedLeg:
-      required:
-      - authorityRef
-      - endTime
-      - fromStopPlaceRef
-      - id
-      - mode
-      - operatorRef
-      - serviceJourneyRef
-      - startTime
-      - toStopPlaceRef
-      type: object
-      properties:
-        id:
-          type: string
-        datedServiceJourneyRef:
-          $ref: '#/components/schemas/RefType'
-        originalDatedServiceJourneyRef:
-          $ref: '#/components/schemas/RefType'
-        startTime:
-          type: string
-          format: date-time
-        fromStopPlaceRef:
-          $ref: '#/components/schemas/RefType'
-        endTime:
-          type: string
-          format: date-time
-        toStopPlaceRef:
-          $ref: '#/components/schemas/RefType'
-        authorityRef:
-          $ref: '#/components/schemas/RefType'
-        operatorRef:
-          $ref: '#/components/schemas/RefType'
-        serviceJourneyRef:
-          $ref: '#/components/schemas/RefType'
-        mode:
-          type: string
-        purchasedFareProducts:
-          type: array
-          description: Reference to Fare Products on this leg
-          items:
-            type: string
-            description: Reference to Fare Products on this leg
-      description: Legs connected to the customer on the journey
     TravellerInfo:
       required:
       - customerNumber
@@ -265,6 +150,75 @@ components:
           type: string
           description: Reference to the journey’s final stop
       description: Each order on the journey enriched with customer information
+    PurchasedLeg:
+      required:
+      - authorityRef
+      - endTime
+      - fromStopPlaceRef
+      - id
+      - mode
+      - operatorRef
+      - serviceJourneyRef
+      - startTime
+      - toStopPlaceRef
+      type: object
+      properties:
+        id:
+          type: string
+        datedServiceJourneyRef:
+          $ref: '#/components/schemas/RefType'
+        originalDatedServiceJourneyRef:
+          $ref: '#/components/schemas/RefType'
+        startTime:
+          type: string
+          format: date-time
+        fromStopPlaceRef:
+          $ref: '#/components/schemas/RefType'
+        endTime:
+          type: string
+          format: date-time
+        toStopPlaceRef:
+          $ref: '#/components/schemas/RefType'
+        authorityRef:
+          $ref: '#/components/schemas/RefType'
+        operatorRef:
+          $ref: '#/components/schemas/RefType'
+        serviceJourneyRef:
+          $ref: '#/components/schemas/RefType'
+        mode:
+          type: string
+        purchasedFareProducts:
+          type: array
+          description: Reference to Fare Products on this leg
+          items:
+            type: string
+            description: Reference to Fare Products on this leg
+      description: Legs connected to the customer on the journey
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    RefType:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: string
     ErrorResponse:
       required:
       - correlationId
@@ -318,11 +272,52 @@ components:
           items:
             $ref: '#/components/schemas/ErrorSpecification'
       description: Response object for errors occurring in the customers API
+  responses:
+    Error500_customers-orchestrator-customers:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403_customers-orchestrator-customers:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401_customers-orchestrator-customers:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-customers-openapi.json
-- entur-customers-openapi.yml

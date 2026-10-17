@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Contracts client API
-  version: 2026.08.0
+  title: Personnel tickets Contracts client API
+  description: Personnel tickets are a Norwegian railway discount scheme providing reduced fares for employees, pensioners, and eligible family members in participating companies.
+  termsOfService: http://entur.org
   contact:
     name: Entur Team Personalisering
     email: team.personalisering@entur.org
-  termsOfService: http://entur.org
-  description: 'Operations tagged Contracts client across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io
 security:
@@ -54,8 +54,6 @@ paths:
           $ref: '#/components/responses/Error403'
         '500':
           $ref: '#/components/responses/Error500'
-    servers:
-    - url: https://api.entur.io
   /customers/v2/benefits/contracts/validate-consumptions:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -92,8 +90,6 @@ paths:
           any:
           - benefits-contract-consumer:les
           - benefits-contract-consumer-global:les
-    servers:
-    - url: https://api.entur.io
   /customers/v2/benefits/contracts:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -300,8 +296,6 @@ paths:
           any:
           - benefits-contract:les
           - benefits-contract-global:les
-    servers:
-    - url: https://api.entur.io
   /customers/v2/benefits/contracts/{externalRef}/by-external-ref:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -407,8 +401,6 @@ paths:
           - benefits-contract:les
           - benefits-contract-jdir:les
           - benefits-contract-global:les
-    servers:
-    - url: https://api.entur.io
   /customers/v2/benefits/contract-consumers/{customerNumber}/contracts:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -497,10 +489,539 @@ paths:
           - benefits-contract-consumer-global:les
       summary: Get all valid contracts by customer number
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io
 components:
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
+    PageOfContractResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          items:
+            $ref: '#/components/schemas/ContractResponse'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int64
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int64
+          examples:
+          - 1
+      description: Paged content
+    ClaimPersonnelTicketRequest:
+      required:
+      - customerNumber
+      - externalReference
+      type: object
+      properties:
+        externalReference:
+          pattern: \w+-(\w+)+-\w+
+          type: string
+          description: The code of the personnel ticket to claim
+          examples:
+          - ABCD-EF12-3456-GH45
+        customerNumber:
+          type: integer
+          description: The customerNumber referring to the customer who claims the personnel ticket
+          format: int64
+          examples:
+          - 1234567
+      description: A request for claiming a personnel ticket
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    CouponConfigResponse:
+      required:
+      - defaultQuantity
+      - loyaltyProgramId
+      type: object
+      properties:
+        defaultQuantity:
+          type: integer
+          description: Default number of how many coupons can be used. May be overridden by contract coupon limit
+          format: int64
+        defaultStartTime:
+          type: string
+          description: The default start time of the contract created by a coupon usage. If set, the contract created by a coupon usage will start on the specified time of the travel date or when created
+          format: time
+        loyaltyProgramId:
+          type: integer
+          description: The loyalty program the contract created by the coupon is connected to
+          format: int64
+        usageValidityPeriod:
+          type: string
+          description: The duration of the of the contract created by a coupon usage. If set, the contract created by a coupon usage will set expiration date to the end of the duration. It will override loyalty program usageValidityPeriod
+          format: duration
+          examples:
+          - P3DT12H30M5S
+      description: Configuration for coupons. This is only set for loyalty program type COUPONS
+    LoyaltyProgramDescriptionResponse:
+      required:
+      - createdAt
+      - createdBy
+      - description
+      - languageCode
+      - lastChangedAt
+      - lastChangedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: When the loyalty program was created
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        createdBy:
+          type: string
+          description: Which client created the loyalty program
+          examples:
+          - 123e4567-e89b-12d3-a456-426655440000
+        description:
+          type: string
+          description: Loyalty program description. Supports any kind of text
+          examples:
+          - Reis Kundekort gir deg 20% rabatt på alle kjøp
+        displayName:
+          type: string
+          description: Display name for loyalty program
+          examples:
+          - Reis Kundekort
+        languageCode:
+          type: string
+          description: What language the description is written in, ISO639-3
+          examples:
+          - NOB
+        lastChangedAt:
+          type: string
+          description: When the loyalty program was last changed
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        lastChangedBy:
+          type: string
+          description: Which client changed the loyalty program last
+          examples:
+          - 123e4567-e89b-12d3-a456-426655440000
+      description: Description of a loyalty program version
+    TaxDistributionResponse:
+      required:
+      - isUnknown
+      - taxMonth
+      - taxSaving
+      - taxYear
+      type: object
+      properties:
+        isUnknown:
+          type: boolean
+          description: If set, the tax distribution saving for that month is unknown. This is the case for all period tickets before may 2021. They need to be calculated manually
+        taxMonth:
+          type: integer
+          description: The month of the tax saving
+          format: int32
+        taxSaving:
+          type: string
+          description: The value of tax saved
+        taxYear:
+          type: integer
+          description: The year of the tax saving
+          format: int32
+      description: Tax distribution for an order line
+    ClaimContractResponse:
+      required:
+      - customerNumber
+      - success
+      type: object
+      properties:
+        customerNumber:
+          type: integer
+          description: The customerNumber for the customer now claiming the personnel ticket
+          format: int64
+          examples:
+          - 1234567
+        success:
+          type: boolean
+          description: Whether the claim was successful
+      description: The response after claiming a contract
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
+    ContractConsumption:
+      required:
+      - contractUuid
+      - customerNumber
+      - entitlementProductId
+      - firstTravelDate
+      type: object
+      properties:
+        contractUuid:
+          type: string
+          description: The id of the contract consumed
+          format: uuid
+          examples:
+          - cae8853a-583e-49af-be61-cf10875a541d
+        coupons:
+          type: integer
+          description: The number of coupons consumed. Has no effect if the contract does not specify a number of available coupons. Defaults to 1.
+          format: int64
+          examples:
+          - 1
+        customerNumber:
+          type: integer
+          description: The customer attempting to consume the contract
+          format: int64
+          examples:
+          - 123415
+        entitlementProductId:
+          minLength: 1
+          type: string
+          description: The id of the product consumed. This is on NetEX format and must match the product in use by the supplied contract.
+          examples:
+          - ENT:TravelRebate:A2
+        entitlementProductVersion:
+          type: string
+          description: The version of the product consumed. This is on NetEX format and if supplied must match the product version in use by the supplied contract.
+          examples:
+          - ENT:Version:V1
+        firstTravelDate:
+          type: string
+          description: The start date and time of travel.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        lastTravelDate:
+          type: string
+          description: The end date and time of travel. Defaults to firstTravelDate if not provided.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        orderLineReference:
+          $ref: '#/components/schemas/OrderLineReference'
+      description: Contract consumption details
+    TotalAmount:
+      required:
+      - amount
+      - calculatedAt
+      - currency
+      type: object
+      properties:
+        amount:
+          minimum: 0.01
+          pattern: -?\d*\.\d\d
+          type: string
+          description: 'Amount amount. Format: -?\d*\.\d\d  Examples: 123.34  1.00  34000.00'
+        calculatedAt:
+          type: string
+          description: When the amount was calculated
+          format: date-time
+          readOnly: true
+        currency:
+          type: string
+          description: Currency of the amount
+          examples:
+          - NOK
+      description: The current total for this contract (earn/burn or giftcard)
+    ContractConsumerResponse:
+      required:
+      - createdAt
+      - createdBy
+      - customerNumber
+      - customerOrganisationId
+      - isBlocked
+      - isContractHolder
+      - lastChangedAt
+      - lastChangedBy
+      type: object
+      properties:
+        createdAt:
+          type: string
+          description: When the contract consumer was created
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        createdBy:
+          type: string
+          description: Which client created the contract consumer
+          examples:
+          - 123e4567-e89b-12d3-a456-426655440000
+        customerNumber:
+          type: integer
+          description: The customer entitled to use the contract. Unique Entur specific number
+          format: int64
+          examples:
+          - 122334
+        customerOrganisationId:
+          type: integer
+          description: The organisation ID the customer belongs to
+          format: int64
+          examples:
+          - 42
+        customerRef:
+          type: string
+          description: The customer entitled to use the contract. External reference unique to organisation
+          examples:
+          - 073R41D4R
+        isBlocked:
+          type: boolean
+          description: Marks that this specific user has been disallowed from using this contract by the contract owner
+          examples:
+          - true
+        isContractHolder:
+          type: boolean
+          description: Marks that this specific user's organisation is the owner of the contract
+        lastChangedAt:
+          type: string
+          description: When the contract consumer was last changed
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        lastChangedBy:
+          type: string
+          description: Which client changed the contract consumer last
+          examples:
+          - 123e4567-e89b-12d3-a456-426655440000
+      description: A description of the customer that's allowed to use the contract
+    OrderLineEventResponse:
+      required:
+      - eventType
+      - isCancelled
+      - isPurchased
+      - orderId
+      - orderLineId
+      - orderLineVersion
+      - organisationId
+      - price
+      - timestamp
+      type: object
+      properties:
+        codespace:
+          type: string
+          description: Codespace
+          examples:
+          - ABC
+        couponsUsed:
+          type: integer
+          description: How many coupons (usages) this event is using. This defaults to 1, but will be ignored if the contract in question does not use coupons.
+          format: int64
+          examples:
+          - 1
+        effectiveCancellationDate:
+          type: string
+          description: If set, the effective date for cancellation.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        eventType:
+          type: string
+          description: The order line event type. Can be one of 'PURCHASE' or 'CANCELLATION'. PURCHASE is used when the order line event describe purchase of a travel using a contract (not the same as isPurchased). CANCELLATION is when the order line event is a cancellation (can be the same as isCancelled)
+        isCancelled:
+          type: boolean
+          description: Whether the order line event is a cancellation
+        isPurchased:
+          type: boolean
+          description: Whether the order line event describes the purchase of a contract, or contract consumer
+        lastTravelDate:
+          type: string
+          description: The last date of travel, related to entitlement usage. Defaults to equal travelDate. Relevant for period tickets only.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        manualTransactionComment:
+          type: string
+          description: If the order line is added manually, this field will have an explanation
+          examples:
+          - Refund because the order was cancelled too late
+        orderId:
+          type: string
+          description: The order ID
+          examples:
+          - ABC
+        orderLineId:
+          type: string
+          description: The order line ID
+          examples:
+          - KFN
+        orderLineText:
+          type: string
+          description: The name of the product that this usage refers to. This should be supplied by the caller to indicate which item has been bought. This is displayed to the user in reports.
+          examples:
+          - 1 x Voksen, Oslo S - OSL
+        orderLineVersion:
+          type: string
+          description: The order line version
+          examples:
+          - '132'
+        organisationId:
+          type: integer
+          description: The organisation through which the order was placed
+          format: int64
+          examples:
+          - 1
+        originalPrice:
+          type: string
+          description: The original price for this item, i.e.  i.e the original price without the travellers discount.
+          examples:
+          - '3.77'
+        price:
+          type: string
+          description: The actual paid price for this item, i.e. what did the user actually pay after rebate. Negative if this was a cancellation
+          examples:
+          - '3.77'
+        taxDistributions:
+          type: array
+          description: Tax savings for this order line
+          items:
+            $ref: '#/components/schemas/TaxDistributionResponse'
+        timestamp:
+          type: string
+          description: When the order line event was saved
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        travelDate:
+          type: string
+          description: The first date of travel on this ticket. Will be used to decide when to report this usage to the Norwegian tax administration, if applicable. Defaults to the current date and time.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+      description: An order line event on a contract
+    OrderLineReference:
+      required:
+      - orderId
+      - orderLineId
+      type: object
+      properties:
+        orderId:
+          maxLength: 90
+          minLength: 0
+          type: string
+          description: The Order id, used for lookup when trying to find the order in Enturs systems.
+          examples:
+          - ABCD
+        orderLineId:
+          maxLength: 100
+          minLength: 0
+          type: string
+          description: The order line Id for Entur orders.
+          examples:
+          - ABCD
+      description: The order line reference. This is used to check if consumption has already been validated.
+    ValidateContractConsumptionResponse:
+      required:
+      - code
+      - isValid
+      - reason
+      type: object
+      properties:
+        code:
+          type: string
+          description: A code pertaining to the reason for rejection, if any. Code 3101 = OK.
+          examples:
+          - '3101'
+        isValid:
+          type: boolean
+          description: True if all consumptions were valid, otherwise false
+        reason:
+          type: string
+          description: A short message detailing the reasoning behind the status.
+          examples:
+          - ok
+      description: The result of a contract consumption validations
     LoyaltyProgramFlatResponse:
       required:
       - descriptions
@@ -588,6 +1109,24 @@ components:
           description: The version of this loyalty program.
           format: int64
       description: The current values for a loyalty program
+    PolicyResponse:
+      required:
+      - id
+      - key
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Id of the policy
+          format: int64
+          examples:
+          - 1
+        key:
+          type: string
+          description: Key for which field that should be matching
+          examples:
+          - surname
+      description: Policy, returns keys that have to match
     ContractResponse:
       required:
       - consumableFrom
@@ -707,82 +1246,18 @@ components:
           examples:
           - 123e4567-e89b-12d3-a456-426655440000
       description: A contract between a customer and an organisation
-    ContractConsumerResponse:
+    ValidateContractConsumptionRequest:
       required:
-      - createdAt
-      - createdBy
-      - customerNumber
-      - customerOrganisationId
-      - isBlocked
-      - isContractHolder
-      - lastChangedAt
-      - lastChangedBy
+      - consumptions
       type: object
       properties:
-        createdAt:
-          type: string
-          description: When the contract consumer was created
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        createdBy:
-          type: string
-          description: Which client created the contract consumer
-          examples:
-          - 123e4567-e89b-12d3-a456-426655440000
-        customerNumber:
-          type: integer
-          description: The customer entitled to use the contract. Unique Entur specific number
-          format: int64
-          examples:
-          - 122334
-        customerOrganisationId:
-          type: integer
-          description: The organisation ID the customer belongs to
-          format: int64
-          examples:
-          - 42
-        customerRef:
-          type: string
-          description: The customer entitled to use the contract. External reference unique to organisation
-          examples:
-          - 073R41D4R
-        isBlocked:
-          type: boolean
-          description: Marks that this specific user has been disallowed from using this contract by the contract owner
-          examples:
-          - true
-        isContractHolder:
-          type: boolean
-          description: Marks that this specific user's organisation is the owner of the contract
-        lastChangedAt:
-          type: string
-          description: When the contract consumer was last changed
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        lastChangedBy:
-          type: string
-          description: Which client changed the contract consumer last
-          examples:
-          - 123e4567-e89b-12d3-a456-426655440000
-      description: A description of the customer that's allowed to use the contract
-    ClaimContractResponse:
-      required:
-      - customerNumber
-      - success
-      type: object
-      properties:
-        customerNumber:
-          type: integer
-          description: The customerNumber for the customer now claiming the personnel ticket
-          format: int64
-          examples:
-          - 1234567
-        success:
-          type: boolean
-          description: Whether the claim was successful
-      description: The response after claiming a contract
+        consumptions:
+          minItems: 1
+          type: array
+          description: A list of consumptions to verify
+          items:
+            $ref: '#/components/schemas/ContractConsumption'
+      description: A request to validate the consumption of one or more product entitlements in an order
     TransactionResponse:
       required:
       - amount
@@ -832,501 +1307,7 @@ components:
           examples:
           - '2007-12-03T10:15:30+01:00'
       description: The list of transactions for this contract (earn/burn or giftcard)
-    LoyaltyProgramDescriptionResponse:
-      required:
-      - createdAt
-      - createdBy
-      - description
-      - languageCode
-      - lastChangedAt
-      - lastChangedBy
-      type: object
-      properties:
-        createdAt:
-          type: string
-          description: When the loyalty program was created
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        createdBy:
-          type: string
-          description: Which client created the loyalty program
-          examples:
-          - 123e4567-e89b-12d3-a456-426655440000
-        description:
-          type: string
-          description: Loyalty program description. Supports any kind of text
-          examples:
-          - Reis Kundekort gir deg 20% rabatt på alle kjøp
-        displayName:
-          type: string
-          description: Display name for loyalty program
-          examples:
-          - Reis Kundekort
-        languageCode:
-          type: string
-          description: What language the description is written in, ISO639-3
-          examples:
-          - NOB
-        lastChangedAt:
-          type: string
-          description: When the loyalty program was last changed
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        lastChangedBy:
-          type: string
-          description: Which client changed the loyalty program last
-          examples:
-          - 123e4567-e89b-12d3-a456-426655440000
-      description: Description of a loyalty program version
-    ErrorResponse:
-      required:
-      - correlationId
-      - error
-      - message
-      - path
-      - status
-      - timestamp
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: When the error occurred.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        status:
-          type: integer
-          description: The http status code.
-          format: int32
-          examples:
-          - 400
-        errorCode:
-          type: string
-          description: Application specific error code
-          examples:
-          - '1033'
-        error:
-          type: string
-          description: The http status reason.
-          examples:
-          - Bad request
-        path:
-          type: string
-          description: The request URI.
-          examples:
-          - /loyaltyPrograms
-        message:
-          type: string
-          description: The main error message.
-          examples:
-          - Validation failed for ...
-        correlationId:
-          type: string
-          description: The unique correlation id for the request.
-          examples:
-          - b5d4960d-7ab2-43d6-a8f3-113da042a288
-        errors:
-          type: array
-          description: Optional list of error specifications.
-          items:
-            $ref: '#/components/schemas/ErrorSpecification'
-      description: Response object for errors occurring in the customers API
-    PolicyResponse:
-      required:
-      - id
-      - key
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Id of the policy
-          format: int64
-          examples:
-          - 1
-        key:
-          type: string
-          description: Key for which field that should be matching
-          examples:
-          - surname
-      description: Policy, returns keys that have to match
-    ErrorSpecification:
-      required:
-      - defaultMessage
-      - field
-      type: object
-      properties:
-        field:
-          type: string
-          description: The field of the associated object in the request related to the error.
-        defaultMessage:
-          type: string
-          description: The message explaining why the error occurred.
-        rejectedValues:
-          type: object
-          description: A list of rejected values.
-      description: Optional list of error specifications.
-    PageOfContractResponse:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: All items for this page
-          items:
-            $ref: '#/components/schemas/ContractResponse'
-        totalItems:
-          type: integer
-          description: Total items which could be returned
-          format: int64
-          examples:
-          - 1
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int64
-          examples:
-          - 1
-      description: Paged content
-    ClaimPersonnelTicketRequest:
-      required:
-      - customerNumber
-      - externalReference
-      type: object
-      properties:
-        externalReference:
-          pattern: \w+-(\w+)+-\w+
-          type: string
-          description: The code of the personnel ticket to claim
-          examples:
-          - ABCD-EF12-3456-GH45
-        customerNumber:
-          type: integer
-          description: The customerNumber referring to the customer who claims the personnel ticket
-          format: int64
-          examples:
-          - 1234567
-      description: A request for claiming a personnel ticket
-    OrderLineReference:
-      required:
-      - orderId
-      - orderLineId
-      type: object
-      properties:
-        orderId:
-          maxLength: 90
-          minLength: 0
-          type: string
-          description: The Order id, used for lookup when trying to find the order in Enturs systems.
-          examples:
-          - ABCD
-        orderLineId:
-          maxLength: 100
-          minLength: 0
-          type: string
-          description: The order line Id for Entur orders.
-          examples:
-          - ABCD
-      description: The order line reference. This is used to check if consumption has already been validated.
-    TaxDistributionResponse:
-      required:
-      - isUnknown
-      - taxMonth
-      - taxSaving
-      - taxYear
-      type: object
-      properties:
-        isUnknown:
-          type: boolean
-          description: If set, the tax distribution saving for that month is unknown. This is the case for all period tickets before may 2021. They need to be calculated manually
-        taxMonth:
-          type: integer
-          description: The month of the tax saving
-          format: int32
-        taxSaving:
-          type: string
-          description: The value of tax saved
-        taxYear:
-          type: integer
-          description: The year of the tax saving
-          format: int32
-      description: Tax distribution for an order line
-    CouponConfigResponse:
-      required:
-      - defaultQuantity
-      - loyaltyProgramId
-      type: object
-      properties:
-        defaultQuantity:
-          type: integer
-          description: Default number of how many coupons can be used. May be overridden by contract coupon limit
-          format: int64
-        defaultStartTime:
-          type: string
-          description: The default start time of the contract created by a coupon usage. If set, the contract created by a coupon usage will start on the specified time of the travel date or when created
-          format: time
-        loyaltyProgramId:
-          type: integer
-          description: The loyalty program the contract created by the coupon is connected to
-          format: int64
-        usageValidityPeriod:
-          type: string
-          description: The duration of the of the contract created by a coupon usage. If set, the contract created by a coupon usage will set expiration date to the end of the duration. It will override loyalty program usageValidityPeriod
-          format: duration
-          examples:
-          - P3DT12H30M5S
-      description: Configuration for coupons. This is only set for loyalty program type COUPONS
-    ContractConsumption:
-      required:
-      - contractUuid
-      - customerNumber
-      - entitlementProductId
-      - firstTravelDate
-      type: object
-      properties:
-        contractUuid:
-          type: string
-          description: The id of the contract consumed
-          format: uuid
-          examples:
-          - cae8853a-583e-49af-be61-cf10875a541d
-        coupons:
-          type: integer
-          description: The number of coupons consumed. Has no effect if the contract does not specify a number of available coupons. Defaults to 1.
-          format: int64
-          examples:
-          - 1
-        customerNumber:
-          type: integer
-          description: The customer attempting to consume the contract
-          format: int64
-          examples:
-          - 123415
-        entitlementProductId:
-          minLength: 1
-          type: string
-          description: The id of the product consumed. This is on NetEX format and must match the product in use by the supplied contract.
-          examples:
-          - ENT:TravelRebate:A2
-        entitlementProductVersion:
-          type: string
-          description: The version of the product consumed. This is on NetEX format and if supplied must match the product version in use by the supplied contract.
-          examples:
-          - ENT:Version:V1
-        firstTravelDate:
-          type: string
-          description: The start date and time of travel.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        lastTravelDate:
-          type: string
-          description: The end date and time of travel. Defaults to firstTravelDate if not provided.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        orderLineReference:
-          $ref: '#/components/schemas/OrderLineReference'
-      description: Contract consumption details
-    TotalAmount:
-      required:
-      - amount
-      - calculatedAt
-      - currency
-      type: object
-      properties:
-        amount:
-          minimum: 0.01
-          pattern: -?\d*\.\d\d
-          type: string
-          description: 'Amount amount. Format: -?\d*\.\d\d  Examples: 123.34  1.00  34000.00'
-        calculatedAt:
-          type: string
-          description: When the amount was calculated
-          format: date-time
-          readOnly: true
-        currency:
-          type: string
-          description: Currency of the amount
-          examples:
-          - NOK
-      description: The current total for this contract (earn/burn or giftcard)
-    ValidateContractConsumptionResponse:
-      required:
-      - code
-      - isValid
-      - reason
-      type: object
-      properties:
-        code:
-          type: string
-          description: A code pertaining to the reason for rejection, if any. Code 3101 = OK.
-          examples:
-          - '3101'
-        isValid:
-          type: boolean
-          description: True if all consumptions were valid, otherwise false
-        reason:
-          type: string
-          description: A short message detailing the reasoning behind the status.
-          examples:
-          - ok
-      description: The result of a contract consumption validations
-    ValidateContractConsumptionRequest:
-      required:
-      - consumptions
-      type: object
-      properties:
-        consumptions:
-          minItems: 1
-          type: array
-          description: A list of consumptions to verify
-          items:
-            $ref: '#/components/schemas/ContractConsumption'
-      description: A request to validate the consumption of one or more product entitlements in an order
-    OrderLineEventResponse:
-      required:
-      - eventType
-      - isCancelled
-      - isPurchased
-      - orderId
-      - orderLineId
-      - orderLineVersion
-      - organisationId
-      - price
-      - timestamp
-      type: object
-      properties:
-        codespace:
-          type: string
-          description: Codespace
-          examples:
-          - ABC
-        couponsUsed:
-          type: integer
-          description: How many coupons (usages) this event is using. This defaults to 1, but will be ignored if the contract in question does not use coupons.
-          format: int64
-          examples:
-          - 1
-        effectiveCancellationDate:
-          type: string
-          description: If set, the effective date for cancellation.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        eventType:
-          type: string
-          description: The order line event type. Can be one of 'PURCHASE' or 'CANCELLATION'. PURCHASE is used when the order line event describe purchase of a travel using a contract (not the same as isPurchased). CANCELLATION is when the order line event is a cancellation (can be the same as isCancelled)
-        isCancelled:
-          type: boolean
-          description: Whether the order line event is a cancellation
-        isPurchased:
-          type: boolean
-          description: Whether the order line event describes the purchase of a contract, or contract consumer
-        lastTravelDate:
-          type: string
-          description: The last date of travel, related to entitlement usage. Defaults to equal travelDate. Relevant for period tickets only.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        manualTransactionComment:
-          type: string
-          description: If the order line is added manually, this field will have an explanation
-          examples:
-          - Refund because the order was cancelled too late
-        orderId:
-          type: string
-          description: The order ID
-          examples:
-          - ABC
-        orderLineId:
-          type: string
-          description: The order line ID
-          examples:
-          - KFN
-        orderLineText:
-          type: string
-          description: The name of the product that this usage refers to. This should be supplied by the caller to indicate which item has been bought. This is displayed to the user in reports.
-          examples:
-          - 1 x Voksen, Oslo S - OSL
-        orderLineVersion:
-          type: string
-          description: The order line version
-          examples:
-          - '132'
-        organisationId:
-          type: integer
-          description: The organisation through which the order was placed
-          format: int64
-          examples:
-          - 1
-        originalPrice:
-          type: string
-          description: The original price for this item, i.e.  i.e the original price without the travellers discount.
-          examples:
-          - '3.77'
-        price:
-          type: string
-          description: The actual paid price for this item, i.e. what did the user actually pay after rebate. Negative if this was a cancellation
-          examples:
-          - '3.77'
-        taxDistributions:
-          type: array
-          description: Tax savings for this order line
-          items:
-            $ref: '#/components/schemas/TaxDistributionResponse'
-        timestamp:
-          type: string
-          description: When the order line event was saved
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        travelDate:
-          type: string
-          description: The first date of travel on this ticket. Will be used to decide when to report this usage to the Norwegian tax administration, if applicable. Defaults to the current date and time.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-      description: An order line event on a contract
-  responses:
-    Error400:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error401:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error403:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1342,11 +1323,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-personnel-tickets-openapi.json
-- entur-personnel-tickets-openapi.yml

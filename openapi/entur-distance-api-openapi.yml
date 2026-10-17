@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Distance API
-  version: 2026.08.0
+  title: Distances and zones Distance API
+  description: Calculates distances between Stop Places
   contact:
     name: Team Avstand og Nettverk
-  description: 'Operations tagged Distance across 2 of this provider''s published API definitions: entur-prdudisapi-openapi.json, entur-prdudisapi-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io/distance
 security:
@@ -211,8 +211,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /stop-place-distances/travel-path/{fromStopPlaceId}/{toStopPlaceId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -394,8 +392,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /stop-place-distances/reachable/{fromStopPlaceId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -570,8 +566,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /stop-place-distances/pricing-path/{fromStopPlaceId}/{toStopPlaceId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -753,8 +747,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /stop-place-distances/connected/{fromStopPlaceId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -937,34 +929,7 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
 components:
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
     DistancePath:
       type: object
@@ -1006,11 +971,33 @@ components:
         paths:
         - - id: NSR:StopPlace:20
             distance: 10
+  parameters:
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     enturOpen:
       type: apiKey
       name: ET-Client-Name
       in: header
-x-refined-from:
-- entur-prdudisapi-openapi.json
-- entur-prdudisapi-openapi.yml

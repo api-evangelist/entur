@@ -5,7 +5,7 @@ info:
   contact:
     name: Team Personalisering
     email: team.personalisering@entur.org
-  description: 'Operations tagged Members across 4 of this provider''s published API definitions: entur-personalisation-client-openapi.json, entur-personalisation-privacy-openapi.json, entur-personalisation-client-openapi.yml, entur-personalisation-privacy-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Members across 2 of this provider''s published API definitions: entur-personalisation-client-openapi.json, entur-personalisation-privacy-openapi.json. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/personalisation
 security:
@@ -649,7 +649,171 @@ paths:
     servers:
     - url: https://api.entur.io/personalisation
 components:
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
+    Member:
+      required:
+      - createdAt
+      - customerId
+      - id
+      - organisationId
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerId:
+          type: string
+          description: Customer id
+        organisationId:
+          type: integer
+          description: The organisation this member belongs to
+          format: int64
+        metadata:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          description: Metadata needed for the processing of events
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      description: A member
+    MemberLevelSummary:
+      required:
+      - name
+      - requirementsNeeded
+      - rewardRequirements
+      - rewards
+      type: object
+      properties:
+        name:
+          type: string
+          description: Level name
+        rewardRequirements:
+          type: array
+          description: Requirements for reaching the level
+          items:
+            $ref: '#/components/schemas/RewardRequirement'
+        requirementsNeeded:
+          type: string
+          description: Whether any or all requirements need to be fulfilled
+          enum:
+          - ALL
+          - ANY
+          examples:
+          - ALL
+        rewards:
+          type: array
+          description: Rewards when the level is reached
+          items:
+            $ref: '#/components/schemas/MemberReward'
+      description: Requirements and rewards for each membership level of a specific program
+    Error:
+      required:
+      - correlationId
+      - message
+      - status
+      - title
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        title:
+          type: string
+          examples:
+          - An error occurred
+        detail:
+          type:
+          - string
+          - 'null'
+          description: The main error message.
+          examples:
+          - An error occurred
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - An error occurred
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type:
+          - array
+          - 'null'
+          description: Validation error on a specific field.
+          items:
+            $ref: '#/components/schemas/FieldError'
+    PageMember:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Member'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
     PagePointPeriod:
       required:
       - items
@@ -727,7 +891,7 @@ components:
         mapping:
           EffectSuspensionPeriod: '#/components/schemas/EffectSuspensionPeriod'
           RewardsSuspensionPeriod: '#/components/schemas/RewardsSuspensionPeriod'
-    PageMember:
+    PageTransaction:
       required:
       - items
       - totalItems
@@ -739,7 +903,7 @@ components:
           description: All items for this page
           readOnly: true
           items:
-            $ref: '#/components/schemas/Member'
+            $ref: '#/components/schemas/Transaction'
         totalItems:
           type: integer
           description: Total items which could be returned
@@ -774,307 +938,6 @@ components:
           - 'null'
           description: Point definition reference
       description: Requirements for reaching the level
-    PointPeriod:
-      required:
-      - endAt
-      - id
-      - startAt
-      type: object
-      properties:
-        id:
-          type: integer
-          description: The ID of the point period
-          format: int64
-        startAt:
-          type: string
-          description: The start time of the point period
-          format: date-time
-        endAt:
-          type: string
-          description: The end time of the point period
-          format: date-time
-        metadata:
-          type:
-          - object
-          - 'null'
-          additionalProperties:
-            type: object
-            description: "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
-          description: "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
-      description: The core information about a point period
-      readOnly: true
-    Error:
-      required:
-      - correlationId
-      - message
-      - status
-      - title
-      type: object
-      properties:
-        status:
-          type: integer
-          description: The http status code.
-          format: int32
-          examples:
-          - 400
-        title:
-          type: string
-          examples:
-          - An error occurred
-        detail:
-          type:
-          - string
-          - 'null'
-          description: The main error message.
-          examples:
-          - An error occurred
-        message:
-          type: string
-          description: The main error message.
-          examples:
-          - An error occurred
-        correlationId:
-          type: string
-          description: The unique correlation id for the request.
-          examples:
-          - b5d4960d-7ab2-43d6-a8f3-113da042a288
-        errors:
-          type:
-          - array
-          - 'null'
-          description: Validation error on a specific field.
-          items:
-            $ref: '#/components/schemas/FieldError'
-    MemberLevelSummary:
-      required:
-      - name
-      - requirementsNeeded
-      - rewardRequirements
-      - rewards
-      type: object
-      properties:
-        name:
-          type: string
-          description: Level name
-        rewardRequirements:
-          type: array
-          description: Requirements for reaching the level
-          items:
-            $ref: '#/components/schemas/RewardRequirement'
-        requirementsNeeded:
-          type: string
-          description: Whether any or all requirements need to be fulfilled
-          enum:
-          - ALL
-          - ANY
-          examples:
-          - ALL
-        rewards:
-          type: array
-          description: Rewards when the level is reached
-          items:
-            $ref: '#/components/schemas/MemberReward'
-      description: Requirements and rewards for each membership level of a specific program
-    MemberReward:
-      required:
-      - '@type'
-      - description
-      - rewardId
-      type: object
-      properties:
-        description:
-          type: string
-        rewardId:
-          type: integer
-          format: int64
-        '@type':
-          type: string
-      description: Rewards when the level is reached
-      discriminator:
-        propertyName: '@type'
-        mapping:
-          MemberPercentDiscountedProductReward: '#/components/schemas/MemberPercentDiscountedProductReward'
-          MemberFeatureReward: '#/components/schemas/MemberFeatureReward'
-    MemberRewardLadder:
-      required:
-      - rewardLadder
-      type: object
-      properties:
-        rewardLadder:
-          type: array
-          description: Program level details, including the specific requirements and rewards for each level in the program
-          items:
-            $ref: '#/components/schemas/MemberLevelSummary'
-      description: Information about the current reward ladder for a program member
-      readOnly: true
-    MemberPoints:
-      required:
-      - amount
-      - createdAt
-      - id
-      - memberId
-      - pointDefinitionReference
-      - programId
-      - sourceId
-      type: object
-      properties:
-        id:
-          type: string
-        sourceId:
-          type: string
-        programId:
-          type: integer
-          format: int64
-        memberId:
-          type: integer
-          format: int64
-        amount:
-          type: number
-        pointDefinitionReference:
-          type: string
-        metadata:
-          type: object
-          additionalProperties:
-            type: object
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      discriminator:
-        propertyName: '@type'
-        mapping:
-          EARNED: '#/components/schemas/MemberPointsEarnedResponse'
-          CONSUMED: '#/components/schemas/MemberPointsConsumedResponse'
-    PageTransaction:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: All items for this page
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/Transaction'
-        totalItems:
-          type: integer
-          description: Total items which could be returned
-          format: int32
-          readOnly: true
-          examples:
-          - 1
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int32
-          readOnly: true
-          examples:
-          - 1
-      description: Paged content
-    FieldError:
-      required:
-      - field
-      - message
-      type: object
-      properties:
-        field:
-          type: string
-        message:
-          type: string
-      description: Validation error on a specific field.
-    PageSuspensionPeriod:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: All items for this page
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/SuspensionPeriod'
-        totalItems:
-          type: integer
-          description: Total items which could be returned
-          format: int32
-          readOnly: true
-          examples:
-          - 1
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int32
-          readOnly: true
-          examples:
-          - 1
-      description: Paged content
-    PageMemberPoints:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: All items for this page
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/MemberPoints'
-        totalItems:
-          type: integer
-          description: Total items which could be returned
-          format: int32
-          readOnly: true
-          examples:
-          - 1
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int32
-          readOnly: true
-          examples:
-          - 1
-      description: Paged content
-    Member:
-      required:
-      - createdAt
-      - customerId
-      - id
-      - organisationId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        customerId:
-          type: string
-          description: Customer id
-        organisationId:
-          type: integer
-          description: The organisation this member belongs to
-          format: int64
-        metadata:
-          type:
-          - object
-          - 'null'
-          additionalProperties: true
-          description: Metadata needed for the processing of events
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-      description: A member
     Transaction:
       required:
       - amount
@@ -1145,47 +1008,175 @@ components:
           additionalProperties: true
           description: Metadata for the transaction
       description: A transaction
-  responses:
-    Error400:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error401:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error403:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+    MemberPoints:
+      required:
+      - amount
+      - createdAt
+      - id
+      - memberId
+      - pointDefinitionReference
+      - programId
+      - sourceId
+      type: object
+      properties:
+        id:
+          type: string
+        sourceId:
+          type: string
+        programId:
+          type: integer
+          format: int64
+        memberId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+        pointDefinitionReference:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      discriminator:
+        propertyName: '@type'
+        mapping:
+          EARNED: '#/components/schemas/MemberPointsEarnedResponse'
+          CONSUMED: '#/components/schemas/MemberPointsConsumedResponse'
+    MemberRewardLadder:
+      required:
+      - rewardLadder
+      type: object
+      properties:
+        rewardLadder:
+          type: array
+          description: Program level details, including the specific requirements and rewards for each level in the program
+          items:
+            $ref: '#/components/schemas/MemberLevelSummary'
+      description: Information about the current reward ladder for a program member
+      readOnly: true
+    PageSuspensionPeriod:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/SuspensionPeriod'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
+    MemberReward:
+      required:
+      - '@type'
+      - description
+      - rewardId
+      type: object
+      properties:
+        description:
+          type: string
+        rewardId:
+          type: integer
+          format: int64
+        '@type':
+          type: string
+      description: Rewards when the level is reached
+      discriminator:
+        propertyName: '@type'
+        mapping:
+          MemberPercentDiscountedProductReward: '#/components/schemas/MemberPercentDiscountedProductReward'
+          MemberFeatureReward: '#/components/schemas/MemberFeatureReward'
+    PointPeriod:
+      required:
+      - endAt
+      - id
+      - startAt
+      type: object
+      properties:
+        id:
+          type: integer
+          description: The ID of the point period
+          format: int64
+        startAt:
+          type: string
+          description: The start time of the point period
+          format: date-time
+        endAt:
+          type: string
+          description: The end time of the point period
+          format: date-time
+        metadata:
+          type:
+          - object
+          - 'null'
+          additionalProperties:
+            type: object
+            description: "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+          description: "Metadata for a point period. Example:\n```\n{\"userType\": \"ADULT\",\n    \"stationPair\": {\n        \"to\": \"NSR:StopPlace:337\",\n        \"from\": \"NSR:StopPlace:11\"\n    }\n}\n```"
+      description: The core information about a point period
+      readOnly: true
+    PageMemberPoints:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MemberPoints'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          readOnly: true
+          examples:
+          - 1
+      description: Paged content
+    FieldError:
+      required:
+      - field
+      - message
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+      description: Validation error on a specific field.
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1201,6 +1192,15 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
@@ -1209,5 +1209,3 @@ components:
 x-refined-from:
 - entur-personalisation-client-openapi.json
 - entur-personalisation-privacy-openapi.json
-- entur-personalisation-client-openapi.yml
-- entur-personalisation-privacy-openapi.yml

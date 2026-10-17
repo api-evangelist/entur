@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Geographic Areas API
-  version: 2026.05.0
+  title: Stop Place Register Geographic Areas API
+  description: The Stop Place Register provides access to public transportation infrastructure data across Norway, including stop places, quays, parkings, and related NeTEx entities. This API enables developers to query stop place information with details on location, accessibility features, transport modes, fare zones, and hierarchical relationships. Ideal for journey planning applications, transportation analysis, mobility services, and public transit integrations.
   contact:
     name: Entur API Support
     url: https://developer.entur.org
-  description: 'Operations tagged Geographic Areas across 2 of this provider''s published API definitions: entur-stop-place-v1-read-openapi.json, entur-stop-place-v1-read-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.05.0
 servers:
 - url: https://api.entur.io/stop-places/v1/read
 tags:
@@ -100,8 +100,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TopographicPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /topographic-places/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -164,8 +162,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TopographicPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /topographic-places/{id}/versions:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -234,8 +230,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/TopographicPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /topographic-places/{id}/versions/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -305,250 +299,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TopographicPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
 components:
   schemas:
-    LocationStructure:
-      type: object
-      properties:
-        altitude:
-          type: number
-          xml:
-            name: Altitude
-        id:
-          type: string
-          xml:
-            attribute: true
-        latitude:
-          type: number
-          xml:
-            name: Latitude
-        longitude:
-          type: number
-          xml:
-            name: Longitude
-        pos:
-          $ref: '#/components/schemas/DirectPositionType'
-          xml:
-            namespace: http://www.opengis.net/gml/3.2
-        precision:
-          type: number
-          xml:
-            name: Precision
-        srsName:
-          type: string
-          xml:
-            attribute: true
-    TopographicPlace:
-      type: object
-      properties:
-        accesses:
-          $ref: '#/components/schemas/Accesses_RelStructure'
-        adjacentPlaces:
-          $ref: '#/components/schemas/TopographicPlaceRefs_RelStructure'
-        alternativeDescriptors:
-          $ref: '#/components/schemas/AlternativeDescriptors'
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        brandingRef:
-          $ref: '#/components/schemas/BrandingRefStructure'
-          xml:
-            name: BrandingRef
-        centroid:
-          $ref: '#/components/schemas/SimplePoint_VersionStructure'
-          xml:
-            name: Centroid
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        containedIn:
-          $ref: '#/components/schemas/TopographicPlaceRefs_RelStructure'
-        countryRef:
-          $ref: '#/components/schemas/CountryRef'
-          xml:
-            name: CountryRef
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        description:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Description
-        descriptor:
-          $ref: '#/components/schemas/TopographicPlaceDescriptor_VersionedChildStructure'
-          xml:
-            name: Descriptor
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
-        id:
-          type: string
-          xml:
-            attribute: true
-        infoLinks:
-          $ref: '#/components/schemas/InfoLinks'
-        isoCode:
-          type: string
-          xml:
-            name: IsoCode
-        keyList:
-          $ref: '#/components/schemas/KeyListStructure'
-        members:
-          $ref: '#/components/schemas/PointRefs_RelStructure'
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        multiSurface:
-          $ref: '#/components/schemas/MultiSurfaceType'
-          xml:
-            name: MultiSurface
-            namespace: http://www.opengis.net/gml/3.2
-        name:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Name
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        otherCountries:
-          $ref: '#/components/schemas/CountryRefs_RelStructure'
-        parentTopographicPlaceRef:
-          $ref: '#/components/schemas/TopographicPlaceRefStructure'
-          xml:
-            name: ParentTopographicPlaceRef
-        parentZoneRef:
-          $ref: '#/components/schemas/ZoneRefStructure'
-          xml:
-            name: ParentZoneRef
-        placeCentre:
-          type: boolean
-          default: false
-          xml:
-            name: PlaceCentre
-        placeTypes:
-          $ref: '#/components/schemas/TypeOfPlaceRefs_RelStructure'
-        polygon:
-          $ref: '#/components/schemas/PolygonType'
-          xml:
-            name: Polygon
-            namespace: http://www.opengis.net/gml/3.2
-        postCode:
-          type: string
-          xml:
-            name: PostCode
-        privateCode:
-          $ref: '#/components/schemas/PrivateCodeStructure'
-          xml:
-            name: PrivateCode
-        projections:
-          $ref: '#/components/schemas/Projections_RelStructure'
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        purposeOfGroupingRef:
-          $ref: '#/components/schemas/PurposeOfGroupingRefStructure'
-          xml:
-            name: PurposeOfGroupingRef
-        responsibilitySetRef:
-          type: string
-          xml:
-            attribute: true
-        shortName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: ShortName
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        topographicPlaceType:
-          type: string
-          enum:
-          - CONTINENT
-          - INTERREGION
-          - COUNTRY
-          - PRINCIPALITY
-          - STATE
-          - PROVINCE
-          - REGION
-          - COUNTY
-          - AREA
-          - CONURBATION
-          - CITY
-          - MUNICIPALITY
-          - QUARTER
-          - SUBURB
-          - TOWN
-          - URBAN_CENTRE
-          - DISTRICT
-          - PARISH
-          - VILLAGE
-          - HAMLET
-          - PLACE_OF_INTEREST
-          - OTHER
-          - UNRECORDED
-          xml:
-            name: TopographicPlaceType
-        types:
-          $ref: '#/components/schemas/TypeOfZoneRefs_RelStructure'
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
-      required:
-      - descriptor
     CountryRef:
       type: object
       properties:
@@ -816,20 +568,18 @@ components:
       xml:
         name: CountryRef
         namespace: http://www.netex.org.uk/netex
-    MultilingualString:
+    KeyListStructure:
       type: object
       properties:
-        lang:
-          type: string
+        keyValue:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyValueStructure'
           xml:
-            attribute: true
-        textIdType:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-    TypeOfZoneRefStructure:
+            name: KeyValue
+      required:
+      - keyValue
+    TopographicPlaceRefStructure:
       type: object
       properties:
         changed:
@@ -852,6 +602,10 @@ components:
           - DELTA
           xml:
             attribute: true
+        nameOfMemberClass:
+          type: string
+          xml:
+            attribute: true
         nameOfRefClass:
           type: string
           xml:
@@ -870,6 +624,7 @@ components:
           type: string
           xml:
             attribute: true
+    AbstractRingType: {}
     TypeOfPlaceRefs_RelStructure:
       type: object
       properties:
@@ -890,29 +645,20 @@ components:
             $ref: '#/components/schemas/TypeOfPlaceRefStructure'
           xml:
             name: TypeOfPlaceRef
-    JAXBElementAbstractRingType:
+    MultiSurfaceType:
       type: object
       properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/AbstractRingType'
-    AbstractSurfaceType:
-      type: object
-      properties:
+        aggregationType:
+          type: string
+          enum:
+          - SET
+          - BAG
+          - SEQUENCE
+          - ARRAY
+          - RECORD
+          - TABLE
+          xml:
+            attribute: true
         descriptionReference:
           $ref: '#/components/schemas/ReferenceType'
         id:
@@ -934,88 +680,32 @@ components:
           type: string
           xml:
             attribute: true
-    PointRefStructure:
+        surfaceMember:
+          type: array
+          items:
+            $ref: '#/components/schemas/SurfacePropertyType'
+        surfaceMembers:
+          $ref: '#/components/schemas/SurfaceArrayPropertyType'
+    TypeOfZoneRefs_RelStructure:
       type: object
       properties:
-        changed:
+        id:
           type: string
-          format: date-time
           xml:
             attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
+        modificationSet:
           type: string
           enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
+          - ALL
+          - CHANGES_ONLY
           xml:
             attribute: true
-        nameOfRefClass:
-          type: string
+        typeOfZoneRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeOfZoneRefStructure'
           xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    ValidityConditionRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
+            name: TypeOfZoneRef
     TopographicPlaceDescriptor_VersionedChildStructure:
       type: object
       properties:
@@ -1116,303 +806,6 @@ components:
             attribute: true
       required:
       - name
-    ValidityConditions_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        validityConditionRefOrValidBetweenOrValidityCondition_:
-          type: array
-          items: {}
-    AlternativeText:
-      type: object
-      properties:
-        alternativeTexts: {}
-        attributeName:
-          type: string
-          xml:
-            attribute: true
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataManagedObjectRef:
-          $ref: '#/components/schemas/VersionOfObjectRefStructure'
-          xml:
-            name: DataManagedObjectRef
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
-        id:
-          type: string
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        order:
-          type: integer
-          xml:
-            attribute: true
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        text:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Text
-        useForLanguage:
-          type: string
-          xml:
-            attribute: true
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
-      required:
-      - text
-    JAXBElementAbstractSurfaceType:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/AbstractSurfaceType'
-    PurposeOfGroupingRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    CountryRefs_RelStructure:
-      type: object
-      properties:
-        countryRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/CountryRef'
-          xml:
-            name: CountryRef
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-      required:
-      - countryRef
-    SimplePoint_VersionStructure:
-      type: object
-      properties:
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        id:
-          type: string
-          xml:
-            attribute: true
-        location:
-          $ref: '#/components/schemas/LocationStructure'
-          xml:
-            name: Location
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        name:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Name
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
     Projections_RelStructure:
       type: object
       properties:
@@ -1431,93 +824,31 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/JAXBElementObject'
-    ErrorResponse:
+    JAXBElementAbstractRingType:
       type: object
-      description: Error response returned when a request fails
       properties:
-        details:
+        globalScope:
+          type: boolean
+        name:
           type: object
-          additionalProperties: {}
-          description: Additional error context
-        errorCode:
-          type: string
-          description: Machine-readable error code
-          example: RESOURCE_NOT_FOUND
-        message:
-          type: string
-          description: Human-readable error message
-          example: Resource not found
-      xml:
-        name: error
-    TopographicPlaceRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        topographicPlaceRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/TopographicPlaceRefStructure'
-          xml:
-            name: TopographicPlaceRef
-      required:
-      - topographicPlaceRef
-    DirectPositionType:
-      type: object
-      properties:
-        srsDimension:
-          type: integer
-          xml:
-            attribute: true
-        srsName:
-          type: string
-          xml:
-            attribute: true
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
         value:
-          type: array
-          items:
-            type: number
-            format: double
-    AbstractRingPropertyType:
-      type: object
-      properties:
-        abstractRing:
-          $ref: '#/components/schemas/JAXBElementAbstractRingType'
-    AbstractRingType: {}
-    KeyValueStructure:
-      type: object
-      properties:
-        key:
-          type: string
-          xml:
-            name: Key
-        typeOfKey:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-          xml:
-            name: Value
-      required:
-      - key
-      - value
-    PolygonType:
+          $ref: '#/components/schemas/AbstractRingType'
+    AbstractSurfaceType:
       type: object
       properties:
         descriptionReference:
           $ref: '#/components/schemas/ReferenceType'
-        exterior:
-          $ref: '#/components/schemas/AbstractRingPropertyType'
         id:
           type: string
           xml:
@@ -1525,10 +856,6 @@ components:
             attribute: true
         identifier:
           $ref: '#/components/schemas/CodeWithAuthorityType'
-        interior:
-          type: array
-          items:
-            $ref: '#/components/schemas/AbstractRingPropertyType'
         name:
           type: array
           items:
@@ -1541,134 +868,50 @@ components:
           type: string
           xml:
             attribute: true
-    CodeType:
+    JAXBElementPointRefStructure:
       type: object
       properties:
-        codeSpace:
-          type: string
-          xml:
-            attribute: true
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
         value:
-          type: string
-    Accesses_RelStructure:
+          $ref: '#/components/schemas/PointRefStructure'
+    Qualify:
       type: object
       properties:
-        accessRefOrAccess:
-          type: array
-          items: {}
-        id:
-          type: string
+        qualifierName:
+          $ref: '#/components/schemas/MultilingualString'
           xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
+            name: QualifierName
+        topographicPlaceRef:
+          $ref: '#/components/schemas/TopographicPlaceRefStructure'
           xml:
-            attribute: true
-    TypeOfZoneRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        typeOfZoneRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/TypeOfZoneRefStructure'
-          xml:
-            name: TypeOfZoneRef
-    TopographicPlacesInFrame_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        topographicPlace:
-          type: array
-          items:
-            $ref: '#/components/schemas/TopographicPlace'
-          xml:
-            name: TopographicPlace
+            name: TopographicPlaceRef
       required:
-      - topographicPlace
-    AlternativeDescriptors:
+      - qualifierName
+    InfoLinks:
       type: object
       properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        topographicPlaceDescriptor:
+        infoLink:
           type: array
           items:
-            $ref: '#/components/schemas/TopographicPlaceDescriptor_VersionedChildStructure'
+            $ref: '#/components/schemas/InfoLinkStructure'
           xml:
-            name: TopographicPlaceDescriptor
+            name: InfoLink
       required:
-      - topographicPlaceDescriptor
-    TopographicPlaceRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfMemberClass:
-          type: string
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
+      - infoLink
     ZoneRefStructure:
       type: object
       properties:
@@ -1714,152 +957,6 @@ components:
           type: string
           xml:
             attribute: true
-    BrandingRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    CodeWithAuthorityType:
-      type: object
-      properties:
-        codeSpace:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-    ExtensionsStructure:
-      type: object
-      properties:
-        any:
-          type: array
-          items: {}
-    JAXBElementPointRefStructure:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/PointRefStructure'
-    TypeOfPlaceRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    InfoLinkStructure:
-      type: object
-      properties:
-        targetPlatform:
-          type: string
-          xml:
-            attribute: true
-        typeOfInfoLink:
-          type: array
-          items:
-            type: string
-            enum:
-            - CONTACT
-            - RESOURCE
-            - INFO
-            - IMAGE
-            - DOCUMENT
-            - TIMETABLE_DOCUMENT
-            - FARE_SHEET
-            - DATA_LICENCE
-            - MOBILE_APP_DOWNLOAD
-            - MOBILE_APP_INSTALL_CHECK
-            - MAP
-            - ICON
-            - OTHER
-          xml:
-            attribute: true
-        value:
-          type: string
     ValidBetween:
       type: object
       properties:
@@ -1978,51 +1075,300 @@ components:
       xml:
         name: ValidBetween
         namespace: http://www.netex.org.uk/netex
-    AlternativeTexts_RelStructure:
+    ValidityConditionRefStructure:
       type: object
       properties:
-        alternativeText:
-          type: array
-          items:
-            $ref: '#/components/schemas/AlternativeText'
+        changed:
+          type: string
+          format: date-time
           xml:
-            name: AlternativeText
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    TypeOfZoneRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    PrivateCodeStructure:
+      type: object
+      properties:
+        type:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+    AlternativeText:
+      type: object
+      properties:
+        alternativeTexts: {}
+        attributeName:
+          type: string
+          xml:
+            attribute: true
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataManagedObjectRef:
+          $ref: '#/components/schemas/VersionOfObjectRefStructure'
+          xml:
+            name: DataManagedObjectRef
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
         id:
           type: string
           xml:
             attribute: true
-      required:
-      - alternativeText
-    InfoLinks:
-      type: object
-      properties:
-        infoLink:
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        order:
+          type: integer
+          xml:
+            attribute: true
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        text:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Text
+        useForLanguage:
+          type: string
+          xml:
+            attribute: true
+        validBetween:
           type: array
           items:
-            $ref: '#/components/schemas/InfoLinkStructure'
+            $ref: '#/components/schemas/ValidBetween'
           xml:
-            name: InfoLink
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
       required:
-      - infoLink
-    JAXBElementObject:
+      - text
+    SurfacePropertyType:
       type: object
       properties:
-        globalScope:
+        abstractSurface:
+          $ref: '#/components/schemas/JAXBElementAbstractSurfaceType'
+        nilReason:
+          type: array
+          items:
+            type: string
+          xml:
+            attribute: true
+        owns:
           type: boolean
-        name:
+          xml:
+            attribute: true
+    ErrorResponse:
+      type: object
+      description: Error response returned when a request fails
+      properties:
+        details:
           type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value: {}
+          additionalProperties: {}
+          description: Additional error context
+        errorCode:
+          type: string
+          description: Machine-readable error code
+          example: RESOURCE_NOT_FOUND
+        message:
+          type: string
+          description: Human-readable error message
+          example: Resource not found
+      xml:
+        name: error
+    ExtensionsStructure:
+      type: object
+      properties:
+        any:
+          type: array
+          items: {}
+    PolygonType:
+      type: object
+      properties:
+        descriptionReference:
+          $ref: '#/components/schemas/ReferenceType'
+        exterior:
+          $ref: '#/components/schemas/AbstractRingPropertyType'
+        id:
+          type: string
+          xml:
+            namespace: http://www.opengis.net/gml/3.2
+            attribute: true
+        identifier:
+          $ref: '#/components/schemas/CodeWithAuthorityType'
+        interior:
+          type: array
+          items:
+            $ref: '#/components/schemas/AbstractRingPropertyType'
+        name:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeType'
+        srsDimension:
+          type: integer
+          xml:
+            attribute: true
+        srsName:
+          type: string
+          xml:
+            attribute: true
+    KeyValueStructure:
+      type: object
+      properties:
+        key:
+          type: string
+          xml:
+            name: Key
+        typeOfKey:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+          xml:
+            name: Value
+      required:
+      - key
+      - value
+    CodeWithAuthorityType:
+      type: object
+      properties:
+        codeSpace:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
     SurfaceArrayPropertyType:
       type: object
       properties:
@@ -2034,31 +1380,66 @@ components:
           type: boolean
           xml:
             attribute: true
-    Qualify:
+    AlternativeDescriptors:
       type: object
       properties:
-        qualifierName:
-          $ref: '#/components/schemas/MultilingualString'
+        id:
+          type: string
           xml:
-            name: QualifierName
-        topographicPlaceRef:
-          $ref: '#/components/schemas/TopographicPlaceRefStructure'
-          xml:
-            name: TopographicPlaceRef
-      required:
-      - qualifierName
-    KeyListStructure:
-      type: object
-      properties:
-        keyValue:
+            attribute: true
+        topographicPlaceDescriptor:
           type: array
           items:
-            $ref: '#/components/schemas/KeyValueStructure'
+            $ref: '#/components/schemas/TopographicPlaceDescriptor_VersionedChildStructure'
           xml:
-            name: KeyValue
+            name: TopographicPlaceDescriptor
       required:
-      - keyValue
-    PointRefs_RelStructure:
+      - topographicPlaceDescriptor
+    AbstractRingPropertyType:
+      type: object
+      properties:
+        abstractRing:
+          $ref: '#/components/schemas/JAXBElementAbstractRingType'
+    Accesses_RelStructure:
+      type: object
+      properties:
+        accessRefOrAccess:
+          type: array
+          items: {}
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+    CountryRefs_RelStructure:
+      type: object
+      properties:
+        countryRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountryRef'
+          xml:
+            name: CountryRef
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+      required:
+      - countryRef
+    TopographicPlaceRefs_RelStructure:
       type: object
       properties:
         id:
@@ -2072,73 +1453,407 @@ components:
           - CHANGES_ONLY
           xml:
             attribute: true
-        pointRef:
+        topographicPlaceRef:
           type: array
           items:
-            $ref: '#/components/schemas/JAXBElementPointRefStructure'
-    MultiSurfaceType:
+            $ref: '#/components/schemas/TopographicPlaceRefStructure'
+          xml:
+            name: TopographicPlaceRef
+      required:
+      - topographicPlaceRef
+    TopographicPlace:
       type: object
       properties:
-        aggregationType:
+        accesses:
+          $ref: '#/components/schemas/Accesses_RelStructure'
+        adjacentPlaces:
+          $ref: '#/components/schemas/TopographicPlaceRefs_RelStructure'
+        alternativeDescriptors:
+          $ref: '#/components/schemas/AlternativeDescriptors'
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        brandingRef:
+          $ref: '#/components/schemas/BrandingRefStructure'
+          xml:
+            name: BrandingRef
+        centroid:
+          $ref: '#/components/schemas/SimplePoint_VersionStructure'
+          xml:
+            name: Centroid
+        changed:
           type: string
-          enum:
-          - SET
-          - BAG
-          - SEQUENCE
-          - ARRAY
-          - RECORD
-          - TABLE
+          format: date-time
           xml:
             attribute: true
-        descriptionReference:
-          $ref: '#/components/schemas/ReferenceType'
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        containedIn:
+          $ref: '#/components/schemas/TopographicPlaceRefs_RelStructure'
+        countryRef:
+          $ref: '#/components/schemas/CountryRef'
+          xml:
+            name: CountryRef
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        description:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Description
+        descriptor:
+          $ref: '#/components/schemas/TopographicPlaceDescriptor_VersionedChildStructure'
+          xml:
+            name: Descriptor
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
         id:
           type: string
           xml:
-            namespace: http://www.opengis.net/gml/3.2
             attribute: true
-        identifier:
-          $ref: '#/components/schemas/CodeWithAuthorityType'
-        name:
-          type: array
-          items:
-            $ref: '#/components/schemas/CodeType'
-        srsDimension:
-          type: integer
+        infoLinks:
+          $ref: '#/components/schemas/InfoLinks'
+        isoCode:
+          type: string
+          xml:
+            name: IsoCode
+        keyList:
+          $ref: '#/components/schemas/KeyListStructure'
+        members:
+          $ref: '#/components/schemas/PointRefs_RelStructure'
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
           xml:
             attribute: true
+        multiSurface:
+          $ref: '#/components/schemas/MultiSurfaceType'
+          xml:
+            name: MultiSurface
+            namespace: http://www.opengis.net/gml/3.2
+        name:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Name
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        otherCountries:
+          $ref: '#/components/schemas/CountryRefs_RelStructure'
+        parentTopographicPlaceRef:
+          $ref: '#/components/schemas/TopographicPlaceRefStructure'
+          xml:
+            name: ParentTopographicPlaceRef
+        parentZoneRef:
+          $ref: '#/components/schemas/ZoneRefStructure'
+          xml:
+            name: ParentZoneRef
+        placeCentre:
+          type: boolean
+          default: false
+          xml:
+            name: PlaceCentre
+        placeTypes:
+          $ref: '#/components/schemas/TypeOfPlaceRefs_RelStructure'
+        polygon:
+          $ref: '#/components/schemas/PolygonType'
+          xml:
+            name: Polygon
+            namespace: http://www.opengis.net/gml/3.2
+        postCode:
+          type: string
+          xml:
+            name: PostCode
+        privateCode:
+          $ref: '#/components/schemas/PrivateCodeStructure'
+          xml:
+            name: PrivateCode
+        projections:
+          $ref: '#/components/schemas/Projections_RelStructure'
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        purposeOfGroupingRef:
+          $ref: '#/components/schemas/PurposeOfGroupingRefStructure'
+          xml:
+            name: PurposeOfGroupingRef
+        responsibilitySetRef:
+          type: string
+          xml:
+            attribute: true
+        shortName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: ShortName
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        topographicPlaceType:
+          type: string
+          enum:
+          - CONTINENT
+          - INTERREGION
+          - COUNTRY
+          - PRINCIPALITY
+          - STATE
+          - PROVINCE
+          - REGION
+          - COUNTY
+          - AREA
+          - CONURBATION
+          - CITY
+          - MUNICIPALITY
+          - QUARTER
+          - SUBURB
+          - TOWN
+          - URBAN_CENTRE
+          - DISTRICT
+          - PARISH
+          - VILLAGE
+          - HAMLET
+          - PLACE_OF_INTEREST
+          - OTHER
+          - UNRECORDED
+          xml:
+            name: TopographicPlaceType
+        types:
+          $ref: '#/components/schemas/TypeOfZoneRefs_RelStructure'
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+      required:
+      - descriptor
+    LocationStructure:
+      type: object
+      properties:
+        altitude:
+          type: number
+          xml:
+            name: Altitude
+        id:
+          type: string
+          xml:
+            attribute: true
+        latitude:
+          type: number
+          xml:
+            name: Latitude
+        longitude:
+          type: number
+          xml:
+            name: Longitude
+        pos:
+          $ref: '#/components/schemas/DirectPositionType'
+          xml:
+            namespace: http://www.opengis.net/gml/3.2
+        precision:
+          type: number
+          xml:
+            name: Precision
         srsName:
           type: string
           xml:
             attribute: true
-        surfaceMember:
-          type: array
-          items:
-            $ref: '#/components/schemas/SurfacePropertyType'
-        surfaceMembers:
-          $ref: '#/components/schemas/SurfaceArrayPropertyType'
-    PrivateCodeStructure:
+    SimplePoint_VersionStructure:
       type: object
       properties:
-        type:
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        id:
+          type: string
+          xml:
+            attribute: true
+        location:
+          $ref: '#/components/schemas/LocationStructure'
+          xml:
+            name: Location
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        name:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Name
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+    BrandingRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
           type: string
           xml:
             attribute: true
         value:
           type: string
-    ReferenceType:
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    TopographicPlacesInFrame_RelStructure:
       type: object
       properties:
-        nilReason:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        topographicPlace:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/TopographicPlace'
           xml:
-            attribute: true
-        owns:
-          type: boolean
-          xml:
-            attribute: true
+            name: TopographicPlace
+      required:
+      - topographicPlace
     VersionOfObjectRefStructure:
       type: object
       properties:
@@ -2180,11 +1895,247 @@ components:
           type: string
           xml:
             attribute: true
-    SurfacePropertyType:
+    DirectPositionType:
       type: object
       properties:
-        abstractSurface:
-          $ref: '#/components/schemas/JAXBElementAbstractSurfaceType'
+        srsDimension:
+          type: integer
+          xml:
+            attribute: true
+        srsName:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: array
+          items:
+            type: number
+            format: double
+    InfoLinkStructure:
+      type: object
+      properties:
+        targetPlatform:
+          type: string
+          xml:
+            attribute: true
+        typeOfInfoLink:
+          type: array
+          items:
+            type: string
+            enum:
+            - CONTACT
+            - RESOURCE
+            - INFO
+            - IMAGE
+            - DOCUMENT
+            - TIMETABLE_DOCUMENT
+            - FARE_SHEET
+            - DATA_LICENCE
+            - MOBILE_APP_DOWNLOAD
+            - MOBILE_APP_INSTALL_CHECK
+            - MAP
+            - ICON
+            - OTHER
+          xml:
+            attribute: true
+        value:
+          type: string
+    MultilingualString:
+      type: object
+      properties:
+        lang:
+          type: string
+          xml:
+            attribute: true
+        textIdType:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+    ValidityConditions_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        validityConditionRefOrValidBetweenOrValidityCondition_:
+          type: array
+          items: {}
+    PointRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    TypeOfPlaceRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    PointRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        pointRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementPointRefStructure'
+    JAXBElementAbstractSurfaceType:
+      type: object
+      properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value:
+          $ref: '#/components/schemas/AbstractSurfaceType'
+    JAXBElementObject:
+      type: object
+      properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value: {}
+    CodeType:
+      type: object
+      properties:
+        codeSpace:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+    AlternativeTexts_RelStructure:
+      type: object
+      properties:
+        alternativeText:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlternativeText'
+          xml:
+            name: AlternativeText
+        id:
+          type: string
+          xml:
+            attribute: true
+      required:
+      - alternativeText
+    ReferenceType:
+      type: object
+      properties:
         nilReason:
           type: array
           items:
@@ -2195,16 +2146,48 @@ components:
           type: boolean
           xml:
             attribute: true
+    PurposeOfGroupingRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -2220,6 +2203,12 @@ components:
       explode: false
       schema:
         type: string
-x-refined-from:
-- entur-stop-place-v1-read-openapi.json
-- entur-stop-place-v1-read-openapi.yml
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string

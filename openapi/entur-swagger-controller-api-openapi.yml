@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Swagger Controller API
+  title: Seating Services Swagger Controller API
+  description: API exposing services to handle seat reservations
   version: 2026.09.0
-  description: 'Operations tagged swagger-controller across 2 of this provider''s published API definitions: entur-seatingservices-openapi.json, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seatingservices
 tags:
@@ -25,8 +25,6 @@ paths:
                 type: string
       summary: Swagger
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
 components:
   parameters:
     X-Correlation-Id:
@@ -58,6 +56,3 @@ components:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seatingservices-openapi.json
-- entur-seatingservices-openapi.yml

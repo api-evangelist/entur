@@ -38,6 +38,47 @@ paths:
           description: pid not found
 components:
   schemas:
+    participantMetadata:
+      type: object
+      required:
+      - pid
+      - organisationName
+      properties:
+        pid:
+          description: Participant identifier
+          type: integer
+          format: int64
+          example: 20
+        organisationName:
+          description: Organisation name
+          type: string
+          example: SJ
+        domainName:
+          description: Fully qualified domain name (FQDN)
+          type: string
+          example: sj.se
+        mtbPublicKeys:
+          description: Public components of current MTB signing keys
+          type: array
+          items:
+            $ref: '#/components/schemas/jwkPublic'
+        authtokenPublicKeys:
+          description: Public components of current auth token signing keys
+          type: array
+          items:
+            $ref: '#/components/schemas/jwkPublic'
+        interfaceEndpoints:
+          description: Location of available endpoints
+          type: array
+          items:
+            $ref: '#/components/schemas/endpoint'
+        issuerSignatureConstraints:
+          description: Acceptable issuers of MTBs
+          type: array
+          items:
+            $ref: '#/components/schemas/issuerSignatureConstraint'
+        participantInfo:
+          $ref: '#/components/schemas/participantInfo'
     endpoint:
       allOf:
       - required:
@@ -62,9 +103,6 @@ components:
           description: Maximum signature life-time allowed for this PID as ISO 8601:2004 duration format (<a href="https://bitbucket.org/samtrafiken/bob-mts-8-date-and-time-formats/src/master/mts8.pdf" target="_blank">MTS8</a>, chapter 2.4)
           type: string
           example: P3W
-    participantInfo:
-      description: Holds participant info. Specified in https://bitbucket.org/samtrafiken/bob-schema-participant-info/src/master/participant-info.json
-      type: object
     endpointCall:
       type: object
       required:
@@ -152,47 +190,9 @@ components:
           type: string
           description: RSA exponent parameter (required for kty=RSA)
           example: AQAB
-    participantMetadata:
+    participantInfo:
+      description: Holds participant info. Specified in https://bitbucket.org/samtrafiken/bob-schema-participant-info/src/master/participant-info.json
       type: object
-      required:
-      - pid
-      - organisationName
-      properties:
-        pid:
-          description: Participant identifier
-          type: integer
-          format: int64
-          example: 20
-        organisationName:
-          description: Organisation name
-          type: string
-          example: SJ
-        domainName:
-          description: Fully qualified domain name (FQDN)
-          type: string
-          example: sj.se
-        mtbPublicKeys:
-          description: Public components of current MTB signing keys
-          type: array
-          items:
-            $ref: '#/components/schemas/jwkPublic'
-        authtokenPublicKeys:
-          description: Public components of current auth token signing keys
-          type: array
-          items:
-            $ref: '#/components/schemas/jwkPublic'
-        interfaceEndpoints:
-          description: Location of available endpoints
-          type: array
-          items:
-            $ref: '#/components/schemas/endpoint'
-        issuerSignatureConstraints:
-          description: Acceptable issuers of MTBs
-          type: array
-          items:
-            $ref: '#/components/schemas/issuerSignatureConstraint'
-        participantInfo:
-          $ref: '#/components/schemas/participantInfo'
   securitySchemes:
     Pop:
       description: OAuth 2.0 Proof-of-possession (pop) Token

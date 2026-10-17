@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Admin/cache API
+  title: Products Admin/cache API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged admin/cache across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -93,13 +93,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/cache/delete/all:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -162,13 +155,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/cache/invalidate:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -248,13 +234,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/cache/keys/count:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -317,13 +296,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/cache/keys/count/{keyOfEntity}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -393,13 +365,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/cache/keys/info:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -461,13 +426,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/cache/keys/info/{nameOfEntity}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -536,13 +494,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/cache/status:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -604,14 +555,22 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
+  schemas:
+    SetString:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
+    MapStringObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
   parameters:
     X-Correlation-Id:
       name: X-Correlation-Id
@@ -637,26 +596,8 @@ components:
       explode: false
       schema:
         type: string
-  schemas:
-    SetString:
-      type: object
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
-    MapStringObject:
-      type: object
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

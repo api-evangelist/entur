@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Change Options API
+  title: Reserve Offers Change Options API
+  description: Simplify adding offers to an order
   version: 2026.07.0
-  description: 'Operations tagged Change Options across 2 of this provider''s published API definitions: entur-reserve-offers-partner-openapi.json, entur-reserve-offers-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.staging.entur.io/sales
   description: Staging test environment
@@ -69,39 +69,7 @@ paths:
           $ref: '#/components/responses/notFound'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
 components:
-  responses:
-    internalServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    badRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    notFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
     ChangeOption:
       title: ChangeOption
@@ -229,11 +197,20 @@ components:
           examples:
           - NOK
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
+    dciHeader:
+      name: Entur-Distribution-Channel
       in: header
-      description: Correlation id
-      required: false
+      description: A header containing the distribution channel ID.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
       style: simple
       explode: false
       schema:
@@ -253,24 +230,37 @@ components:
       explode: false
       schema:
         type: string
-    dciHeader:
-      name: Entur-Distribution-Channel
+    X-Correlation-Id:
+      name: X-Correlation-Id
       in: header
-      description: A header containing the distribution channel ID.
-      required: true
+      description: Correlation id
+      required: false
       style: simple
       explode: false
       schema:
         type: string
-    posHeader:
-      name: Entur-Pos
-      in: header
-      description: Point-of-sale identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-x-refined-from:
-- entur-reserve-offers-partner-openapi.json
-- entur-reserve-offers-partner-openapi.yml
+  responses:
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'

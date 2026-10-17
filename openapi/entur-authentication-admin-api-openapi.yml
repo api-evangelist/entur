@@ -1,13 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Entur Authentication admin API
-  version: 2026.10.0
+  title: Customers Authentication admin API
+  description: Documentation of the Customers API
+  termsOfService: https://entur.org
   contact:
     name: Entur Team Personalisering
     url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
     email: team.personalisering@entur.org
-  termsOfService: https://entur.org
-  description: 'Operations tagged Authentication admin across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.10.0
 servers:
 - url: https://api.entur.io/customers/v2
 security:
@@ -61,8 +61,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: customers-profile-credentials:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/set-password:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -107,8 +105,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: customers-profile-credentials:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/{customerNumber}/change-password:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -153,8 +149,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: customers-profile-credentials:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /profiles/verify-credentials:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -188,8 +182,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: customers-profile-credentials:les
-    servers:
-    - url: https://api.entur.io/customers/v2
   /authentication/generate-password:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -229,33 +221,112 @@ paths:
           $ref: '#/components/responses/Error500_customers-orchestrator-customers'
       x-entur-permissions:
         value: customers-profile-credentials:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
 components:
   schemas:
-    CustomerConsent:
+    NoteResponse:
+      required:
+      - changedAt
+      - changedBy
+      - createdAt
+      - createdBy
+      - customerId
+      - id
+      - text
       type: object
       properties:
         changedAt:
           type: string
-          description: When the customer consent was last changed.
+          description: When the note was last changed. ISO 8601 date format
           format: date-time
-        consentChoice:
-          type: boolean
-          description: Whether the customer has approved or declined this consent.
-        consentCode:
-          maxLength: 20
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedBy:
+          maxLength: 100
           type: string
-          description: The consent code.
+          description: Who last changed the note.
         createdAt:
           type: string
-          description: When the customer consent was created.
+          description: When the note was created. ISO 8601 date format
           format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdBy:
+          maxLength: 100
+          type: string
+          description: Who created the note.
         customerId:
           type: integer
-          description: Id of the customer.
+          description: Id of the customer connected to the note.
           format: int64
-      description: Legacy consents for a customer
+        id:
+          type: integer
+          description: Note id.
+          format: int64
+        text:
+          maxLength: 4000
+          type: string
+          description: Note content.
+      description: Deprecated
+    LocalDateResponse:
+      required:
+      - day
+      - month
+      - year
+      type: object
+      properties:
+        day:
+          type: integer
+          description: day of month
+          format: int32
+        month:
+          type: integer
+          description: month number
+          format: int32
+        year:
+          type: integer
+          description: year
+          format: int32
+      description: Date as object
+    VerifyCredentialsRequest:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          maxLength: 80
+          type: string
+          description: Email used for login. See property 'username' on CustomerResponse
+        lastSignInFrom:
+          maxLength: 100
+          type: string
+          description: The place if login. Typically web or app. Typically used to display to the user where the last login was performed.
+        password:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: Password used for login.
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorMessage'
+      description: The fields used when verifying credentials
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
     ErrorMessage:
       required:
       - errorCode
@@ -282,6 +353,106 @@ components:
           type: string
           description: Short error message (Norwegian).
       description: 'An Error message. '
+    EcardOwnershipResponse:
+      required:
+      - changedAt
+      - createdAt
+      - customerId
+      - ecardNumber
+      - ecardNumber16digits
+      - ecardOperator
+      - id
+      - startOfOwnership
+      type: object
+      properties:
+        bookingDate:
+          type: string
+          description: When the physical ecard was booked. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        changedAt:
+          type: string
+          description: When the ecard was last changed. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        createdAt:
+          type: string
+          description: When the ecard was created. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        customerId:
+          type: integer
+          description: The customer connected to the ecard. Deprecated
+          format: int64
+          deprecated: true
+        ecardName:
+          maxLength: 100
+          type: string
+          description: Customer defined ecard alias.
+        ecardNumber:
+          type: integer
+          description: Ecard number.
+          format: int64
+        ecardNumber16digits:
+          maxLength: 16
+          minLength: 16
+          type: string
+          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
+        ecardOperator:
+          type: integer
+          description: Ecard operator.
+          format: int32
+        endOfOwnership:
+          type: string
+          description: When the customer removed the ecard connection. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        expirationDate:
+          type: string
+          description: When the physical ecard expires. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        id:
+          type: integer
+          description: Ecard id.
+          format: int64
+        shippingDate:
+          type: string
+          description: When the physical ecard was shipped to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        startOfOwnership:
+          type: string
+          description: When the ecard was first connected to the customer. ISO 8601 date format
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Ecards connected to a customer
+    GeneratePasswordRequest:
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          minLength: 1
+          pattern: ^[a-zA-Z0-9æøåÆØÅ.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-æøåÆØÅ]{0,61}[a-zA-Z0-9æøåÆØÅ])?(?:\.[a-zA-Z0-9æøåÆØÅ](?:[a-zA-Z0-9-æøåÆØÅ]{0,61}[a-zA-Z0-9æøåÆØÅ])?)*$
+          type: string
+          description: The email address identifying the profile
+          examples:
+          - customer@example.com
+        organisationId:
+          type: integer
+          description: The organisation the profile belongs to. Default is tenant organisation ID. Only Internal tenants are allowed to override the organisation id
+          format: int64
+          examples:
+          - 1
+      description: Generate a new password for a profile identified by email and organisation id
     CustomerAccountResponse:
       required:
       - createdAt
@@ -331,26 +502,6 @@ components:
           type: boolean
           description: True if the account is the default account for the customer
       description: Customer account connected to a customer
-    LocalDateResponse:
-      required:
-      - day
-      - month
-      - year
-      type: object
-      properties:
-        day:
-          type: integer
-          description: day of month
-          format: int32
-        month:
-          type: integer
-          description: month number
-          format: int32
-        year:
-          type: integer
-          description: year
-          format: int32
-      description: Date as object
     NewPasswordRequest:
       required:
       - newPassword
@@ -435,6 +586,59 @@ components:
           examples:
           - '2019-04-05T14:30:30+02:00'
       description: Postal address connected to a customer
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
     CustomerResponse:
       required:
       - changedAt
@@ -671,202 +875,67 @@ components:
           format: uuid
           deprecated: true
       description: A registered customer response
-    ChangePasswordRequest:
+    GeneratePasswordResponse:
       required:
-      - newPassword
-      - oldPassword
+      - customerNumber
+      - firstName
+      - generatedPassword
+      - organisationId
+      - surname
       type: object
       properties:
-        newPassword:
+        customerNumber:
+          type: integer
+          description: Customer number.
+          format: int64
+        customerRef:
+          maxLength: 40
+          type: string
+          description: Customer reference
+        firstName:
+          maxLength: 50
+          type: string
+          description: Customer first and middle name.
+        generatedPassword:
           maxLength: 100
-          minLength: 1
           type: string
-          description: The new user password.
-        oldPassword:
-          maxLength: 100
-          minLength: 1
-          type: string
-          description: The old user password.
-        validationErrors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorMessage'
-      description: The fields used when verifying credentials
-    GeneratePasswordRequest:
-      required:
-      - email
-      type: object
-      properties:
-        email:
-          minLength: 1
-          pattern: ^[a-zA-Z0-9æøåÆØÅ.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-æøåÆØÅ]{0,61}[a-zA-Z0-9æøåÆØÅ])?(?:\.[a-zA-Z0-9æøåÆØÅ](?:[a-zA-Z0-9-æøåÆØÅ]{0,61}[a-zA-Z0-9æøåÆØÅ])?)*$
-          type: string
-          description: The email address identifying the profile
-          examples:
-          - customer@example.com
+          description: The new generated password.
         organisationId:
           type: integer
-          description: The organisation the profile belongs to. Default is tenant organisation ID. Only Internal tenants are allowed to override the organisation id
+          description: Organisation id.
           format: int64
-          examples:
-          - 1
-      description: Generate a new password for a profile identified by email and organisation id
-    ErrorResponse:
-      required:
-      - correlationId
-      - error
-      - message
-      - path
-      - status
-      - timestamp
-      type: object
-      properties:
-        timestamp:
+        surname:
+          maxLength: 50
           type: string
-          description: When the error occurred.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        status:
-          type: integer
-          description: The http status code.
-          format: int32
-          examples:
-          - 400
-        errorCode:
+          description: Customer surname.
+        telephoneNumber:
+          maxLength: 20
           type: string
-          description: Application specific error code
-          examples:
-          - '1033'
-        error:
-          type: string
-          description: The http status reason.
-          examples:
-          - Bad request
-        path:
-          type: string
-          description: The request URI.
-          examples:
-          - /loyaltyPrograms
-        message:
-          type: string
-          description: The main error message.
-          examples:
-          - Validation failed for ...
-        correlationId:
-          type: string
-          description: The unique correlation id for the request.
-          examples:
-          - b5d4960d-7ab2-43d6-a8f3-113da042a288
-        errors:
-          type: array
-          description: Optional list of error specifications.
-          items:
-            $ref: '#/components/schemas/ErrorSpecification'
-      description: Response object for errors occurring in the customers API
-    NoteResponse:
-      required:
-      - changedAt
-      - changedBy
-      - createdAt
-      - createdBy
-      - customerId
-      - id
-      - text
+          description: Telephone number for customer. This should be a cell phone number.
+      description: Return object when generating a new password
+    CustomerConsent:
       type: object
       properties:
         changedAt:
           type: string
-          description: When the note was last changed. ISO 8601 date format
+          description: When the customer consent was last changed.
           format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        changedBy:
-          maxLength: 100
+        consentChoice:
+          type: boolean
+          description: Whether the customer has approved or declined this consent.
+        consentCode:
+          maxLength: 20
           type: string
-          description: Who last changed the note.
+          description: The consent code.
         createdAt:
           type: string
-          description: When the note was created. ISO 8601 date format
+          description: When the customer consent was created.
           format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        createdBy:
-          maxLength: 100
-          type: string
-          description: Who created the note.
         customerId:
           type: integer
-          description: Id of the customer connected to the note.
+          description: Id of the customer.
           format: int64
-        id:
-          type: integer
-          description: Note id.
-          format: int64
-        text:
-          maxLength: 4000
-          type: string
-          description: Note content.
-      description: Deprecated
-    VerifyCredentialsRequest:
-      required:
-      - email
-      - password
-      type: object
-      properties:
-        email:
-          maxLength: 80
-          type: string
-          description: Email used for login. See property 'username' on CustomerResponse
-        lastSignInFrom:
-          maxLength: 100
-          type: string
-          description: The place if login. Typically web or app. Typically used to display to the user where the last login was performed.
-        password:
-          maxLength: 100
-          minLength: 1
-          type: string
-          description: Password used for login.
-        validationErrors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ErrorMessage'
-      description: The fields used when verifying credentials
-    PersonnelTicketBearer:
-      type: object
-      properties:
-        bearerCustomerId:
-          type: integer
-          format: int64
-        changedAt:
-          type: string
-          format: date-time
-        createdAt:
-          type: string
-          format: date-time
-        isSelfServedRetrieval:
-          type: boolean
-        ticketRightBearer:
-          type: string
-        ticketRightOwner:
-          type: string
-      description: The personnel tickets connected to the customer. Deprecated. Does not contain updated information.
-    ErrorSpecification:
-      required:
-      - defaultMessage
-      - field
-      type: object
-      properties:
-        field:
-          type: string
-          description: The field of the associated object in the request related to the error.
-        defaultMessage:
-          type: string
-          description: The message explaining why the error occurred.
-        rejectedValues:
-          type: object
-          description: A list of rejected values.
-      description: Optional list of error specifications.
+      description: Legacy consents for a customer
     PreferenceResponse:
       required:
       - changedAt
@@ -910,6 +979,27 @@ components:
           type: string
           description: Type of preference.
       description: Preference
+    ChangePasswordRequest:
+      required:
+      - newPassword
+      - oldPassword
+      type: object
+      properties:
+        newPassword:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: The new user password.
+        oldPassword:
+          maxLength: 100
+          minLength: 1
+          type: string
+          description: The old user password.
+        validationErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorMessage'
+      description: The fields used when verifying credentials
     CustomerPreferenceResponse:
       required:
       - changedAt
@@ -947,138 +1037,26 @@ components:
           type: string
           description: Value of the preference. This can be things like membership number.
       description: Preferences response for a customer
-    EcardOwnershipResponse:
-      required:
-      - changedAt
-      - createdAt
-      - customerId
-      - ecardNumber
-      - ecardNumber16digits
-      - ecardOperator
-      - id
-      - startOfOwnership
+    PersonnelTicketBearer:
       type: object
       properties:
-        bookingDate:
-          type: string
-          description: When the physical ecard was booked. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
+        bearerCustomerId:
+          type: integer
+          format: int64
         changedAt:
           type: string
-          description: When the ecard was last changed. ISO 8601 date format
           format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
         createdAt:
           type: string
-          description: When the ecard was created. ISO 8601 date format
           format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        customerId:
-          type: integer
-          description: The customer connected to the ecard. Deprecated
-          format: int64
-          deprecated: true
-        ecardName:
-          maxLength: 100
+        isSelfServedRetrieval:
+          type: boolean
+        ticketRightBearer:
           type: string
-          description: Customer defined ecard alias.
-        ecardNumber:
-          type: integer
-          description: Ecard number.
-          format: int64
-        ecardNumber16digits:
-          maxLength: 16
-          minLength: 16
+        ticketRightOwner:
           type: string
-          description: The 16 digit ecard number. A combination of ecardNumber, ecardOperator and control digit.
-        ecardOperator:
-          type: integer
-          description: Ecard operator.
-          format: int32
-        endOfOwnership:
-          type: string
-          description: When the customer removed the ecard connection. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        expirationDate:
-          type: string
-          description: When the physical ecard expires. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        id:
-          type: integer
-          description: Ecard id.
-          format: int64
-        shippingDate:
-          type: string
-          description: When the physical ecard was shipped to the customer. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-        startOfOwnership:
-          type: string
-          description: When the ecard was first connected to the customer. ISO 8601 date format
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-      description: Ecards connected to a customer
-    GeneratePasswordResponse:
-      required:
-      - customerNumber
-      - firstName
-      - generatedPassword
-      - organisationId
-      - surname
-      type: object
-      properties:
-        customerNumber:
-          type: integer
-          description: Customer number.
-          format: int64
-        customerRef:
-          maxLength: 40
-          type: string
-          description: Customer reference
-        firstName:
-          maxLength: 50
-          type: string
-          description: Customer first and middle name.
-        generatedPassword:
-          maxLength: 100
-          type: string
-          description: The new generated password.
-        organisationId:
-          type: integer
-          description: Organisation id.
-          format: int64
-        surname:
-          maxLength: 50
-          type: string
-          description: Customer surname.
-        telephoneNumber:
-          maxLength: 20
-          type: string
-          description: Telephone number for customer. This should be a cell phone number.
-      description: Return object when generating a new password
+      description: The personnel tickets connected to the customer. Deprecated. Does not contain updated information.
   responses:
-    Error500_customers-orchestrator-customers:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error401_customers-orchestrator-customers:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
     Error400:
       description: Bad request
       content:
@@ -1091,14 +1069,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
-    Error403_customers-orchestrator-customers:
-      description: Forbidden
+    Error404:
+      description: Not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error400_customers-orchestrator-customers:
-      description: Bad request
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401_customers-orchestrator-customers:
+      description: Unauthorized
       content:
         application/json:
           schema:
@@ -1109,14 +1087,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
-    Error404_customers-orchestrator-customers:
-      description: Not found
+    Error400_customers-orchestrator-customers:
+      description: Bad request
       content:
         application/json:
           schema:
@@ -1127,16 +1099,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
+    Error404_customers-orchestrator-customers:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500_customers-orchestrator-customers:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403_customers-orchestrator-customers:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1152,11 +1133,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-customers-openapi.json
-- entur-customers-openapi.yml

@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Reserve Offers API
+  title: Reserve Offers API
+  description: Simplify adding offers to an order
   version: 2026.07.0
-  description: 'Operations tagged Reserve Offers across 2 of this provider''s published API definitions: entur-reserve-offers-partner-openapi.json, entur-reserve-offers-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.staging.entur.io/sales
   description: Staging test environment
@@ -81,13 +81,6 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
   /v1/update-order:
     parameters:
     - $ref: '#/components/parameters/dciHeader'
@@ -145,13 +138,6 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
   /v1/update-order/supplement-products:
     parameters:
     - $ref: '#/components/parameters/dciHeader'
@@ -207,101 +193,24 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
 components:
-  responses:
-    notFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    badRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    internalServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    conflict:
-      description: Conflict
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
   schemas:
-    ChangeOrderLinesRequest:
-      title: ChangeOrderLinesRequest
-      required:
-      - offerConfigurations
-      - orderId
-      - refundPriceDifference
+    DistributionDetails:
+      title: DistributionDetails
       type: object
       properties:
-        orderId:
+        fulfillmentMethodRef:
+          $ref: '#/components/schemas/RefType'
+        typeOfTravelDocumentToIssueRef:
+          $ref: '#/components/schemas/RefType'
+        customerAccountRef:
+          $ref: '#/components/schemas/RefType'
+        distributionHolderCustomerId:
           type: string
-          description: The order to add the offer(s) to
+          description: The Entur customer id that will be linked to the distribution of the order line created
           examples:
-          - ABCD1234
-        offerConfigurations:
-          type: array
-          description: A list of change offer configurations selected for purchase
-          items:
-            $ref: '#/components/schemas/ChangeOrderLinesConfiguration'
-        refundPriceDifference:
-          type: boolean
-          description: Experimental value that is used to refund the price difference between the original purchase and the change, if the change is cheaper than the original product.
-          default: false
-      description: The holder for a change offer configuration.
-    AddSupplementProductsConfiguration:
-      title: AddSupplementProductsConfiguration
-      required:
-      - offerId
-      - orderLineId
-      - selectedProductsConfiguration
-      type: object
-      properties:
-        customers:
-          type: array
-          description: Customers with optional entitlement data; used to link travellers to order line and when offers are created with entitlements
-          items:
-            $ref: '#/components/schemas/Customer'
-          default: []
-        offerId:
-          type: string
-          description: The id of the offer that is used
-          format: uuid
-          examples:
-          - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
-        orderLineId:
-          type: string
-          description: The id of the order line to add supplement products to
-          examples:
-          - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
-        selectedProductsConfiguration:
-          type: array
-          description: A list of ids and counts for selected supplement product configurations. Count is only considered for fare products.
-          items:
-            $ref: '#/components/schemas/SelectedProductConfiguration'
-          default: []
-      description: The configuration-holder for an offer configuration
+          - '1234556'
+      description: Wrapper for references connected to distribution of travel rights and/or tickets
     AddSupplementProductsRequest:
       title: AddSupplementProductsRequest
       required:
@@ -320,6 +229,97 @@ components:
           examples:
           - ABCD1234
       description: The holder for an add supplement product configuration.
+    SelectedProductConfiguration:
+      title: SelectedProductConfiguration
+      required:
+      - count
+      - selectedProductId
+      type: object
+      properties:
+        selectedProductId:
+          type: string
+          description: A selectable product id.
+        count:
+          type: integer
+          description: The number of times to add said product. Count will only be considered on a fare product level. Default 1
+          format: int32
+          default: 1
+      description: Configuration for a selectable product from an offer
+    ReserveOffersRequest:
+      title: ReserveOffersRequest
+      required:
+      - offerConfigurations
+      type: object
+      properties:
+        offerConfigurations:
+          type: array
+          description: A list of offer configurations selected for purchase
+          items:
+            $ref: '#/components/schemas/OfferConfiguration'
+        orderId:
+          type: string
+          description: The offer to add the order to. If no orderId is specified, a new order is created
+          examples:
+          - ABCD1234
+      description: The input-holder for reserving offers and add them to an existing order.
+    IdAndVersionRef:
+      title: IdAndVersionRef
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Id reference to an external entity
+        version:
+          type: string
+          description: Optional version reference to an external entity
+      description: A holder for an id and version combination
+    RefType:
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: Value to identify a given resource
+        version:
+          type: string
+          description: Optional version for a given resource
+      description: Versioned Reference to a resource
+    ApiError:
+      title: ApiError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          examples:
+          - '2025-01-01T12:00:00Z'
+        status:
+          type: integer
+          format: int32
+          examples:
+          - 500
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
     ReplacedOrderLineIds:
       title: ReplacedOrderLineIds
       required:
@@ -341,40 +341,25 @@ components:
           - - 818d3ef9-925e-493f-bc21-8763314749ec
             - 79006e6b-6c72-48b6-a9e6-ddadec19cbca
       description: A holder that combines orginal order line ids with those that replaces them
-    ReserveOffersRequest:
-      title: ReserveOffersRequest
+    Customer:
+      title: Customer
       required:
-      - offerConfigurations
+      - customerId
+      - entitlements
       type: object
       properties:
-        offerConfigurations:
+        customerId:
+          type: string
+          description: Customer id that will be linked to the order line created from the offer specified
+          examples:
+          - '1234567'
+        entitlements:
           type: array
-          description: A list of offer configurations selected for purchase
+          description: The entitlement data for a customer; used if the the offer is created with entitlements
           items:
-            $ref: '#/components/schemas/OfferConfiguration'
-        orderId:
-          type: string
-          description: The offer to add the order to. If no orderId is specified, a new order is created
-          examples:
-          - ABCD1234
-      description: The input-holder for reserving offers and add them to an existing order.
-    CustomerEntitlement:
-      title: CustomerEntitlement
-      required:
-      - entitlementProductRef
-      type: object
-      properties:
-        contractId:
-          type: string
-          description: The id of a benefit-contract that gives a customer an entitlement
-          format: uuid
-          examples:
-          - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
-        entitlementProductRef:
-          $ref: '#/components/schemas/IdAndVersionRef'
-        externalEntitlementRef:
-          $ref: '#/components/schemas/IdAndVersionRef'
-      description: A holder for a customers entitlements
+            $ref: '#/components/schemas/CustomerEntitlement'
+          default: []
+      description: A holder for a customer and entitlements used by the customer for the offer
     OrderLineIdsAndReservationIds:
       title: OrderLineIdsAndReservationIds
       required:
@@ -406,22 +391,78 @@ components:
             $ref: '#/components/schemas/ReplacedOrderLineIds'
           default: []
       description: A wrapper that holds the resulting ids for newly created order lines, reservations and possible replacement order lines
-    SelectedProductConfiguration:
-      title: SelectedProductConfiguration
+    ChangeOrderLinesRequest:
+      title: ChangeOrderLinesRequest
       required:
-      - count
-      - selectedProductId
+      - offerConfigurations
+      - orderId
+      - refundPriceDifference
       type: object
       properties:
-        selectedProductId:
+        orderId:
           type: string
-          description: A selectable product id.
-        count:
-          type: integer
-          description: The number of times to add said product. Count will only be considered on a fare product level. Default 1
-          format: int32
-          default: 1
-      description: Configuration for a selectable product from an offer
+          description: The order to add the offer(s) to
+          examples:
+          - ABCD1234
+        offerConfigurations:
+          type: array
+          description: A list of change offer configurations selected for purchase
+          items:
+            $ref: '#/components/schemas/ChangeOrderLinesConfiguration'
+        refundPriceDifference:
+          type: boolean
+          description: Experimental value that is used to refund the price difference between the original purchase and the change, if the change is cheaper than the original product.
+          default: false
+      description: The holder for a change offer configuration.
+    ChangeOrderLinesConfiguration:
+      title: ChangeOrderLinesConfiguration
+      required:
+      - offerId
+      - orderLineId
+      type: object
+      properties:
+        customers:
+          type: array
+          description: Customers with optional entitlement data; used to link travellers to order line and when offers are created with entitlements
+          items:
+            $ref: '#/components/schemas/Customer'
+          default: []
+        distributionDetails:
+          $ref: '#/components/schemas/DistributionDetails'
+        externalReference:
+          type: string
+          description: External reference to an order line. Only used by external operators to identify order lines created by OfferConfigurations
+        offerId:
+          type: string
+          description: The id of the offer that is used
+          format: uuid
+          examples:
+          - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
+        orderLineId:
+          type: string
+          description: The id of the OrderLine to replace. Multiple offer configurations may contain the same orderLineId if replacing the OrderLine with multiple offer configurations. In that case, selectedOrderLineIds must also be equal.
+          examples:
+          - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
+        selectableProductIds:
+          type: array
+          description: A list of ids for selected products. Duplicates are only supported for SupplementProducts which does not modify seating assignments for the PreassignedFareProduct
+          items:
+            type: string
+          default: []
+        selectedTravellerIds:
+          type: array
+          description: This field is used to specify which travellers will be included in the use of this offer. It is validated against the travellers identified in the travellerMappings property of the selected Offer, as well as the legal number of UserProfiles per compartment when reserving a group product. When reserving a group product, validation is performed against the valid number of UserProfiles per compartment. When reserving regular products, a number of order lines will be made, corresponding to the number of selectedTravellerIds. Each order line will have one of the selectedTravellerIds.
+          items:
+            type: string
+          default: []
+        selectedOrderLineIds:
+          type: array
+          items:
+            type: string
+          default: []
+          examples:
+          - - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
+      description: The configuration-holder for an offer configuration
     OfferConfiguration:
       title: OfferConfiguration
       required:
@@ -477,44 +518,12 @@ components:
             type: string
           default: []
       description: The configuration-holder for an offer configuration
-    ApiError:
-      title: ApiError
-      required:
-      - error
-      - exception
-      - message
-      - path
-      - status
-      - timestamp
-      - title
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-          examples:
-          - '2025-01-01T12:00:00Z'
-        status:
-          type: integer
-          format: int32
-          examples:
-          - 500
-        title:
-          type: string
-          description: Short, human-readable summary of the problem
-        error:
-          type: string
-        exception:
-          type: string
-        message:
-          type: string
-        path:
-          type: string
-    ChangeOrderLinesConfiguration:
-      title: ChangeOrderLinesConfiguration
+    AddSupplementProductsConfiguration:
+      title: AddSupplementProductsConfiguration
       required:
       - offerId
       - orderLineId
+      - selectedProductsConfiguration
       type: object
       properties:
         customers:
@@ -523,11 +532,6 @@ components:
           items:
             $ref: '#/components/schemas/Customer'
           default: []
-        distributionDetails:
-          $ref: '#/components/schemas/DistributionDetails'
-        externalReference:
-          type: string
-          description: External reference to an order line. Only used by external operators to identify order lines created by OfferConfigurations
         offerId:
           type: string
           description: The id of the offer that is used
@@ -536,95 +540,48 @@ components:
           - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
         orderLineId:
           type: string
-          description: The id of the OrderLine to replace. Multiple offer configurations may contain the same orderLineId if replacing the OrderLine with multiple offer configurations. In that case, selectedOrderLineIds must also be equal.
+          description: The id of the order line to add supplement products to
           examples:
           - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
-        selectableProductIds:
+        selectedProductsConfiguration:
           type: array
-          description: A list of ids for selected products. Duplicates are only supported for SupplementProducts which does not modify seating assignments for the PreassignedFareProduct
+          description: A list of ids and counts for selected supplement product configurations. Count is only considered for fare products.
           items:
-            type: string
+            $ref: '#/components/schemas/SelectedProductConfiguration'
           default: []
-        selectedTravellerIds:
-          type: array
-          description: This field is used to specify which travellers will be included in the use of this offer. It is validated against the travellers identified in the travellerMappings property of the selected Offer, as well as the legal number of UserProfiles per compartment when reserving a group product. When reserving a group product, validation is performed against the valid number of UserProfiles per compartment. When reserving regular products, a number of order lines will be made, corresponding to the number of selectedTravellerIds. Each order line will have one of the selectedTravellerIds.
-          items:
-            type: string
-          default: []
-        selectedOrderLineIds:
-          type: array
-          items:
-            type: string
-          default: []
-          examples:
-          - - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
       description: The configuration-holder for an offer configuration
-    Customer:
-      title: Customer
+    CustomerEntitlement:
+      title: CustomerEntitlement
       required:
-      - customerId
-      - entitlements
+      - entitlementProductRef
       type: object
       properties:
-        customerId:
+        contractId:
           type: string
-          description: Customer id that will be linked to the order line created from the offer specified
+          description: The id of a benefit-contract that gives a customer an entitlement
+          format: uuid
           examples:
-          - '1234567'
-        entitlements:
-          type: array
-          description: The entitlement data for a customer; used if the the offer is created with entitlements
-          items:
-            $ref: '#/components/schemas/CustomerEntitlement'
-          default: []
-      description: A holder for a customer and entitlements used by the customer for the offer
-    RefType:
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: string
-          description: Value to identify a given resource
-        version:
-          type: string
-          description: Optional version for a given resource
-      description: Versioned Reference to a resource
-    DistributionDetails:
-      title: DistributionDetails
-      type: object
-      properties:
-        fulfillmentMethodRef:
-          $ref: '#/components/schemas/RefType'
-        typeOfTravelDocumentToIssueRef:
-          $ref: '#/components/schemas/RefType'
-        customerAccountRef:
-          $ref: '#/components/schemas/RefType'
-        distributionHolderCustomerId:
-          type: string
-          description: The Entur customer id that will be linked to the distribution of the order line created
-          examples:
-          - '1234556'
-      description: Wrapper for references connected to distribution of travel rights and/or tickets
-    IdAndVersionRef:
-      title: IdAndVersionRef
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: string
-          description: Id reference to an external entity
-        version:
-          type: string
-          description: Optional version reference to an external entity
-      description: A holder for an id and version combination
+          - 5d3e9d2c-f9ab-4dd0-a735-100886278e0b
+        entitlementProductRef:
+          $ref: '#/components/schemas/IdAndVersionRef'
+        externalEntitlementRef:
+          $ref: '#/components/schemas/IdAndVersionRef'
+      description: A holder for a customers entitlements
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
+    dciHeader:
+      name: Entur-Distribution-Channel
       in: header
-      description: Correlation id
-      required: false
+      description: A header containing the distribution channel ID.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
       style: simple
       explode: false
       schema:
@@ -644,24 +601,43 @@ components:
       explode: false
       schema:
         type: string
-    dciHeader:
-      name: Entur-Distribution-Channel
+    X-Correlation-Id:
+      name: X-Correlation-Id
       in: header
-      description: A header containing the distribution channel ID.
-      required: true
+      description: Correlation id
+      required: false
       style: simple
       explode: false
       schema:
         type: string
-    posHeader:
-      name: Entur-Pos
-      in: header
-      description: Point-of-sale identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-x-refined-from:
-- entur-reserve-offers-partner-openapi.json
-- entur-reserve-offers-partner-openapi.yml
+  responses:
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'

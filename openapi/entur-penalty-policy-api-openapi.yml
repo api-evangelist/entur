@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur penalty Policy API
+  title: Products penalty Policy API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged penalty Policy across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -161,13 +161,6 @@ paths:
       x-summary-source: derived
       x-operation-id-source: normalized
       x-operation-id-original: penalty Policy_create
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /penalty-policies/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -397,15 +390,127 @@ paths:
         value: product-api-access:endre
       x-operation-id-source: normalized
       x-operation-id-original: penalty Policy_deleteById
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
     PenaltyPolicy:
       required:
       - changed
@@ -530,26 +635,25 @@ components:
           examples:
           - NSB:Version:V1
       description: A PENALTY POLICY
-    VersionOfObjectRef:
+    TextInLanguage:
       required:
-      - nameOfClass
-      - ref
-      - version
+      - lang
+      - value
       type: object
       properties:
-        nameOfClass:
+        lang:
           minLength: 1
           type: string
-          description: Name of class.
-        ref:
+          description: Language code.
+          examples:
+          - nob
+        value:
           minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: The netex id reference to the object.
-        version:
-          type: string
-          description: Version.
-      description: Fare frame ref.
+          description: The text.
+      description: Text in a specific language.
+    BoxedUnit:
+      type: object
     FarePrice:
       required:
       - changed
@@ -779,134 +883,7 @@ components:
           examples:
           - NSB:Version:V1
       description: A LimitingRule
-    TextInLanguage:
-      required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
-    BoxedUnit:
-      type: object
-    Rounding:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - roundingMethod
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:Rounding:Ordinary
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - Rounding
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
-        status:
-          type: string
-          description: Rounding status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Rounding version.
-          examples:
-          - NSB:Version:V1
-      description: A description of how prices are rounded post calculation
-      deprecated: true
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -922,11 +899,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

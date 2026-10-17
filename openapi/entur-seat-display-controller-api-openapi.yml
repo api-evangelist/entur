@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Seat Display Controller API
+  title: Seating manager Seat Display Controller API
+  description: Seating manager generates seating offers and keeps track of what seats are reserved and/or blocked
   version: 2026.09.0
-  description: 'Operations tagged seat-display-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seating-manager
 security:
@@ -36,102 +36,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/TripResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
 components:
   schemas:
-    TripResponse:
-      required:
-      - coaches
-      - route
-      - stations
-      - tripId
-      type: object
-      properties:
-        tripId:
-          type: string
-          description: The unique identifier of the trip (DSJ)
-          examples:
-          - VYG:DatedServiceJourney:67_OSL-BRG_25-05-22
-        route:
-          type: array
-          items:
-            type: string
-            description: Ordered list of stop place IDs in the route
-            examples:
-            - '["NSR:StopPlace:337","NSR:StopPlace:548"]'
-        stations:
-          type: object
-          additionalProperties:
-            type: string
-            description: Mapping of stop place IDs to human-readable station names
-            examples:
-            - '{"NSR:StopPlace:337":"Oslo","NSR:StopPlace:548":"Bergen"}'
-          description: Mapping of stop place IDs to human-readable station names
-          examples:
-          - NSR:StopPlace:337: Oslo
-            NSR:StopPlace:548: Bergen
-        coaches:
-          type: array
-          items:
-            $ref: '#/components/schemas/CoachResponse'
-    ReservationLineResponse:
-      required:
-      - reference
-      - requestedProperties
-      - requestedSeatingProperties
-      - reservedProperties
-      - reservedSeatingProperties
-      - type
-      type: object
-      properties:
-        reference:
-          type: string
-          description: Reference for this reservation line`
-          format: uuid
-        reservedProperties:
-          type: array
-          items:
-            minLength: 1
-            type: string
-            description: The properties reserved by the reservation line.
-            examples:
-            - '[FareClass_STANDARD_CLASS]'
-        reservedSeatingProperties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-        requestedProperties:
-          type: array
-          items:
-            minLength: 1
-            type: string
-            description: The properties required by the traveller.
-            examples:
-            - '[FareClass_STANDARD_CLASS]'
-        requestedSeatingProperties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-        orderLineId:
-          type: string
-          description: OrderLine ID for this reservation line.
-          examples:
-          - d4a599f6-6b0b-473f-a182-79f87a4a8689
-        numberOfTravellers:
-          type: integer
-          description: Number of travellers on the reservation line.
-          format: int32
-          examples:
-          - 2
-        type:
-          type: string
-          description: The type of reservation line.
-          examples:
-          - SINGLE_SEAT
-      discriminator:
-        propertyName: type
-        mapping:
-          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineResponse'
-          COMPARTMENT: '#/components/schemas/CompartmentReservationLineResponse'
-          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineResponse'
-          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineResponse'
     SeatResponse:
       required:
       - id
@@ -377,33 +283,81 @@ components:
           examples:
           - HANDBAG,SUITCASE
       description: Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class.
-    CoachResponse:
+    StopPlaceResponseV1:
       required:
-      - id
-      - label
-      - seats
-      - sequenceNumber
+      - nsrCode
+      - sequenceNr
       type: object
       properties:
-        id:
+        nsrCode:
           type: string
-          description: The identifier of the coach
+          description: Stop Place id defined by National StopPlace registry.
           examples:
-          - '1'
-        label:
-          type: string
-          description: The label of the coach
-          examples:
-          - '1'
-        sequenceNumber:
+          - NSR:StopPlace:337
+        sequenceNr:
           type: integer
-          description: The sequence number in this coach
+          description: The ordering of the station in the journey.
           format: int32
-        seats:
+          examples:
+          - 0
+      description: Destination `StopPlace` of the `reservation`
+    ReservationLineResponse:
+      required:
+      - reference
+      - requestedProperties
+      - requestedSeatingProperties
+      - reservedProperties
+      - reservedSeatingProperties
+      - type
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference for this reservation line`
+          format: uuid
+        reservedProperties:
           type: array
           items:
-            $ref: '#/components/schemas/SeatResponse'
-      description: List of coaches in this trip
+            minLength: 1
+            type: string
+            description: The properties reserved by the reservation line.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        reservedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        requestedProperties:
+          type: array
+          items:
+            minLength: 1
+            type: string
+            description: The properties required by the traveller.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+        requestedSeatingProperties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line.
+          examples:
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        numberOfTravellers:
+          type: integer
+          description: Number of travellers on the reservation line.
+          format: int32
+          examples:
+          - 2
+        type:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+      discriminator:
+        propertyName: type
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/SingleSeatReservationLineResponse'
+          COMPARTMENT: '#/components/schemas/CompartmentReservationLineResponse'
+          FREE_SEATING: '#/components/schemas/FreeSeatingReservationLineResponse'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingReservationLineResponse'
     ReservationResponse:
       required:
       - createdAt
@@ -524,34 +478,69 @@ components:
           description: Additional free text information about the reservation.
           examples:
           - Unable to rebook this reservation due to no available seats.
-    StopPlaceResponseV1:
+    CoachResponse:
       required:
-      - nsrCode
-      - sequenceNr
+      - id
+      - label
+      - seats
+      - sequenceNumber
       type: object
       properties:
-        nsrCode:
+        id:
           type: string
-          description: Stop Place id defined by National StopPlace registry.
+          description: The identifier of the coach
           examples:
-          - NSR:StopPlace:337
-        sequenceNr:
+          - '1'
+        label:
+          type: string
+          description: The label of the coach
+          examples:
+          - '1'
+        sequenceNumber:
           type: integer
-          description: The ordering of the station in the journey.
+          description: The sequence number in this coach
           format: int32
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatResponse'
+      description: List of coaches in this trip
+    TripResponse:
+      required:
+      - coaches
+      - route
+      - stations
+      - tripId
+      type: object
+      properties:
+        tripId:
+          type: string
+          description: The unique identifier of the trip (DSJ)
           examples:
-          - 0
-      description: Destination `StopPlace` of the `reservation`
+          - VYG:DatedServiceJourney:67_OSL-BRG_25-05-22
+        route:
+          type: array
+          items:
+            type: string
+            description: Ordered list of stop place IDs in the route
+            examples:
+            - '["NSR:StopPlace:337","NSR:StopPlace:548"]'
+        stations:
+          type: object
+          additionalProperties:
+            type: string
+            description: Mapping of stop place IDs to human-readable station names
+            examples:
+            - '{"NSR:StopPlace:337":"Oslo","NSR:StopPlace:548":"Bergen"}'
+          description: Mapping of stop place IDs to human-readable station names
+          examples:
+          - NSR:StopPlace:337: Oslo
+            NSR:StopPlace:548: Bergen
+        coaches:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoachResponse'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -567,11 +556,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seating-manager-openapi.json
-- entur-seating-manager-openapi.yml

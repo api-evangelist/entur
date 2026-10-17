@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Inventory Admin API
-  version: 2026.09.0
+  title: Inventory Admin API
+  description: API exposing services to handle stock
   contact:
     name: Entur Team Varelager
-  description: 'Operations tagged Inventory Admin across 2 of this provider''s published API definitions: entur-inventory-openapi.json, entur-inventory-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.0
 servers:
 - url: https://api.entur.io/inventory
 security:
@@ -130,8 +130,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/QuotaResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/quotas/{quotaId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -207,8 +205,6 @@ paths:
       responses:
         '204':
           description: No Content
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/quota-templates:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -256,8 +252,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/QuotaTemplateResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/quota-templates/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -333,8 +327,6 @@ paths:
       responses:
         '204':
           description: No Content
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/quota-configurations/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -415,8 +407,6 @@ paths:
           description: No Content
       security:
       - bearer-key: []
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/dated-service-journeys/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -471,8 +461,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepartureResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/quota-configurations:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -531,8 +519,6 @@ paths:
                 $ref: '#/components/schemas/QuotaConfigurationResponseV1'
       security:
       - bearer-key: []
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/nesting-config-tree:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -589,8 +575,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NestingConfigTreeResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
   /v1/dated-service-journeys/{departureId}/refresh:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -626,184 +610,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DepartureResponseV1'
-    servers:
-    - url: https://api.entur.io/inventory
 components:
   schemas:
-    OdRequestV1:
+    NestingConfigTreeNodeResponseV1:
       type: object
       properties:
-        origin:
-          type: string
-        destination:
-          type: string
-      required:
-      - destination
-      - origin
-    QuotaTemplateQuotaResponseV1:
-      type: object
-      properties:
-        quota:
-          type: integer
-          format: int32
-        productIds:
+        quotaConfiguration:
+          $ref: '#/components/schemas/QuotaConfigurationResponseV1'
+        children:
           type: array
           items:
-            type: string
-        quotaConfigurationId:
-          type: integer
-          format: int32
-          nullable: true
+            required:
+            - quotaConfiguration
       required:
-      - productIds
-      - quota
-    QuotaTemplateQuotaRequestV1:
-      type: object
-      properties:
-        quota:
-          type: integer
-          format: int32
-        productIds:
-          type: array
-          items:
-            type: string
-        quotaConfigurationId:
-          type: integer
-          format: int32
-          nullable: true
-      required:
-      - productIds
-      - quota
-    UpdateQuotaRequestV1:
-      type: object
-      description: Quota to update
-      properties:
-        quota:
-          type: integer
-          format: int32
-        products:
-          type: array
-          items:
-            type: string
-        ods:
-          type: array
-          items:
-            $ref: '#/components/schemas/OdRequestV1'
-        quotaConfigurationId:
-          type: integer
-          format: int32
-        purchaseWindowStart:
-          type: string
-          format: date-time
-        purchaseWindowStop:
-          type: string
-          format: date-time
-        useStoplist:
-          type: boolean
-      required:
-      - ods
-      - products
-      - quota
-      - useStoplist
-    Line:
-      type: object
-      properties:
-        id:
-          type: string
-        version:
-          type: integer
-          format: int32
-        organisationId:
-          type: integer
-          format: int64
-        created:
-          type: string
-          format: date-time
-        changed:
-          type: string
-          format: date-time
-        stops:
-          type: array
-          items:
-            type: string
-      required:
-      - changed
-      - created
-      - id
-      - organisationId
-      - stops
-      - version
-    DepartureResponseV1:
-      type: object
-      properties:
-        id:
-          type: string
-        invertedDirection:
-          type: string
-        line:
-          $ref: '#/components/schemas/Line'
-        organisationId:
-          type: integer
-          format: int64
-        departureDate:
-          type: string
-          format: date
-        isClosed:
-          type: boolean
-      required:
-      - departureDate
-      - id
-      - invertedDirection
-      - isClosed
-      - line
-      - organisationId
-    QuotaResponseV1:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        quota:
-          type: integer
-          format: int32
-        products:
-          type: array
-          items:
-            type: string
-        ods:
-          type: array
-          items:
-            $ref: '#/components/schemas/OdResponse'
-        quotaConfigurationId:
-          type: integer
-          format: int32
-        datedServiceJourneyId:
-          type: string
-        purchaseWindowStart:
-          type: string
-          format: date-time
-        purchaseWindowStop:
-          type: string
-          format: date-time
-        useStoplist:
-          type: boolean
-      required:
-      - datedServiceJourneyId
-      - id
-      - ods
-      - products
-      - quota
-      - useStoplist
-    QuotaTemplateUpdateRequestV1:
-      type: object
-      description: Request to update a quota template
-      properties:
-        quotas:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuotaTemplateQuotaRequestV1'
-      required:
-      - quotas
+      - children
+      - quotaConfiguration
     QuotaConfiguration:
       type: object
       description: Updated quota configuration
@@ -842,36 +663,57 @@ components:
       required:
       - name
       - priority
-    UpdateDepartureRequestV1:
+    QuotaTemplateQuotaResponseV1:
       type: object
       properties:
-        isClosed:
-          type:
-          - boolean
-          - 'null'
-    QuotaTemplateResponseV1:
+        quota:
+          type: integer
+          format: int32
+        productIds:
+          type: array
+          items:
+            type: string
+        quotaConfigurationId:
+          type: integer
+          format: int32
+          nullable: true
+      required:
+      - productIds
+      - quota
+    Line:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          format: int32
+        organisationId:
+          type: integer
+          format: int64
+        created:
+          type: string
+          format: date-time
+        changed:
+          type: string
+          format: date-time
+        stops:
+          type: array
+          items:
+            type: string
+      required:
+      - changed
+      - created
+      - id
+      - organisationId
+      - stops
+      - version
+    QuotaResponseV1:
       type: object
       properties:
         id:
           type: integer
           format: int64
-        lineId:
-          type: string
-        privateCode:
-          type: string
-          nullable: true
-        quotas:
-          type: array
-          items:
-            $ref: '#/components/schemas/QuotaTemplateQuotaResponseV1'
-      required:
-      - id
-      - lineId
-      - quotas
-    QuotaRequestV1:
-      type: object
-      description: One or more quotas for the service journey
-      properties:
         quota:
           type: integer
           format: int32
@@ -882,7 +724,7 @@ components:
         ods:
           type: array
           items:
-            $ref: '#/components/schemas/OdRequestV1'
+            $ref: '#/components/schemas/OdResponse'
         quotaConfigurationId:
           type: integer
           format: int32
@@ -898,46 +740,11 @@ components:
           type: boolean
       required:
       - datedServiceJourneyId
+      - id
       - ods
       - products
       - quota
       - useStoplist
-    NestingConfigTreeNodeRequestV1:
-      type: object
-      properties:
-        quotaConfigurationRequest:
-          $ref: '#/components/schemas/QuotaConfiguration'
-        children:
-          type: array
-          items:
-            required:
-            - quotaConfigurationRequest
-      required:
-      - children
-      - quotaConfigurationRequest
-    OdResponse:
-      type: object
-      properties:
-        origin:
-          type: string
-        destination:
-          type: string
-      required:
-      - destination
-      - origin
-    NestingConfigTreeNodeResponseV1:
-      type: object
-      properties:
-        quotaConfiguration:
-          $ref: '#/components/schemas/QuotaConfigurationResponseV1'
-        children:
-          type: array
-          items:
-            required:
-            - quotaConfiguration
-      required:
-      - children
-      - quotaConfiguration
     QuotaConfigurationResponseV1:
       type: object
       properties:
@@ -981,13 +788,59 @@ components:
       - name
       - organisationId
       - priority
-    NestingConfigTreeResponseV1:
+    DepartureResponseV1:
       type: object
       properties:
-        root:
-          $ref: '#/components/schemas/NestingConfigTreeNodeResponseV1'
+        id:
+          type: string
+        invertedDirection:
+          type: string
+        line:
+          $ref: '#/components/schemas/Line'
+        organisationId:
+          type: integer
+          format: int64
+        departureDate:
+          type: string
+          format: date
+        isClosed:
+          type: boolean
       required:
-      - root
+      - departureDate
+      - id
+      - invertedDirection
+      - isClosed
+      - line
+      - organisationId
+    QuotaTemplateResponseV1:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        lineId:
+          type: string
+        privateCode:
+          type: string
+          nullable: true
+        quotas:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotaTemplateQuotaResponseV1'
+      required:
+      - id
+      - lineId
+      - quotas
+    OdResponse:
+      type: object
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+      required:
+      - destination
+      - origin
     NestingConfigTree:
       type: object
       description: A NestingConfigTree
@@ -1001,6 +854,36 @@ components:
       required:
       - flattenTree
       - root
+    NestingConfigTreeResponseV1:
+      type: object
+      properties:
+        root:
+          $ref: '#/components/schemas/NestingConfigTreeNodeResponseV1'
+      required:
+      - root
+    QuotaTemplateUpdateRequestV1:
+      type: object
+      description: Request to update a quota template
+      properties:
+        quotas:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotaTemplateQuotaRequestV1'
+      required:
+      - quotas
+    NestingConfigTreeNodeRequestV1:
+      type: object
+      properties:
+        quotaConfigurationRequest:
+          $ref: '#/components/schemas/QuotaConfiguration'
+        children:
+          type: array
+          items:
+            required:
+            - quotaConfigurationRequest
+      required:
+      - children
+      - quotaConfigurationRequest
     QuotaTemplateRequestV1:
       type: object
       description: Request to create a quota template
@@ -1017,16 +900,106 @@ components:
       required:
       - lineId
       - quotas
+    UpdateDepartureRequestV1:
+      type: object
+      properties:
+        isClosed:
+          type:
+          - boolean
+          - 'null'
+    QuotaTemplateQuotaRequestV1:
+      type: object
+      properties:
+        quota:
+          type: integer
+          format: int32
+        productIds:
+          type: array
+          items:
+            type: string
+        quotaConfigurationId:
+          type: integer
+          format: int32
+          nullable: true
+      required:
+      - productIds
+      - quota
+    OdRequestV1:
+      type: object
+      properties:
+        origin:
+          type: string
+        destination:
+          type: string
+      required:
+      - destination
+      - origin
+    QuotaRequestV1:
+      type: object
+      description: One or more quotas for the service journey
+      properties:
+        quota:
+          type: integer
+          format: int32
+        products:
+          type: array
+          items:
+            type: string
+        ods:
+          type: array
+          items:
+            $ref: '#/components/schemas/OdRequestV1'
+        quotaConfigurationId:
+          type: integer
+          format: int32
+        datedServiceJourneyId:
+          type: string
+        purchaseWindowStart:
+          type: string
+          format: date-time
+        purchaseWindowStop:
+          type: string
+          format: date-time
+        useStoplist:
+          type: boolean
+      required:
+      - datedServiceJourneyId
+      - ods
+      - products
+      - quota
+      - useStoplist
+    UpdateQuotaRequestV1:
+      type: object
+      description: Quota to update
+      properties:
+        quota:
+          type: integer
+          format: int32
+        products:
+          type: array
+          items:
+            type: string
+        ods:
+          type: array
+          items:
+            $ref: '#/components/schemas/OdRequestV1'
+        quotaConfigurationId:
+          type: integer
+          format: int32
+        purchaseWindowStart:
+          type: string
+          format: date-time
+        purchaseWindowStop:
+          type: string
+          format: date-time
+        useStoplist:
+          type: boolean
+      required:
+      - ods
+      - products
+      - quota
+      - useStoplist
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1042,11 +1015,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-inventory-openapi.json
-- entur-inventory-openapi.yml

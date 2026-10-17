@@ -252,43 +252,33 @@ paths:
         value: product-api-access:endre
 components:
   schemas:
-    ProblemDetails:
+    UsageValidityPeriodListResponse:
       required:
-      - detail
-      - status
-      - title
-      - type
+      - instances
+      - page
+      - size
+      - totalCount
       type: object
       properties:
-        type:
-          type: string
-          description: A URI reference that identifies the problem type.
-          format: uri
-          examples:
-          - https://developer.entur.org/errors/bad-request
-        title:
-          type: string
-          description: Short, human-readable summary of the problem type.
-          examples:
-          - Bad Request
-        status:
+        instances:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsageValidityPeriod'
+        totalCount:
           type: integer
-          description: The HTTP status code.
-          format: int32
+          description: Total number of UsageValidityPeriod instances.
           examples:
-          - 400
-        detail:
-          type: string
-          description: Human-readable explanation specific to this occurrence.
+          - 8
+        page:
+          type: integer
+          description: Current zero-based page number.
           examples:
-          - The supplied ruleId is not a valid UUID.
-        instance:
-          type: string
-          description: A URI reference that identifies the specific occurrence.
-          format: uri
+          - 0
+        size:
+          type: integer
+          description: Number of instances per page.
           examples:
-          - https://api.example.com/requests/12345
-      description: RFC 9457 Problem Details
+          - 100
     UsageValidityPeriodRequest:
       required:
       - name
@@ -321,6 +311,23 @@ components:
           - ON_PURCHASE
           - ON_FIRST_USE
           - ON_CHECK_IN
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
     UsageValidityPeriod:
       required:
       - id
@@ -360,103 +367,44 @@ components:
           - ON_PURCHASE
           - ON_FIRST_USE
           - ON_CHECK_IN
-    UsageValidityPeriodListResponse:
+    ProblemDetails:
       required:
-      - instances
-      - page
-      - size
-      - totalCount
+      - detail
+      - status
+      - title
+      - type
       type: object
       properties:
-        instances:
-          type: array
-          items:
-            $ref: '#/components/schemas/UsageValidityPeriod'
-        totalCount:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
           type: integer
-          description: Total number of UsageValidityPeriod instances.
+          description: The HTTP status code.
+          format: int32
           examples:
-          - 8
-        page:
-          type: integer
-          description: Current zero-based page number.
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
           examples:
-          - 0
-        size:
-          type: integer
-          description: Number of instances per page.
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
           examples:
-          - 100
-    LocalizedString:
-      type: array
-      items:
-        required:
-        - lang
-        - value
-        type: object
-        properties:
-          lang:
-            pattern: ^[a-z]{2}-[A-Z]{2}$
-            type: string
-            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
-            examples:
-            - nb-NO
-          value:
-            type: string
-            description: The localized string value for the specified lang.
-  responses:
-    ForbiddenError:
-      description: Forbidden - Insufficient permissions
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            forbidden:
-              summary: Access forbidden
-              value:
-                type: https://example.com/probs/forbidden
-                title: Forbidden
-                status: 403
-                detail: You do not have permission to access this resource.
-    UnauthorizedError:
-      description: Unauthorized - Authentication required
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
-          examples:
-            unauthorized:
-              summary: Authentication required
-              value:
-                type: https://example.com/probs/unauthorized
-                title: Unauthorized
-                status: 401
-                detail: Authentication credentials were missing or invalid.
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
   parameters:
-    page:
-      name: page
-      in: query
-      description: Zero-based page number. Defaults to 0.
-      required: false
-      style: form
-      explode: true
-      schema:
-        minimum: 0
-        type: integer
-        default: 0
-      examples:
-        default:
-          value: 0
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     id:
       name: id
       in: path
@@ -485,6 +433,20 @@ components:
       explode: false
       schema:
         type: string
+    page:
+      name: page
+      in: query
+      description: Zero-based page number. Defaults to 0.
+      required: false
+      style: form
+      explode: true
+      schema:
+        minimum: 0
+        type: integer
+        default: 0
+      examples:
+        default:
+          value: 0
     size:
       name: size
       in: query
@@ -500,6 +462,44 @@ components:
       examples:
         default:
           value: 100
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Authentication required
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            unauthorized:
+              summary: Authentication required
+              value:
+                type: https://example.com/probs/unauthorized
+                title: Unauthorized
+                status: 401
+                detail: Authentication credentials were missing or invalid.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
   securitySchemes:
     jwt:
       type: http

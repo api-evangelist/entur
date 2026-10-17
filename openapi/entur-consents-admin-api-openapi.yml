@@ -1,13 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Entur Consents admin API
-  version: 2026.07.1
+  title: Consents admin API
+  description: An API for handling consents within Entur's sales systems
+  termsOfService: https://entur.org
   contact:
     name: Entur Team Personalisering
     url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
     email: team.personalisering@entur.org
-  termsOfService: https://entur.org
-  description: 'Operations tagged Consents admin across 2 of this provider''s published API definitions: entur-consents-openapi.json, entur-consents-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.07.1
 servers:
 - url: https://api.entur.io/customers/v2/consents
 security:
@@ -194,8 +194,6 @@ paths:
           any:
           - consents-admin-data:endre
           - consents-admin-data-global:endre
-    servers:
-    - url: https://api.entur.io/customers/v2/consents
   /admin/consent-bases/{consentCode}/versions/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -415,8 +413,6 @@ paths:
           any:
           - consents-admin-data:endre
           - consents-admin-data-global:endre
-    servers:
-    - url: https://api.entur.io/customers/v2/consents
   /admin/consents:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -541,8 +537,6 @@ paths:
           any:
           - consents-admin-data:opprett
           - consents-admin-data-global:opprett
-    servers:
-    - url: https://api.entur.io/customers/v2/consents
   /admin/consent-bases:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -622,8 +616,6 @@ paths:
           any:
           - consents-admin-data:opprett
           - consents-admin-data-global:opprett
-    servers:
-    - url: https://api.entur.io/customers/v2/consents
   /admin/consent-bases/{consentCode}/versions:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -716,8 +708,6 @@ paths:
           any:
           - consents-admin-data:endre
           - consents-admin-data-global:endre
-    servers:
-    - url: https://api.entur.io/customers/v2/consents
   /admin/consent-bases/{consentCode}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -798,10 +788,27 @@ paths:
           any:
           - consents-admin-data:slett
           - consents-admin-data-global:slett
-    servers:
-    - url: https://api.entur.io/customers/v2/consents
 components:
   schemas:
+    ConsentTermsResponse:
+      required:
+      - fullDescription
+      - languageCode
+      - shortDescription
+      type: object
+      properties:
+        fullDescription:
+          type: string
+          description: Text describing the terms in detail. The text can contain MarkDown
+        languageCode:
+          type: string
+          description: ISO-639-3 language code. 3 characters
+          examples:
+          - ENG
+        shortDescription:
+          type: string
+          description: Short text explaining the terms. The text can contain MarkDown
+      description: Text for terms in a specific language
     ErrorMessage:
       required:
       - errorCode
@@ -828,16 +835,21 @@ components:
           type: string
           description: Short error message (Norwegian).
       description: ErrorMessage
-    ConsentPatchRequest:
+    InternalDescriptionResponse:
+      required:
+      - description
+      - languageCode
       type: object
       properties:
-        validTo:
+        description:
           type: string
-          description: If set, the date the consent is valid to. Set the date to deactivate the consent. If not set the consent is active from validFrom and forever after
-          format: date-time
+          description: A description for the partner administrating consents
+        languageCode:
+          type: string
+          description: ISO-639-3 language code. 3 characters
           examples:
-          - '2019-04-05T14:30:30+02:00'
-      description: Request to set the valid to date for a consent
+          - ENG
+      description: Contains internal description for a consent. Will not be shown to customer
     ConsentBaseRequest:
       required:
       - consentCode
@@ -882,39 +894,6 @@ components:
           examples:
           - '2019-04-05T14:30:30+02:00'
       description: Create new consent base
-    ConsentTermsResponse:
-      required:
-      - fullDescription
-      - languageCode
-      - shortDescription
-      type: object
-      properties:
-        fullDescription:
-          type: string
-          description: Text describing the terms in detail. The text can contain MarkDown
-        languageCode:
-          type: string
-          description: ISO-639-3 language code. 3 characters
-          examples:
-          - ENG
-        shortDescription:
-          type: string
-          description: Short text explaining the terms. The text can contain MarkDown
-      description: Text for terms in a specific language
-    InternalDescriptionRequest:
-      required:
-      - languageCode
-      type: object
-      properties:
-        description:
-          type: string
-          description: A description for the partner administrating consents. If the request is an update and this is set to null, the description for the language will be deleted
-        languageCode:
-          type: string
-          description: ISO-639-3 languageCode. 3 characters
-          examples:
-          - ENG
-      description: Contains internal description for a consent. Will not be shown to a customer
     ConsentBaseVersionRequest:
       required:
       - terms
@@ -948,40 +927,6 @@ components:
           examples:
           - '2019-04-05T14:30:30+02:00'
       description: Request body for updating a consent base in draft mode or creating a new version of a consent base.
-    ConsentTermsRequest:
-      required:
-      - fullDescription
-      - languageCode
-      - shortDescription
-      type: object
-      properties:
-        fullDescription:
-          type: string
-          description: Text describing the terms in detail. The text can contain MarkDown
-        languageCode:
-          type: string
-          description: ISO-639-3 languageCode.
-          examples:
-          - ENG
-        shortDescription:
-          type: string
-          description: Short text explaining the terms. The text can contain MarkDown
-      description: 'Text for terms in a specific language. Short descriptions should contain enough information to obtain consents, with the long description containing detailed information. '
-    InternalDescriptionResponse:
-      required:
-      - description
-      - languageCode
-      type: object
-      properties:
-        description:
-          type: string
-          description: A description for the partner administrating consents
-        languageCode:
-          type: string
-          description: ISO-639-3 language code. 3 characters
-          examples:
-          - ENG
-      description: Contains internal description for a consent. Will not be shown to customer
     ConsentBaseResponse:
       required:
       - changedAt
@@ -1044,6 +989,81 @@ components:
           description: The consent base version
           format: int32
       description: Consent base
+    ConsentRequest:
+      required:
+      - consentCode
+      - isEmailSupported
+      - isSmsSupported
+      - organisationId
+      type: object
+      properties:
+        consentBaseVersion:
+          type: integer
+          description: Consent base version for adding a consent to a specific version. If not provided, the latest version is used.
+          format: int32
+          examples:
+          - 1
+        consentCode:
+          type: string
+          description: Consent code. Use the consent code + consent base version to identify the consent base
+          examples:
+          - ENT_INFO_SMS
+        isEmailSupported:
+          type: boolean
+          description: Whether the organisation supports email as a contact method
+          examples:
+          - true
+        isSmsSupported:
+          type: boolean
+          description: Whether the organisation supports SMS as a contact method
+          examples:
+          - false
+        organisationId:
+          type: integer
+          description: The organisation the consent is valid for.
+          format: int64
+        validFrom:
+          type: string
+          description: If set, the date the consent is valid from. Can only be set to a date after consent base validFrom. If not set, the consent base is in draft mode.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+        validTo:
+          type: string
+          description: If set, the date the consent is valid to. Set the date to deactivate the consent. Can only be set to a date before the consent base validTo. If not set the consent is active from validFrom and forever after.
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: 'Adds a consent to a given consent base. '
+    ConsentPatchRequest:
+      type: object
+      properties:
+        validTo:
+          type: string
+          description: If set, the date the consent is valid to. Set the date to deactivate the consent. If not set the consent is active from validFrom and forever after
+          format: date-time
+          examples:
+          - '2019-04-05T14:30:30+02:00'
+      description: Request to set the valid to date for a consent
+    ConsentTermsRequest:
+      required:
+      - fullDescription
+      - languageCode
+      - shortDescription
+      type: object
+      properties:
+        fullDescription:
+          type: string
+          description: Text describing the terms in detail. The text can contain MarkDown
+        languageCode:
+          type: string
+          description: ISO-639-3 languageCode.
+          examples:
+          - ENG
+        shortDescription:
+          type: string
+          description: Short text explaining the terms. The text can contain MarkDown
+      description: 'Text for terms in a specific language. Short descriptions should contain enough information to obtain consents, with the long description containing detailed information. '
     ConsentResponse:
       required:
       - changedAt
@@ -1116,52 +1136,20 @@ components:
           examples:
           - '2019-04-05T14:30:30+02:00'
       description: Request to update updatable fields after the consent base is active
-    ConsentRequest:
+    InternalDescriptionRequest:
       required:
-      - consentCode
-      - isEmailSupported
-      - isSmsSupported
-      - organisationId
+      - languageCode
       type: object
       properties:
-        consentBaseVersion:
-          type: integer
-          description: Consent base version for adding a consent to a specific version. If not provided, the latest version is used.
-          format: int32
-          examples:
-          - 1
-        consentCode:
+        description:
           type: string
-          description: Consent code. Use the consent code + consent base version to identify the consent base
-          examples:
-          - ENT_INFO_SMS
-        isEmailSupported:
-          type: boolean
-          description: Whether the organisation supports email as a contact method
-          examples:
-          - true
-        isSmsSupported:
-          type: boolean
-          description: Whether the organisation supports SMS as a contact method
-          examples:
-          - false
-        organisationId:
-          type: integer
-          description: The organisation the consent is valid for.
-          format: int64
-        validFrom:
+          description: A description for the partner administrating consents. If the request is an update and this is set to null, the description for the language will be deleted
+        languageCode:
           type: string
-          description: If set, the date the consent is valid from. Can only be set to a date after consent base validFrom. If not set, the consent base is in draft mode.
-          format: date-time
+          description: ISO-639-3 languageCode. 3 characters
           examples:
-          - '2019-04-05T14:30:30+02:00'
-        validTo:
-          type: string
-          description: If set, the date the consent is valid to. Set the date to deactivate the consent. Can only be set to a date before the consent base validTo. If not set the consent is active from validFrom and forever after.
-          format: date-time
-          examples:
-          - '2019-04-05T14:30:30+02:00'
-      description: 'Adds a consent to a given consent base. '
+          - ENG
+      description: Contains internal description for a consent. Will not be shown to a customer
   responses:
     Error400:
       description: Bad request
@@ -1175,14 +1163,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
-    Error500:
-      description: Internal server error
+    Error404:
+      description: Not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
-    Error404:
-      description: Not found
+    Error500:
+      description: Internal server error
       content:
         application/json:
           schema:
@@ -1194,15 +1182,6 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1218,11 +1197,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-consents-openapi.json
-- entur-consents-openapi.yml

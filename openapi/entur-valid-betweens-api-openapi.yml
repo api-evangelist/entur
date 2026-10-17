@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Valid Betweens API
+  title: Products Valid Betweens API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged valid-betweens across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -141,13 +141,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v2/valid-betweens:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -296,13 +289,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v2/valid-betweens/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -372,13 +358,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v2/valid-betweens/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -616,13 +595,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /valid-betweens:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -765,13 +737,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /valid-betweens/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -1002,15 +967,302 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
+    ValidityCondition:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        fromDate:
+          type: string
+          description: From Date.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ValidBetween:2018
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - ValidBetween
+        status:
+          type: string
+          description: Status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        toDate:
+          type: string
+          description: To Date.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A condition of the validity of the priceable object
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+    PenaltyPolicyAlternatives:
+      required:
+      - penaltyOptions
+      - ref
+      type: object
+      properties:
+        penaltyOptions:
+          type: array
+          description: Penalty policy alternatives for this element.
+          items:
+            $ref: '#/components/schemas/PenaltyPolicy'
+        ref:
+          $ref: '#/components/schemas/IdAndVersion'
+      description: Penalty policy alternatives for an element.
+    ValidBetween:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - fromDate
+      - id
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        description:
+          type: array
+          description: Description of ValidBetween represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fromDate:
+          type: string
+          description: From Date.
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:ValidBetween:2018
+        name:
+          type: array
+          description: Name of ValidBetween represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - ValidBetween
+        organisationId:
+          type: string
+          description: Organisation related to the userProfile
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        toDate:
+          type: string
+          description: To Date.
+        validityConditions:
+          type: array
+          description: List of validityConditions.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version.
+          examples:
+          - NSB:Version:V1
+      description: A ValidBetween
+    IdAndVersion:
+      required:
+      - id
+      - version
+      type: object
+      properties:
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: ID of the element.
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version of the element.
+      description: Describes the ID and version of an element.
     PenaltyPolicy:
       required:
       - changed
@@ -1135,110 +1387,25 @@ components:
           examples:
           - NSB:Version:V1
       description: A PENALTY POLICY
-    VersionOfObjectRef:
+    TextInLanguage:
       required:
-      - nameOfClass
-      - ref
-      - version
+      - lang
+      - value
       type: object
       properties:
-        nameOfClass:
+        lang:
           minLength: 1
           type: string
-          description: Name of class.
-        ref:
+          description: Language code.
+          examples:
+          - nob
+        value:
           minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: The netex id reference to the object.
-        version:
-          type: string
-          description: Version.
-      description: Fare frame ref.
-    IdAndVersion:
-      required:
-      - id
-      - version
+          description: The text.
+      description: Text in a specific language.
+    BoxedUnit:
       type: object
-      properties:
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: ID of the element.
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version of the element.
-      description: Describes the ID and version of an element.
-    ValidityCondition:
-      required:
-      - changed
-      - created
-      - id
-      - modification
-      - nameOfClass
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        fromDate:
-          type: string
-          description: From Date.
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:ValidBetween:2018
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - ValidBetween
-        status:
-          type: string
-          description: Status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        toDate:
-          type: string
-          description: To Date.
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A condition of the validity of the priceable object
     FarePrice:
       required:
       - changed
@@ -1361,59 +1528,6 @@ components:
           examples:
           - NSB:Version:V1
       description: A description of the price and factor for a set fare
-    ValidBetweenInsert:
-      required:
-      - fareFrameRef
-      - fromDate
-      - id
-      type: object
-      properties:
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fromDate:
-          type: string
-          description: From Date.
-          examples:
-          - '2017-07-21T17:32:28Z'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:ValidBetween:2018
-        toDate:
-          type: string
-          description: To Date.
-          examples:
-          - '2017-07-21T17:32:28Z'
-        validityConditions:
-          type: array
-          description: List of validityConditions.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A ValidBetween create request
-    PenaltyPolicyAlternatives:
-      required:
-      - penaltyOptions
-      - ref
-      type: object
-      properties:
-        penaltyOptions:
-          type: array
-          description: Penalty policy alternatives for this element.
-          items:
-            $ref: '#/components/schemas/PenaltyPolicy'
-        ref:
-          $ref: '#/components/schemas/IdAndVersion'
-      description: Penalty policy alternatives for an element.
     LimitingRule:
       required:
       - changed
@@ -1521,53 +1635,20 @@ components:
           examples:
           - NSB:Version:V1
       description: A LimitingRule
-    TextInLanguage:
+    ValidBetweenInsert:
       required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
-    ValidBetween:
-      required:
-      - changed
-      - created
       - fareFrameRef
       - fromDate
       - id
-      - nameOfClass
-      - status
-      - version
       type: object
       properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        description:
-          type: array
-          description: Description of ValidBetween represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
         fareFrameRef:
           $ref: '#/components/schemas/VersionOfObjectRef'
         fromDate:
           type: string
           description: From Date.
+          examples:
+          - '2017-07-21T17:32:28Z'
         id:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
@@ -1575,33 +1656,11 @@ components:
           description: Id.
           examples:
           - NSB:ValidBetween:2018
-        name:
-          type: array
-          description: Name of ValidBetween represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          examples:
-          - ValidBetween
-        organisationId:
-          type: string
-          description: Organisation related to the userProfile
-        status:
-          type: string
-          description: Status
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
         toDate:
           type: string
           description: To Date.
+          examples:
+          - '2017-07-21T17:32:28Z'
         validityConditions:
           type: array
           description: List of validityConditions.
@@ -1614,118 +1673,8 @@ components:
           description: Version.
           examples:
           - NSB:Version:V1
-      description: A ValidBetween
-    BoxedUnit:
-      type: object
-    Rounding:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - roundingMethod
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:Rounding:Ordinary
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - Rounding
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
-        status:
-          type: string
-          description: Rounding status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Rounding version.
-          examples:
-          - NSB:Version:V1
-      description: A description of how prices are rounded post calculation
-      deprecated: true
+      description: A ValidBetween create request
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1741,11 +1690,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

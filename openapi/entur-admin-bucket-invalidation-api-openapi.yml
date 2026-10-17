@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Admin/bucket Invalidation API
+  title: Products Admin/bucket Invalidation API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged admin/bucket-invalidation across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -67,13 +67,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /admin/bucket-invalidation/{entityType}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -135,13 +128,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-admin-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   parameters:
     X-Correlation-Id:
@@ -173,6 +159,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

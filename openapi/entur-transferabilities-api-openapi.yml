@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Transferabilities API
+  title: Products Transferabilities API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged transferabilities across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -156,13 +156,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /transferabilities/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -315,13 +308,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
     VersionOfObjectRef:
@@ -344,6 +330,105 @@ components:
           type: string
           description: Version.
       description: Fare frame ref.
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
     FarePrice:
       required:
       - changed
@@ -466,113 +551,6 @@ components:
           examples:
           - NSB:Version:V1
       description: A description of the price and factor for a set fare
-    LimitingRule:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - status
-      type: object
-      properties:
-        canBeCumulative:
-          type: boolean
-          description: CanBeCumulative.
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        discountAsPercentage:
-          type: number
-          description: DiscountAsPercentage.
-          format: float
-        discountAsValue:
-          type: number
-          description: DiscountAsValue.
-          format: float
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-        maximumPrice:
-          type: string
-          description: MaximumPrice.
-          examples:
-          - '164.0'
-        maximumPriceAsPercentage:
-          type: number
-          description: MaximumPriceAsPercentage.
-          format: double
-        minimumLimitPrice:
-          type: string
-          description: MinimumLimitPrice.
-          examples:
-          - '164.0'
-        minimumPrice:
-          type: string
-          description: MinimumPrice.
-          examples:
-          - '164.0'
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - LimitingRule
-        status:
-          type: string
-          description: Status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version.
-          examples:
-          - NSB:Version:V1
-      description: A LimitingRule
     TextInLanguage:
       required:
       - lang
@@ -688,7 +666,7 @@ components:
           examples:
           - NSB:Version:V1
       description: Transferability
-    Rounding:
+    LimitingRule:
       required:
       - changed
       - created
@@ -696,11 +674,12 @@ components:
       - id
       - modification
       - nameOfClass
-      - roundingMethod
       - status
-      - version
       type: object
       properties:
+        canBeCumulative:
+          type: boolean
+          description: CanBeCumulative.
         changed:
           type: string
           description: Changed datetime.
@@ -720,6 +699,14 @@ components:
           description: Description.
           items:
             $ref: '#/components/schemas/TextInLanguage'
+        discountAsPercentage:
+          type: number
+          description: DiscountAsPercentage.
+          format: float
+        discountAsValue:
+          type: number
+          description: DiscountAsValue.
+          format: float
         fareFrameRef:
           $ref: '#/components/schemas/VersionOfObjectRef'
         id:
@@ -727,8 +714,25 @@ components:
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
           description: Id.
+        maximumPrice:
+          type: string
+          description: MaximumPrice.
           examples:
-          - NSB:Rounding:Ordinary
+          - '164.0'
+        maximumPriceAsPercentage:
+          type: number
+          description: MaximumPriceAsPercentage.
+          format: double
+        minimumLimitPrice:
+          type: string
+          description: MinimumLimitPrice.
+          examples:
+          - '164.0'
+        minimumPrice:
+          type: string
+          description: MinimumPrice.
+          examples:
+          - '164.0'
         modification:
           type: string
           description: Modification status.
@@ -749,27 +753,10 @@ components:
           description: Name of class.
           readOnly: true
           examples:
-          - Rounding
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
+          - LimitingRule
         status:
           type: string
-          description: Rounding status.
+          description: Status.
           readOnly: true
           enum:
           - DRAFT
@@ -782,21 +769,11 @@ components:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: Rounding version.
+          description: Version.
           examples:
           - NSB:Version:V1
-      description: A description of how prices are rounded post calculation
-      deprecated: true
+      description: A LimitingRule
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -812,11 +789,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

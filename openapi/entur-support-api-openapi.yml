@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Support API
-  version: 2026.09.2
+  title: Entur shared mobility Support API
+  description: This is the API for Entur shared mobility. It is used to communicate with the Entur shared mobility platform. The API is based on the TOMP-API standard and is used to manage bookings, payments, and other operations related to shared mobility. The API is designed to be easy to use and understand, with clear documentation and examples. The API is also designed to be secure, with support for OAuth2 authentication and authorization.
   contact:
     name: Team Delingsmobilitet
-  description: 'Operations tagged Support across 2 of this provider''s published API definitions: entur-shared-mobility-openapi.json, entur-shared-mobility-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.2
 servers:
 - url: https://api.entur.io/shared-mobility/v1
   description: Generated server url
@@ -82,39 +82,51 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ApiError'
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
 components:
   schemas:
-    Coordinates:
+    SupportRequest:
       type: object
       properties:
-        longitude:
-          type: number
-          format: float
-        latitude:
-          type: number
-          format: float
-        altitude:
+        bookingId:
           type:
-          - number
+          - string
           - 'null'
-          format: float
+          format: uuid
+        assetId:
+          type:
+          - string
+          - 'null'
+        supportType:
+          type: string
+          enum:
+          - BROKEN_DOWN
+          - NOT_AT_LOCATION
+          - MISSING_AFTER_PAUSE
+          - NOT_CLEAN
+          - NOT_AVAILABLE
+          - UNABLE_TO_OPEN
+          - UNABLE_TO_CLOSE
+          - API_TECHNICAL
+          - API_FUNCTIONAL
+          - ACCIDENT
+          - OTHER
+        contactInformationEndUser:
+          $ref: '#/components/schemas/ContactInformation'
+        comment:
+          type:
+          - string
+          - 'null'
+        place:
+          oneOf:
+          - $ref: '#/components/schemas/Place'
+          - type: 'null'
+        stationId:
+          type:
+          - string
+          - 'null'
       required:
-      - latitude
-      - longitude
-    ContactInformation:
-      type: object
-      properties:
-        email:
-          type:
-          - string
-          - 'null'
-        phone:
-          type:
-          - string
-          - 'null'
+      - contactInformationEndUser
+      - supportType
     SupportStatus:
       type: object
       properties:
@@ -174,59 +186,35 @@ components:
           - 'null'
       required:
       - coordinates
-    SupportRequest:
+    Coordinates:
       type: object
       properties:
-        bookingId:
+        longitude:
+          type: number
+          format: float
+        latitude:
+          type: number
+          format: float
+        altitude:
           type:
-          - string
+          - number
           - 'null'
-          format: uuid
-        assetId:
-          type:
-          - string
-          - 'null'
-        supportType:
-          type: string
-          enum:
-          - BROKEN_DOWN
-          - NOT_AT_LOCATION
-          - MISSING_AFTER_PAUSE
-          - NOT_CLEAN
-          - NOT_AVAILABLE
-          - UNABLE_TO_OPEN
-          - UNABLE_TO_CLOSE
-          - API_TECHNICAL
-          - API_FUNCTIONAL
-          - ACCIDENT
-          - OTHER
-        contactInformationEndUser:
-          $ref: '#/components/schemas/ContactInformation'
-        comment:
-          type:
-          - string
-          - 'null'
-        place:
-          oneOf:
-          - $ref: '#/components/schemas/Place'
-          - type: 'null'
-        stationId:
-          type:
-          - string
-          - 'null'
+          format: float
       required:
-      - contactInformationEndUser
-      - supportType
+      - latitude
+      - longitude
+    ContactInformation:
+      type: object
+      properties:
+        email:
+          type:
+          - string
+          - 'null'
+        phone:
+          type:
+          - string
+          - 'null'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -242,12 +230,18 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     Authorization:
       type: http
       description: Authorization header
       scheme: bearer
       bearerFormat: Bearer eyJhbGciOiJIUzI1NiIsInR5cCIf36POk6yJV_adQssw5c
-x-refined-from:
-- entur-shared-mobility-openapi.json
-- entur-shared-mobility-openapi.yml

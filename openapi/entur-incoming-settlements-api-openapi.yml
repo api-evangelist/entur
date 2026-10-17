@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Incoming Settlements API
-  version: 2026.09.1
+  title: Clearing Incoming Settlements API
+  description: Partner API documentation for self serviced use of the Clearing services. See the developer guide for more information.
   contact:
     name: Team Avregning
-  description: 'Operations tagged Incoming Settlements across 2 of this provider''s published API definitions: entur-clearing-openapi.json, entur-clearing-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.1
 servers:
 - url: https://api.entur.io/clearing
 - url: https://api.staging.entur.io/clearing
@@ -76,10 +76,6 @@ paths:
                 $ref: '#/components/schemas/CleosProblemJsonDto'
       x-entur-permissions:
         value: cleos-settlements:opprett
-    servers:
-    - url: https://api.entur.io/clearing
-    - url: https://api.staging.entur.io/clearing
-    - url: https://api.dev.entur.io/clearing
   /v1/settlement-import/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -144,10 +140,6 @@ paths:
                 $ref: '#/components/schemas/CleosProblemJsonDto'
       x-entur-permissions:
         value: cleos-settlements:opprett
-    servers:
-    - url: https://api.entur.io/clearing
-    - url: https://api.staging.entur.io/clearing
-    - url: https://api.dev.entur.io/clearing
 components:
   schemas:
     PartnerTransactionImportDto:
@@ -180,47 +172,19 @@ components:
       required:
       - genericAnnexes
       - transactionType
-    PartnerSettlementImportResponseDto:
+    PartnerRefDto:
       type: object
-      description: Relevant information on the successfully registered Settlement Import. See documentation for PartnerSettlementImportDto for details on fields that the client submitted.
+      description: A REF is a reference that is intended for business logic use, with best effort NAME lookups in GUI and reporting. For most practical purposes it can be considered a URN on the format NAMESPACE:TYPE:ID, but this is not guaranteed.
       properties:
         id:
-          type: integer
-          format: int64
-          description: Unique identifier of queued Settlement Import.
-          example: 12345
-        posRef:
           type: string
-        settlementDate:
+          maxLength: 100
+          minLength: 0
+        name:
           type: string
-          format: date
-        settlementNo:
-          type: integer
-          format: int64
-        correctedSettlementId:
-          type: integer
-          format: int64
-        externalSettlementNo:
-          type: integer
-          format: int64
-        ignoreSequence:
-          type: boolean
-          description: Indicates whether sequence errors will be ignored during import, typical for negative settlement sequences (corrections).
-          example: false
-        comments:
-          type: array
-          items:
-            type: string
-        status:
-          type: integer
-          format: int32
-          description: Status code indicating the result of the import operation. This will always be 0 (TO BE PROCESSED) on creation. 1 indicates SUCCESSFUL CLEARING
-          examples:
-          - '0'
-        statusDescription:
-          type: string
-          description: Message providing additional information on the import status.
-          example: Partner Settlement queued for processing.
+          description: 'The NAME corresponding to the REF, if found in the CLEOS REF lookup table (best effort). NOTE: This may be set for REFs returned by CLEOS, the client is not expected to submit this value.'
+      required:
+      - id
     PartnerMoneyDto:
       type: object
       description: Representation of an amount with relevant metadata such as currency and tax information. The Annex will be considered without Price Contribution if amount is 0.00
@@ -254,6 +218,50 @@ components:
           pattern: ^\d{1,12}(\.\d{1,4})?$
       required:
       - amount
+    PartnerAnnexDto:
+      type: object
+      description: Generic representation of a node in a recursive transaction tree structure.
+      properties:
+        cancel:
+          type: boolean
+          description: If true, this annex root (and all sub-annexes) will be accounted with DEBED/CREDIT switched. Typically used for reversing older versions of the transaction. Default false.
+        guid:
+          type: string
+          maxLength: 38
+          minLength: 0
+        annexRef:
+          type: string
+          maxLength: 100
+          minLength: 0
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+        price:
+          $ref: '#/components/schemas/PartnerMoneyDto'
+          description: PriceContribution may be provided if a custom weight on Price is needed. The Amount will always be recalculated as the sum of PriceContributions.
+        priceContribution:
+          $ref: '#/components/schemas/PartnerMoneyDto'
+        foreignAmount:
+          $ref: '#/components/schemas/PartnerMoneyDto'
+        description:
+          type: string
+          maxLength: 500
+          minLength: 0
+        context:
+          type: object
+          additionalProperties: {}
+        parameters:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartnerAnnexDto'
+        subAnnexes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartnerAnnexDto'
+      required:
+      - annexRef
+      - priceContribution
     PartnerCommentDto:
       type: object
       description: Any external comments relevant for clearing the settlement. This will not be part of the reporting context. Useful for guiding potential corrections.
@@ -264,19 +272,6 @@ components:
           minLength: 0
       required:
       - comment
-    PartnerRefDto:
-      type: object
-      description: A REF is a reference that is intended for business logic use, with best effort NAME lookups in GUI and reporting. For most practical purposes it can be considered a URN on the format NAMESPACE:TYPE:ID, but this is not guaranteed.
-      properties:
-        id:
-          type: string
-          maxLength: 100
-          minLength: 0
-        name:
-          type: string
-          description: 'The NAME corresponding to the REF, if found in the CLEOS REF lookup table (best effort). NOTE: This may be set for REFs returned by CLEOS, the client is not expected to submit this value.'
-      required:
-      - id
     CleosProblemJsonDto:
       type: object
       description: DTO representing the generic response of an error condition according to the JSON+ERROR content type (RFC 9457).
@@ -321,6 +316,47 @@ components:
             $ref: '#/components/schemas/PartnerRefDto'
             description: 'Domain object references that caused the error on problem type cleos-ref. NOTE: These _may_ be references to entities outside of CLEOS'
             example: EOS:Agreement:1234
+    PartnerSettlementImportResponseDto:
+      type: object
+      description: Relevant information on the successfully registered Settlement Import. See documentation for PartnerSettlementImportDto for details on fields that the client submitted.
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier of queued Settlement Import.
+          example: 12345
+        posRef:
+          type: string
+        settlementDate:
+          type: string
+          format: date
+        settlementNo:
+          type: integer
+          format: int64
+        correctedSettlementId:
+          type: integer
+          format: int64
+        externalSettlementNo:
+          type: integer
+          format: int64
+        ignoreSequence:
+          type: boolean
+          description: Indicates whether sequence errors will be ignored during import, typical for negative settlement sequences (corrections).
+          example: false
+        comments:
+          type: array
+          items:
+            type: string
+        status:
+          type: integer
+          format: int32
+          description: Status code indicating the result of the import operation. This will always be 0 (TO BE PROCESSED) on creation. 1 indicates SUCCESSFUL CLEARING
+          examples:
+          - '0'
+        statusDescription:
+          type: string
+          description: Message providing additional information on the import status.
+          example: Partner Settlement queued for processing.
     PartnerSettlementImportDto:
       type: object
       description: Generic Settlement submitted by Partner. This is a subset of the CLEOS settlement structure intended for self-serviced clearing.
@@ -375,60 +411,7 @@ components:
       - genericTransactions
       - posRef
       - settlementDate
-    PartnerAnnexDto:
-      type: object
-      description: Generic representation of a node in a recursive transaction tree structure.
-      properties:
-        cancel:
-          type: boolean
-          description: If true, this annex root (and all sub-annexes) will be accounted with DEBED/CREDIT switched. Typically used for reversing older versions of the transaction. Default false.
-        guid:
-          type: string
-          maxLength: 38
-          minLength: 0
-        annexRef:
-          type: string
-          maxLength: 100
-          minLength: 0
-        attributes:
-          type: object
-          additionalProperties:
-            type: string
-        price:
-          $ref: '#/components/schemas/PartnerMoneyDto'
-          description: PriceContribution may be provided if a custom weight on Price is needed. The Amount will always be recalculated as the sum of PriceContributions.
-        priceContribution:
-          $ref: '#/components/schemas/PartnerMoneyDto'
-        foreignAmount:
-          $ref: '#/components/schemas/PartnerMoneyDto'
-        description:
-          type: string
-          maxLength: 500
-          minLength: 0
-        context:
-          type: object
-          additionalProperties: {}
-        parameters:
-          type: array
-          items:
-            $ref: '#/components/schemas/PartnerAnnexDto'
-        subAnnexes:
-          type: array
-          items:
-            $ref: '#/components/schemas/PartnerAnnexDto'
-      required:
-      - annexRef
-      - priceContribution
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -444,6 +427,15 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearerToken:
       type: http
@@ -452,6 +444,3 @@ components:
 externalDocs:
   description: Clearing Partner API Developer Guide
   url: https://developer.entur.no/guides/clearing
-x-refined-from:
-- entur-clearing-openapi.json
-- entur-clearing-openapi.yml

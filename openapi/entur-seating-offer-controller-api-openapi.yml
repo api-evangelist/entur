@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Seating Offer Controller API
+  title: Seating manager Seating Offer Controller API
+  description: Seating manager generates seating offers and keeps track of what seats are reserved and/or blocked
   version: 2026.09.0
-  description: 'Operations tagged seating-offer-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seating-manager
 security:
@@ -44,8 +44,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatingOfferResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers/refresh:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -88,8 +86,6 @@ paths:
       responses:
         '200':
           description: OK
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers/{datedServiceJourneyId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -152,8 +148,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatingOfferResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -243,8 +237,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/SeatingOfferResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers/{datedServiceJourneyId}/availability:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -289,8 +281,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AvailableElementResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers/service-journey-periods:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -321,8 +311,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ServiceJourneyScheduleResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers/service-journey-ids-per-line-id:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -353,8 +341,6 @@ paths:
                 type: array
                 items:
                   type: string
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers/debug/{datedServiceJourneyId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -415,8 +401,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatingOfferDebugResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seating-offers/debug/{datedServiceJourneyId}/:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -477,161 +461,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatingOfferDebugResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
 components:
   schemas:
-    AvailableSeatResponse:
-      required:
-      - properties
-      - seatNumber
-      type: object
-      properties:
-        seatNumber:
-          type: string
-          description: Seat number of seat.
-          examples:
-          - '21'
-        properties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-      description: Seat with seatNumber and properties.
-    MaterialElementRequest:
-      required:
-      - carriageIdentifier
-      - direction
-      - logicalElementSeries
-      - sequenceNumber
-      type: object
-      properties:
-        logicalElementSeries:
-          type: string
-          description: The rolling stock series of the `logical element` for this element.
-          examples:
-          - GOA-BM73A-PREMIUM
-        carriageIdentifier:
-          type: string
-          description: The carriage identifier for this element.
-          examples:
-          - '5'
-        sequenceNumber:
-          type: integer
-          description: The sequence number for this element in the material composition. 1-n
-          format: int32
-          examples:
-          - 3
-        direction:
-          type: string
-          description: The direction for this element.
-          enum:
-          - FORWARDS
-          - BACKWARDS
-          - UNKNOWN
-          examples:
-          - BACKWARDS
-      description: List of elements in the changed material composition. Each list element corresponds to a carriage.
-    MaterialCompositionRequest:
-      required:
-      - elements
-      - existingMaterialCompositionNetexId
-      type: object
-      properties:
-        existingMaterialCompositionNetexId:
-          type: string
-          description: The netex id of the `material composition` that will be changed.
-          examples:
-          - GOA:CompoundTrain:73a_1-2-3-4
-        newMaterialCompositionNetexId:
-          type:
-          - string
-          - 'null'
-          description: The new netex id of the `material composition` that will be changed. If not supplied, an id will be generated.
-          examples:
-          - GOA:CompoundTrain:73a_1-2-3-4_extra-carriage
-        elements:
-          type: array
-          description: List of elements in the changed material composition. Each list element corresponds to a carriage.
-          items:
-            $ref: '#/components/schemas/MaterialElementRequest'
-    ElementDebugResponse:
-      required:
-      - carriageIdentifier
-      - elementParts
-      - netexId
-      - seats
-      - series
-      - seriesVersion
-      type: object
-      properties:
-        series:
-          type: string
-          description: Rolling stock series of the corresponding element.
-          examples:
-          - GOA-BM73A-KOMFORT
-        seriesVersion:
-          type: integer
-          description: Rolling stock version of the corresponding element.
-          format: int32
-          examples:
-          - 2
-        carriageIdentifier:
-          type: string
-          description: Carriage identifier for the element in the train.
-          examples:
-          - '4'
-        netexId:
-          type: string
-          description: Netex id of the element.
-          examples:
-          - GOA:TrainElement:73-2-A
-        seatmapKey:
-          type:
-          - string
-          - 'null'
-          description: Seatmap key of the basic element. This can be used as a lookup in the seatmap service.
-          examples:
-          - SETRA-S431DT-LOWER
-        elementParts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ElementPartResponseV1'
-        seats:
-          type: array
-          items:
-            $ref: '#/components/schemas/SeatDebugResponse'
-    ElementPartResponseV1:
-      required:
-      - destinationStopPlace
-      - direction
-      - materialCompositionNetexId
-      - originStopPlace
-      - sequenceNumber
-      type: object
-      properties:
-        originStopPlace:
-          $ref: '#/components/schemas/StopPlaceWithTimesResponseV1'
-        destinationStopPlace:
-          $ref: '#/components/schemas/StopPlaceWithTimesResponseV1'
-        materialCompositionNetexId:
-          type: string
-          description: Netex id for corresponding material composition.
-          examples:
-          - GOA:CompoundTrain:73
-        sequenceNumber:
-          type: integer
-          description: Sequence number of the element in this material composition.
-          format: int32
-          examples:
-          - 2
-        direction:
-          type: string
-          description: Direction of the element in this material composition.
-          enum:
-          - FORWARDS
-          - BACKWARDS
-          - UNKNOWN
-          examples:
-          - BACKWARDS
-      description: Information about one element in one material composition.
     SeatingPropertiesResponseV1:
       type: object
       properties:
@@ -855,94 +686,40 @@ components:
           examples:
           - HANDBAG,SUITCASE
       description: Properties of a seat. They describe both physical and logical properties of a seat.Physical properties are for example position of the seat.Logical properties describe properties that the operator use when selling the seat. For example fare class.
-    AvailableElementResponse:
+    ElementPartResponseV1:
       required:
-      - availableSeats
-      - carriageIdentifier
+      - destinationStopPlace
+      - direction
+      - materialCompositionNetexId
+      - originStopPlace
+      - sequenceNumber
       type: object
       properties:
-        carriageIdentifier:
+        originStopPlace:
+          $ref: '#/components/schemas/StopPlaceWithTimesResponseV1'
+        destinationStopPlace:
+          $ref: '#/components/schemas/StopPlaceWithTimesResponseV1'
+        materialCompositionNetexId:
           type: string
-          description: Carriage number of the element.
+          description: Netex id for corresponding material composition.
           examples:
-          - '1'
-        availableSeats:
-          type: array
-          description: Available seats in element.
-          items:
-            $ref: '#/components/schemas/AvailableSeatResponse'
-      description: Element (e.g. train carriage) with available.
-    SeatUsageDebugResponse:
-      required:
-      - createdAt
-      - elementClosureReferences
-      - fromSequenceNumber
-      - seatNumberClosureReferences
-      - toSequenceNumber
-      type: object
-      properties:
-        fromSequenceNumber:
+          - GOA:CompoundTrain:73
+        sequenceNumber:
           type: integer
-          description: The sequence nr of the stop place that this seat usage is from.
+          description: Sequence number of the element in this material composition.
           format: int32
           examples:
-          - 0
-        toSequenceNumber:
-          type: integer
-          description: The sequence nr of the stop place that this seat usage is to.
-          format: int32
-          examples:
-          - 1
-        reservationLineReference:
-          type:
-          - string
-          - 'null'
-          description: The reference of the reservation line that has reserved this seat usage. Null if unreserved.
-          format: uuid
-          examples:
-          - 784160f6-4afe-4ff9-8d11-186d4cd9b8b8
-        elementClosureReferences:
-          type: array
-          description: The references of element closures affecting this seat usage.
-          items:
-            type: string
-            description: The references of element closures affecting this seat usage.
-            examples:
-            - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
-          examples:
-          - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
-        seatNumberClosureReferences:
-          type: array
-          description: The references of seat closures affecting this seat usage.
-          items:
-            type: string
-            description: The references of seat closures affecting this seat usage.
-            examples:
-            - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
-          examples:
-          - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
-        createdAt:
+          - 2
+        direction:
           type: string
-          description: When this seat usage was initially created.
-          format: date-time
+          description: Direction of the element in this material composition.
+          enum:
+          - FORWARDS
+          - BACKWARDS
+          - UNKNOWN
           examples:
-          - '2018-10-26T10:00:00Z'
-        updatedAt:
-          type:
-          - string
-          - 'null'
-          description: When this seat usage was las updated. Null if never updated after creation.
-          format: date-time
-          examples:
-          - '2018-10-26T10:00:00Z'
-        updatedBy:
-          type:
-          - integer
-          - 'null'
-          description: The organisation id that last updated this seat usage.
-          format: int64
-          examples:
-          - 1
+          - BACKWARDS
+      description: Information about one element in one material composition.
     SeatingOfferResponse:
       required:
       - createdAt
@@ -1060,6 +837,69 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SeatingOfferElementResponse'
+    SeatingOfferElementResponse:
+      required:
+      - carriageIdentifier
+      - carriageNumber
+      - elementParts
+      - netexId
+      - series
+      - seriesVersion
+      type: object
+      properties:
+        series:
+          type: string
+          description: Rolling stock series of the corresponding element.
+          examples:
+          - GOA-BM73A-KOMFORT
+        seriesVersion:
+          type: integer
+          description: Rolling stock version of the corresponding element.
+          format: int32
+          examples:
+          - 2
+        carriageNumber:
+          type: integer
+          description: Carriage number for the element in the train.
+          format: int32
+        carriageIdentifier:
+          type: string
+          description: Carriage identifier for the element in the train.
+          examples:
+          - V5-upper
+        netexId:
+          type: string
+          description: Netex id of the element.
+          examples:
+          - GOA:TrainElement:73-2-A
+        seatmapKey:
+          type:
+          - string
+          - 'null'
+          description: Seatmap key of the basic element. This can be used as a lookup in the seatmap service.
+          examples:
+          - SETRA-S431DT-LOWER
+        elementParts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementPartResponseV1'
+    PatchSeatingOfferRequest:
+      type: object
+      properties:
+        inactive:
+          type:
+          - boolean
+          - 'null'
+          description: If true, the departure will not be open for sales
+          examples:
+          - false
+        manualMaterial:
+          type:
+          - boolean
+          - 'null'
+          description: If true, the material on this SeatingOffer has been set manually
+          examples:
+          - false
     SeatingOfferDebugResponse:
       required:
       - capactiyOnly
@@ -1197,153 +1037,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StopPlaceWithTimesResponseV1'
-    ServiceJourneyScheduleResponse:
+    MaterialCompositionRequest:
       required:
-      - firstDepartureDate
-      - lastDepartureDate
-      - serviceJourneyId
+      - elements
+      - existingMaterialCompositionNetexId
       type: object
       properties:
-        serviceJourneyId:
+        existingMaterialCompositionNetexId:
           type: string
-          description: The netex id of the `serviceJourney`
+          description: The netex id of the `material composition` that will be changed.
           examples:
-          - GOA:ServiceJourney:709_337-R
-        firstDepartureDate:
-          type: string
-          description: The first date and time of departure.
-          format: date
-          examples:
-          - '2023-02-13'
-        lastDepartureDate:
-          type: string
-          description: The last date and time of departure.
-          format: date
-          examples:
-          - '2023-02-18'
-    PatchSeatingOfferRequest:
-      type: object
-      properties:
-        inactive:
-          type:
-          - boolean
-          - 'null'
-          description: If true, the departure will not be open for sales
-          examples:
-          - false
-        manualMaterial:
-          type:
-          - boolean
-          - 'null'
-          description: If true, the material on this SeatingOffer has been set manually
-          examples:
-          - false
-    SeatGroupDebugResponse:
-      required:
-      - name
-      - seatGroupType
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name of the seat group.
-          examples:
-          - COMPARTMENT-1
-        seatGroupType:
-          type: string
-          description: The type of the seat group.
-          enum:
-          - OTHER
-          - TABLE_GROUP
-          - COMPARTMENT
-          - COMPANION
-          examples:
-          - COMPARTMENT
-        label:
+          - GOA:CompoundTrain:73a_1-2-3-4
+        newMaterialCompositionNetexId:
           type:
           - string
           - 'null'
-          description: The label of the seat group.
+          description: The new netex id of the `material composition` that will be changed. If not supplied, an id will be generated.
           examples:
-          - 'Kupe 1: 11-15'
-    SeatingOfferElementResponse:
-      required:
-      - carriageIdentifier
-      - carriageNumber
-      - elementParts
-      - netexId
-      - series
-      - seriesVersion
-      type: object
-      properties:
-        series:
-          type: string
-          description: Rolling stock series of the corresponding element.
-          examples:
-          - GOA-BM73A-KOMFORT
-        seriesVersion:
-          type: integer
-          description: Rolling stock version of the corresponding element.
-          format: int32
-          examples:
-          - 2
-        carriageNumber:
-          type: integer
-          description: Carriage number for the element in the train.
-          format: int32
-        carriageIdentifier:
-          type: string
-          description: Carriage identifier for the element in the train.
-          examples:
-          - V5-upper
-        netexId:
-          type: string
-          description: Netex id of the element.
-          examples:
-          - GOA:TrainElement:73-2-A
-        seatmapKey:
-          type:
-          - string
-          - 'null'
-          description: Seatmap key of the basic element. This can be used as a lookup in the seatmap service.
-          examples:
-          - SETRA-S431DT-LOWER
-        elementParts:
+          - GOA:CompoundTrain:73a_1-2-3-4_extra-carriage
+        elements:
           type: array
+          description: List of elements in the changed material composition. Each list element corresponds to a carriage.
           items:
-            $ref: '#/components/schemas/ElementPartResponseV1'
-    StopPlaceWithTimesResponseV1:
-      required:
-      - arrivalDateTime
-      - departureDateTime
-      - nsrCode
-      - sequenceNr
-      type: object
-      properties:
-        nsrCode:
-          type: string
-          description: Stop Place id defined by National StopPlace registry.
-          examples:
-          - NSR:StopPlace:337
-        departureDateTime:
-          type: string
-          description: Time of departure from this stop. Set to time of arrival on last stop.
-          format: date-time
-          examples:
-          - '2025-02-12T12:08:45.539473+01:00'
-        arrivalDateTime:
-          type: string
-          description: Time of arrival on this stop. Set to time of departure on first stop.
-          format: date-time
-          examples:
-          - '2025-02-12T12:08:45.539473+01:00'
-        sequenceNr:
-          type: integer
-          description: The ordering of the station in the journey.
-          format: int32
-          examples:
-          - 0
-      description: Destination stop place for this element in this material composition.
+            $ref: '#/components/schemas/MaterialElementRequest'
     SeatDebugResponse:
       required:
       - column
@@ -1391,16 +1107,273 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SeatUsageDebugResponse'
+    ElementDebugResponse:
+      required:
+      - carriageIdentifier
+      - elementParts
+      - netexId
+      - seats
+      - series
+      - seriesVersion
+      type: object
+      properties:
+        series:
+          type: string
+          description: Rolling stock series of the corresponding element.
+          examples:
+          - GOA-BM73A-KOMFORT
+        seriesVersion:
+          type: integer
+          description: Rolling stock version of the corresponding element.
+          format: int32
+          examples:
+          - 2
+        carriageIdentifier:
+          type: string
+          description: Carriage identifier for the element in the train.
+          examples:
+          - '4'
+        netexId:
+          type: string
+          description: Netex id of the element.
+          examples:
+          - GOA:TrainElement:73-2-A
+        seatmapKey:
+          type:
+          - string
+          - 'null'
+          description: Seatmap key of the basic element. This can be used as a lookup in the seatmap service.
+          examples:
+          - SETRA-S431DT-LOWER
+        elementParts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementPartResponseV1'
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatDebugResponse'
+    StopPlaceWithTimesResponseV1:
+      required:
+      - arrivalDateTime
+      - departureDateTime
+      - nsrCode
+      - sequenceNr
+      type: object
+      properties:
+        nsrCode:
+          type: string
+          description: Stop Place id defined by National StopPlace registry.
+          examples:
+          - NSR:StopPlace:337
+        departureDateTime:
+          type: string
+          description: Time of departure from this stop. Set to time of arrival on last stop.
+          format: date-time
+          examples:
+          - '2025-02-12T12:08:45.539473+01:00'
+        arrivalDateTime:
+          type: string
+          description: Time of arrival on this stop. Set to time of departure on first stop.
+          format: date-time
+          examples:
+          - '2025-02-12T12:08:45.539473+01:00'
+        sequenceNr:
+          type: integer
+          description: The ordering of the station in the journey.
+          format: int32
+          examples:
+          - 0
+      description: Destination stop place for this element in this material composition.
+    AvailableElementResponse:
+      required:
+      - availableSeats
+      - carriageIdentifier
+      type: object
+      properties:
+        carriageIdentifier:
+          type: string
+          description: Carriage number of the element.
+          examples:
+          - '1'
+        availableSeats:
+          type: array
+          description: Available seats in element.
+          items:
+            $ref: '#/components/schemas/AvailableSeatResponse'
+      description: Element (e.g. train carriage) with available.
+    AvailableSeatResponse:
+      required:
+      - properties
+      - seatNumber
+      type: object
+      properties:
+        seatNumber:
+          type: string
+          description: Seat number of seat.
+          examples:
+          - '21'
+        properties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+      description: Seat with seatNumber and properties.
+    SeatGroupDebugResponse:
+      required:
+      - name
+      - seatGroupType
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the seat group.
+          examples:
+          - COMPARTMENT-1
+        seatGroupType:
+          type: string
+          description: The type of the seat group.
+          enum:
+          - OTHER
+          - TABLE_GROUP
+          - COMPARTMENT
+          - COMPANION
+          examples:
+          - COMPARTMENT
+        label:
+          type:
+          - string
+          - 'null'
+          description: The label of the seat group.
+          examples:
+          - 'Kupe 1: 11-15'
+    SeatUsageDebugResponse:
+      required:
+      - createdAt
+      - elementClosureReferences
+      - fromSequenceNumber
+      - seatNumberClosureReferences
+      - toSequenceNumber
+      type: object
+      properties:
+        fromSequenceNumber:
+          type: integer
+          description: The sequence nr of the stop place that this seat usage is from.
+          format: int32
+          examples:
+          - 0
+        toSequenceNumber:
+          type: integer
+          description: The sequence nr of the stop place that this seat usage is to.
+          format: int32
+          examples:
+          - 1
+        reservationLineReference:
+          type:
+          - string
+          - 'null'
+          description: The reference of the reservation line that has reserved this seat usage. Null if unreserved.
+          format: uuid
+          examples:
+          - 784160f6-4afe-4ff9-8d11-186d4cd9b8b8
+        elementClosureReferences:
+          type: array
+          description: The references of element closures affecting this seat usage.
+          items:
+            type: string
+            description: The references of element closures affecting this seat usage.
+            examples:
+            - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
+          examples:
+          - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
+        seatNumberClosureReferences:
+          type: array
+          description: The references of seat closures affecting this seat usage.
+          items:
+            type: string
+            description: The references of seat closures affecting this seat usage.
+            examples:
+            - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
+          examples:
+          - '[784160f6-4afe-4ff9-8d11-186d4cd9b8b8]'
+        createdAt:
+          type: string
+          description: When this seat usage was initially created.
+          format: date-time
+          examples:
+          - '2018-10-26T10:00:00Z'
+        updatedAt:
+          type:
+          - string
+          - 'null'
+          description: When this seat usage was las updated. Null if never updated after creation.
+          format: date-time
+          examples:
+          - '2018-10-26T10:00:00Z'
+        updatedBy:
+          type:
+          - integer
+          - 'null'
+          description: The organisation id that last updated this seat usage.
+          format: int64
+          examples:
+          - 1
+    MaterialElementRequest:
+      required:
+      - carriageIdentifier
+      - direction
+      - logicalElementSeries
+      - sequenceNumber
+      type: object
+      properties:
+        logicalElementSeries:
+          type: string
+          description: The rolling stock series of the `logical element` for this element.
+          examples:
+          - GOA-BM73A-PREMIUM
+        carriageIdentifier:
+          type: string
+          description: The carriage identifier for this element.
+          examples:
+          - '5'
+        sequenceNumber:
+          type: integer
+          description: The sequence number for this element in the material composition. 1-n
+          format: int32
+          examples:
+          - 3
+        direction:
+          type: string
+          description: The direction for this element.
+          enum:
+          - FORWARDS
+          - BACKWARDS
+          - UNKNOWN
+          examples:
+          - BACKWARDS
+      description: List of elements in the changed material composition. Each list element corresponds to a carriage.
+    ServiceJourneyScheduleResponse:
+      required:
+      - firstDepartureDate
+      - lastDepartureDate
+      - serviceJourneyId
+      type: object
+      properties:
+        serviceJourneyId:
+          type: string
+          description: The netex id of the `serviceJourney`
+          examples:
+          - GOA:ServiceJourney:709_337-R
+        firstDepartureDate:
+          type: string
+          description: The first date and time of departure.
+          format: date
+          examples:
+          - '2023-02-13'
+        lastDepartureDate:
+          type: string
+          description: The last date and time of departure.
+          format: date
+          examples:
+          - '2023-02-18'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1416,11 +1389,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seating-manager-openapi.json
-- entur-seating-manager-openapi.yml

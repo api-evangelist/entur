@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Rebooking V 1 Controller API
+  title: Seating manager Rebooking V 1 Controller API
+  description: Seating manager generates seating offers and keeps track of what seats are reserved and/or blocked
   version: 2026.09.0
-  description: 'Operations tagged rebooking-v-1-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seating-manager
 security:
@@ -78,8 +78,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RebookedReservationResponseV1'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1/rebookings/dated-service-journeys:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -152,69 +150,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CommonError'
-    servers:
-    - url: https://api.entur.io/seating-manager
 components:
   schemas:
-    RebookedReservationLineResponseV1:
+    StopPlaceResponseV1:
       required:
-      - reference
-      - reservationLineType
-      - reservedProperties
+      - nsrCode
+      - sequenceNr
       type: object
       properties:
-        reference:
+        nsrCode:
           type: string
-          description: Reference for this reservation line`
-          format: uuid
-        orderLineId:
-          type: string
-          description: OrderLine ID for this reservation line`
+          description: Stop Place id defined by National StopPlace registry.
           examples:
-          - d4a599f6-6b0b-473f-a182-79f87a4a8689
-        reservationLineType:
-          type: string
-          description: The type of reservation line.
-          examples:
-          - SINGLE_SEAT
-        reservedProperties:
-          type: array
-          items:
-            type: string
-            description: The properties required by the traveller.
-            examples:
-            - '[FareClass_STANDARD_CLASS]'
-      discriminator:
-        propertyName: reservationLineType
-        mapping:
-          SINGLE_SEAT: '#/components/schemas/RebookedSingleSeatReservationLineResponseV1'
-          COMPARTMENT: '#/components/schemas/RebookedCompartmentReservationLineResponseV1'
-          FREE_SEATING: '#/components/schemas/RebookedFreeSeatingReservationLineResponseV1'
-          FAILED_REBOOKING: '#/components/schemas/FailedRebookingDataResponseV1'
-    CommonError:
-      required:
-      - error
-      - exception
-      - message
-      - path
-      - status
-      - timestamp
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        status:
+          - NSR:StopPlace:337
+        sequenceNr:
           type: integer
+          description: The ordering of the station in the journey.
           format: int32
-        error:
-          type: string
-        exception:
-          type: string
-        message:
-          type: string
-        path:
-          type: string
+          examples:
+          - 0
+      description: Destination `StopPlace` of the `reservation`
     RebookedReservationResponseV1:
       required:
       - createdAt
@@ -383,34 +338,66 @@ components:
           format: int32
           examples:
           - 0
-    StopPlaceResponseV1:
+    CommonError:
       required:
-      - nsrCode
-      - sequenceNr
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
       type: object
       properties:
-        nsrCode:
+        timestamp:
           type: string
-          description: Stop Place id defined by National StopPlace registry.
-          examples:
-          - NSR:StopPlace:337
-        sequenceNr:
+          format: date-time
+        status:
           type: integer
-          description: The ordering of the station in the journey.
           format: int32
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    RebookedReservationLineResponseV1:
+      required:
+      - reference
+      - reservationLineType
+      - reservedProperties
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference for this reservation line`
+          format: uuid
+        orderLineId:
+          type: string
+          description: OrderLine ID for this reservation line`
           examples:
-          - 0
-      description: Destination `StopPlace` of the `reservation`
+          - d4a599f6-6b0b-473f-a182-79f87a4a8689
+        reservationLineType:
+          type: string
+          description: The type of reservation line.
+          examples:
+          - SINGLE_SEAT
+        reservedProperties:
+          type: array
+          items:
+            type: string
+            description: The properties required by the traveller.
+            examples:
+            - '[FareClass_STANDARD_CLASS]'
+      discriminator:
+        propertyName: reservationLineType
+        mapping:
+          SINGLE_SEAT: '#/components/schemas/RebookedSingleSeatReservationLineResponseV1'
+          COMPARTMENT: '#/components/schemas/RebookedCompartmentReservationLineResponseV1'
+          FREE_SEATING: '#/components/schemas/RebookedFreeSeatingReservationLineResponseV1'
+          FAILED_REBOOKING: '#/components/schemas/FailedRebookingDataResponseV1'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -426,11 +413,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seating-manager-openapi.json
-- entur-seating-manager-openapi.yml

@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Order Notes API
-  version: 2026.07.0
+  title: Order Notes API
+  description: Repository for data that is connectable to `orderId` and can be represented in String form. Note that only one note per `type` is able to be used per `orderId` for DEADLINE, VENDOR_CONTACT_INFO_OVERRIDE, ZERO_TICKET and PENALTY_FARE. If there is any need for nested data structures, consumers are invited to simply store small JSON objects in the `text` field.
   contact:
     name: Team Salg
     email: team.salg@entur.org
-  description: 'Operations tagged Order Notes across 2 of this provider''s published API definitions: entur-order-note-partner-openapi.json, entur-order-note-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.07.0
 servers:
 - url: https://api.staging.entur.io/sales
   description: Staging test environment
@@ -185,13 +185,6 @@ paths:
           $ref: '#/components/responses/badRequest'
         '409':
           $ref: '#/components/responses/conflict'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
   /v1/order-notes/{id}:
     parameters:
     - $ref: '#/components/parameters/orderNoteIdPathParam'
@@ -246,149 +239,8 @@ paths:
           description: OK
         '404':
           $ref: '#/components/responses/notFound'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
 components:
-  responses:
-    badRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    conflict:
-      description: OrderNote already exists with that orderId and type
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    notFound:
-      description: Order note not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    orderNoteIdPathParam:
-      name: id
-      in: path
-      description: Id of the Order Note
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
-    OrderNoteType:
-      type: string
-      description: "Type of Order Note. \n\nPENALTY_FARE - info used to generate penalty fare invoice \n\nZERO_TICKET - info regarding why zero ticket issued \n\nVENDOR_CONTACT_INFO_OVERRIDE - updated contact info for vendor eg. for group travel offer\n\nDEADLINE - deadline for changes to order eg. for group travel offer\n\nCUSTOMER_COMMUNICATION - note sent to customer, either manually or automated \n\nTERMS_AND_CONDITIONS - note relating to terms and conditions\n\nREFUND - note created as a part of refund process, either manually or automated \n\nGENERIC - note with additional order info \n\nUNKNOWN - untagged info "
-      default: UNKNOWN
-      enum:
-      - PENALTY_FARE
-      - ZERO_TICKET
-      - VENDOR_CONTACT_INFO_OVERRIDE
-      - DEADLINE
-      - CUSTOMER_COMMUNICATION
-      - TERMS_AND_CONDITIONS
-      - REFUND
-      - GENERIC
-      - UNKNOWN
-    ApiError:
-      title: ApiError
-      required:
-      - error
-      - exception
-      - message
-      - path
-      - status
-      - timestamp
-      type: object
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        status:
-          type: integer
-          format: int32
-        title:
-          type: string
-          description: Short, human-readable summary of the problem
-        error:
-          type: string
-        exception:
-          type: string
-        message:
-          type: string
-        path:
-          type: string
-      examples:
-      - timestamp: '2024-01-10T11:00:59Z'
-        status: 404
-        title: Not Found
-        error: Not Found
-        exception: NotFoundException
-        message: Order note with id 1234 not found
-        path: /v1/order-notes/1234
-    PageOfOrderNoteResponse:
-      title: PageOfOrderNoteResponse
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderNoteResponse'
-        totalPages:
-          type: integer
-          format: int32
-        totalItems:
-          type: integer
-          format: int64
-      examples:
-      - items:
-        - orderId: ABCD1234
-          orderLineIds: []
-          text: Customer called and wanted to change the delivery address for the tickets to work address.
-          type: CUSTOMER_COMMUNICATION
-          createdBy: '1234'
-          updatedBy: '1234'
-          id: 5678
-          createdAt: '2025-12-10T11:00:59Z'
-          updatedAt: '2025-12-10T11:00:59Z'
-        totalPages: 1
-        totalItems: 1
     OrderNoteResponse:
       title: OrderNoteResponse
       required:
@@ -448,6 +300,87 @@ components:
         id: 5678
         createdAt: '2025-12-10T11:00:59Z'
         updatedAt: '2025-12-10T11:00:59Z'
+    PageOfOrderNoteResponse:
+      title: PageOfOrderNoteResponse
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderNoteResponse'
+        totalPages:
+          type: integer
+          format: int32
+        totalItems:
+          type: integer
+          format: int64
+      examples:
+      - items:
+        - orderId: ABCD1234
+          orderLineIds: []
+          text: Customer called and wanted to change the delivery address for the tickets to work address.
+          type: CUSTOMER_COMMUNICATION
+          createdBy: '1234'
+          updatedBy: '1234'
+          id: 5678
+          createdAt: '2025-12-10T11:00:59Z'
+          updatedAt: '2025-12-10T11:00:59Z'
+        totalPages: 1
+        totalItems: 1
+    ApiError:
+      title: ApiError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          format: int32
+        title:
+          type: string
+          description: Short, human-readable summary of the problem
+        error:
+          type: string
+        exception:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      examples:
+      - timestamp: '2024-01-10T11:00:59Z'
+        status: 404
+        title: Not Found
+        error: Not Found
+        exception: NotFoundException
+        message: Order note with id 1234 not found
+        path: /v1/order-notes/1234
+    OrderNoteType:
+      type: string
+      description: "Type of Order Note. \n\nPENALTY_FARE - info used to generate penalty fare invoice \n\nZERO_TICKET - info regarding why zero ticket issued \n\nVENDOR_CONTACT_INFO_OVERRIDE - updated contact info for vendor eg. for group travel offer\n\nDEADLINE - deadline for changes to order eg. for group travel offer\n\nCUSTOMER_COMMUNICATION - note sent to customer, either manually or automated \n\nTERMS_AND_CONDITIONS - note relating to terms and conditions\n\nREFUND - note created as a part of refund process, either manually or automated \n\nGENERIC - note with additional order info \n\nUNKNOWN - untagged info "
+      default: UNKNOWN
+      enum:
+      - PENALTY_FARE
+      - ZERO_TICKET
+      - VENDOR_CONTACT_INFO_OVERRIDE
+      - DEADLINE
+      - CUSTOMER_COMMUNICATION
+      - TERMS_AND_CONDITIONS
+      - REFUND
+      - GENERIC
+      - UNKNOWN
     OrderNoteRequest:
       title: OrderNoteRequest
       required:
@@ -487,11 +420,61 @@ components:
         type: CUSTOMER_COMMUNICATION
         createdBy: '1234'
         updatedBy: '1234'
+  responses:
+    notFound:
+      description: Order note not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    conflict:
+      description: OrderNote already exists with that orderId and type
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  parameters:
+    orderNoteIdPathParam:
+      name: id
+      in: path
+      description: Id of the Order Note
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-order-note-partner-openapi.json
-- entur-order-note-partner-openapi.yml

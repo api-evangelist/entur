@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Entitlements API
-  version: 2026.08.0
+  title: Personnel tickets Entitlements API
+  description: Personnel tickets are a Norwegian railway discount scheme providing reduced fares for employees, pensioners, and eligible family members in participating companies.
+  termsOfService: http://entur.org
   contact:
     name: Entur Team Personalisering
     email: team.personalisering@entur.org
-  termsOfService: http://entur.org
-  description: 'Operations tagged Entitlements across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io
 security:
@@ -73,10 +73,61 @@ paths:
           $ref: '#/components/responses/Error403'
         '500':
           $ref: '#/components/responses/Error500'
-    servers:
-    - url: https://api.entur.io
 components:
   schemas:
+    ErrorResponse:
+      required:
+      - correlationId
+      - error
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        timestamp:
+          type: string
+          description: When the error occurred.
+          format: date-time
+          examples:
+          - '2007-12-03T10:15:30+01:00'
+        status:
+          type: integer
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        errorCode:
+          type: string
+          description: Application specific error code
+          examples:
+          - '1033'
+        error:
+          type: string
+          description: The http status reason.
+          examples:
+          - Bad request
+        path:
+          type: string
+          description: The request URI.
+          examples:
+          - /loyaltyPrograms
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - Validation failed for ...
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type: array
+          description: Optional list of error specifications.
+          items:
+            $ref: '#/components/schemas/ErrorSpecification'
+      description: Response object for errors occurring in the customers API
     LocalDateResponse:
       required:
       - day
@@ -94,6 +145,22 @@ components:
           type: integer
           format: int32
       description: Contract owners birth day
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
     EntitlementResponse:
       required:
       - contractOwnerCustomerNumber
@@ -187,82 +254,7 @@ components:
           type: string
           description: Loyalty program description. Supports any kind of text
       description: Localized text with language code
-    ErrorSpecification:
-      required:
-      - defaultMessage
-      - field
-      type: object
-      properties:
-        field:
-          type: string
-          description: The field of the associated object in the request related to the error.
-        defaultMessage:
-          type: string
-          description: The message explaining why the error occurred.
-        rejectedValues:
-          type: object
-          description: A list of rejected values.
-      description: Optional list of error specifications.
-    ErrorResponse:
-      required:
-      - correlationId
-      - error
-      - message
-      - path
-      - status
-      - timestamp
-      type: object
-      properties:
-        timestamp:
-          type: string
-          description: When the error occurred.
-          format: date-time
-          examples:
-          - '2007-12-03T10:15:30+01:00'
-        status:
-          type: integer
-          description: The http status code.
-          format: int32
-          examples:
-          - 400
-        errorCode:
-          type: string
-          description: Application specific error code
-          examples:
-          - '1033'
-        error:
-          type: string
-          description: The http status reason.
-          examples:
-          - Bad request
-        path:
-          type: string
-          description: The request URI.
-          examples:
-          - /loyaltyPrograms
-        message:
-          type: string
-          description: The main error message.
-          examples:
-          - Validation failed for ...
-        correlationId:
-          type: string
-          description: The unique correlation id for the request.
-          examples:
-          - b5d4960d-7ab2-43d6-a8f3-113da042a288
-        errors:
-          type: array
-          description: Optional list of error specifications.
-          items:
-            $ref: '#/components/schemas/ErrorSpecification'
-      description: Response object for errors occurring in the customers API
   responses:
-    Error500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
     Error401:
       description: Unauthorized
       content:
@@ -275,16 +267,13 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -300,11 +289,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-personnel-tickets-openapi.json
-- entur-personnel-tickets-openapi.yml

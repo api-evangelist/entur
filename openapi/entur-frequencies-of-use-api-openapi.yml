@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Frequencies Of Use API
+  title: Products Frequencies Of Use API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged frequencies-of-use across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -157,13 +157,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /frequencies-of-use/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -324,13 +317,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v1/frequencies-of-use/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -449,15 +435,109 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
+    FrequencyOfUse:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - fareTableRefs
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Frequency of use changed datetime.
+          format: date-time
+        created:
+          type: string
+          description: Frequency of use created datetime.
+          format: date-time
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References for associated fare tables.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        frequencyOfUseType:
+          type: string
+          description: Frequency of use type.
+          enum:
+          - NONE
+          - SINGLE
+          - LIMITED
+          - UNLIMITED
+          - TWICE_A_DAY
+          examples:
+          - SINGLE
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FrequencyOfUse:Single
+        maximalFrequency:
+          type: integer
+          description: Maximal frequency given for this frequency of use.
+          format: int32
+        minimalFrequency:
+          type: integer
+          description: Minimal frequency given for this frequency of use.
+          format: int32
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - FrequencyOfUse
+        prices:
+          type: array
+          description: Prices in different currencies for the refunding rule.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        status:
+          type: string
+          description: Status.
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Frequency of use version.
+          examples:
+          - NSB:Version:V1
+      description: Frequency of use
     VersionOfObjectRef:
       required:
       - nameOfClass
@@ -478,6 +558,235 @@ components:
           type: string
           description: Version.
       description: Fare frame ref.
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+    RoundingInsert:
+      required:
+      - fareFrameRef
+      - id
+      - roundingMethod
+      - version
+      type: object
+      properties:
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: Rounding.
+      deprecated: true
+    FarePriceInsert:
+      required:
+      - fareFrameRef
+      - id
+      - name
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount.
+          examples:
+          - '164.0'
+        canBeCumulative:
+          type: boolean
+          description: canBeCumulative.
+          examples:
+          - true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        currency:
+          type: string
+          description: Currency.
+          examples:
+          - NOK
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        discountPercentageUsed:
+          type: integer
+          description: discountPercentageUsed.
+          format: int32
+          examples:
+          - 5
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:FarePrice:1005TEN
+        isAllowed:
+          type: boolean
+          description: isAllowed.
+          examples:
+          - true
+        limitingRule:
+          $ref: '#/components/schemas/LimitingRule'
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        ranking:
+          type: integer
+          description: Ranking.
+          format: int32
+          examples:
+          - 1
+        rounding:
+          $ref: '#/components/schemas/RoundingInsert'
+        roundingRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        vatRegisterGroup:
+          type: string
+          description: vatRegisterGroup.
+          enum:
+          - EXCEPTION_FROM_VAT
+          - GENERAL_VAT
+          - FOOD_VAT
+          - TRANSPORT_AND_TICKETS_VAT
+          examples:
+          - TRANSPORT_AND_TICKETS_VAT
+        version:
+          type: string
     FrequencyOfUseInsert:
       required:
       - fareFrameRef
@@ -540,6 +849,23 @@ components:
           description: Frequency of use version.
           examples:
           - NSB:Version:V1
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
     FarePrice:
       required:
       - changed
@@ -769,363 +1095,7 @@ components:
           examples:
           - NSB:Version:V1
       description: A LimitingRule
-    RoundingInsert:
-      required:
-      - fareFrameRef
-      - id
-      - roundingMethod
-      - version
-      type: object
-      properties:
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:Rounding:Ordinary
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Rounding version.
-          examples:
-          - NSB:Version:V1
-      description: Rounding.
-      deprecated: true
-    FrequencyOfUse:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - fareTableRefs
-      - id
-      - modification
-      - nameOfClass
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Frequency of use changed datetime.
-          format: date-time
-        created:
-          type: string
-          description: Frequency of use created datetime.
-          format: date-time
-        description:
-          type: array
-          description: Description represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: References for associated fare tables.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        frequencyOfUseType:
-          type: string
-          description: Frequency of use type.
-          enum:
-          - NONE
-          - SINGLE
-          - LIMITED
-          - UNLIMITED
-          - TWICE_A_DAY
-          examples:
-          - SINGLE
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FrequencyOfUse:Single
-        maximalFrequency:
-          type: integer
-          description: Maximal frequency given for this frequency of use.
-          format: int32
-        minimalFrequency:
-          type: integer
-          description: Minimal frequency given for this frequency of use.
-          format: int32
-        modification:
-          type: string
-          description: Modification status.
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          examples:
-          - FrequencyOfUse
-        prices:
-          type: array
-          description: Prices in different currencies for the refunding rule.
-          items:
-            $ref: '#/components/schemas/FarePrice'
-        status:
-          type: string
-          description: Status.
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Frequency of use version.
-          examples:
-          - NSB:Version:V1
-      description: Frequency of use
-    TextInLanguage:
-      required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
-    FarePriceInsert:
-      required:
-      - fareFrameRef
-      - id
-      - name
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount.
-          examples:
-          - '164.0'
-        canBeCumulative:
-          type: boolean
-          description: canBeCumulative.
-          examples:
-          - true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        currency:
-          type: string
-          description: Currency.
-          examples:
-          - NOK
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        discountPercentageUsed:
-          type: integer
-          description: discountPercentageUsed.
-          format: int32
-          examples:
-          - 5
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:FarePrice:1005TEN
-        isAllowed:
-          type: boolean
-          description: isAllowed.
-          examples:
-          - true
-        limitingRule:
-          $ref: '#/components/schemas/LimitingRule'
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        ranking:
-          type: integer
-          description: Ranking.
-          format: int32
-          examples:
-          - 1
-        rounding:
-          $ref: '#/components/schemas/RoundingInsert'
-        roundingRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        vatRegisterGroup:
-          type: string
-          description: vatRegisterGroup.
-          enum:
-          - EXCEPTION_FROM_VAT
-          - GENERAL_VAT
-          - FOOD_VAT
-          - TRANSPORT_AND_TICKETS_VAT
-          examples:
-          - TRANSPORT_AND_TICKETS_VAT
-        version:
-          type: string
-    Rounding:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - roundingMethod
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:Rounding:Ordinary
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - Rounding
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
-        status:
-          type: string
-          description: Rounding status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Rounding version.
-          examples:
-          - NSB:Version:V1
-      description: A description of how prices are rounded post calculation
-      deprecated: true
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -1141,11 +1111,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

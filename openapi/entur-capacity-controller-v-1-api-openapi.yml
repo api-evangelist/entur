@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Capacity Controller V 1 API
+  title: Seating manager Capacity Controller V 1 API
+  description: Seating manager generates seating offers and keeps track of what seats are reserved and/or blocked
   version: 2026.09.0
-  description: 'Operations tagged capacity-controller-v-1 across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seating-manager
 security:
@@ -65,35 +65,23 @@ paths:
                   $ref: '#/components/schemas/TotalMaterialCompositionCapacityResponseV1'
       summary: Get total capacity
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seating-manager
 components:
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
+    TotalCapacityEntryResponseV1:
+      required:
+      - numberOfSeats
+      - seatingPropertyKey
+      - totalCompartments
+      type: object
+      properties:
+        seatingPropertyKey:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        numberOfSeats:
+          type: integer
+          format: int32
+        totalCompartments:
+          type: integer
+          format: int32
     SeatingPropertiesResponseV1:
       type: object
       properties:
@@ -335,26 +323,33 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TotalCapacityEntryResponseV1'
-    TotalCapacityEntryResponseV1:
-      required:
-      - numberOfSeats
-      - seatingPropertyKey
-      - totalCompartments
-      type: object
-      properties:
-        seatingPropertyKey:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-        numberOfSeats:
-          type: integer
-          format: int32
-        totalCompartments:
-          type: integer
-          format: int32
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seating-manager-openapi.json
-- entur-seating-manager-openapi.yml

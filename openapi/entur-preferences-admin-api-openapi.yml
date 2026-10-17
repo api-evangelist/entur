@@ -1,13 +1,13 @@
 openapi: 3.2.0
 info:
-  title: Entur Preferences admin API
-  version: 2026.10.0
+  title: Customers Preferences admin API
+  description: Documentation of the Customers API
+  termsOfService: https://entur.org
   contact:
     name: Entur Team Personalisering
     url: https://enturas.atlassian.net/wiki/spaces/CULP/overview
     email: team.personalisering@entur.org
-  termsOfService: https://entur.org
-  description: 'Operations tagged Preferences admin across 2 of this provider''s published API definitions: entur-customers-openapi.json, entur-customers-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.10.0
 servers:
 - url: https://api.entur.io/customers/v2
 security:
@@ -98,8 +98,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: customers-preference:endre
-    servers:
-    - url: https://api.entur.io/customers/v2
   /preferences:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -164,60 +162,39 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: customers-preference:opprett
-    servers:
-    - url: https://api.entur.io/customers/v2
 components:
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
   schemas:
-    ErrorMessage:
-      required:
-      - errorCode
-      - longEnglish
-      - longNorwegian
-      - shortEnglish
-      - shortNorwegian
-      type: object
-      properties:
-        errorCode:
-          type: integer
-          description: The error code.
-          format: int32
-        longEnglish:
-          type: string
-          description: Long error message (English).
-        longNorwegian:
-          type: string
-          description: Long error message (Norwegian).
-        shortEnglish:
-          type: string
-          description: Short error message (English).
-        shortNorwegian:
-          type: string
-          description: Short error message (Norwegian).
-      description: 'An Error message. '
-    PreferenceRequest:
-      required:
-      - isActive
-      - preferenceCode
-      - preferenceDescription
-      - preferenceType
-      type: object
-      properties:
-        isActive:
-          type: boolean
-          description: Whether the preference is active.
-        preferenceCode:
-          maxLength: 20
-          type: string
-          description: The preference code.
-        preferenceDescription:
-          maxLength: 255
-          type: string
-          description: A description of the preference.
-        preferenceType:
-          maxLength: 20
-          type: string
-          description: Type of preference.
-      description: Preference
     PreferenceResponse:
       required:
       - changedAt
@@ -261,47 +238,57 @@ components:
           type: string
           description: Type of preference.
       description: Preference
-  responses:
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
-    Error400:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
-    Error500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
-    Error401:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
-    Error403:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorMessage'
+    PreferenceRequest:
+      required:
+      - isActive
+      - preferenceCode
+      - preferenceDescription
+      - preferenceType
+      type: object
+      properties:
+        isActive:
+          type: boolean
+          description: Whether the preference is active.
+        preferenceCode:
+          maxLength: 20
+          type: string
+          description: The preference code.
+        preferenceDescription:
+          maxLength: 255
+          type: string
+          description: A description of the preference.
+        preferenceType:
+          maxLength: 20
+          type: string
+          description: Type of preference.
+      description: Preference
+    ErrorMessage:
+      required:
+      - errorCode
+      - longEnglish
+      - longNorwegian
+      - shortEnglish
+      - shortNorwegian
+      type: object
+      properties:
+        errorCode:
+          type: integer
+          description: The error code.
+          format: int32
+        longEnglish:
+          type: string
+          description: Long error message (English).
+        longNorwegian:
+          type: string
+          description: Long error message (Norwegian).
+        shortEnglish:
+          type: string
+          description: Short error message (English).
+        shortNorwegian:
+          type: string
+          description: Short error message (Norwegian).
+      description: 'An Error message. '
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -317,11 +304,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-customers-openapi.json
-- entur-customers-openapi.yml

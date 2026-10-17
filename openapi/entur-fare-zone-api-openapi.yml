@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Fare Zone API
-  version: 2026.08.0
+  title: Distances and zones Fare Zone API
+  description: Calculates distances between Stop Places
   contact:
     name: Team Avstand og Nettverk
-  description: 'Operations tagged Fare Zone across 2 of this provider''s published API definitions: entur-prdudisapi-openapi.json, entur-prdudisapi-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io/distance
 security:
@@ -165,8 +165,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /fare-zones/distances/stops:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -322,8 +320,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /fare-zones/distances/polyline:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -513,41 +509,51 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
 components:
   schemas:
-    OrgBasedDistances:
+    CoordinateDistanceResponse:
       type: object
       properties:
         from:
-          type: string
-        to:
-          type: string
-        organisation:
-          type: integer
-          format: int64
-        zonesCrossed:
           type: array
           items:
             type: string
-        shortestDistance:
-          type: integer
-          format: int32
-        shortestPath:
+        to:
           type: array
           items:
-            type: array
-            items:
-              type: string
+            type: string
+        polylineCoordinates:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/ZoneCoordinate'
+        allZonesCrossed:
+          type: array
+          items:
+            type: string
+        orgBasedDistances:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrgBasedDistances'
       examples:
-      - from: ENT:FareZone:337
-        to: ENT:FareZone:337
-        organisation: 1
-        zonesCrossed:
+      - from:
         - ENT:FareZone:337
-        shortestDistance: 1
-        shortestPath: []
+        to:
+        - ENT:FareZone:94
+        polylineCoordinates:
+        - latitude: 1
+          longitude: 1
+        allZonesCrossed:
+        - RUT:FareZone:1
+        orgBasedDistances:
+        - from: ENT:FareZone:337
+          to: ENT:FareZone:337
+          organisation: 1
+          zonesCrossed:
+          - ENT:FareZone:337
+          shortestDistance: 1
+          shortestPath: []
     ZonalStopPlaceDistanceRequest:
       required:
       - stopPlaces
@@ -592,29 +598,6 @@ components:
         time: '2026-08-26T10:53:07.820698178Z'
         preOwned:
         - ENT:FareZone:1
-    Zones:
-      type: object
-      properties:
-        requiredZones:
-          uniqueItems: true
-          type: array
-          items:
-            type: string
-        path:
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-      examples:
-      - requiredZones:
-        - ENT:FareZone:1
-        - ENT:FareZone:2
-        - ENT:FareZone:4
-        path:
-        - ENT:FareZone:1
-        - ENT:FareZone:2
-        - ENT:FareZone:4
     FareZoneDistanceResponse:
       type: object
       properties:
@@ -660,6 +643,47 @@ components:
           path:
           - ENT:FareZone:1
           - ENT:FareZone:4
+    ZoneCoordinate:
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+      examples:
+      - latitude: 1
+        longitude: 1
+    OrgBasedDistances:
+      type: object
+      properties:
+        from:
+          type: string
+        to:
+          type: string
+        organisation:
+          type: integer
+          format: int64
+        zonesCrossed:
+          type: array
+          items:
+            type: string
+        shortestDistance:
+          type: integer
+          format: int32
+        shortestPath:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+      examples:
+      - from: ENT:FareZone:337
+        to: ENT:FareZone:337
+        organisation: 1
+        zonesCrossed:
+        - ENT:FareZone:337
+        shortestDistance: 1
+        shortestPath: []
     FareZoneDistanceRequest:
       type: object
       properties:
@@ -705,69 +729,30 @@ components:
         - ENT:FareZone:1
         preOwned:
         - ENT:FareZone:2
-    CoordinateDistanceResponse:
+    Zones:
       type: object
       properties:
-        from:
+        requiredZones:
+          uniqueItems: true
           type: array
           items:
             type: string
-        to:
-          type: array
-          items:
-            type: string
-        polylineCoordinates:
+        path:
           type:
           - array
           - 'null'
           items:
-            $ref: '#/components/schemas/ZoneCoordinate'
-        allZonesCrossed:
-          type: array
-          items:
             type: string
-        orgBasedDistances:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrgBasedDistances'
       examples:
-      - from:
-        - ENT:FareZone:337
-        to:
-        - ENT:FareZone:94
-        polylineCoordinates:
-        - latitude: 1
-          longitude: 1
-        allZonesCrossed:
-        - RUT:FareZone:1
-        orgBasedDistances:
-        - from: ENT:FareZone:337
-          to: ENT:FareZone:337
-          organisation: 1
-          zonesCrossed:
-          - ENT:FareZone:337
-          shortestDistance: 1
-          shortestPath: []
-    ZoneCoordinate:
-      type: object
-      properties:
-        latitude:
-          type: number
-        longitude:
-          type: number
-      examples:
-      - latitude: 1
-        longitude: 1
+      - requiredZones:
+        - ENT:FareZone:1
+        - ENT:FareZone:2
+        - ENT:FareZone:4
+        path:
+        - ENT:FareZone:1
+        - ENT:FareZone:2
+        - ENT:FareZone:4
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -783,11 +768,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     enturOpen:
       type: apiKey
       name: ET-Client-Name
       in: header
-x-refined-from:
-- entur-prdudisapi-openapi.json
-- entur-prdudisapi-openapi.yml

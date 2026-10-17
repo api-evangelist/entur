@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Companion Profiles API
+  title: Products Companion Profiles API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged companion-profiles across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -103,13 +103,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /companion-profiles/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -198,13 +191,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v1/companion-profiles/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -324,13 +310,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
     VersionOfObjectRef:
@@ -420,6 +399,257 @@ components:
           examples:
           - NSB:Version:V1
       description: A condition of the validity of the priceable object
+    Rounding:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - roundingMethod
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          readOnly: true
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          readOnly: true
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Rounding:Ordinary
+        modification:
+          type: string
+          description: Modification status.
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Rounding
+        roundingMethod:
+          type: string
+          description: Type of rounding.
+          enum:
+          - NONE
+          - DOWN
+          - UP
+          - SPLIT
+          - STEP_TABLE
+          - FIVE
+          - NINE
+          - TEN
+          - FORTY_NINE
+        roundingModulus:
+          type: number
+          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
+          format: double
+        status:
+          type: string
+          description: Rounding status.
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Rounding version.
+          examples:
+          - NSB:Version:V1
+      description: A description of how prices are rounded post calculation
+      deprecated: true
+    CompanionProfile:
+      required:
+      - changed
+      - created
+      - fareFrameRef
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        changed:
+          type: string
+          description: Changed datetime.
+          format: date-time
+        compatibleWithVersionRef:
+          type: string
+          description: Compatible with version.
+        created:
+          type: string
+          description: Created datetime.
+          format: date-time
+        derivedFromVersionRef:
+          type: string
+          description: Derived from version.
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        discountBasis:
+          type: string
+          description: Basis for discount.
+          enum:
+          - NONE
+          - FREE
+          - DISCOUNT
+          - FULLRATE
+          examples:
+          - DISCOUNT
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        fareTableRefs:
+          type: array
+          description: References to fare tables that provide prices or discounts for the companion profile.
+          items:
+            $ref: '#/components/schemas/VersionOfObjectRef'
+        generalGroupOfEntities:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:CompanionProfile:Adult
+        limitingRuleRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        maximumNumberOfPersons:
+          type: integer
+          description: Maximum number of allowed companions.
+          format: int32
+        minimumNumberOfPersons:
+          type: integer
+          description: Minimum number of allowed companions.
+          format: int32
+        modification:
+          type: string
+          description: Modification status.
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: The name of the companion profile represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class.
+          examples:
+          - CompanionProfile
+        parentRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        prices:
+          type: array
+          description: Fare prices for the companion profile.
+          items:
+            $ref: '#/components/schemas/FarePrice'
+        status:
+          type: string
+          description: Status
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        ticketing:
+          type: string
+          description: The type of way that tickets are issued to the group.
+          deprecated: true
+          enum:
+          - ALL_ON_ONE_TICKET
+          - SEPARATE_TICKETS
+          - TICKET_WITH_COUPONS
+          - OTHER
+          examples:
+          - SEPARATE_TICKETS
+        typeOfUsageParameter:
+          type: string
+          description: typeOfUsageParameter.
+        userProfileId:
+          type: string
+          description: A user profile defining a category of people eligible to be a companion.
+        userProfileRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        validityConditions:
+          type: array
+          description: Validity conditions for the companion profile.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The version of the companion profile.
+          examples:
+          - NSB:Version:V1
+      description: A companion profile
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
     FarePrice:
       required:
       - changed
@@ -649,267 +879,7 @@ components:
           examples:
           - NSB:Version:V1
       description: A LimitingRule
-    TextInLanguage:
-      required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
-    CompanionProfile:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          format: date-time
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          format: date-time
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        description:
-          type: array
-          description: Description represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        discountBasis:
-          type: string
-          description: Basis for discount.
-          enum:
-          - NONE
-          - FREE
-          - DISCOUNT
-          - FULLRATE
-          examples:
-          - DISCOUNT
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        fareTableRefs:
-          type: array
-          description: References to fare tables that provide prices or discounts for the companion profile.
-          items:
-            $ref: '#/components/schemas/VersionOfObjectRef'
-        generalGroupOfEntities:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:CompanionProfile:Adult
-        limitingRuleRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        maximumNumberOfPersons:
-          type: integer
-          description: Maximum number of allowed companions.
-          format: int32
-        minimumNumberOfPersons:
-          type: integer
-          description: Minimum number of allowed companions.
-          format: int32
-        modification:
-          type: string
-          description: Modification status.
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: The name of the companion profile represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          examples:
-          - CompanionProfile
-        parentRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        prices:
-          type: array
-          description: Fare prices for the companion profile.
-          items:
-            $ref: '#/components/schemas/FarePrice'
-        status:
-          type: string
-          description: Status
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        ticketing:
-          type: string
-          description: The type of way that tickets are issued to the group.
-          deprecated: true
-          enum:
-          - ALL_ON_ONE_TICKET
-          - SEPARATE_TICKETS
-          - TICKET_WITH_COUPONS
-          - OTHER
-          examples:
-          - SEPARATE_TICKETS
-        typeOfUsageParameter:
-          type: string
-          description: typeOfUsageParameter.
-        userProfileId:
-          type: string
-          description: A user profile defining a category of people eligible to be a companion.
-        userProfileRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        validityConditions:
-          type: array
-          description: Validity conditions for the companion profile.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: The version of the companion profile.
-          examples:
-          - NSB:Version:V1
-      description: A companion profile
-    Rounding:
-      required:
-      - changed
-      - created
-      - fareFrameRef
-      - id
-      - modification
-      - nameOfClass
-      - roundingMethod
-      - status
-      - version
-      type: object
-      properties:
-        changed:
-          type: string
-          description: Changed datetime.
-          readOnly: true
-        compatibleWithVersionRef:
-          type: string
-          description: Compatible with version.
-        created:
-          type: string
-          description: Created datetime.
-          readOnly: true
-        derivedFromVersionRef:
-          type: string
-          description: Derived from version.
-        description:
-          type: array
-          description: Description.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:Rounding:Ordinary
-        modification:
-          type: string
-          description: Modification status.
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - Rounding
-        roundingMethod:
-          type: string
-          description: Type of rounding.
-          enum:
-          - NONE
-          - DOWN
-          - UP
-          - SPLIT
-          - STEP_TABLE
-          - FIVE
-          - NINE
-          - TEN
-          - FORTY_NINE
-        roundingModulus:
-          type: number
-          description: Amount by which rounding is to be quantised, i.e. results should be quantised to nearest whole multiple of this value.
-          format: double
-        status:
-          type: string
-          description: Rounding status.
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Rounding version.
-          examples:
-          - NSB:Version:V1
-      description: A description of how prices are rounded post calculation
-      deprecated: true
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -925,11 +895,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

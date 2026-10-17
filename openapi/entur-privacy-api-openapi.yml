@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Privacy API
-  version: 2026.09.0
+  title: Personalisation Privacy API
+  description: Retrieve privacy data from personalisation to ensure GDPR compliance.
   contact:
     name: Team Personalisering
     email: team.personalisering@entur.org
-  description: 'Operations tagged Privacy across 2 of this provider''s published API definitions: entur-personalisation-privacy-openapi.json, entur-personalisation-privacy-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.0
 servers:
 - url: https://api.entur.io/personalisation
 security:
@@ -58,24 +58,10 @@ paths:
           any:
           - personalisation-customerdata:les
           - personalisation-customerdata-global:les
-    servers:
-    - url: https://api.entur.io/personalisation
 components:
   responses:
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     Error400:
       description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error500:
-      description: Internal server error
       content:
         application/json:
           schema:
@@ -86,12 +72,49 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     Error403:
       description: Forbidden
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   schemas:
     Error:
       required:
@@ -146,31 +169,6 @@ components:
         message:
           type: string
       description: Validation error on a specific field.
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
   securitySchemes:
     jwt:
       type: http
@@ -179,6 +177,3 @@ components:
 externalDocs:
   description: Entur Developer Documentation
   url: https://developer.entur.org/pages-personalisation-docs-personalisation-privacy-api
-x-refined-from:
-- entur-personalisation-privacy-openapi.json
-- entur-personalisation-privacy-openapi.yml

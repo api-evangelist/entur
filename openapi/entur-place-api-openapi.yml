@@ -1,14 +1,14 @@
 openapi: 3.2.0
 info:
-  title: Entur Place API
-  version: 2026.09.1
+  title: Geocoder Place API
+  description: Geocoding and reverse geocoding for Norwegian addresses and points of interest.
   contact:
     name: Team Ruter og reiseplanlegging
     url: https://developer.entur.org
   license:
     name: EUPL-1.2
     url: https://opensource.org/licenses/EUPL-1.2
-  description: 'Operations tagged Place across 2 of this provider''s published API definitions: entur-geocoder-openapi.json, entur-geocoder-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.1
 servers:
 - url: https://api.entur.io/geocoder
 security:
@@ -73,21 +73,50 @@ paths:
                     status: 400
                     title: Bad Request
                     detail: Parameter 'ids' is required
-    servers:
-    - url: https://api.entur.io/geocoder
 components:
   schemas:
-    Layer:
-      type: string
-      enum:
-      - address
-      - street
-      - stopPlace
-      - groupOfStopPlaces
-      - poi
-      - place
-      examples:
-      - stopPlace
+    Filters:
+      type: object
+      properties:
+        layers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Layer'
+        sources:
+          type: array
+          items:
+            type: string
+        countries:
+          type: array
+          items:
+            type: string
+        counties:
+          type: array
+          items:
+            type: string
+        localities:
+          type: array
+          items:
+            type: string
+        fareZones:
+          type: array
+          items:
+            type: string
+        fareZoneAuthorities:
+          type: array
+          items:
+            type: string
+        stopPlaceTypes:
+          type: array
+          items:
+            type: string
+        multimodal:
+          type: string
+          enum:
+          - parent
+          - child
+          - all
+      description: Echoes the request filters as sent, not the effective filter set.
     QueryInfo:
       required:
       - lang
@@ -118,33 +147,99 @@ components:
           - 'no'
         filters:
           $ref: '#/components/schemas/Filters'
-    Feature:
+    Layer:
+      type: string
+      enum:
+      - address
+      - street
+      - stopPlace
+      - groupOfStopPlaces
+      - poi
+      - place
+      examples:
+      - stopPlace
+    Metadata:
       required:
-      - geometry
-      - properties
+      - query
+      - resultCount
+      - timestamp
+      type: object
+      properties:
+        query:
+          $ref: '#/components/schemas/QueryInfo'
+        resultCount:
+          type: integer
+          examples:
+          - 5
+        timestamp:
+          type: string
+          description: Response generation time as an ISO 8601 instant (UTC).
+          format: date-time
+          examples:
+          - '2025-03-04T11:00:00Z'
+    Geometry:
+      required:
+      - coordinates
       - type
       type: object
       properties:
         type:
           type: string
           enum:
-          - Feature
-        geometry:
-          $ref: '#/components/schemas/Geometry'
-        properties:
-          $ref: '#/components/schemas/Place'
-        bbox:
-          maxItems: 4
-          minItems: 4
+          - Point
+        coordinates:
+          maxItems: 2
+          minItems: 2
           type: array
-          description: GeoJSON bounding box `[minLon, minLat, maxLon, maxLat]`. Present for features with a real extent (streets, groups of stop places); omitted for point features.
+          description: '[longitude, latitude]'
           items:
             type: number
           examples:
-          - - 10.73
-            - 59.91
-            - 10.76
-            - 59.92
+          - - 10.7522
+            - 59.911
+    Address:
+      type: object
+      properties:
+        streetName:
+          type: string
+          examples:
+          - Jernbanetorget
+        houseNumber:
+          type: string
+          examples:
+          - '1'
+        postalCode:
+          type: string
+          examples:
+          - '0154'
+        locality:
+          type: string
+          examples:
+          - Oslo
+        localityId:
+          type: string
+          examples:
+          - KVE:TopographicPlace:0301
+        borough:
+          type: string
+          examples:
+          - Sentrum
+        boroughId:
+          type: string
+          examples:
+          - KVE:Borough:34200502
+        county:
+          type: string
+          examples:
+          - Oslo
+        countyId:
+          type: string
+          examples:
+          - KVE:TopographicPlace:03
+        countryCode:
+          type: string
+          examples:
+          - 'no'
     Names:
       required:
       - default
@@ -166,6 +261,35 @@ components:
           description: Formatted name with locality context, suitable for display
           examples:
           - Oslo S, Oslo
+    Result:
+      required:
+      - features
+      - metadata
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - FeatureCollection
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/Feature'
+        metadata:
+          $ref: '#/components/schemas/Metadata'
+        bbox:
+          maxItems: 4
+          minItems: 4
+          type: array
+          description: '[minLon, minLat, maxLon, maxLat]'
+          items:
+            type: number
+          examples:
+          - - 10.7335
+            - 59.911
+            - 10.7522
+            - 59.9144
     Error:
       required:
       - status
@@ -184,25 +308,6 @@ components:
           type: string
           examples:
           - Parameter 'lat' is required
-    Metadata:
-      required:
-      - query
-      - resultCount
-      - timestamp
-      type: object
-      properties:
-        query:
-          $ref: '#/components/schemas/QueryInfo'
-        resultCount:
-          type: integer
-          examples:
-          - 5
-        timestamp:
-          type: string
-          description: Response generation time as an ISO 8601 instant (UTC).
-          format: date-time
-          examples:
-          - '2025-03-04T11:00:00Z'
     Place:
       required:
       - id
@@ -279,35 +384,6 @@ components:
           examples:
           - nor: Norges nasjonalteater
             eng: Norway's national theatre
-    Result:
-      required:
-      - features
-      - metadata
-      - type
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-          - FeatureCollection
-        features:
-          type: array
-          items:
-            $ref: '#/components/schemas/Feature'
-        metadata:
-          $ref: '#/components/schemas/Metadata'
-        bbox:
-          maxItems: 4
-          minItems: 4
-          type: array
-          description: '[minLon, minLat, maxLon, maxLat]'
-          items:
-            type: number
-          examples:
-          - - 10.7335
-            - 59.911
-            - 10.7522
-            - 59.9144
     TransportMode:
       required:
       - mode
@@ -321,111 +397,33 @@ components:
           type: string
           examples:
           - localBus
-    Filters:
-      type: object
-      properties:
-        layers:
-          type: array
-          items:
-            $ref: '#/components/schemas/Layer'
-        sources:
-          type: array
-          items:
-            type: string
-        countries:
-          type: array
-          items:
-            type: string
-        counties:
-          type: array
-          items:
-            type: string
-        localities:
-          type: array
-          items:
-            type: string
-        fareZones:
-          type: array
-          items:
-            type: string
-        fareZoneAuthorities:
-          type: array
-          items:
-            type: string
-        stopPlaceTypes:
-          type: array
-          items:
-            type: string
-        multimodal:
-          type: string
-          enum:
-          - parent
-          - child
-          - all
-      description: Echoes the request filters as sent, not the effective filter set.
-    Address:
-      type: object
-      properties:
-        streetName:
-          type: string
-          examples:
-          - Jernbanetorget
-        houseNumber:
-          type: string
-          examples:
-          - '1'
-        postalCode:
-          type: string
-          examples:
-          - '0154'
-        locality:
-          type: string
-          examples:
-          - Oslo
-        localityId:
-          type: string
-          examples:
-          - KVE:TopographicPlace:0301
-        borough:
-          type: string
-          examples:
-          - Sentrum
-        boroughId:
-          type: string
-          examples:
-          - KVE:Borough:34200502
-        county:
-          type: string
-          examples:
-          - Oslo
-        countyId:
-          type: string
-          examples:
-          - KVE:TopographicPlace:03
-        countryCode:
-          type: string
-          examples:
-          - 'no'
-    Geometry:
+    Feature:
       required:
-      - coordinates
+      - geometry
+      - properties
       - type
       type: object
       properties:
         type:
           type: string
           enum:
-          - Point
-        coordinates:
-          maxItems: 2
-          minItems: 2
+          - Feature
+        geometry:
+          $ref: '#/components/schemas/Geometry'
+        properties:
+          $ref: '#/components/schemas/Place'
+        bbox:
+          maxItems: 4
+          minItems: 4
           type: array
-          description: '[longitude, latitude]'
+          description: GeoJSON bounding box `[minLon, minLat, maxLon, maxLat]`. Present for features with a real extent (streets, groups of stop places); omitted for point features.
           items:
             type: number
           examples:
-          - - 10.7522
-            - 59.911
+          - - 10.73
+            - 59.91
+            - 10.76
+            - 59.92
   parameters:
     Ids:
       name: ids
@@ -444,15 +442,6 @@ components:
           value:
           - NSR:StopPlace:337
           - NSR:StopPlace:59872
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     Language:
       name: lang
       in: query
@@ -481,9 +470,15 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
 externalDocs:
   description: Geocoder documentation and v3 migration guide
   url: https://developer.entur.no/docs/open-services/geocoder
-x-refined-from:
-- entur-geocoder-openapi.json
-- entur-geocoder-openapi.yml

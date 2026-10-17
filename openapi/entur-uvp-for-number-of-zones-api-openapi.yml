@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Uvp For Number Of Zones API
+  title: Products Uvp For Number Of Zones API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged uvp-for-number-of-zones across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -157,13 +157,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /uvp-for-number-of-zones/batch:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -282,13 +275,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /uvp-for-number-of-zones/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -449,13 +435,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /v1/uvp-for-number-of-zones/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -574,13 +553,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
     VersionOfObjectRef:
@@ -603,6 +575,13 @@ components:
           type: string
           description: Version.
       description: Fare frame ref.
+    SeqUVPForNumberOfZonesInsert:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        traversableAgain:
+          type: boolean
     UVPForNumberOfZonesInsert:
       required:
       - authorityId
@@ -649,13 +628,6 @@ components:
           description: Zone range.
           examples:
           - '4:9'
-    SeqUVPForNumberOfZonesInsert:
-      type: object
-      properties:
-        empty:
-          type: boolean
-        traversableAgain:
-          type: boolean
     UVPForNumberOfZones:
       required:
       - authorityId
@@ -721,15 +693,6 @@ components:
           examples:
           - '4:9'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -745,11 +708,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

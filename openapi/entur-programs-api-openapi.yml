@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Programs API
-  version: 2026.09.0
+  title: Personalisation Client Integration Programs API
+  description: Integrate personalisation in clients, for example show a customers status in programs.
   contact:
     name: Team Personalisering
     email: team.personalisering@entur.org
-  description: 'Operations tagged Programs across 2 of this provider''s published API definitions: entur-personalisation-client-openapi.json, entur-personalisation-client-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.0
 servers:
 - url: https://api.entur.io/personalisation
 security:
@@ -67,8 +67,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: personalisation.programs.program:les
-    servers:
-    - url: https://api.entur.io/personalisation
   /v1/programs/{programId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -110,94 +108,59 @@ paths:
           any:
           - personalisation.programs.program:les
           - personalisation.admin.programs:les
-    servers:
-    - url: https://api.entur.io/personalisation
 components:
+  responses:
+    Error400:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
-    MemberRewardLadder:
+    MemberReward:
       required:
-      - rewardLadder
+      - '@type'
+      - description
+      - rewardId
       type: object
       properties:
-        rewardLadder:
-          type: array
-          description: Program level details, including the specific requirements and rewards for each level in the program
-          items:
-            $ref: '#/components/schemas/MemberLevelSummary'
-      description: Information about the current reward ladder for a program member
-      readOnly: true
-    Error:
-      required:
-      - correlationId
-      - message
-      - status
-      - title
-      type: object
-      properties:
-        status:
+        description:
+          type: string
+        rewardId:
           type: integer
-          description: The http status code.
-          format: int32
-          examples:
-          - 400
-        title:
-          type: string
-          examples:
-          - An error occurred
-        detail:
-          type:
-          - string
-          - 'null'
-          description: The main error message.
-          examples:
-          - An error occurred
-        message:
-          type: string
-          description: The main error message.
-          examples:
-          - An error occurred
-        correlationId:
-          type: string
-          description: The unique correlation id for the request.
-          examples:
-          - b5d4960d-7ab2-43d6-a8f3-113da042a288
-        errors:
-          type:
-          - array
-          - 'null'
-          description: Validation error on a specific field.
-          items:
-            $ref: '#/components/schemas/FieldError'
-    FieldError:
-      required:
-      - field
-      - message
-      type: object
-      properties:
-        field:
-          type: string
-        message:
-          type: string
-      description: Validation error on a specific field.
-    RewardRequirement:
-      required:
-      - pointDefinitionId
-      - requiredAmount
-      type: object
-      properties:
-        requiredAmount:
-          type: number
-          description: Required amount to reach a program level
-        pointDefinitionId:
-          type: integer
-          description: Id of the point definition
           format: int64
-        pointDefinitionReference:
-          type:
-          - string
-          - 'null'
-          description: Point definition reference
-      description: Requirements for reaching the level
+        '@type':
+          type: string
+      description: Rewards when the level is reached
+      discriminator:
+        propertyName: '@type'
+        mapping:
+          MemberPercentDiscountedProductReward: '#/components/schemas/MemberPercentDiscountedProductReward'
+          MemberFeatureReward: '#/components/schemas/MemberFeatureReward'
     MemberLevelSummary:
       required:
       - name
@@ -228,6 +191,25 @@ components:
           items:
             $ref: '#/components/schemas/MemberReward'
       description: Requirements and rewards for each membership level of a specific program
+    RewardRequirement:
+      required:
+      - pointDefinitionId
+      - requiredAmount
+      type: object
+      properties:
+        requiredAmount:
+          type: number
+          description: Required amount to reach a program level
+        pointDefinitionId:
+          type: integer
+          description: Id of the point definition
+          format: int64
+        pointDefinitionReference:
+          type:
+          - string
+          - 'null'
+          description: Point definition reference
+      description: Requirements for reaching the level
     Program:
       required:
       - active
@@ -324,67 +306,72 @@ components:
           type: integer
           format: int64
       description: Information about a program
-    MemberReward:
+    Error:
       required:
-      - '@type'
-      - description
-      - rewardId
+      - correlationId
+      - message
+      - status
+      - title
       type: object
       properties:
-        description:
-          type: string
-        rewardId:
+        status:
           type: integer
-          format: int64
-        '@type':
+          description: The http status code.
+          format: int32
+          examples:
+          - 400
+        title:
           type: string
-      description: Rewards when the level is reached
-      discriminator:
-        propertyName: '@type'
-        mapping:
-          MemberPercentDiscountedProductReward: '#/components/schemas/MemberPercentDiscountedProductReward'
-          MemberFeatureReward: '#/components/schemas/MemberFeatureReward'
-  responses:
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error400:
-      description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error401:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Error403:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+          examples:
+          - An error occurred
+        detail:
+          type:
+          - string
+          - 'null'
+          description: The main error message.
+          examples:
+          - An error occurred
+        message:
+          type: string
+          description: The main error message.
+          examples:
+          - An error occurred
+        correlationId:
+          type: string
+          description: The unique correlation id for the request.
+          examples:
+          - b5d4960d-7ab2-43d6-a8f3-113da042a288
+        errors:
+          type:
+          - array
+          - 'null'
+          description: Validation error on a specific field.
+          items:
+            $ref: '#/components/schemas/FieldError'
+    FieldError:
+      required:
+      - field
+      - message
+      type: object
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+      description: Validation error on a specific field.
+    MemberRewardLadder:
+      required:
+      - rewardLadder
+      type: object
+      properties:
+        rewardLadder:
+          type: array
+          description: Program level details, including the specific requirements and rewards for each level in the program
+          items:
+            $ref: '#/components/schemas/MemberLevelSummary'
+      description: Information about the current reward ladder for a program member
+      readOnly: true
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -400,6 +387,15 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
@@ -408,6 +404,3 @@ components:
 externalDocs:
   description: Entur Developer Documentation
   url: https://developer.entur.org/pages-personalisation-docs-personalisation-client-integration-guide
-x-refined-from:
-- entur-personalisation-client-openapi.json
-- entur-personalisation-client-openapi.yml

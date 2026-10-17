@@ -1,15 +1,15 @@
 openapi: 3.2.0
 info:
-  title: Entur Partner Receipts API
-  version: 2026.06.0
+  title: Receipt Partner Partner Receipts API
+  description: Public API for generating and delivering receipts for customer orders. Provides endpoints to send receipts, determine the resulting receipt type for an order, and retrieve pickup-code messages in multiple formats and languages.
+  termsOfService: https://developer.entur.org/pages-intro-setup-and-access
   contact:
     name: Entur Team Salg
     url: https://www.entur.org
     email: team.salg@entur.org
   license:
     name: Proprietary
-  termsOfService: https://developer.entur.org/pages-intro-setup-and-access
-  description: 'Operations tagged Partner Receipts across 2 of this provider''s published API definitions: entur-receipt-partner-openapi.json, entur-receipt-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.06.0
 servers:
 - url: https://api.entur.io/sales
   description: production
@@ -98,13 +98,6 @@ paths:
         '500':
           $ref: '#/components/responses/internalServerError'
       deprecated: false
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
   /v1/receipts/type:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -154,13 +147,6 @@ paths:
         '500':
           $ref: '#/components/responses/internalServerError'
       deprecated: false
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
   /v1/receipts/pickup-code-message/{orderId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -231,95 +217,7 @@ paths:
           $ref: '#/components/responses/notFound'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: production
-    - url: https://api.staging.entur.io/sales
-      description: staging
-    - url: https://api.dev.entur.io/sales
-      description: dev
 components:
-  responses:
-    internalServerError:
-      description: Internal Server Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-          examples:
-            default:
-              value:
-                timestamp: '2025-11-13T10:15:30+01:00'
-                status: 500
-                title: Internal Server Error
-                error: Internal Server Error
-                exception: InternalServerException
-                message: Unexpected error while rendering receipt template
-                path: /v1/receipts/render-version
-    badRequest:
-      description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-          examples:
-            default:
-              value:
-                timestamp: '2025-11-13T10:15:30+01:00'
-                status: 400
-                title: Bad Request
-                error: Bad Request
-                exception: BAD_REQUEST
-                message: Required parameter 'orderId' is not present.
-                path: /v1/receipts
-    forbidden:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-          examples:
-            default:
-              value:
-                timestamp: '2025-11-13T10:15:30+01:00'
-                status: 403
-                title: Forbidden
-                error: Forbidden
-                exception: ForbiddenException
-                message: The request requires higher privileges than provided by the access token.
-                path: /v1/receipts?organisationId=1
-    conflict:
-      description: Conflict
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-          examples:
-            default:
-              value:
-                timestamp: '2025-11-13T10:15:30+01:00'
-                status: 409
-                title: Conflict
-                error: Conflict
-                exception: ConflictException
-                message: Receipt with ID 1 and organisation ID 1 is disabled.
-                path: /v1/receipts/1/versions
-    notFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-          examples:
-            default:
-              value:
-                timestamp: '2025-11-13T10:15:30+01:00'
-                status: 404
-                title: Not Found
-                error: Not Found
-                exception: NotFoundException
-                message: This receipt does not have any versions
-                path: /v1/receipts/1/latest-version
   schemas:
     SendReceiptRequest:
       title: SendReceiptRequest
@@ -366,6 +264,18 @@ components:
         receiptLanguage: nob
         serialNumber: RCP-2024-000123
         copyReceipt: false
+    Distribution:
+      title: Distribution
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email to receive receipt
+          examples:
+          - example@entur.org
+        telephone:
+          $ref: '#/components/schemas/Telephone'
+      description: Request for sending a receipt to a customer using one or more distribution methods. Will only send email if both email and telephone are provided. To send sms, leave email as null.
     Telephone:
       title: Telephone
       required:
@@ -384,18 +294,6 @@ components:
           examples:
           - '61051910'
       description: Telephone model for distribution
-    Distribution:
-      title: Distribution
-      type: object
-      properties:
-        email:
-          type: string
-          description: Email to receive receipt
-          examples:
-          - example@entur.org
-        telephone:
-          $ref: '#/components/schemas/Telephone'
-      description: Request for sending a receipt to a customer using one or more distribution methods. Will only send email if both email and telephone are provided. To send sms, leave email as null.
     ReceiptTypeResponse:
       title: ReceiptTypeResponse
       type: object
@@ -403,6 +301,18 @@ components:
         receiptType:
           $ref: '#/components/schemas/ReceiptType'
       description: Response from a successful type query.
+    UserReceiptResponse:
+      title: UserReceiptResponse
+      required:
+      - reference
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference to receipt
+          examples:
+          - a49f7259-7285-42ce-b7b0-e48a77fbfb39
+      description: Response from a accepted receipt request.
     ApiError:
       title: ApiError
       required:
@@ -431,18 +341,6 @@ components:
           type: string
         path:
           type: string
-    UserReceiptResponse:
-      title: UserReceiptResponse
-      required:
-      - reference
-      type: object
-      properties:
-        reference:
-          type: string
-          description: Reference to receipt
-          examples:
-          - a49f7259-7285-42ce-b7b0-e48a77fbfb39
-      description: Response from a accepted receipt request.
     ReceiptType:
       type: string
       description: Type of receipt
@@ -454,16 +352,88 @@ components:
       - DAY_SUMMARY
       examples:
       - SALE
+  responses:
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 404
+                title: Not Found
+                error: Not Found
+                exception: NotFoundException
+                message: This receipt does not have any versions
+                path: /v1/receipts/1/latest-version
+    internalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 500
+                title: Internal Server Error
+                error: Internal Server Error
+                exception: InternalServerException
+                message: Unexpected error while rendering receipt template
+                path: /v1/receipts/render-version
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 403
+                title: Forbidden
+                error: Forbidden
+                exception: ForbiddenException
+                message: The request requires higher privileges than provided by the access token.
+                path: /v1/receipts?organisationId=1
+    conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 409
+                title: Conflict
+                error: Conflict
+                exception: ConflictException
+                message: Receipt with ID 1 and organisation ID 1 is disabled.
+                path: /v1/receipts/1/versions
+    badRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          examples:
+            default:
+              value:
+                timestamp: '2025-11-13T10:15:30+01:00'
+                status: 400
+                title: Bad Request
+                error: Bad Request
+                exception: BAD_REQUEST
+                message: Required parameter 'orderId' is not present.
+                path: /v1/receipts
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -479,11 +449,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-receipt-partner-openapi.json
-- entur-receipt-partner-openapi.yml

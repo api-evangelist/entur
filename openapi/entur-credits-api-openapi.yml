@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Credits API
-  version: 2026.10.2
+  title: Payments Credits API
+  description: The Payments API acts as a gateway to external payment service providers and provides endpoints to create, process and credit payment transactions.
   contact:
     name: Entur
     url: https://developer.entur.org
-  description: 'Operations tagged Credits across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.10.2
 servers:
 - url: https://api.entur.io/sales
   description: Entur's Production environment
@@ -372,13 +372,6 @@ paths:
           $ref: '#/components/responses/notFound'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
   /v1/credits/{creditId}:
     parameters:
     - $ref: '#/components/parameters/creditIdPathParam'
@@ -429,13 +422,6 @@ paths:
           $ref: '#/components/responses/notFound'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
   /v1/credits/{creditId}/execute:
     parameters:
     - $ref: '#/components/parameters/dciHeader'
@@ -463,15 +449,17 @@ paths:
           $ref: '#/components/responses/internalServerError'
         '503':
           $ref: '#/components/responses/serviceUnavailableError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
 components:
   parameters:
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Distribution channel identifier.
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
     initiatedByHeader:
       name: Entur-Initiated-By
       in: header
@@ -481,6 +469,17 @@ components:
       explode: false
       schema:
         type: string
+    paginationPerPageParam:
+      name: perPage
+      in: query
+      description: Selects the number of elements per page
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 30
     creditIdPathParam:
       name: creditId
       in: path
@@ -491,11 +490,11 @@ components:
       schema:
         type: integer
         format: int64
-    X-Correlation-Id:
-      name: X-Correlation-Id
+    posHeader:
+      name: Entur-POS
       in: header
-      description: Correlation id
-      required: false
+      description: Point-of-sale identifier.
+      required: true
       style: simple
       explode: false
       schema:
@@ -526,36 +525,72 @@ components:
         type: integer
         format: int32
         default: 1
-    dciHeader:
-      name: Entur-Distribution-Channel
+    X-Correlation-Id:
+      name: X-Correlation-Id
       in: header
-      description: Distribution channel identifier.
+      description: Correlation id
       required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    paginationPerPageParam:
-      name: perPage
-      in: query
-      description: Selects the number of elements per page
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: integer
-        format: int32
-        default: 30
-    posHeader:
-      name: Entur-POS
-      in: header
-      description: Point-of-sale identifier.
-      required: true
       style: simple
       explode: false
       schema:
         type: string
   schemas:
+    PaymentError:
+      title: PaymentError
+      required:
+      - error
+      - exception
+      - message
+      - path
+      - status
+      - timestamp
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error that occurred.
+          examples:
+          - Internal Server Error
+        exception:
+          type: string
+          description: What exception caused the error.
+          examples:
+          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message:
+          type: string
+          description: A message detailing the error.
+          examples:
+          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path:
+          type: string
+          description: The url path that was accessed when the error happenened.
+          examples:
+          - /v1/payments/1/transactions/1/capture
+        status:
+          type: integer
+          description: The http status of the response.
+          format: int32
+          examples:
+          - 500
+        timestamp:
+          type: string
+          description: When the error occurred
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        errorReason:
+          type: string
+          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
+          examples:
+          - SOFT_DECLINE
+      x-examples: {}
+      examples:
+      - error: Internal Server Error
+        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
+        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
+        path: /v1/payments/1/transactions/1/capture
+        status: 500
+        timestamp: '2025-08-24T14:15:22Z'
     TransactionImportRequest:
       title: TransactionImportRequest
       required:
@@ -627,6 +662,56 @@ components:
         transactionConfirmedAt: '2025-01-12T16:13:13Z'
         transactionData:
           someKey: someValue
+    CreditMergePatch:
+      title: CreditMergePatch
+      required:
+      - totalCreditAmount
+      properties:
+        totalCreditAmount:
+          type: string
+          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+        creditTransactions:
+          type: array
+          description: List of individual transactions to credit.
+          items:
+            $ref: '#/components/schemas/CreditTransactionRequest'
+          examples:
+          - - amount: '450.00'
+              currency: NOK
+              paymentTransactionId: 1
+              reimbursementTypeGroup: PAYMENTCARD
+        active:
+          type: boolean
+          description: Active is used during activation of credit
+          examples:
+          - true
+      description: Request body used to update a credit. The properties described here are the only properties that can be updated on a credit.
+      examples:
+      - totalCreditAmount: '450.00'
+        creditTransactions:
+        - amount: '450.00'
+          currency: NOK
+          paymentTransactionId: 1
+          reimbursementTypeGroup: PAYMENTCARD
+        active: true
+    PaymentTypeGroup:
+      type: string
+      description: A PaymentTypeGroup used to override which kind of method to use for reimbursement, instead of using same as used for the payment transaction.This will only take effect if the payment method on the payment transaction allows for overriding.
+      enum:
+      - AGENT
+      - CASH
+      - ECARD
+      - GIFTCARD
+      - INVOICE
+      - MOBILE
+      - PAYMENTCARD
+      - PAYPAL
+      - REMITTED
+      - REQUISITION
+      examples:
+      - CASH
     CreditTransactionRequest:
       title: CreditTransactionRequest
       required:
@@ -666,6 +751,107 @@ components:
         currency: NOK
         paymentTransactionId: 1
         reimbursementTypeGroup: PAYMENTCARD
+    CreditTransactionResponse:
+      title: CreditTransaction
+      required:
+      - amount
+      - paymentId
+      - paymentTransactionId
+      - reimbursementTypeGroup
+      type: object
+      properties:
+        amount:
+          type: string
+          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
+          examples:
+          - '450.00'
+        createdAt:
+          type: string
+          description: Timestamp for when transaction was first created.
+          format: date-time
+          readOnly: true
+        creditedAt:
+          type: string
+          description: Time when credit was confirmed.
+          format: date-time
+          examples:
+          - '2025-01-12T16:13:13Z'
+        currency:
+          type: string
+          description: 3-letter ISO 4217 currency code. Default is NOK.
+          examples:
+          - NOK
+        newGiftCardId:
+          type: string
+          description: 'Reference to the gift card id (contract uuid) the credited payment transaction belongs to. Note: This field will be set if the transaction was credited to a gift card.'
+          readOnly: true
+          examples:
+          - 0068a450-066f-442d-8117-1543fe2b1e0e
+        paymentId:
+          type: integer
+          description: Reference to the payment the credited payment transaction belongs to.
+          format: int64
+          examples:
+          - 1
+        paymentTransactionId:
+          type: integer
+          description: Reference to the transaction this credit transaction credits.
+          format: int64
+          examples:
+          - 10
+        reimbursementMethod:
+          type: string
+          description: Specific type of reimbursement method.
+          examples:
+          - VISA
+        reimbursementTypeGroup:
+          type: string
+          description: General type of reimbursement method.
+          examples:
+          - PAYMENTCARD
+        rrn:
+          type: string
+          description: Reconciliation reference number used to track a transaction through different economy systems.
+          examples:
+          - 000012345678
+        status:
+          type: string
+          description: Status of this credit transaction.
+          enum:
+          - CREATED
+          - CREDITED
+          examples:
+          - CREATED
+        transactionData:
+          type: object
+          additionalProperties:
+            type: string
+          description: Extra transaction data from external client. Only relevant for clients using the import flow.
+          examples:
+          - extraData: any extra data you want to add
+        updatedAt:
+          type: string
+          description: Timestamp for when transaction was last updated.
+          format: date-time
+          readOnly: true
+          examples:
+          - '2025-01-12T16:13:13Z'
+      description: Represents a credit transaction referring to a payment transaction.
+      examples:
+      - amount: '450.00'
+        createdAt: '2025-01-12T16:08:03Z'
+        creditedAt: '2025-01-12T16:13:13Z'
+        currency: NOK
+        newGiftCardId: 0068a450-066f-442d-8117-1543fe2b1e0e
+        paymentId: 1
+        paymentTransactionId: 10
+        reimbursementMethod: VISA
+        reimbursementTypeGroup: PAYMENTCARD
+        rrn: '000123456123'
+        status: CREATED
+        transactionData:
+          extraData: any extra data you want to add
+        updatedAt: '2025-01-12T16:13:13Z'
     CreditRequest:
       title: CreditRequest
       required:
@@ -914,222 +1100,9 @@ components:
         organisationId: 1
         settlementId: 1245
         totalCreditAmount: '450.00'
-    PaymentError:
-      title: PaymentError
-      required:
-      - error
-      - exception
-      - message
-      - path
-      - status
-      - timestamp
-      type: object
-      properties:
-        error:
-          type: string
-          description: The error that occurred.
-          examples:
-          - Internal Server Error
-        exception:
-          type: string
-          description: What exception caused the error.
-          examples:
-          - org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
-        message:
-          type: string
-          description: A message detailing the error.
-          examples:
-          - An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
-        path:
-          type: string
-          description: The url path that was accessed when the error happenened.
-          examples:
-          - /v1/payments/1/transactions/1/capture
-        status:
-          type: integer
-          description: The http status of the response.
-          format: int32
-          examples:
-          - 500
-        timestamp:
-          type: string
-          description: When the error occurred
-          format: date-time
-          examples:
-          - '2025-01-12T16:13:13Z'
-        errorReason:
-          type: string
-          description: 'In some cases, the client is required to act upon getting a PaymentError. When action is required from the client, this field will be populated. Valid values: SOFT_DECLINE, REFUSED_BY_ISSUER, ISSUER_UNAVAILABLE, RESOURCE_BUSY, USER_ERROR, COMPLIANCE_CHECK_FAILED.'
-          examples:
-          - SOFT_DECLINE
-      x-examples: {}
-      examples:
-      - error: Internal Server Error
-        exception: org.entur.payment.faulthandling.exceptions.psp.InternalPSPFailureException
-        message: An internal error occurred in the PSP. message='Unable to sale', errorCode='99', errorSource='Netaxept', errorText='Internal failure'
-        path: /v1/payments/1/transactions/1/capture
-        status: 500
-        timestamp: '2025-08-24T14:15:22Z'
-    CreditTransactionResponse:
-      title: CreditTransaction
-      required:
-      - amount
-      - paymentId
-      - paymentTransactionId
-      - reimbursementTypeGroup
-      type: object
-      properties:
-        amount:
-          type: string
-          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
-          examples:
-          - '450.00'
-        createdAt:
-          type: string
-          description: Timestamp for when transaction was first created.
-          format: date-time
-          readOnly: true
-        creditedAt:
-          type: string
-          description: Time when credit was confirmed.
-          format: date-time
-          examples:
-          - '2025-01-12T16:13:13Z'
-        currency:
-          type: string
-          description: 3-letter ISO 4217 currency code. Default is NOK.
-          examples:
-          - NOK
-        newGiftCardId:
-          type: string
-          description: 'Reference to the gift card id (contract uuid) the credited payment transaction belongs to. Note: This field will be set if the transaction was credited to a gift card.'
-          readOnly: true
-          examples:
-          - 0068a450-066f-442d-8117-1543fe2b1e0e
-        paymentId:
-          type: integer
-          description: Reference to the payment the credited payment transaction belongs to.
-          format: int64
-          examples:
-          - 1
-        paymentTransactionId:
-          type: integer
-          description: Reference to the transaction this credit transaction credits.
-          format: int64
-          examples:
-          - 10
-        reimbursementMethod:
-          type: string
-          description: Specific type of reimbursement method.
-          examples:
-          - VISA
-        reimbursementTypeGroup:
-          type: string
-          description: General type of reimbursement method.
-          examples:
-          - PAYMENTCARD
-        rrn:
-          type: string
-          description: Reconciliation reference number used to track a transaction through different economy systems.
-          examples:
-          - 000012345678
-        status:
-          type: string
-          description: Status of this credit transaction.
-          enum:
-          - CREATED
-          - CREDITED
-          examples:
-          - CREATED
-        transactionData:
-          type: object
-          additionalProperties:
-            type: string
-          description: Extra transaction data from external client. Only relevant for clients using the import flow.
-          examples:
-          - extraData: any extra data you want to add
-        updatedAt:
-          type: string
-          description: Timestamp for when transaction was last updated.
-          format: date-time
-          readOnly: true
-          examples:
-          - '2025-01-12T16:13:13Z'
-      description: Represents a credit transaction referring to a payment transaction.
-      examples:
-      - amount: '450.00'
-        createdAt: '2025-01-12T16:08:03Z'
-        creditedAt: '2025-01-12T16:13:13Z'
-        currency: NOK
-        newGiftCardId: 0068a450-066f-442d-8117-1543fe2b1e0e
-        paymentId: 1
-        paymentTransactionId: 10
-        reimbursementMethod: VISA
-        reimbursementTypeGroup: PAYMENTCARD
-        rrn: '000123456123'
-        status: CREATED
-        transactionData:
-          extraData: any extra data you want to add
-        updatedAt: '2025-01-12T16:13:13Z'
-    PaymentTypeGroup:
-      type: string
-      description: A PaymentTypeGroup used to override which kind of method to use for reimbursement, instead of using same as used for the payment transaction.This will only take effect if the payment method on the payment transaction allows for overriding.
-      enum:
-      - AGENT
-      - CASH
-      - ECARD
-      - GIFTCARD
-      - INVOICE
-      - MOBILE
-      - PAYMENTCARD
-      - PAYPAL
-      - REMITTED
-      - REQUISITION
-      examples:
-      - CASH
-    CreditMergePatch:
-      title: CreditMergePatch
-      required:
-      - totalCreditAmount
-      properties:
-        totalCreditAmount:
-          type: string
-          description: 'Amount to credit, represented in the standard currency. Maximum (totalDigits: 18, fractionDigits: 5) according to ISO 20022. The integer and fractional digits are separated by a dot.'
-          examples:
-          - '450.00'
-        creditTransactions:
-          type: array
-          description: List of individual transactions to credit.
-          items:
-            $ref: '#/components/schemas/CreditTransactionRequest'
-          examples:
-          - - amount: '450.00'
-              currency: NOK
-              paymentTransactionId: 1
-              reimbursementTypeGroup: PAYMENTCARD
-        active:
-          type: boolean
-          description: Active is used during activation of credit
-          examples:
-          - true
-      description: Request body used to update a credit. The properties described here are the only properties that can be updated on a credit.
-      examples:
-      - totalCreditAmount: '450.00'
-        creditTransactions:
-        - amount: '450.00'
-          currency: NOK
-          paymentTransactionId: 1
-          reimbursementTypeGroup: PAYMENTCARD
-        active: true
   responses:
-    notFound:
-      description: Not Found
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/PaymentError'
-    badRequest:
-      description: Bad Request
+    internalServerError:
+      description: Internal Server Error
       content:
         application/hal+json:
           schema:
@@ -1140,8 +1113,14 @@ components:
         application/hal+json:
           schema:
             $ref: '#/components/schemas/PaymentError'
-    internalServerError:
-      description: Internal Server Error
+    badRequest:
+      description: Bad Request
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
+    notFound:
+      description: Not Found
       content:
         application/hal+json:
           schema:
@@ -1151,6 +1130,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-payment-partner-openapi.json
-- entur-payment-partner-openapi.yml

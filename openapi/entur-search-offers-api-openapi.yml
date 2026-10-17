@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Search offers API
-  version: 2026.09.6
+  title: Offers V3 beta Search offers API
+  description: This api is in Beta. Search for offers by different means.
   contact:
     name: Team Tilbud
     email: teamtilbud@entur.org
+  version: 2026.09.6
   x-stability-level: beta
-  description: 'Operations tagged Search offers across 2 of this provider''s published API definitions: entur-offers-partner-openapi.json, entur-offers-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io
   description: Production environment.
@@ -59,13 +59,6 @@ paths:
           - offers.trip-pattern.offers:opprett
           - Salgskanal:les
       x-entur-rate-limited: true
-    servers:
-    - url: https://api.entur.io
-      description: Production environment.
-    - url: https://api.staging.entur.io
-      description: Staging environment.
-    - url: https://api.dev.entur.io
-      description: Development environment.
   /offers/v3/search/geographical-locations:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -105,13 +98,6 @@ paths:
           - offers.geographical-locations.offers:opprett
           - Salgskanal:les
       x-entur-rate-limited: true
-    servers:
-    - url: https://api.entur.io
-      description: Production environment.
-    - url: https://api.staging.entur.io
-      description: Staging environment.
-    - url: https://api.dev.entur.io
-      description: Development environment.
   /offers/v3/search/authority:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -151,810 +137,8 @@ paths:
           - offers.authority.offers:opprett
           - Salgskanal:les
       x-entur-rate-limited: true
-    servers:
-    - url: https://api.entur.io
-      description: Production environment.
-    - url: https://api.staging.entur.io
-      description: Staging environment.
-    - url: https://api.dev.entur.io
-      description: Development environment.
 components:
-  parameters:
-    AcceptLanguageHeader:
-      name: Accept-Language
-      in: header
-      description: The language code from IETF BCP 47
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-        default: nb
-        maxLength: 2
-        minLength: 2
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    DistributionChannelHeader:
-      name: Entur-Distribution-Channel
-      in: header
-      description: Id of distribution channel requesting offers
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-        pattern: ^[A-Z]{3}:DistributionChannel:.+$
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    POS-Header:
-      name: Entur-POS
-      in: header
-      description: Point-of-sale identifier
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
-    CategorySpec:
-      type: object
-      description: How to categorise and group recommendations based on different categories. Recommendations will attempt to calculate categories from the combination of input parameters.
-      examples:
-      - example:
-          typesOfRecommendation:
-          - FLEXIBLE
-          - CHEAPEST
-          durationTypes:
-          - DAY_PASS
-          - SINGLE_TRIP
-          fareClasses:
-          - FIRST_CLASS
-          facilitySet:
-          - SLEEPER
-          - SEATING
-      properties:
-        typesOfRecommendation:
-          type: array
-          default:
-          - CHEAPEST
-          description: Which categories to use for flexibility grouping.
-          items:
-            $ref: '#/components/schemas/TypeOfRecommendationEnum'
-          minItems: 1
-        durationTypes:
-          type: array
-          default:
-          - ANY
-          description: If not specified, all durationTypes will be considered.
-          items:
-            $ref: '#/components/schemas/DurationEnum'
-          minItems: 1
-        fareClasses:
-          type: array
-          default:
-          - ANY
-          description: If not specified, all fareClasses will be considered. Be aware that if not specified, the fareClass attribute in the recommendation object will read "fareClass":"ANY". To get the actual fareClass you would have to look up the corresponding offer.
-          items:
-            $ref: '#/components/schemas/FareClassEnum'
-          minItems: 1
-        facilitySet:
-          type: array
-          default:
-          - ANY
-          description: If not specified, all accommodations will be considered. Be aware that if not specified, the facilitySet attribute in the recommendation object will read "facilitySet":"ANY". To get the actual facilitySet you would have to look up the corresponding offer.
-          items:
-            $ref: '#/components/schemas/AccommodationFacilityEnum'
-          minItems: 1
-      required:
-      - typesOfRecommendation
-    FareClassEnum:
-      type: string
-      default: ANY
-      description: A type of FareClass. Subset of FareClassEnumeration from NeTEx service restrictions support.
-      enum:
-      - FIRST_CLASS
-      - SECOND_CLASS
-      - THIRD_CLASS
-      - ECONOMY_CLASS
-      - BUSINESS_CLASS
-      - TURISTA
-      - PREFERENTE
-      - PREMIUM_CLASS
-      - ANY
-      - STANDARD_CLASS
-      - UNKNOWN
-      example: STANDARD_CLASS
-    RecommendationConfig:
-      type: object
-      description: Specify what types of recommendations are returned in the response. For a more in depth explanation of recommendations, see the guide for recommendations at TODO [INSERT NEW LINK].
-      properties:
-        categorySpec:
-          $ref: '#/components/schemas/CategorySpec'
-        ruleSpec:
-          $ref: '#/components/schemas/RuleSpec'
-    ProgramAccrualSummary:
-      type: object
-      properties:
-        id:
-          type: string
-          example: '9'
-        reference:
-          type: string
-          description: Identifier for the loyalty program.
-          example: entur_reis
-        name:
-          type: string
-          example: Entur Reis
-        infoLink:
-          type: string
-          description: URL to information about the loyalty program.
-        paused:
-          type: boolean
-          description: Whether accrual for this program is currently paused.
-          example: false
-      required:
-      - id
-    ServiceJourneySummary:
-      type: object
-      properties:
-        datedServiceJourneyId:
-          type: string
-          example: ENT:DatedServiceJourney:12345
-        serviceJourneyId:
-          type: string
-          example: ENT:ServiceJourney:56789
-      required:
-      - datedServiceJourneyId
-      - serviceJourneyId
-    TravellerMappingSummary:
-      type: object
-      description: A specification of which travellers can use an offer, along with limitations on the number of travellers that must be selected from the group for the OFFER to be valid.
-      properties:
-        travellerIds:
-          type: array
-          description: The ids of the travellers.
-          items:
-            type: string
-            example: ID_A
-        maxNumberOfTravellers:
-          type: integer
-          format: int32
-          description: The maximum number of travellers that can be selected from the group.
-        minNumberOfTravellers:
-          type: integer
-          format: int32
-          description: The minimum number of travellers that can be selected from the group.
-        userType:
-          type: string
-          description: A type of person. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Compatible with the current NeTEx implementation of UserTypeEnumeration at Entur. Related to but may include more than 'UserTypeEnum'.
-          examples:
-          - ANYONE
-          - ADULT
-          - CHILD
-          - INFANT
-          - ANIMAL
-          - SENIOR
-          - GUIDE_DOG
-          - YOUNG_PERSON
-          - STUDENT
-          - MILITARY
-          - SCHOOL_PUPIL
-          - VETERAN
-          - DISABLED
-          - DISABLED_COMPANION
-          - JOB_SEEKER
-          - EMPLOYEE
-          - MEMBER
-          - RESIDENT
-          - OTHER
-      required:
-      - maxNumberOfTravellers
-      - minNumberOfTravellers
-      - travellerIds
-      - userType
-    TypeOfRecommendationEnum:
-      type: string
-      default: CHEAPEST
-      description: Describes the degree of flexibility in a recommendation (refundable vs non-refundable, exchangeable vs non-exchangeable). Whether the recommendation is the CHEAPEST - regardless of flexibility, or whether the recommendation is for a specified product.
-      enum:
-      - FLEXIBLE
-      - SEMI_FLEXIBLE
-      - NON_FLEXIBLE
-      - CHEAPEST
-      example: CHEAPEST
-    UserTypeEnum:
-      type: string
-      description: A type of traveller. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Subset of UserTypeEnumeration from NeTEx usage parameter eligibility support.
-      enum:
-      - ANYONE
-      - ADULT
-      - CHILD
-      - INFANT
-      - ANIMAL
-      - SENIOR
-      - GUIDE_DOG
-      - YOUNG_PERSON
-      - STUDENT
-      - MILITARY
-      example: ADULT
-    UnavailableProductProperties:
-      type: object
-      description: Properties of an unavailable product.
-      properties:
-        accommodations:
-          type: array
-          items:
-            type: string
-            description: Accommodation facility. Compatible with the current NeTEx implementation of AccommodationFacilityEnumeration at Entur. Related to but may include more than 'AccommodationFacilityEnum'.
-            examples:
-            - SLEEPER
-            - SEATING
-            - DOUBLE_SLEEPER
-            - SINGLE_SLEEPER
-            - SPECIAL_SLEEPER
-            - COUCHETTE
-            - SINGLE_COUCHETTE
-            - DOUBLE_COUCHETTE
-            - RECLINING_SEATS
-            - BABY_COMPARTMENT
-            - FAMILY_CARRIAGE
-            - PANORAMA_COACH
-            - PULLMAN_COACH
-            - STANDING
-        fareClasses:
-          type: array
-          items:
-            type: string
-            description: A type of FareClass. Compatible with the current NeTEx implementation of FareClassEnumeration at Entur. Related to but may include more than 'FareClassEnum'.
-            examples:
-            - FIRST_CLASS
-            - SECOND_CLASS
-            - THIRD_CLASS
-            - ECONOMY_CLASS
-            - BUSINESS_CLASS
-            - TURISTA
-            - PREFERENTE
-            - PREMIUM_CLASS
-            - STANDARD_CLASS
-            - UNKNOWN
-        isExchangeable:
-          type: boolean
-          description: Whether the product would have been exchangeable.
-        isRefundable:
-          type: boolean
-          description: Whether the product would have been refundable.
-        organisation:
-          $ref: '#/components/schemas/OrganisationSummary'
-    GeographicalValidity:
-      type: object
-      description: Describes the geographical validity of a product. Includes information on ServiceJourneys, PointToPointValidity and ZonalValidity. In cases of replacement transport, these fields describe the replacement journey.
-      properties:
-        serviceJourneys:
-          type: array
-          description: Service journeys where this product is valid.
-          items:
-            $ref: '#/components/schemas/ServiceJourneySummary'
-        pointToPointValidity:
-          $ref: '#/components/schemas/PointToPointValidity'
-        zonalValidity:
-          $ref: '#/components/schemas/ZonalValidity'
-    GroupSummary:
-      type: object
-      properties:
-        id:
-          type: string
-          example: ENT:GroupTicket:Family
-        version:
-          type: string
-          example: ENT:Version:V1
-        name:
-          type: string
-          example: Familiebillett
-        description:
-          type: string
-        userProfiles:
-          type: array
-          description: User profiles and their required number of travellers in the group.
-          items:
-            $ref: '#/components/schemas/UserProfileInGroupSummary'
-      required:
-      - description
-      - id
-      - userProfiles
-      - version
-    UnavailableProduct:
-      type: object
-      description: Representation of a product that is unavailable, but would have been included in an offer if available.
-      properties:
-        id:
-          type: string
-          description: NeTEx ID of the unavailable product.
-          example: ENT:PreassignedFareProduct:StandardFullFlex
-        name:
-          type: string
-          description: Human readable name for the product.
-          example: Enkeltbillett
-        unavailableStatus:
-          type: string
-          description: "Status of why a product is unavailable.\n NOT_IN_PURCHASE_WINDOW - Product is outside of window where it can be purchased.\n NOT_YET_AVAILABLE - The product is not available yet, no further information is specified\n NO_QUOTAS_DEFINED - The product requires quotas to be purchased, but no quotas are defined yet.\nNO_LONGER_AVAILABLE - The product is no longer available for purchase, no further information is specified.\nSOLD_OUT - The product has no more seats or quotas available for sale.\nCLOSED - The product is closed for sale.\n"
-          examples:
-          - NOT_YET_AVAILABLE
-          - SOLD_OUT
-          - CLOSED
-          - NO_QUOTAS_DEFINED
-          - NOT_IN_PURCHASE_WINDOW
-          - NO_LONGER_AVAILABLE
-        serviceJourney:
-          $ref: '#/components/schemas/ServiceJourneySummary'
-        properties:
-          $ref: '#/components/schemas/UnavailableProductProperties'
-      required:
-      - id
-      - unavailableStatus
-    NamedReference:
-      type: object
-      description: A simple reference with id and name.
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
-    Traveller:
-      type: object
-      description: A specification of a traveller. Either age or userType must be set.
-      examples:
-      - example:
-          id: ID_A
-          userType: ADULT
-          productIds:
-          - ENT:PreassignedFareProduct:StandardFullFlex
-          baggageTypes:
-          - BICYCLE
-      properties:
-        id:
-          type: string
-          description: Identifier for the traveller. The travellers id will be referenced in the response where natural. Specifying an id for each traveller can make it easier to determine the seating and for whom each product is intended. If no ID is specified, the traveller will be assigned a random ID, only valid for the particular offer.
-          example: ID_A
-        userType:
-          $ref: '#/components/schemas/UserTypeEnum'
-        age:
-          type: integer
-          description: Specify the travellers age, to let the system calculate the corresponding userType.
-          minimum: 0
-        baggageTypes:
-          type: array
-          description: A filter for what kind of luggage the traveller wants offers for. If, for example, a user wants to bring a bicycle along for the trip. "BICYCLE" can be specified in that array. Offers that can't fulfil the wish for a "BICYCLE" accommodation are still returned from our services.
-          items:
-            $ref: '#/components/schemas/BaggageTypeEnum'
-          minItems: 1
-        campaignCodes:
-          type: array
-          description: Campaign codes that may grant entitlements or discounts. Usually not connected to the identity of the Traveller.
-          items:
-            type: string
-            example: MYCODE
-          minItems: 1
-        travellerContext:
-          $ref: '#/components/schemas/TravellerContext'
-      x-class-extra-annotation: '@org.entur.offers.config.validation.AtLeastOneParameter(parameters = {"userType", "age"})'
-    SearchTripPatternRequest:
-      type: object
-      description: A request used to search for fare products for a specified trip.
-      properties:
-        travellers:
-          type: array
-          description: The travellers.
-          items:
-            $ref: '#/components/schemas/Traveller'
-          minItems: 1
-        recommendationConfig:
-          $ref: '#/components/schemas/RecommendationConfig'
-        tripPattern:
-          $ref: '#/components/schemas/TripPatternRequest'
-        groupConfig:
-          $ref: '#/components/schemas/GroupConfig'
-        includeMultiTripOffers:
-          type: boolean
-          default: false
-          description: Indicates whether multi-trip offers should be included in the response, such as monthly passes, day passes, and similar options.
-      required:
-      - travellers
-      - tripPattern
-    JourneyOrganizeAlgorithmEnum:
-      type: string
-      default: SUBSEQUENT_COMBINATIONS
-      description: 'There are two supported algorithms for organizing how we present each combination of journeys. Given three journeys in the trip pattern; SJ-1, SJ-2, SJ-3 the two algorithms will generate these combinations:
-
-        SUBSEQUENT_COMBINATIONS: (SJ-1), (SJ-2), (SJ-3), (SJ-1, SJ-2), (SJ-2, SJ-3), (SJ-1, SJ-2, SJ-3)
-
-        COMBINATIONS_FROM_OFFERS: Will only organize by unique journey combinations covered by offers.'
-      enum:
-      - SUBSEQUENT_COMBINATIONS
-      - COMBINATIONS_FROM_OFFERS
-      example: SUBSEQUENT_COMBINATIONS
-    CappedDiscountOption:
-      type: object
-      description: A discount might be given based on previous transactions if CappedDiscountRequest was specified. A cappingSpecification must be specified in the traveller attribute in the request to the search/ endpoints in order to receive a discount. Capping must also be enabled by the operator of the service journey.
-      properties:
-        cappedDiscountRightRef:
-          $ref: '#/components/schemas/ObjectRef'
-        cappedDiscountRuleRef:
-          $ref: '#/components/schemas/ObjectRef'
-        alternatives:
-          type: array
-          items:
-            $ref: '#/components/schemas/CappingAlternative'
-      required:
-      - cappedDiscountRightRef
-      - cappedDiscountRuleRef
-    AvailableFulfilmentMethod:
-      type: object
-      description: Describes which fulfilmentMethods are available for an Offer,.
-      properties:
-        id:
-          type: string
-          description: NeTEx standard.
-        version:
-          type: string
-          description: NeTEx standard.
-        distributionRights:
-          type: array
-          description: Says what the distribution channel is allowed to do with this offer. Compatible with the current NeTEx implementation of DistributionRightsEnumeration at Entur.
-          items:
-            type: string
-            examples:
-            - NONE
-            - SELL
-            - REFUND
-            - EXCHANGE
-            - INFORM
-            - PRIVATE
-            - OTHER
-          minItems: 1
-      required:
-      - id
-      - version
-    SearchGeoLocationRequest:
-      type: object
-      description: A request used to search for fare products between stop places or zones. If two stopPlaces are provided, Offers are calculated for each set of FareZones sharing the same codespace. For any other combination, the common codespace is selected. In either case, transport mode and authority can be used to further refine which Offers are returned. Some combinations of stop places may result in offers that cover parts of the distance. As an example, let's say the "from" stop place is A, and the "to" stop place is C. There may not be a ticket that is valid from A to C, but tickets that are valid from A to B, and B to C. In that case you will receive offers that are valid for A to B and B to C. If you only want offers that cover the whole distance, set "offersForWholeTripOnly" to true.
-      properties:
-        travelDate:
-          type: string
-          format: date-time
-          description: The specific time for when the ticket should be activated. For most purposes it is recommended to use the current time as travel date. That is because most period tickets are activated immediately on purchase. If you want to get a period ticket that should be activated some time in the future, specify the future date.
-          example: 2020-12-24T14:48:00+0200
-        from:
-          type: string
-          description: The id of the origin stop place or zone.
-          example: NSR:StopPlace:123
-          pattern: ^[A-Z]{3}:FareZone:.+$|^NSR:StopPlace:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___" or "NSR:StopPlace:___".
-        to:
-          type: string
-          description: The id of the destination stop place or zone.
-          example: NSR:StopPlace:337
-          pattern: ^[A-Z]{3}:FareZone:.+$|^NSR:StopPlace:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___" or "NSR:StopPlace:___".
-        via:
-          type: array
-          description: Optional sequence of via locations. Mostly useful for zone based searches.
-          items:
-            type: string
-            example: ENT:FareZone:3
-          minItems: 1
-          pattern: ^[A-Z]{3}:FareZone:.+$|^NSR:StopPlace:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___" or "NSR:StopPlace:___".
-        travellers:
-          type: array
-          description: The travellers the offer should be valid for.
-          items:
-            $ref: '#/components/schemas/Traveller'
-          minItems: 1
-        recommendationConfig:
-          $ref: '#/components/schemas/RecommendationConfig'
-        offersForWholeTripOnly:
-          type: boolean
-          default: false
-          description: Set this flag to true if you only want tickets that are valid all the way between the stop-places specified in the "from" and "to" field. When set to false, you will receive additional offers that are  valid for parts of the trip with one of the stop places covered.
-        authority:
-          type: string
-          description: Optional authority ID, to further refine search. The returned Offers will only contain products allowing or requiring the provided Authority. In the case of two rail stopPlaces, Authority is set from pre-defined rules and this parameter will be ignored.
-          example: ENT:Authority:ENT
-          pattern: ^[A-Z]{3}:Authority:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:Authority:___".
-        transportMode:
-          type: string
-          description: Optional transport mode, to further refine search. Most useful when there is a specific use case where there may be overlapping Offers, for instance high speed ferry or rail.
-          example: RAIL
-      required:
-      - from
-      - to
-      - travelDate
-      - travellers
-    PreassignedProduct:
-      type: object
-      description: Representation of a mandatory product that is included in an offer.
-      properties:
-        id:
-          type: string
-          description: The id if the preassigned product.
-          example: ENT:PreassignedFareProduct:StandardFullFlex
-        version:
-          type: string
-          description: The version of the preassigned product.
-          example: ENT:Version:V1
-        name:
-          type: string
-          description: The name of the preassigned product.
-          example: Standard refunderbar
-        description:
-          type: string
-          description: The description of the preassigned product.
-          example: Standard refunderbar
-        properties:
-          $ref: '#/components/schemas/PropertiesSummary'
-        geographicalValidity:
-          $ref: '#/components/schemas/GeographicalValidity'
-        discountRights:
-          type: array
-          description: Optional discounts applied to this product.
-          items:
-            $ref: '#/components/schemas/DiscountRightSummary'
-          minItems: 1
-      required:
-      - description
-      - geographicalValidity
-      - id
-      - name
-      - properties
-      - version
-    GroupConfig:
-      type: object
-      description: A configuration of how to group travellers in offers.
-      properties:
-        numberOfCompartments:
-          type: integer
-          description: Number of compartments to group travellers in. If we are unable to fit the given travellers in the specified amount of compartments, no offer will be returned.
-      required:
-      - numberOfCompartments
-    PointToPointValidity:
-      type: object
-      description: Start and stop places where the product is valid.
-      properties:
-        fromPlace:
-          $ref: '#/components/schemas/NamedReference'
-          description: Valid from place.
-        toPlace:
-          $ref: '#/components/schemas/NamedReference'
-          description: Valid to place.
-      required:
-      - fromPlace
-      - toPlace
-    UserProfileSummary:
-      type: object
-      description: id, version, name and user type of a user.
-      examples:
-      - example:
-          id: ENT:UserProfile:Adult
-          version: ENT:Version:V1
-          name: Ola Nordmann
-          userType: ADULT
-      properties:
-        id:
-          type: string
-        version:
-          type: string
-        name:
-          type: string
-        userType:
-          type: string
-          description: A type of person. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Compatible with the current NeTEx implementation of UserTypeEnumeration at Entur. Related to but may include more than 'UserTypeEnum'.
-          examples:
-          - ANYONE
-          - ADULT
-          - CHILD
-          - INFANT
-          - ANIMAL
-          - SENIOR
-          - GUIDE_DOG
-          - YOUNG_PERSON
-          - STUDENT
-          - MILITARY
-          - SCHOOL_PUPIL
-          - VETERAN
-          - DISABLED
-          - DISABLED_COMPANION
-          - JOB_SEEKER
-          - EMPLOYEE
-          - MEMBER
-          - RESIDENT
-          - OTHER
-      required:
-      - id
-      - name
-      - version
-    OfferToBuy:
-      type: object
-      description: Describes which offer to buy and how many of this offer to buy to satisfy a recommendation.
-      properties:
-        id:
-          type: string
-          description: Id of the offer to buy.
-          example: 00faf83-56c3-4f4e-8be9-e793c255a77b
-        numberToBuy:
-          type: integer
-          description: Number of this offer to buy.
-          example: 2
-        selectableProductIds:
-          type: array
-          description: List of selectableIds of supplement products which upgrades a product.
-          items:
-            type: string
-            example: KEeaHd
-        possibleTravellerIds:
-          type: array
-          description: One possible grouping of travellers for the number of offers to buy.
-          items:
-            type: array
-            items:
-              type: string
-              example: Adult-1
-      required:
-      - id
-      - numberToBuy
-      - possibleTravellerIds
-      - selectableProductIds
-    RecommendationCombination:
-      type: object
-      description: A combination of recommendations that together cover the entire journey.
-      properties:
-        geographicalValidityCovered:
-          $ref: '#/components/schemas/GeographicalValidityCovered'
-        recommendationsToCoverEntireJourney:
-          type: array
-          description: You must select all recommendations in the list to cover the geographical validity.
-          items:
-            type: string
-            description: Id of the recommendation(s) to select.
-          minItems: 1
-      required:
-      - geographicalValidityCovered
-      - recommendationsToCoverEntireJourney
-      title: RecommendationCombination
-    Recommendation:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of a recommendation within this response.
-        geographicalValidityCovered:
-          $ref: '#/components/schemas/GeographicalValidityCovered'
-        typeOfRecommendation:
-          $ref: '#/components/schemas/TypeOfRecommendationEnum'
-        durationType:
-          $ref: '#/components/schemas/DurationEnum'
-        fareClass:
-          $ref: '#/components/schemas/FareClassEnum'
-        facilitySet:
-          $ref: '#/components/schemas/AccommodationFacilityEnum'
-        offersToBuy:
-          type: array
-          description: Describes which offer to buy and how many of this offer to buy to satisfy a recommendation.
-          items:
-            $ref: '#/components/schemas/OfferToBuy'
-        combineWithToCoverEntireJourney:
-          type: array
-          description: List of RecommendationCombination covering remaining parts of the journey. The current recommendation can be combined with one of these to cover the entire journey.
-          items:
-            $ref: '#/components/schemas/RecommendationCombination'
-      required:
-      - geographicalValidityCovered
-      - id
-      - offersToBuy
-      - typeOfRecommendation
-    SearchResponse:
-      type: object
-      properties:
-        tripPatternId:
-          type: string
-          example: 5e7cbc83e58e6a00011cecc3
-        offers:
-          type: array
-          items:
-            $ref: '#/components/schemas/OfferSummary'
-        recommendations:
-          $ref: '#/components/schemas/RecommendationResult'
-        optionalProducts:
-          type: array
-          items:
-            $ref: '#/components/schemas/OptionalProduct'
-        unavailableProducts:
-          type: array
-          items:
-            $ref: '#/components/schemas/UnavailableProduct'
-        notices:
-          type: array
-          description: Additional information about potentially missing information or functionality due to transient errors.
-          items:
-            type: string
-            description: 'A code identifying which downstream service was unavailable. Known values: OSDM (OSDM-gateway unavailable), PERSONALISATION (Personalisation service unavailable), INVENTORY (Inventory service unavailable), SEATING (Seating service unavailable). This list may be extended without a spec change.'
-            examples:
-            - OSDM
-            - PERSONALISATION
-            - INVENTORY
-            - SEATING
-      required:
-      - offers
-      - recommendations
-    UserProfileInGroupSummary:
-      type: object
-      description: Reference to a group.
-      properties:
-        id:
-          type: string
-        version:
-          type: string
-        numberOfPeople:
-          type: integer
-          description: Number of travellers required for this user profile in the group.
-      required:
-      - id
-      - numberOfPeople
-    RuleSpec:
-      type: object
-      description: Determines what rules to apply when categorising and recommending offers for travellers.
-      properties:
-        journeyOrganizeAlgorithm:
-          $ref: '#/components/schemas/JourneyOrganizeAlgorithmEnum'
-        priceComparisonAlgorithm:
-          $ref: '#/components/schemas/PriceComparisonAlgorithmEnum'
-        onlyIncludeRecommendedOffers:
-          type: boolean
-          default: true
-          description: Only keep Offers referenced by one or more Recommendations.
-        onlyIncludeRecommendationsWithOffersToBuy:
-          type: boolean
-          default: true
-          description: Only include Recommendations with OffersToBuy.
-        mixInOffersWithHigherFlexibility:
-          type: boolean
-          default: true
-          description: Only applicable to multi leg journeys. If part of the journey has no Offer for the required flexibility, Recommendations will mix in a higher flexibility if it matches other parameters.
-        mixInOffersWithOtherFacilitySets:
-          type: boolean
-          default: true
-          description: Only applicable to multi leg journeys. If part of the journey has no Offer for the required facility set, Recommendations will mix in the cheapest facility set that matches other parameters.
-        onlyKeepUpgradeProductSalesPackages:
-          type: boolean
-          default: false
-          description: When enabled, only offers containing exclusively upgrade products (e.g. seat reservations) are considered for recommendations. Offers containing base fare products are excluded.
-        onlyIncludeMostCompleteInCategorySpec:
-          type: boolean
-          default: false
-          description: 'BETA: This field is in beta and may change or be removed in future versions.'
     OptionalProduct:
       type: object
       description: Representation of a optional product that can be selected together with mandatory products in an offer.
@@ -1008,58 +192,144 @@ components:
       - properties
       - selectableId
       - version
-    AccommodationFacilityEnum:
-      type: string
-      default: ANY
-      description: Subset of AccommodationFacilityEnumeration from NeTEx facility support.
-      enum:
-      - ANY
-      - SLEEPER
-      - SEATING
-      - COUCHETTE
-      - RECLINING_SEATS
-      - STANDING
-      example: SLEEPER
-    CappingAlternative:
+    ServiceJourneySummary:
       type: object
-      description: An alternative is based on previous transactions might have a discount at the expense of setting the start date in the past.
       properties:
-        selectableId:
+        datedServiceJourneyId:
           type: string
-          description: A pseudo random string that is used to select what alternative to use when purchasing an offer.
-        discount:
-          $ref: '#/components/schemas/Price'
-        startDateTime:
+          example: ENT:DatedServiceJourney:12345
+        serviceJourneyId:
           type: string
-          format: date-time
-          description: The start date of this alternative.
-        endDateTime:
-          type: string
-          format: date-time
-          description: The end date of this alternative.
+          example: ENT:ServiceJourney:56789
       required:
-      - discount
-      - endDateTime
-      - selectableId
-      - startDateTime
-    DurationEnum:
-      type: string
-      default: ANY
-      description: Validity duration. Subset of UsageValidityTypeEnumeration from NeTEx usage parameter travel support.
-      enum:
-      - SINGLE_TRIP
-      - RETURN_TRIP
-      - CARNET
-      - DAY_PASS
-      - WEEKLY_PASS
-      - WEEKEND_PASS
-      - MONTHLY_PASS
-      - SEASON_TICKET
-      - PROFILE_MEMBERSHIP
-      - OPEN_ENDED
-      - OTHER
-      - ANY
-      example: DAY_PASS
+      - datedServiceJourneyId
+      - serviceJourneyId
+    LegRequest:
+      type: object
+      description: Leg request describing a part of a journey.
+      properties:
+        travelDate:
+          type: string
+          format: date
+          description: The date of departure from the source origin. In most cases, this is the same date as departure from fromStopPlace. However, in the case of a ServiceJourney spanning midnight and departure from fromStopPlace is after midnight, these two dates are not equal. The correct date to use is for the ServiceJourney.
+          example: '2020-05-13'
+        travelDateTime:
+          type: string
+          format: date-time
+          description: The specific time for the chosen journey at fromStopPlaceId as specified in JourneyPlanner.
+          example: '2024-02-24T00:00:00+00'
+        fromStopPlaceId:
+          type: string
+          description: Stop place id for the origin of the leg.
+          example: NSR:StopPlace:635
+          pattern: NSR:StopPlace:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "NSR:StopPlace:___".
+        toStopPlaceId:
+          type: string
+          description: Stop place id for the destination of the leg.
+          example: NSR:StopPlace:640
+          pattern: NSR:StopPlace:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "NSR:StopPlace:___".
+        serviceJourneyId:
+          type: string
+          description: Service journey id for the leg.
+          example: ENT:ServiceJourney:1-232-1016-20201117132
+          pattern: ^[A-Z]{3}:ServiceJourney:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:ServiceJourney:___".
+      required:
+      - fromStopPlaceId
+      - serviceJourneyId
+      - toStopPlaceId
+      - travelDate
+    UserProfileInGroupSummary:
+      type: object
+      description: Reference to a group.
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        numberOfPeople:
+          type: integer
+          description: Number of travellers required for this user profile in the group.
+      required:
+      - id
+      - numberOfPeople
+    SearchTripPatternRequest:
+      type: object
+      description: A request used to search for fare products for a specified trip.
+      properties:
+        travellers:
+          type: array
+          description: The travellers.
+          items:
+            $ref: '#/components/schemas/Traveller'
+          minItems: 1
+        recommendationConfig:
+          $ref: '#/components/schemas/RecommendationConfig'
+        tripPattern:
+          $ref: '#/components/schemas/TripPatternRequest'
+        groupConfig:
+          $ref: '#/components/schemas/GroupConfig'
+        includeMultiTripOffers:
+          type: boolean
+          default: false
+          description: Indicates whether multi-trip offers should be included in the response, such as monthly passes, day passes, and similar options.
+      required:
+      - travellers
+      - tripPattern
+    RuleSpec:
+      type: object
+      description: Determines what rules to apply when categorising and recommending offers for travellers.
+      properties:
+        journeyOrganizeAlgorithm:
+          $ref: '#/components/schemas/JourneyOrganizeAlgorithmEnum'
+        priceComparisonAlgorithm:
+          $ref: '#/components/schemas/PriceComparisonAlgorithmEnum'
+        onlyIncludeRecommendedOffers:
+          type: boolean
+          default: true
+          description: Only keep Offers referenced by one or more Recommendations.
+        onlyIncludeRecommendationsWithOffersToBuy:
+          type: boolean
+          default: true
+          description: Only include Recommendations with OffersToBuy.
+        mixInOffersWithHigherFlexibility:
+          type: boolean
+          default: true
+          description: Only applicable to multi leg journeys. If part of the journey has no Offer for the required flexibility, Recommendations will mix in a higher flexibility if it matches other parameters.
+        mixInOffersWithOtherFacilitySets:
+          type: boolean
+          default: true
+          description: Only applicable to multi leg journeys. If part of the journey has no Offer for the required facility set, Recommendations will mix in the cheapest facility set that matches other parameters.
+        onlyKeepUpgradeProductSalesPackages:
+          type: boolean
+          default: false
+          description: When enabled, only offers containing exclusively upgrade products (e.g. seat reservations) are considered for recommendations. Offers containing base fare products are excluded.
+        onlyIncludeMostCompleteInCategorySpec:
+          type: boolean
+          default: false
+          description: 'BETA: This field is in beta and may change or be removed in future versions.'
+    ObjectRef:
+      type: object
+      description: Object ref.
+      properties:
+        ref:
+          type: string
+          description: object ref ref.
+        version:
+          type: string
+          description: object ref version.
+      required:
+      - ref
+    RecommendationConfig:
+      type: object
+      description: Specify what types of recommendations are returned in the response. For a more in depth explanation of recommendations, see the guide for recommendations at TODO [INSERT NEW LINK].
+      properties:
+        categorySpec:
+          $ref: '#/components/schemas/CategorySpec'
+        ruleSpec:
+          $ref: '#/components/schemas/RuleSpec'
     Price:
       type: object
       description: Price with currency and optional VAT information for this element.
@@ -1079,6 +349,451 @@ components:
       required:
       - amount
       - currency
+    Recommendation:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of a recommendation within this response.
+        geographicalValidityCovered:
+          $ref: '#/components/schemas/GeographicalValidityCovered'
+        typeOfRecommendation:
+          $ref: '#/components/schemas/TypeOfRecommendationEnum'
+        durationType:
+          $ref: '#/components/schemas/DurationEnum'
+        fareClass:
+          $ref: '#/components/schemas/FareClassEnum'
+        facilitySet:
+          $ref: '#/components/schemas/AccommodationFacilityEnum'
+        offersToBuy:
+          type: array
+          description: Describes which offer to buy and how many of this offer to buy to satisfy a recommendation.
+          items:
+            $ref: '#/components/schemas/OfferToBuy'
+        combineWithToCoverEntireJourney:
+          type: array
+          description: List of RecommendationCombination covering remaining parts of the journey. The current recommendation can be combined with one of these to cover the entire journey.
+          items:
+            $ref: '#/components/schemas/RecommendationCombination'
+      required:
+      - geographicalValidityCovered
+      - id
+      - offersToBuy
+      - typeOfRecommendation
+    FareClassEnum:
+      type: string
+      default: ANY
+      description: A type of FareClass. Subset of FareClassEnumeration from NeTEx service restrictions support.
+      enum:
+      - FIRST_CLASS
+      - SECOND_CLASS
+      - THIRD_CLASS
+      - ECONOMY_CLASS
+      - BUSINESS_CLASS
+      - TURISTA
+      - PREFERENTE
+      - PREMIUM_CLASS
+      - ANY
+      - STANDARD_CLASS
+      - UNKNOWN
+      example: STANDARD_CLASS
+    DurationEnum:
+      type: string
+      default: ANY
+      description: Validity duration. Subset of UsageValidityTypeEnumeration from NeTEx usage parameter travel support.
+      enum:
+      - SINGLE_TRIP
+      - RETURN_TRIP
+      - CARNET
+      - DAY_PASS
+      - WEEKLY_PASS
+      - WEEKEND_PASS
+      - MONTHLY_PASS
+      - SEASON_TICKET
+      - PROFILE_MEMBERSHIP
+      - OPEN_ENDED
+      - OTHER
+      - ANY
+      example: DAY_PASS
+    SearchResponse:
+      type: object
+      properties:
+        tripPatternId:
+          type: string
+          example: 5e7cbc83e58e6a00011cecc3
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/OfferSummary'
+        recommendations:
+          $ref: '#/components/schemas/RecommendationResult'
+        optionalProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/OptionalProduct'
+        unavailableProducts:
+          type: array
+          items:
+            $ref: '#/components/schemas/UnavailableProduct'
+        notices:
+          type: array
+          description: Additional information about potentially missing information or functionality due to transient errors.
+          items:
+            type: string
+            description: 'A code identifying which downstream service was unavailable. Known values: OSDM (OSDM-gateway unavailable), PERSONALISATION (Personalisation service unavailable), INVENTORY (Inventory service unavailable), SEATING (Seating service unavailable). This list may be extended without a spec change.'
+            examples:
+            - OSDM
+            - PERSONALISATION
+            - INVENTORY
+            - SEATING
+      required:
+      - offers
+      - recommendations
+    SearchAuthorityRequest:
+      type: object
+      description: A request used to search for fare products without inputting geographic data, but instead use Authority.
+      properties:
+        travelDate:
+          type: string
+          format: date-time
+          description: The specific time for when the ticket should be activated. For most purposes it is recommended to use the current time as travel date. That is because most period tickets are activated immediately on purchase. If you want to get a period ticket that should be activated some time in the future, specify the future date.
+          example: '2022-02-24T00:00:00+00'
+        travellers:
+          type: array
+          description: The travellers the offer should be valid for.
+          items:
+            $ref: '#/components/schemas/Traveller'
+          minItems: 1
+        authorityId:
+          type: string
+          description: NeTEx-id of Authority. Only offers valid for this Authority will be considered.
+          example: ENT:Authority:1
+          pattern: ^[A-Z]{3}:Authority:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:Authority:___".
+      required:
+      - authorityId
+      - travelDate
+      - travellers
+    UnavailableProduct:
+      type: object
+      description: Representation of a product that is unavailable, but would have been included in an offer if available.
+      properties:
+        id:
+          type: string
+          description: NeTEx ID of the unavailable product.
+          example: ENT:PreassignedFareProduct:StandardFullFlex
+        name:
+          type: string
+          description: Human readable name for the product.
+          example: Enkeltbillett
+        unavailableStatus:
+          type: string
+          description: "Status of why a product is unavailable.\n NOT_IN_PURCHASE_WINDOW - Product is outside of window where it can be purchased.\n NOT_YET_AVAILABLE - The product is not available yet, no further information is specified\n NO_QUOTAS_DEFINED - The product requires quotas to be purchased, but no quotas are defined yet.\nNO_LONGER_AVAILABLE - The product is no longer available for purchase, no further information is specified.\nSOLD_OUT - The product has no more seats or quotas available for sale.\nCLOSED - The product is closed for sale.\n"
+          examples:
+          - NOT_YET_AVAILABLE
+          - SOLD_OUT
+          - CLOSED
+          - NO_QUOTAS_DEFINED
+          - NOT_IN_PURCHASE_WINDOW
+          - NO_LONGER_AVAILABLE
+        serviceJourney:
+          $ref: '#/components/schemas/ServiceJourneySummary'
+        properties:
+          $ref: '#/components/schemas/UnavailableProductProperties'
+      required:
+      - id
+      - unavailableStatus
+    DiscountRightSummary:
+      type: object
+      description: Summary of a sale discount right that has been applied to the fare product.
+      examples:
+      - example:
+          id: ENT:SaleDiscountRight:Premium
+          version: ENT:Version:SDR-Premium-1
+          price:
+            amount: '-739.00'
+            currency: NOK
+          name: Premiumrabatt
+      properties:
+        id:
+          type: string
+          example: ENT:SaleDiscountRight:Premium
+        version:
+          type: string
+          example: ENT:Version:SDR-Premium-1
+        price:
+          $ref: '#/components/schemas/Price'
+        name:
+          type: string
+          example: Premiumrabatt
+        description:
+          type: string
+          example: Premiumrabatt
+        originatingFromProductId:
+          type: string
+          example: ENT:EntitlementProduct:levelA1
+      required:
+      - description
+      - id
+      - name
+      - price
+      - version
+    CappedDiscountOption:
+      type: object
+      description: A discount might be given based on previous transactions if CappedDiscountRequest was specified. A cappingSpecification must be specified in the traveller attribute in the request to the search/ endpoints in order to receive a discount. Capping must also be enabled by the operator of the service journey.
+      properties:
+        cappedDiscountRightRef:
+          $ref: '#/components/schemas/ObjectRef'
+        cappedDiscountRuleRef:
+          $ref: '#/components/schemas/ObjectRef'
+        alternatives:
+          type: array
+          items:
+            $ref: '#/components/schemas/CappingAlternative'
+      required:
+      - cappedDiscountRightRef
+      - cappedDiscountRuleRef
+    PreassignedProduct:
+      type: object
+      description: Representation of a mandatory product that is included in an offer.
+      properties:
+        id:
+          type: string
+          description: The id if the preassigned product.
+          example: ENT:PreassignedFareProduct:StandardFullFlex
+        version:
+          type: string
+          description: The version of the preassigned product.
+          example: ENT:Version:V1
+        name:
+          type: string
+          description: The name of the preassigned product.
+          example: Standard refunderbar
+        description:
+          type: string
+          description: The description of the preassigned product.
+          example: Standard refunderbar
+        properties:
+          $ref: '#/components/schemas/PropertiesSummary'
+        geographicalValidity:
+          $ref: '#/components/schemas/GeographicalValidity'
+        discountRights:
+          type: array
+          description: Optional discounts applied to this product.
+          items:
+            $ref: '#/components/schemas/DiscountRightSummary'
+          minItems: 1
+      required:
+      - description
+      - geographicalValidity
+      - id
+      - name
+      - properties
+      - version
+    ReservingRequirementForServiceJourney:
+      type: object
+      properties:
+        serviceJourney:
+          $ref: '#/components/schemas/ServiceJourneySummary'
+        reservingRequirement:
+          type: string
+          description: Indicates requirements for reservation. Compatible with the current NeTEx implementation of ReservationEnumeration at Entur.
+          examples:
+          - RESERVATIONS_COMPULSORY
+          - RESERVATIONS_COMPULSORY_FOR_GROUPS
+          - RESERVATIONS_COMPULSORY_FOR_FIRST_CLASS
+          - RESERVATIONS_COMPULSORY_FROM_ORIGIN_STATION
+          - RESERVATIONS_RECOMMENDED
+          - RESERVATIONS_POSSIBLE
+          - RESERVATIONS_POSSIBLE_ONLY_IN_FIRST_CLASS
+          - RESERVATIONS_POSSIBLE_ONLY_IN_SECOND_CLASS
+          - RESERVATIONS_POSSIBLE_FOR_CERTAIN_CLASSES
+          - GROUP_BOOKING_RESTRICTED
+          - NO_GROUPS_ALLOWED
+          - NO_RESERVATIONS_POSSIBLE
+          - WHEELCHAIR_ONLY_RESERVATIONS
+          - BICYCLE_RESERVATIONS_COMPULSORY
+          - RESERVATIONS_SUPPLEMENT_CHARGED
+        seatMapIsAvailable:
+          type: boolean
+          description: Whether a seat map is available for seat selection on this service journey.
+      required:
+      - seatMapIsAvailable
+      - serviceJourney
+    GeographicalValidityCovered:
+      type: object
+      description: Describes the geographical validity covered by the recommendation.
+      properties:
+        coversEntireJourney:
+          type: boolean
+          description: Indicates whether the geographical validity covers the entire journey or not.
+        serviceJourneys:
+          type: array
+          description: The service journeys this geographical validity applies to.
+          items:
+            type: string
+          minItems: 1
+        pointToPointValidity:
+          $ref: '#/components/schemas/PointToPointValidity'
+        zonalValidity:
+          $ref: '#/components/schemas/ZonalValidity'
+      required:
+      - coversEntireJourney
+    PointToPointValidity:
+      type: object
+      description: Start and stop places where the product is valid.
+      properties:
+        fromPlace:
+          $ref: '#/components/schemas/NamedReference'
+          description: Valid from place.
+        toPlace:
+          $ref: '#/components/schemas/NamedReference'
+          description: Valid to place.
+      required:
+      - fromPlace
+      - toPlace
+    ZonalValidity:
+      type: object
+      description: Describes zones where a product is valid. Either a specific list of from, to and viaZones, or a reference to a GroupOfTariffZones.
+      properties:
+        fromZone:
+          $ref: '#/components/schemas/NamedReference'
+          description: Zone at the start of the journey.
+        toZone:
+          $ref: '#/components/schemas/NamedReference'
+          description: Zone at the end of the journey.
+        viaZones:
+          type: array
+          description: Unordered list of valid fare zones through which the trip traverses.
+          items:
+            $ref: '#/components/schemas/NamedReference'
+          minItems: 1
+          uniqueItems: true
+        groupOfTariffZones:
+          type: array
+          description: Reference to a group of fare zones. The offer is valid through all of the zones in this group.
+          items:
+            $ref: '#/components/schemas/NamedReference'
+    AccommodationFacilityEnum:
+      type: string
+      default: ANY
+      description: Subset of AccommodationFacilityEnumeration from NeTEx facility support.
+      enum:
+      - ANY
+      - SLEEPER
+      - SEATING
+      - COUCHETTE
+      - RECLINING_SEATS
+      - STANDING
+      example: SLEEPER
+    UserProfileSummary:
+      type: object
+      description: id, version, name and user type of a user.
+      examples:
+      - example:
+          id: ENT:UserProfile:Adult
+          version: ENT:Version:V1
+          name: Ola Nordmann
+          userType: ADULT
+      properties:
+        id:
+          type: string
+        version:
+          type: string
+        name:
+          type: string
+        userType:
+          type: string
+          description: A type of person. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Compatible with the current NeTEx implementation of UserTypeEnumeration at Entur. Related to but may include more than 'UserTypeEnum'.
+          examples:
+          - ANYONE
+          - ADULT
+          - CHILD
+          - INFANT
+          - ANIMAL
+          - SENIOR
+          - GUIDE_DOG
+          - YOUNG_PERSON
+          - STUDENT
+          - MILITARY
+          - SCHOOL_PUPIL
+          - VETERAN
+          - DISABLED
+          - DISABLED_COMPANION
+          - JOB_SEEKER
+          - EMPLOYEE
+          - MEMBER
+          - RESIDENT
+          - OTHER
+      required:
+      - id
+      - name
+      - version
+    TripPatternRequest:
+      type: object
+      description: List of legs constituting a suggested sequence of rides and links for a specific trip.
+      properties:
+        legs:
+          type: array
+          description: Legs constituting a suggested sequence of rides and links for this trip.
+          items:
+            $ref: '#/components/schemas/LegRequest'
+          minItems: 1
+      required:
+      - legs
+    OrganisationSummary:
+      type: object
+      description: id and and name of an organisation.
+      properties:
+        id:
+          type: string
+          description: the netex-id of organisation.
+          example: ENT:Authority:TST
+        name:
+          type: string
+          description: the name of the organisation.
+          example: Example organisation
+      required:
+      - id
+      - name
+    Traveller:
+      type: object
+      description: A specification of a traveller. Either age or userType must be set.
+      examples:
+      - example:
+          id: ID_A
+          userType: ADULT
+          productIds:
+          - ENT:PreassignedFareProduct:StandardFullFlex
+          baggageTypes:
+          - BICYCLE
+      properties:
+        id:
+          type: string
+          description: Identifier for the traveller. The travellers id will be referenced in the response where natural. Specifying an id for each traveller can make it easier to determine the seating and for whom each product is intended. If no ID is specified, the traveller will be assigned a random ID, only valid for the particular offer.
+          example: ID_A
+        userType:
+          $ref: '#/components/schemas/UserTypeEnum'
+        age:
+          type: integer
+          description: Specify the travellers age, to let the system calculate the corresponding userType.
+          minimum: 0
+        baggageTypes:
+          type: array
+          description: A filter for what kind of luggage the traveller wants offers for. If, for example, a user wants to bring a bicycle along for the trip. "BICYCLE" can be specified in that array. Offers that can't fulfil the wish for a "BICYCLE" accommodation are still returned from our services.
+          items:
+            $ref: '#/components/schemas/BaggageTypeEnum'
+          minItems: 1
+        campaignCodes:
+          type: array
+          description: Campaign codes that may grant entitlements or discounts. Usually not connected to the identity of the Traveller.
+          items:
+            type: string
+            example: MYCODE
+          minItems: 1
+        travellerContext:
+          $ref: '#/components/schemas/TravellerContext'
+      x-class-extra-annotation: '@org.entur.offers.config.validation.AtLeastOneParameter(parameters = {"userType", "age"})'
     ApiError:
       type: object
       properties:
@@ -1128,119 +843,101 @@ components:
       - status
       - timestamp
       - title
-    TravellerContext:
+    ProgramSummary:
       type: object
-      description: Customer-specific context used to personalise and determine entitlements for a traveller.
       properties:
-        customerIdentity:
-          type: array
-          description: One or more references to customer identities in different systems.
-          items:
-            $ref: '#/components/schemas/CustomerIdentity'
-          minItems: 1
-        ownedRights:
-          type: array
-          items:
-            $ref: '#/components/schemas/OwnedRight'
-          minItems: 1
+        id:
+          type: string
+          example: '9'
+        reference:
+          type: string
+          description: Identifier for the loyalty program.
+          example: entur_reis
+        name:
+          type: string
+          example: Entur Reis
+        infoLink:
+          type: string
+          description: URL to information about the loyalty program.
       required:
-      - customerIdentity
-    AccommodationForServiceJourney:
+      - id
+    PriceComparisonAlgorithmEnum:
+      type: string
+      default: TOTAL_PRICE
+      description: 'There are two supported algorithms for comparing offers; TOTAL_PRICE and BEFORE_SDR. TOTAL_PRICE: This is the default algorithm used if not specified, this only looks at the total price of the offers and finds the cheapest, if two offers have the same price, the one with the least amount of offers in the combination is chosen. BEFORE_SDR: This algorithm unapplies all sales discount rights in the offers before comparing prices, when the price of two combinations is the same, the combination containing the most amount of SDRs is chosen, thereafter if the amount is the same the combination with the least amount of offers in the combination is chosen.'
+      enum:
+      - TOTAL_PRICE
+      - BEFORE_SDR
+    CappingAlternative:
       type: object
-      description: Accommodation for service journey.
-      examples:
-      - example:
-          serviceJourney:
-            datedServiceJourneyId: ENT:DatedServiceJourney:56179534
-            serviceJourneyId: ENT:ServiceJourney:1-435-119-202007111809
-          accommodation: SLEEPER
+      description: An alternative is based on previous transactions might have a discount at the expense of setting the start date in the past.
       properties:
-        serviceJourney:
-          $ref: '#/components/schemas/ServiceJourneySummary'
-        accommodation:
-          type: array
-          items:
-            type: string
-            description: Accommodation facility. Compatible with the current NeTEx implementation of AccommodationFacilityEnumeration at Entur. Related to but may include more than 'AccommodationFacilityEnum'.
-            examples:
-            - SLEEPER
-            - SEATING
-            - DOUBLE_SLEEPER
-            - SINGLE_SLEEPER
-            - SPECIAL_SLEEPER
-            - COUCHETTE
-            - SINGLE_COUCHETTE
-            - DOUBLE_COUCHETTE
-            - RECLINING_SEATS
-            - BABY_COMPARTMENT
-            - FAMILY_CARRIAGE
-            - PANORAMA_COACH
-            - PULLMAN_COACH
-            - STANDING
-      required:
-      - accommodation
-      - serviceJourney
-    RecommendationResult:
-      type: object
-      description: A set of recommendations matching the provided recommendation configuration.
-      properties:
-        coveringEntireJourney:
-          type: array
-          description: Recommendations that cover the entire journey.
-          items:
-            $ref: '#/components/schemas/Recommendation'
-        coveringPartOfJourney:
-          type: array
-          description: Recommendations that cover part of the journey. Use `combineWithToCoverEntireJourney` when available to build recommendations to achieve full journey coverage.
-          items:
-            $ref: '#/components/schemas/Recommendation'
-    ZonalValidity:
-      type: object
-      description: Describes zones where a product is valid. Either a specific list of from, to and viaZones, or a reference to a GroupOfTariffZones.
-      properties:
-        fromZone:
-          $ref: '#/components/schemas/NamedReference'
-          description: Zone at the start of the journey.
-        toZone:
-          $ref: '#/components/schemas/NamedReference'
-          description: Zone at the end of the journey.
-        viaZones:
-          type: array
-          description: Unordered list of valid fare zones through which the trip traverses.
-          items:
-            $ref: '#/components/schemas/NamedReference'
-          minItems: 1
-          uniqueItems: true
-        groupOfTariffZones:
-          type: array
-          description: Reference to a group of fare zones. The offer is valid through all of the zones in this group.
-          items:
-            $ref: '#/components/schemas/NamedReference'
-    SearchAuthorityRequest:
-      type: object
-      description: A request used to search for fare products without inputting geographic data, but instead use Authority.
-      properties:
-        travelDate:
+        selectableId:
+          type: string
+          description: A pseudo random string that is used to select what alternative to use when purchasing an offer.
+        discount:
+          $ref: '#/components/schemas/Price'
+        startDateTime:
           type: string
           format: date-time
-          description: The specific time for when the ticket should be activated. For most purposes it is recommended to use the current time as travel date. That is because most period tickets are activated immediately on purchase. If you want to get a period ticket that should be activated some time in the future, specify the future date.
-          example: '2022-02-24T00:00:00+00'
-        travellers:
-          type: array
-          description: The travellers the offer should be valid for.
-          items:
-            $ref: '#/components/schemas/Traveller'
-          minItems: 1
-        authorityId:
+          description: The start date of this alternative.
+        endDateTime:
           type: string
-          description: NeTEx-id of Authority. Only offers valid for this Authority will be considered.
-          example: ENT:Authority:1
-          pattern: ^[A-Z]{3}:Authority:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:Authority:___".
+          format: date-time
+          description: The end date of this alternative.
       required:
-      - authorityId
-      - travelDate
-      - travellers
+      - discount
+      - endDateTime
+      - selectableId
+      - startDateTime
+    GroupSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          example: ENT:GroupTicket:Family
+        version:
+          type: string
+          example: ENT:Version:V1
+        name:
+          type: string
+          example: Familiebillett
+        description:
+          type: string
+        userProfiles:
+          type: array
+          description: User profiles and their required number of travellers in the group.
+          items:
+            $ref: '#/components/schemas/UserProfileInGroupSummary'
+      required:
+      - description
+      - id
+      - userProfiles
+      - version
+    CustomerIdentity:
+      type: object
+      description: One or more references identifying the customer.
+      examples:
+      - CUSTOMERS:
+          customerRef: '1234567'
+          source: CUSTOMERS
+      - ABT:
+          customerRef: ENT:CustomerAccount:12345678
+          source: ABT
+      properties:
+        customerRef:
+          type: string
+          description: A reference to a customer.
+        source:
+          type: string
+          default: CUSTOMERS
+          description: Which system the customer information can be found in.
+          enum:
+          - CUSTOMERS
+          - ABT
+      required:
+      - customerRef
+      - source
     PropertiesSummary:
       type: object
       description: Summary of properties for a product. The properties field contains all necessary information about a product. Here you will find accommodations, baggageTypes, fareClass, userProfiles and more.
@@ -1346,216 +1043,121 @@ components:
             - UNKNOWN
       required:
       - organisation
-    CustomerIdentity:
+    UnavailableProductProperties:
       type: object
-      description: One or more references identifying the customer.
-      examples:
-      - CUSTOMERS:
-          customerRef: '1234567'
-          source: CUSTOMERS
-      - ABT:
-          customerRef: ENT:CustomerAccount:12345678
-          source: ABT
+      description: Properties of an unavailable product.
       properties:
-        customerRef:
-          type: string
-          description: A reference to a customer.
-        source:
-          type: string
-          default: CUSTOMERS
-          description: Which system the customer information can be found in.
-          enum:
-          - CUSTOMERS
-          - ABT
-      required:
-      - customerRef
-      - source
-    ObjectRef:
-      type: object
-      description: Object ref.
-      properties:
-        ref:
-          type: string
-          description: object ref ref.
-        version:
-          type: string
-          description: object ref version.
-      required:
-      - ref
-    PriceComparisonAlgorithmEnum:
-      type: string
-      default: TOTAL_PRICE
-      description: 'There are two supported algorithms for comparing offers; TOTAL_PRICE and BEFORE_SDR. TOTAL_PRICE: This is the default algorithm used if not specified, this only looks at the total price of the offers and finds the cheapest, if two offers have the same price, the one with the least amount of offers in the combination is chosen. BEFORE_SDR: This algorithm unapplies all sales discount rights in the offers before comparing prices, when the price of two combinations is the same, the combination containing the most amount of SDRs is chosen, thereafter if the amount is the same the combination with the least amount of offers in the combination is chosen.'
-      enum:
-      - TOTAL_PRICE
-      - BEFORE_SDR
-    OwnedRight:
-      type: object
-      description: A specification of preowned products or other entitlements that the customer already owns. They are taken into account when considering which products the user may need.
-      examples:
-      - supplementProduct:
-          id: ENT:PreassignedFareProduct:SupplementaryTicket
-          zones:
-          - ENT:FareZone:1
-          - ENT:FareZone:2
-      - fareContract:
-          id: ENT:FareContract:1234567u8iop
-      properties:
-        id:
-          type: string
-          description: The netex-id of the entity.
-          example: ENT:PreassignedFareProduct:SupplementaryTicket
-          pattern: ^[A-Z]{3}:.+:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:___:___".
-        zones:
+        accommodations:
           type: array
-          description: The zones the existing ticket is valid for.
           items:
             type: string
-            example: ENT:FareZone:1
-          minItems: 1
-          pattern: ^[A-Z]{3}:FareZone:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___".
-        cappingSpecification:
-          $ref: '#/components/schemas/CappingSpecification'
-      required:
-      - id
-    TripPatternRequest:
-      type: object
-      description: List of legs constituting a suggested sequence of rides and links for a specific trip.
-      properties:
-        legs:
+            description: Accommodation facility. Compatible with the current NeTEx implementation of AccommodationFacilityEnumeration at Entur. Related to but may include more than 'AccommodationFacilityEnum'.
+            examples:
+            - SLEEPER
+            - SEATING
+            - DOUBLE_SLEEPER
+            - SINGLE_SLEEPER
+            - SPECIAL_SLEEPER
+            - COUCHETTE
+            - SINGLE_COUCHETTE
+            - DOUBLE_COUCHETTE
+            - RECLINING_SEATS
+            - BABY_COMPARTMENT
+            - FAMILY_CARRIAGE
+            - PANORAMA_COACH
+            - PULLMAN_COACH
+            - STANDING
+        fareClasses:
           type: array
-          description: Legs constituting a suggested sequence of rides and links for this trip.
           items:
-            $ref: '#/components/schemas/LegRequest'
+            type: string
+            description: A type of FareClass. Compatible with the current NeTEx implementation of FareClassEnumeration at Entur. Related to but may include more than 'FareClassEnum'.
+            examples:
+            - FIRST_CLASS
+            - SECOND_CLASS
+            - THIRD_CLASS
+            - ECONOMY_CLASS
+            - BUSINESS_CLASS
+            - TURISTA
+            - PREFERENTE
+            - PREMIUM_CLASS
+            - STANDARD_CLASS
+            - UNKNOWN
+        isExchangeable:
+          type: boolean
+          description: Whether the product would have been exchangeable.
+        isRefundable:
+          type: boolean
+          description: Whether the product would have been refundable.
+        organisation:
+          $ref: '#/components/schemas/OrganisationSummary'
+    TravellerContext:
+      type: object
+      description: Customer-specific context used to personalise and determine entitlements for a traveller.
+      properties:
+        customerIdentity:
+          type: array
+          description: One or more references to customer identities in different systems.
+          items:
+            $ref: '#/components/schemas/CustomerIdentity'
+          minItems: 1
+        ownedRights:
+          type: array
+          items:
+            $ref: '#/components/schemas/OwnedRight'
           minItems: 1
       required:
-      - legs
-    DiscountRightSummary:
+      - customerIdentity
+    UserTypeEnum:
+      type: string
+      description: A type of traveller. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Subset of UserTypeEnumeration from NeTEx usage parameter eligibility support.
+      enum:
+      - ANYONE
+      - ADULT
+      - CHILD
+      - INFANT
+      - ANIMAL
+      - SENIOR
+      - GUIDE_DOG
+      - YOUNG_PERSON
+      - STUDENT
+      - MILITARY
+      example: ADULT
+    AccommodationForServiceJourney:
       type: object
-      description: Summary of a sale discount right that has been applied to the fare product.
+      description: Accommodation for service journey.
       examples:
       - example:
-          id: ENT:SaleDiscountRight:Premium
-          version: ENT:Version:SDR-Premium-1
-          price:
-            amount: '-739.00'
-            currency: NOK
-          name: Premiumrabatt
+          serviceJourney:
+            datedServiceJourneyId: ENT:DatedServiceJourney:56179534
+            serviceJourneyId: ENT:ServiceJourney:1-435-119-202007111809
+          accommodation: SLEEPER
       properties:
-        id:
-          type: string
-          example: ENT:SaleDiscountRight:Premium
-        version:
-          type: string
-          example: ENT:Version:SDR-Premium-1
-        price:
-          $ref: '#/components/schemas/Price'
-        name:
-          type: string
-          example: Premiumrabatt
-        description:
-          type: string
-          example: Premiumrabatt
-        originatingFromProductId:
-          type: string
-          example: ENT:EntitlementProduct:levelA1
-      required:
-      - description
-      - id
-      - name
-      - price
-      - version
-    LegRequest:
-      type: object
-      description: Leg request describing a part of a journey.
-      properties:
-        travelDate:
-          type: string
-          format: date
-          description: The date of departure from the source origin. In most cases, this is the same date as departure from fromStopPlace. However, in the case of a ServiceJourney spanning midnight and departure from fromStopPlace is after midnight, these two dates are not equal. The correct date to use is for the ServiceJourney.
-          example: '2020-05-13'
-        travelDateTime:
-          type: string
-          format: date-time
-          description: The specific time for the chosen journey at fromStopPlaceId as specified in JourneyPlanner.
-          example: '2024-02-24T00:00:00+00'
-        fromStopPlaceId:
-          type: string
-          description: Stop place id for the origin of the leg.
-          example: NSR:StopPlace:635
-          pattern: NSR:StopPlace:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "NSR:StopPlace:___".
-        toStopPlaceId:
-          type: string
-          description: Stop place id for the destination of the leg.
-          example: NSR:StopPlace:640
-          pattern: NSR:StopPlace:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "NSR:StopPlace:___".
-        serviceJourneyId:
-          type: string
-          description: Service journey id for the leg.
-          example: ENT:ServiceJourney:1-232-1016-20201117132
-          pattern: ^[A-Z]{3}:ServiceJourney:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:ServiceJourney:___".
-      required:
-      - fromStopPlaceId
-      - serviceJourneyId
-      - toStopPlaceId
-      - travelDate
-    ProgramSummary:
-      type: object
-      properties:
-        id:
-          type: string
-          example: '9'
-        reference:
-          type: string
-          description: Identifier for the loyalty program.
-          example: entur_reis
-        name:
-          type: string
-          example: Entur Reis
-        infoLink:
-          type: string
-          description: URL to information about the loyalty program.
-      required:
-      - id
-    OrganisationSummary:
-      type: object
-      description: id and and name of an organisation.
-      properties:
-        id:
-          type: string
-          description: the netex-id of organisation.
-          example: ENT:Authority:TST
-        name:
-          type: string
-          description: the name of the organisation.
-          example: Example organisation
-      required:
-      - id
-      - name
-    GeographicalValidityCovered:
-      type: object
-      description: Describes the geographical validity covered by the recommendation.
-      properties:
-        coversEntireJourney:
-          type: boolean
-          description: Indicates whether the geographical validity covers the entire journey or not.
-        serviceJourneys:
+        serviceJourney:
+          $ref: '#/components/schemas/ServiceJourneySummary'
+        accommodation:
           type: array
-          description: The service journeys this geographical validity applies to.
           items:
             type: string
-          minItems: 1
-        pointToPointValidity:
-          $ref: '#/components/schemas/PointToPointValidity'
-        zonalValidity:
-          $ref: '#/components/schemas/ZonalValidity'
+            description: Accommodation facility. Compatible with the current NeTEx implementation of AccommodationFacilityEnumeration at Entur. Related to but may include more than 'AccommodationFacilityEnum'.
+            examples:
+            - SLEEPER
+            - SEATING
+            - DOUBLE_SLEEPER
+            - SINGLE_SLEEPER
+            - SPECIAL_SLEEPER
+            - COUCHETTE
+            - SINGLE_COUCHETTE
+            - DOUBLE_COUCHETTE
+            - RECLINING_SEATS
+            - BABY_COMPARTMENT
+            - FAMILY_CARRIAGE
+            - PANORAMA_COACH
+            - PULLMAN_COACH
+            - STANDING
       required:
-      - coversEntireJourney
+      - accommodation
+      - serviceJourney
     BaggageTypeEnum:
       type: string
       description: Type of baggage. Subset of BaggageTypeEnumeration from NeTEx usage parameter luggage support.
@@ -1580,6 +1182,175 @@ components:
       - MOTORCYCLE
       - OTHER
       example: BICYCLE
+    TypeOfRecommendationEnum:
+      type: string
+      default: CHEAPEST
+      description: Describes the degree of flexibility in a recommendation (refundable vs non-refundable, exchangeable vs non-exchangeable). Whether the recommendation is the CHEAPEST - regardless of flexibility, or whether the recommendation is for a specified product.
+      enum:
+      - FLEXIBLE
+      - SEMI_FLEXIBLE
+      - NON_FLEXIBLE
+      - CHEAPEST
+      example: CHEAPEST
+    SearchGeoLocationRequest:
+      type: object
+      description: A request used to search for fare products between stop places or zones. If two stopPlaces are provided, Offers are calculated for each set of FareZones sharing the same codespace. For any other combination, the common codespace is selected. In either case, transport mode and authority can be used to further refine which Offers are returned. Some combinations of stop places may result in offers that cover parts of the distance. As an example, let's say the "from" stop place is A, and the "to" stop place is C. There may not be a ticket that is valid from A to C, but tickets that are valid from A to B, and B to C. In that case you will receive offers that are valid for A to B and B to C. If you only want offers that cover the whole distance, set "offersForWholeTripOnly" to true.
+      properties:
+        travelDate:
+          type: string
+          format: date-time
+          description: The specific time for when the ticket should be activated. For most purposes it is recommended to use the current time as travel date. That is because most period tickets are activated immediately on purchase. If you want to get a period ticket that should be activated some time in the future, specify the future date.
+          example: 2020-12-24T14:48:00+0200
+        from:
+          type: string
+          description: The id of the origin stop place or zone.
+          example: NSR:StopPlace:123
+          pattern: ^[A-Z]{3}:FareZone:.+$|^NSR:StopPlace:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___" or "NSR:StopPlace:___".
+        to:
+          type: string
+          description: The id of the destination stop place or zone.
+          example: NSR:StopPlace:337
+          pattern: ^[A-Z]{3}:FareZone:.+$|^NSR:StopPlace:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___" or "NSR:StopPlace:___".
+        via:
+          type: array
+          description: Optional sequence of via locations. Mostly useful for zone based searches.
+          items:
+            type: string
+            example: ENT:FareZone:3
+          minItems: 1
+          pattern: ^[A-Z]{3}:FareZone:.+$|^NSR:StopPlace:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___" or "NSR:StopPlace:___".
+        travellers:
+          type: array
+          description: The travellers the offer should be valid for.
+          items:
+            $ref: '#/components/schemas/Traveller'
+          minItems: 1
+        recommendationConfig:
+          $ref: '#/components/schemas/RecommendationConfig'
+        offersForWholeTripOnly:
+          type: boolean
+          default: false
+          description: Set this flag to true if you only want tickets that are valid all the way between the stop-places specified in the "from" and "to" field. When set to false, you will receive additional offers that are  valid for parts of the trip with one of the stop places covered.
+        authority:
+          type: string
+          description: Optional authority ID, to further refine search. The returned Offers will only contain products allowing or requiring the provided Authority. In the case of two rail stopPlaces, Authority is set from pre-defined rules and this parameter will be ignored.
+          example: ENT:Authority:ENT
+          pattern: ^[A-Z]{3}:Authority:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:Authority:___".
+        transportMode:
+          type: string
+          description: Optional transport mode, to further refine search. Most useful when there is a specific use case where there may be overlapping Offers, for instance high speed ferry or rail.
+          example: RAIL
+      required:
+      - from
+      - to
+      - travelDate
+      - travellers
+    Carnet:
+      type: object
+      description: Representation of a repeatable ticket, with an optional duration for each instance and an amount of times the ticket can be used.
+      properties:
+        amount:
+          type: integer
+          description: Number of times the ticket can be used.
+          example: 10
+        duration:
+          type: string
+          format: duration
+          description: Validity duration of each use, formatted according to ISO-8601.
+          example: PT1H30M
+      required:
+      - amount
+    CappingSpecification:
+      type: object
+      description: Configuration on how to configure the discount right. Requires a CustomerIdentity with source ABT.
+      properties:
+        cappedDiscountRightId:
+          type: string
+          description: Reference to a CappedDiscountRight.
+          example: ENT:CappedDiscountRight:Bestepris
+          pattern: ^[A-Z]{3}:CappedDiscountRight:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:CappedDiscountRight:___".
+        minimumDurationBetweenAlternatives:
+          type: string
+          format: duration
+          description: To avoid too many similar alternatives you can specify a minimum period between the start date of each alternative.
+        minimumAlternativeDuration:
+          type: string
+          format: duration
+          description: Specify a minimum alternative duration to avoid alternatives that doesn't last long enough in the future to be useful.
+      required:
+      - cappedDiscountRightId
+    JourneyOrganizeAlgorithmEnum:
+      type: string
+      default: SUBSEQUENT_COMBINATIONS
+      description: 'There are two supported algorithms for organizing how we present each combination of journeys. Given three journeys in the trip pattern; SJ-1, SJ-2, SJ-3 the two algorithms will generate these combinations:
+
+        SUBSEQUENT_COMBINATIONS: (SJ-1), (SJ-2), (SJ-3), (SJ-1, SJ-2), (SJ-2, SJ-3), (SJ-1, SJ-2, SJ-3)
+
+        COMBINATIONS_FROM_OFFERS: Will only organize by unique journey combinations covered by offers.'
+      enum:
+      - SUBSEQUENT_COMBINATIONS
+      - COMBINATIONS_FROM_OFFERS
+      example: SUBSEQUENT_COMBINATIONS
+    NamedReference:
+      type: object
+      description: A simple reference with id and name.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    OfferToBuy:
+      type: object
+      description: Describes which offer to buy and how many of this offer to buy to satisfy a recommendation.
+      properties:
+        id:
+          type: string
+          description: Id of the offer to buy.
+          example: 00faf83-56c3-4f4e-8be9-e793c255a77b
+        numberToBuy:
+          type: integer
+          description: Number of this offer to buy.
+          example: 2
+        selectableProductIds:
+          type: array
+          description: List of selectableIds of supplement products which upgrades a product.
+          items:
+            type: string
+            example: KEeaHd
+        possibleTravellerIds:
+          type: array
+          description: One possible grouping of travellers for the number of offers to buy.
+          items:
+            type: array
+            items:
+              type: string
+              example: Adult-1
+      required:
+      - id
+      - numberToBuy
+      - possibleTravellerIds
+      - selectableProductIds
+    GeographicalValidity:
+      type: object
+      description: Describes the geographical validity of a product. Includes information on ServiceJourneys, PointToPointValidity and ZonalValidity. In cases of replacement transport, these fields describe the replacement journey.
+      properties:
+        serviceJourneys:
+          type: array
+          description: Service journeys where this product is valid.
+          items:
+            $ref: '#/components/schemas/ServiceJourneySummary'
+        pointToPointValidity:
+          $ref: '#/components/schemas/PointToPointValidity'
+        zonalValidity:
+          $ref: '#/components/schemas/ZonalValidity'
     OfferSummary:
       type: object
       properties:
@@ -1653,71 +1424,279 @@ components:
       - price
       - salesPackageId
       - salesPackageVersion
-    CappingSpecification:
-      type: object
-      description: Configuration on how to configure the discount right. Requires a CustomerIdentity with source ABT.
-      properties:
-        cappedDiscountRightId:
-          type: string
-          description: Reference to a CappedDiscountRight.
-          example: ENT:CappedDiscountRight:Bestepris
-          pattern: ^[A-Z]{3}:CappedDiscountRight:.+$
-          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:CappedDiscountRight:___".
-        minimumDurationBetweenAlternatives:
-          type: string
-          format: duration
-          description: To avoid too many similar alternatives you can specify a minimum period between the start date of each alternative.
-        minimumAlternativeDuration:
-          type: string
-          format: duration
-          description: Specify a minimum alternative duration to avoid alternatives that doesn't last long enough in the future to be useful.
-      required:
-      - cappedDiscountRightId
-    ReservingRequirementForServiceJourney:
+    ProgramAccrualSummary:
       type: object
       properties:
-        serviceJourney:
-          $ref: '#/components/schemas/ServiceJourneySummary'
-        reservingRequirement:
+        id:
           type: string
-          description: Indicates requirements for reservation. Compatible with the current NeTEx implementation of ReservationEnumeration at Entur.
-          examples:
-          - RESERVATIONS_COMPULSORY
-          - RESERVATIONS_COMPULSORY_FOR_GROUPS
-          - RESERVATIONS_COMPULSORY_FOR_FIRST_CLASS
-          - RESERVATIONS_COMPULSORY_FROM_ORIGIN_STATION
-          - RESERVATIONS_RECOMMENDED
-          - RESERVATIONS_POSSIBLE
-          - RESERVATIONS_POSSIBLE_ONLY_IN_FIRST_CLASS
-          - RESERVATIONS_POSSIBLE_ONLY_IN_SECOND_CLASS
-          - RESERVATIONS_POSSIBLE_FOR_CERTAIN_CLASSES
-          - GROUP_BOOKING_RESTRICTED
-          - NO_GROUPS_ALLOWED
-          - NO_RESERVATIONS_POSSIBLE
-          - WHEELCHAIR_ONLY_RESERVATIONS
-          - BICYCLE_RESERVATIONS_COMPULSORY
-          - RESERVATIONS_SUPPLEMENT_CHARGED
-        seatMapIsAvailable:
+          example: '9'
+        reference:
+          type: string
+          description: Identifier for the loyalty program.
+          example: entur_reis
+        name:
+          type: string
+          example: Entur Reis
+        infoLink:
+          type: string
+          description: URL to information about the loyalty program.
+        paused:
           type: boolean
-          description: Whether a seat map is available for seat selection on this service journey.
+          description: Whether accrual for this program is currently paused.
+          example: false
       required:
-      - seatMapIsAvailable
-      - serviceJourney
-    Carnet:
+      - id
+    GroupConfig:
       type: object
-      description: Representation of a repeatable ticket, with an optional duration for each instance and an amount of times the ticket can be used.
+      description: A configuration of how to group travellers in offers.
       properties:
-        amount:
+        numberOfCompartments:
           type: integer
-          description: Number of times the ticket can be used.
-          example: 10
-        duration:
-          type: string
-          format: duration
-          description: Validity duration of each use, formatted according to ISO-8601.
-          example: PT1H30M
+          description: Number of compartments to group travellers in. If we are unable to fit the given travellers in the specified amount of compartments, no offer will be returned.
       required:
-      - amount
+      - numberOfCompartments
+    RecommendationResult:
+      type: object
+      description: A set of recommendations matching the provided recommendation configuration.
+      properties:
+        coveringEntireJourney:
+          type: array
+          description: Recommendations that cover the entire journey.
+          items:
+            $ref: '#/components/schemas/Recommendation'
+        coveringPartOfJourney:
+          type: array
+          description: Recommendations that cover part of the journey. Use `combineWithToCoverEntireJourney` when available to build recommendations to achieve full journey coverage.
+          items:
+            $ref: '#/components/schemas/Recommendation'
+    OwnedRight:
+      type: object
+      description: A specification of preowned products or other entitlements that the customer already owns. They are taken into account when considering which products the user may need.
+      examples:
+      - supplementProduct:
+          id: ENT:PreassignedFareProduct:SupplementaryTicket
+          zones:
+          - ENT:FareZone:1
+          - ENT:FareZone:2
+      - fareContract:
+          id: ENT:FareContract:1234567u8iop
+      properties:
+        id:
+          type: string
+          description: The netex-id of the entity.
+          example: ENT:PreassignedFareProduct:SupplementaryTicket
+          pattern: ^[A-Z]{3}:.+:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:___:___".
+        zones:
+          type: array
+          description: The zones the existing ticket is valid for.
+          items:
+            type: string
+            example: ENT:FareZone:1
+          minItems: 1
+          pattern: ^[A-Z]{3}:FareZone:.+$
+          x-pattern-message: Wrong format for NeTEx id. Must be on the format "XXX:FareZone:___".
+        cappingSpecification:
+          $ref: '#/components/schemas/CappingSpecification'
+      required:
+      - id
+    CategorySpec:
+      type: object
+      description: How to categorise and group recommendations based on different categories. Recommendations will attempt to calculate categories from the combination of input parameters.
+      examples:
+      - example:
+          typesOfRecommendation:
+          - FLEXIBLE
+          - CHEAPEST
+          durationTypes:
+          - DAY_PASS
+          - SINGLE_TRIP
+          fareClasses:
+          - FIRST_CLASS
+          facilitySet:
+          - SLEEPER
+          - SEATING
+      properties:
+        typesOfRecommendation:
+          type: array
+          default:
+          - CHEAPEST
+          description: Which categories to use for flexibility grouping.
+          items:
+            $ref: '#/components/schemas/TypeOfRecommendationEnum'
+          minItems: 1
+        durationTypes:
+          type: array
+          default:
+          - ANY
+          description: If not specified, all durationTypes will be considered.
+          items:
+            $ref: '#/components/schemas/DurationEnum'
+          minItems: 1
+        fareClasses:
+          type: array
+          default:
+          - ANY
+          description: If not specified, all fareClasses will be considered. Be aware that if not specified, the fareClass attribute in the recommendation object will read "fareClass":"ANY". To get the actual fareClass you would have to look up the corresponding offer.
+          items:
+            $ref: '#/components/schemas/FareClassEnum'
+          minItems: 1
+        facilitySet:
+          type: array
+          default:
+          - ANY
+          description: If not specified, all accommodations will be considered. Be aware that if not specified, the facilitySet attribute in the recommendation object will read "facilitySet":"ANY". To get the actual facilitySet you would have to look up the corresponding offer.
+          items:
+            $ref: '#/components/schemas/AccommodationFacilityEnum'
+          minItems: 1
+      required:
+      - typesOfRecommendation
+    AvailableFulfilmentMethod:
+      type: object
+      description: Describes which fulfilmentMethods are available for an Offer,.
+      properties:
+        id:
+          type: string
+          description: NeTEx standard.
+        version:
+          type: string
+          description: NeTEx standard.
+        distributionRights:
+          type: array
+          description: Says what the distribution channel is allowed to do with this offer. Compatible with the current NeTEx implementation of DistributionRightsEnumeration at Entur.
+          items:
+            type: string
+            examples:
+            - NONE
+            - SELL
+            - REFUND
+            - EXCHANGE
+            - INFORM
+            - PRIVATE
+            - OTHER
+          minItems: 1
+      required:
+      - id
+      - version
+    RecommendationCombination:
+      type: object
+      description: A combination of recommendations that together cover the entire journey.
+      properties:
+        geographicalValidityCovered:
+          $ref: '#/components/schemas/GeographicalValidityCovered'
+        recommendationsToCoverEntireJourney:
+          type: array
+          description: You must select all recommendations in the list to cover the geographical validity.
+          items:
+            type: string
+            description: Id of the recommendation(s) to select.
+          minItems: 1
+      required:
+      - geographicalValidityCovered
+      - recommendationsToCoverEntireJourney
+      title: RecommendationCombination
+    TravellerMappingSummary:
+      type: object
+      description: A specification of which travellers can use an offer, along with limitations on the number of travellers that must be selected from the group for the OFFER to be valid.
+      properties:
+        travellerIds:
+          type: array
+          description: The ids of the travellers.
+          items:
+            type: string
+            example: ID_A
+        maxNumberOfTravellers:
+          type: integer
+          format: int32
+          description: The maximum number of travellers that can be selected from the group.
+        minNumberOfTravellers:
+          type: integer
+          format: int32
+          description: The minimum number of travellers that can be selected from the group.
+        userType:
+          type: string
+          description: A type of person. An offer for userType=CHILD, will naturally be different than an offer for userType=ADULT. Compatible with the current NeTEx implementation of UserTypeEnumeration at Entur. Related to but may include more than 'UserTypeEnum'.
+          examples:
+          - ANYONE
+          - ADULT
+          - CHILD
+          - INFANT
+          - ANIMAL
+          - SENIOR
+          - GUIDE_DOG
+          - YOUNG_PERSON
+          - STUDENT
+          - MILITARY
+          - SCHOOL_PUPIL
+          - VETERAN
+          - DISABLED
+          - DISABLED_COMPANION
+          - JOB_SEEKER
+          - EMPLOYEE
+          - MEMBER
+          - RESIDENT
+          - OTHER
+      required:
+      - maxNumberOfTravellers
+      - minNumberOfTravellers
+      - travellerIds
+      - userType
+  parameters:
+    AcceptLanguageHeader:
+      name: Accept-Language
+      in: header
+      description: The language code from IETF BCP 47
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+        default: nb
+        maxLength: 2
+        minLength: 2
+    DistributionChannelHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: Id of distribution channel requesting offers
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+        pattern: ^[A-Z]{3}:DistributionChannel:.+$
+    POS-Header:
+      name: Entur-POS
+      in: header
+      description: Point-of-sale identifier
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   headers:
     ExpiresHeader:
       description: When the provided offers expires. After this time, they will not work when proceeding to booking and must be refreshed.
@@ -1749,6 +1728,3 @@ components:
 externalDocs:
   description: Entur developer documentation.
   url: https://developer.entur.org/pages-offers-docs-intro
-x-refined-from:
-- entur-offers-partner-openapi.json
-- entur-offers-partner-openapi.yml

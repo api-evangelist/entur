@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Netex API
-  version: 2026.08.0
+  title: Distances and zones Netex API
+  description: Calculates distances between Stop Places
   contact:
     name: Team Avstand og Nettverk
-  description: 'Operations tagged Netex across 2 of this provider''s published API definitions: entur-prdudisapi-openapi.json, entur-prdudisapi-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io/distance
 security:
@@ -178,8 +178,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /netex/groups-of-tariff-zones:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -351,8 +349,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /netex/fare-zones:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -525,8 +521,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /netex/fare-zones/{netexId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -689,8 +683,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
   /netex/fare-zones/authority-ref:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -862,8 +854,6 @@ paths:
                   detail: Human readable error
       security:
       - enturOpen: []
-    servers:
-    - url: https://api.entur.io/distance
 components:
   parameters:
     X-Correlation-Id:
@@ -895,6 +885,3 @@ components:
       type: apiKey
       name: ET-Client-Name
       in: header
-x-refined-from:
-- entur-prdudisapi-openapi.json
-- entur-prdudisapi-openapi.yml

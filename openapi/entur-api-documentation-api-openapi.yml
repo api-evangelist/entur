@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur API Documentation API
-  version: 2026.10.2
+  title: Payments API Documentation API
+  description: The Payments API acts as a gateway to external payment service providers and provides endpoints to create, process and credit payment transactions.
   contact:
     name: Entur
     url: https://developer.entur.org
-  description: 'Operations tagged API Documentation across 2 of this provider''s published API definitions: entur-payment-partner-openapi.json, entur-payment-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.10.2
 servers:
 - url: https://api.entur.io/sales
   description: Entur's Production environment
@@ -66,13 +66,6 @@ paths:
           $ref: '#/components/responses/notFound'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
   /v3/api-docs-internal:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -121,15 +114,14 @@ paths:
           $ref: '#/components/responses/notFound'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.entur.io/sales
-      description: Entur's Production environment
-    - url: https://api.staging.entur.io/sales
-      description: Entur's Staging environment
-    - url: https://api.dev.entur.io/sales
-      description: Entur's Development environment
 components:
   responses:
+    notFound:
+      description: Not Found
+      content:
+        application/hal+json:
+          schema:
+            $ref: '#/components/schemas/PaymentError'
     internalServerError:
       description: Internal Server Error
       content:
@@ -142,37 +134,6 @@ components:
         application/hal+json:
           schema:
             $ref: '#/components/schemas/PaymentError'
-    notFound:
-      description: Not Found
-      content:
-        application/hal+json:
-          schema:
-            $ref: '#/components/schemas/PaymentError'
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
     PaymentError:
       title: PaymentError
@@ -230,11 +191,33 @@ components:
         path: /v1/payments/1/transactions/1/capture
         status: 500
         timestamp: '2025-08-24T14:15:22Z'
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-payment-partner-openapi.json
-- entur-payment-partner-openapi.yml

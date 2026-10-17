@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Raw Timetable Data API
+  title: Raw Timetable Data API
+  description: Provide access to the original NeTEx datasets uploaded by data providers
   version: 2026.09.0
-  description: 'Operations tagged Raw Timetable Data across 2 of this provider''s published API definitions: entur-raw-timetable-data-openapi.json, entur-raw-timetable-data-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/timetable/v1/timetable-data
   description: Production
@@ -102,13 +102,6 @@ paths:
                   value:
                     errorCode: INTERNAL_ERROR
                     message: Failed to download timetable data
-    servers:
-    - url: https://api.entur.io/timetable/v1/timetable-data
-      description: Production
-    - url: https://api.staging.entur.io/timetable/v1/timetable-data
-      description: Staging
-    - url: https://api.dev.entur.io/timetable/v1/timetable-data
-      description: Development
   /timetable-data/datasets/{codespace}/version/{importKey}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -227,13 +220,6 @@ paths:
                   value:
                     errorCode: INTERNAL_ERROR
                     message: Failed to download timetable data
-    servers:
-    - url: https://api.entur.io/timetable/v1/timetable-data
-      description: Production
-    - url: https://api.staging.entur.io/timetable/v1/timetable-data
-      description: Staging
-    - url: https://api.dev.entur.io/timetable/v1/timetable-data
-      description: Development
   /timetable-data/datasets/{codespace}/latest:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -344,14 +330,16 @@ paths:
                   value:
                     errorCode: INTERNAL_ERROR
                     message: Failed to download timetable data
-    servers:
-    - url: https://api.entur.io/timetable/v1/timetable-data
-      description: Production
-    - url: https://api.staging.entur.io/timetable/v1/timetable-data
-      description: Staging
-    - url: https://api.dev.entur.io/timetable/v1/timetable-data
-      description: Development
 components:
+  schemas:
+    NetexImport:
+      type: object
+      properties:
+        importKey:
+          type: string
+        creationDate:
+          type: string
+          format: date-time
   parameters:
     X-Correlation-Id:
       name: X-Correlation-Id
@@ -377,20 +365,8 @@ components:
       explode: false
       schema:
         type: string
-  schemas:
-    NetexImport:
-      type: object
-      properties:
-        importKey:
-          type: string
-        creationDate:
-          type: string
-          format: date-time
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-raw-timetable-data-openapi.json
-- entur-raw-timetable-data-openapi.yml

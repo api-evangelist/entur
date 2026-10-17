@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Service Facility Sets API
+  title: Products Service Facility Sets API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged service-facility-sets across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -163,13 +163,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /service-facility-sets/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -249,13 +242,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /service-facility-sets/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -479,15 +465,188 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
+    ServiceFacilitySet:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        accommodation:
+          $ref: '#/components/schemas/Accommodation'
+        changed:
+          type: string
+          description: Changed datetime
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime
+          readOnly: true
+        description:
+          type: array
+          description: Description
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id
+          examples:
+          - NSB:ServiceFacilitySet:Ordinary
+        modification:
+          type: string
+          description: Modification status
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        name:
+          type: array
+          description: Name
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        nameOfClass:
+          type: string
+          description: Name of class
+          readOnly: true
+          examples:
+          - ServiceFacilitySet
+        onboardStay:
+          $ref: '#/components/schemas/OnboardStay'
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: A ServiceFacilitySet
+    Accommodation:
+      required:
+      - changed
+      - created
+      - id
+      - modification
+      - nameOfClass
+      - status
+      - version
+      type: object
+      properties:
+        accommodationFacility:
+          type: string
+          description: Accommodation facility.
+          enum:
+          - SLEEPER
+          - SEATING
+          - DOUBLE_SLEEPER
+          - SINGLE_SLEEPER
+          - SPECIAL_SLEEPER
+          - COUCHETTE
+          - SINGLE_COUCHETTE
+          - DOUBLE_COUCHETTE
+          - RECLINING_SEAT
+          - BABY_COMPARTMENT
+          - FAMILY_COMPARTMENT
+          - PANORAMA_COACH
+          - PULLMAN_COACH
+          - STANDING
+          examples:
+          - SLEEPER
+        changed:
+          type: string
+          description: Changed datetime
+          readOnly: true
+        created:
+          type: string
+          description: Created datetime
+          readOnly: true
+        id:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Id.
+          examples:
+          - NSB:Accommodation:Sleeper
+        modification:
+          type: string
+          description: Modification status
+          readOnly: true
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          examples:
+          - NEW
+        nameOfClass:
+          type: string
+          description: Name of class.
+          readOnly: true
+          examples:
+          - Accommodation
+        nuisanceFacilities:
+          type: array
+          description: List of nuisance facilities
+          items:
+            type: string
+        status:
+          type: string
+          description: Status
+          readOnly: true
+          enum:
+          - DRAFT
+          - PROPOSED
+          - VERSIONED
+          - DEPRECATED
+          examples:
+          - DRAFT
+        version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: Version
+          examples:
+          - NSB:Version:V1
+      description: An Accommodation
+    TextInLanguage:
+      required:
+      - lang
+      - value
+      type: object
+      properties:
+        lang:
+          minLength: 1
+          type: string
+          description: Language code.
+          examples:
+          - nob
+        value:
+          minLength: 1
+          type: string
+          description: The text.
+      description: Text in a specific language.
+    BoxedUnit:
+      type: object
     OnboardStay:
       required:
       - changed
@@ -580,196 +739,7 @@ components:
           examples:
           - NSB:Version:V1
       description: An OnboardStay
-    Accommodation:
-      required:
-      - changed
-      - created
-      - id
-      - modification
-      - nameOfClass
-      - status
-      - version
-      type: object
-      properties:
-        accommodationFacility:
-          type: string
-          description: Accommodation facility.
-          enum:
-          - SLEEPER
-          - SEATING
-          - DOUBLE_SLEEPER
-          - SINGLE_SLEEPER
-          - SPECIAL_SLEEPER
-          - COUCHETTE
-          - SINGLE_COUCHETTE
-          - DOUBLE_COUCHETTE
-          - RECLINING_SEAT
-          - BABY_COMPARTMENT
-          - FAMILY_COMPARTMENT
-          - PANORAMA_COACH
-          - PULLMAN_COACH
-          - STANDING
-          examples:
-          - SLEEPER
-        changed:
-          type: string
-          description: Changed datetime
-          readOnly: true
-        created:
-          type: string
-          description: Created datetime
-          readOnly: true
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:Accommodation:Sleeper
-        modification:
-          type: string
-          description: Modification status
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        nameOfClass:
-          type: string
-          description: Name of class.
-          readOnly: true
-          examples:
-          - Accommodation
-        nuisanceFacilities:
-          type: array
-          description: List of nuisance facilities
-          items:
-            type: string
-        status:
-          type: string
-          description: Status
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version
-          examples:
-          - NSB:Version:V1
-      description: An Accommodation
-    ServiceFacilitySet:
-      required:
-      - changed
-      - created
-      - id
-      - modification
-      - nameOfClass
-      - status
-      - version
-      type: object
-      properties:
-        accommodation:
-          $ref: '#/components/schemas/Accommodation'
-        changed:
-          type: string
-          description: Changed datetime
-          readOnly: true
-        created:
-          type: string
-          description: Created datetime
-          readOnly: true
-        description:
-          type: array
-          description: Description
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id
-          examples:
-          - NSB:ServiceFacilitySet:Ordinary
-        modification:
-          type: string
-          description: Modification status
-          readOnly: true
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          examples:
-          - NEW
-        name:
-          type: array
-          description: Name
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        nameOfClass:
-          type: string
-          description: Name of class
-          readOnly: true
-          examples:
-          - ServiceFacilitySet
-        onboardStay:
-          $ref: '#/components/schemas/OnboardStay'
-        status:
-          type: string
-          description: Status
-          readOnly: true
-          enum:
-          - DRAFT
-          - PROPOSED
-          - VERSIONED
-          - DEPRECATED
-          examples:
-          - DRAFT
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Version
-          examples:
-          - NSB:Version:V1
-      description: A ServiceFacilitySet
-    TextInLanguage:
-      required:
-      - lang
-      - value
-      type: object
-      properties:
-        lang:
-          minLength: 1
-          type: string
-          description: Language code.
-          examples:
-          - nob
-        value:
-          minLength: 1
-          type: string
-          description: The text.
-      description: Text in a specific language.
-    BoxedUnit:
-      type: object
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -785,11 +755,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

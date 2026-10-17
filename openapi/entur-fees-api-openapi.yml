@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Fees API
+  title: Orders Fees API
+  description: The Order API provides services to create and manage orders in Entur sales platform. It allows clients to create orders, add and change order lines, apply fees, manage connected reservations, and handle traveller information.
   version: 2026.09.0
-  description: 'Operations tagged Fees across 2 of this provider''s published API definitions: entur-order-partner-openapi.json, entur-order-partner-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.staging.entur.io/sales
   description: Staging test environment
@@ -51,13 +51,6 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
   /v1/orders/{orderId}/fees/{feeId}:
     parameters:
     - $ref: '#/components/parameters/dciHeader'
@@ -89,17 +82,76 @@ paths:
           $ref: '#/components/responses/conflict'
         '500':
           $ref: '#/components/responses/internalServerError'
-    servers:
-    - url: https://api.staging.entur.io/sales
-      description: Staging test environment
-    - url: https://api.dev.entur.io/sales
-      description: Development test environment
-    - url: https://api.entur.io/sales
-      description: Production environment
 components:
+  parameters:
+    orderIdPathParam:
+      name: orderId
+      in: path
+      description: Order ID
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    dciHeader:
+      name: Entur-Distribution-Channel
+      in: header
+      description: A header containing the distribution channel ID.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    posHeader:
+      name: Entur-Pos
+      in: header
+      description: Point-of-sale identifier.
+      required: true
+      style: simple
+      explode: false
+      schema:
+        type: string
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   responses:
+    notFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
     internalServerError:
       description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    noContent:
+      description: No Content
+    conflict:
+      description: Conflict
       content:
         application/json:
           schema:
@@ -110,20 +162,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-    conflict:
-      description: Conflict
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    notFound:
-      description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiError'
-    noContent:
-      description: No Content
   schemas:
     FeeRequest:
       title: FeeRequest
@@ -177,6 +215,58 @@ components:
         orderLineIds:
         - dd3e1d71-1c96-4b88-a683-538a8724ee0d
         orderVersion: 2
+    PriceWithTax:
+      title: PriceWithTax
+      required:
+      - amount
+      - currency
+      - taxAmount
+      type: object
+      properties:
+        amount:
+          type: string
+          description: Amount including tax amount.
+          examples:
+          - '399.00'
+        taxAmount:
+          type: string
+          description: Tax amount
+          examples:
+          - '36.27'
+        taxRate:
+          type: string
+          description: Tax rate. Must be in valid BigDecimal format
+          examples:
+          - '12.00'
+        taxCode:
+          type: string
+          description: Tax code for this tax rate
+          examples:
+          - '33'
+        currency:
+          type: string
+          description: Currency
+          default: NOK
+          examples:
+          - NOK
+      description: Price with included tax amounts and an optional rate.
+    RefType:
+      title: RefType
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the resources
+          examples:
+          - ENT:Resource:12345
+        version:
+          type: string
+          description: A specific version of the resource if applicable
+          examples:
+          - '1'
+      description: Reference to a resource available in a different APIs
     ApiError:
       title: ApiError
       required:
@@ -229,110 +319,3 @@ components:
             examples:
             - dd3e1d71-1c96-4b88-a683-538a8724ee0d
       - $ref: '#/components/schemas/FeeRequest'
-    RefType:
-      title: RefType
-      required:
-      - id
-      type: object
-      properties:
-        id:
-          type: string
-          description: ID of the resources
-          examples:
-          - ENT:Resource:12345
-        version:
-          type: string
-          description: A specific version of the resource if applicable
-          examples:
-          - '1'
-      description: Reference to a resource available in a different APIs
-    PriceWithTax:
-      title: PriceWithTax
-      required:
-      - amount
-      - currency
-      - taxAmount
-      type: object
-      properties:
-        amount:
-          type: string
-          description: Amount including tax amount.
-          examples:
-          - '399.00'
-        taxAmount:
-          type: string
-          description: Tax amount
-          examples:
-          - '36.27'
-        taxRate:
-          type: string
-          description: Tax rate. Must be in valid BigDecimal format
-          examples:
-          - '12.00'
-        taxCode:
-          type: string
-          description: Tax code for this tax rate
-          examples:
-          - '33'
-        currency:
-          type: string
-          description: Currency
-          default: NOK
-          examples:
-          - NOK
-      description: Price with included tax amounts and an optional rate.
-  parameters:
-    orderIdPathParam:
-      name: orderId
-      in: path
-      description: Order ID
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    dciHeader:
-      name: Entur-Distribution-Channel
-      in: header
-      description: A header containing the distribution channel ID.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    posHeader:
-      name: Entur-Pos
-      in: header
-      description: Point-of-sale identifier.
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
-x-refined-from:
-- entur-order-partner-openapi.json
-- entur-order-partner-openapi.yml

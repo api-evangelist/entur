@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur Booking API
-  version: 2026.09.2
+  title: Entur shared mobility Booking API
+  description: This is the API for Entur shared mobility. It is used to communicate with the Entur shared mobility platform. The API is based on the TOMP-API standard and is used to manage bookings, payments, and other operations related to shared mobility. The API is designed to be easy to use and understand, with clear documentation and examples. The API is also designed to be secure, with support for OAuth2 authentication and authorization.
   contact:
     name: Team Delingsmobilitet
-  description: 'Operations tagged Booking across 2 of this provider''s published API definitions: entur-shared-mobility-openapi.json, entur-shared-mobility-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.2
 servers:
 - url: https://api.entur.io/shared-mobility/v1
   description: Generated server url
@@ -78,9 +78,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: Retry failed payment
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
   /bookings/{transportOperatorBookingId}/notification:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -138,9 +135,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: Send notification
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
   /bookings/{bookingId}/one-stop/event:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -211,9 +205,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: One stop event
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
   /bookings/one-stop:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -290,9 +281,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: Create one stop booking
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
   /bookings/leg/{transportOperatorLegId}/event:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -366,9 +354,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: Update booking with legs id events post
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
   /bookings:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -456,9 +441,6 @@ paths:
       deprecated: true
       summary: Get bookings
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
   /bookings/{customerNumber}/active:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -519,9 +501,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: Get active bookings
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
   /bookings/{bookingId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -580,240 +559,18 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: Get booking
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
 components:
   schemas:
-    PricingDto:
+    Operator:
       type: object
       properties:
-        currentAmount:
-          type: number
-          format: double
-        originalAmount:
-          type: number
-          format: double
-        finalAmount:
-          type:
-          - number
-          - 'null'
-          format: double
-        priceAdjustments:
-          type: array
-          items:
-            $ref: '#/components/schemas/PriceAdjustmentDto'
-        paymentStatus:
+        id:
           type: string
-          enum:
-          - UNPAID
-          - PAID
-          - PAYMENT_FAILED
-        surcharge:
-          type:
-          - string
-          - 'null'
-      required:
-      - currentAmount
-      - originalAmount
-      - paymentStatus
-      - priceAdjustments
-      title: Pricing
-    Coordinates:
-      type: object
-      properties:
-        longitude:
-          type: number
-          format: float
-        latitude:
-          type: number
-          format: float
-        altitude:
-          type:
-          - number
-          - 'null'
-          format: float
-      required:
-      - latitude
-      - longitude
-    Notification:
-      type: object
-      properties:
-        originOperator:
-          type: string
-        message:
-          type:
-          - string
-          - 'null'
-      required:
-      - originOperator
-    ApiError:
-      type: object
-      properties:
-        type:
-          type: string
-        status:
-          type: integer
-          format: int32
-        title:
-          type: string
-        detail:
-          type: string
-        instance:
-          type: string
-        timestamp:
-          type: string
-          format: date-time
-        exception:
-          type: string
-        error:
-          type: string
-        message:
-          type: string
-        path:
+        name:
           type: string
       required:
-      - detail
-      - error
-      - exception
-      - instance
-      - message
-      - path
-      - status
-      - timestamp
-      - title
-      - type
-    PricingSegmentDto:
-      type: object
-      properties:
-        start:
-          type: integer
-          format: int32
-        end:
-          type:
-          - integer
-          - 'null'
-          format: int32
-        interval:
-          type: integer
-          format: int32
-        rate:
-          type: number
-          format: double
-      required:
-      - interval
-      - rate
-      - start
-      title: PricingSegment
-    PriceAdjustmentDto:
-      type: object
-      properties:
-        amount:
-          type: number
-          format: double
-        description:
-          type: string
-      required:
-      - amount
-      - description
-      title: PriceAdjustment
-    OneStopBooking:
-      type: object
-      properties:
-        customerNumber:
-          type: integer
-          format: int64
-        recurringPaymentId:
-          type: integer
-          format: int64
-        coordinates:
-          $ref: '#/components/schemas/Coordinates'
-        assetId:
-          type:
-          - string
-          - 'null'
-        stationId:
-          type:
-          - string
-          - 'null'
-        vehicleTypeId:
-          type:
-          - string
-          - 'null'
-        autoStart:
-          type:
-          - boolean
-          - 'null'
-        priceAdjustments:
-          type: array
-          items:
-            $ref: '#/components/schemas/PriceAdjustmentDto'
-        pricingPlan:
-          type:
-          - string
-          - 'null'
-      required:
-      - coordinates
-      - customerNumber
-      - priceAdjustments
-      - recurringPaymentId
-    BookingResponse:
-      type: object
-      properties:
-        bookingId:
-          type: string
-          format: uuid
-        transportOperatorBookingId:
-          type: string
-        transportOperatorLegId:
-          type: string
-        state:
-          type: string
-          enum:
-          - NOT_STARTED
-          - IN_USE
-          - PAUSED
-          - FINISHING
-          - FINISHED
-          - CANCELLED
-          - PREPARING
-        orderId:
-          type: string
-        pricingPlan:
-          $ref: '#/components/schemas/PricingPlanDto'
-        departureTime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        arrivalTime:
-          type:
-          - string
-          - 'null'
-          format: date-time
-        distanceTravelled:
-          type:
-          - integer
-          - 'null'
-          format: int32
-        pricing:
-          $ref: '#/components/schemas/PricingDto'
-        asset:
-          $ref: '#/components/schemas/Asset'
-        comment:
-          type:
-          - string
-          - 'null'
-      required:
-      - asset
-      - bookingId
-      - orderId
-      - pricing
-      - pricingPlan
-      - state
-      - transportOperatorBookingId
-      - transportOperatorLegId
-      title: Booking
+      - id
+      - name
     PricingPlanDto:
       type: object
       properties:
@@ -832,6 +589,18 @@ components:
       - currency
       - price
       title: PricingPlan
+    PriceAdjustmentDto:
+      type: object
+      properties:
+        amount:
+          type: number
+          format: double
+        description:
+          type: string
+      required:
+      - amount
+      - description
+      title: PriceAdjustment
     Asset:
       type: object
       properties:
@@ -912,16 +681,6 @@ components:
           - 'null'
       required:
       - operator
-    Operator:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-      required:
-      - id
-      - name
     OneStopBookingEvent:
       type: object
       properties:
@@ -950,16 +709,224 @@ components:
           format: byte
       required:
       - event
+    Notification:
+      type: object
+      properties:
+        originOperator:
+          type: string
+        message:
+          type:
+          - string
+          - 'null'
+      required:
+      - originOperator
+    OneStopBooking:
+      type: object
+      properties:
+        customerNumber:
+          type: integer
+          format: int64
+        recurringPaymentId:
+          type: integer
+          format: int64
+        coordinates:
+          $ref: '#/components/schemas/Coordinates'
+        assetId:
+          type:
+          - string
+          - 'null'
+        stationId:
+          type:
+          - string
+          - 'null'
+        vehicleTypeId:
+          type:
+          - string
+          - 'null'
+        autoStart:
+          type:
+          - boolean
+          - 'null'
+        priceAdjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceAdjustmentDto'
+        pricingPlan:
+          type:
+          - string
+          - 'null'
+      required:
+      - coordinates
+      - customerNumber
+      - priceAdjustments
+      - recurringPaymentId
+    PricingDto:
+      type: object
+      properties:
+        currentAmount:
+          type: number
+          format: double
+        originalAmount:
+          type: number
+          format: double
+        finalAmount:
+          type:
+          - number
+          - 'null'
+          format: double
+        priceAdjustments:
+          type: array
+          items:
+            $ref: '#/components/schemas/PriceAdjustmentDto'
+        paymentStatus:
+          type: string
+          enum:
+          - UNPAID
+          - PAID
+          - PAYMENT_FAILED
+        surcharge:
+          type:
+          - string
+          - 'null'
+      required:
+      - currentAmount
+      - originalAmount
+      - paymentStatus
+      - priceAdjustments
+      title: Pricing
+    ApiError:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: integer
+          format: int32
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        exception:
+          type: string
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      required:
+      - detail
+      - error
+      - exception
+      - instance
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      - type
+    Coordinates:
+      type: object
+      properties:
+        longitude:
+          type: number
+          format: float
+        latitude:
+          type: number
+          format: float
+        altitude:
+          type:
+          - number
+          - 'null'
+          format: float
+      required:
+      - latitude
+      - longitude
+    PricingSegmentDto:
+      type: object
+      properties:
+        start:
+          type: integer
+          format: int32
+        end:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        interval:
+          type: integer
+          format: int32
+        rate:
+          type: number
+          format: double
+      required:
+      - interval
+      - rate
+      - start
+      title: PricingSegment
+    BookingResponse:
+      type: object
+      properties:
+        bookingId:
+          type: string
+          format: uuid
+        transportOperatorBookingId:
+          type: string
+        transportOperatorLegId:
+          type: string
+        state:
+          type: string
+          enum:
+          - NOT_STARTED
+          - IN_USE
+          - PAUSED
+          - FINISHING
+          - FINISHED
+          - CANCELLED
+          - PREPARING
+        orderId:
+          type: string
+        pricingPlan:
+          $ref: '#/components/schemas/PricingPlanDto'
+        departureTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        arrivalTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        distanceTravelled:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        pricing:
+          $ref: '#/components/schemas/PricingDto'
+        asset:
+          $ref: '#/components/schemas/Asset'
+        comment:
+          type:
+          - string
+          - 'null'
+      required:
+      - asset
+      - bookingId
+      - orderId
+      - pricing
+      - pricingPlan
+      - state
+      - transportOperatorBookingId
+      - transportOperatorLegId
+      title: Booking
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -975,12 +942,18 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     Authorization:
       type: http
       description: Authorization header
       scheme: bearer
       bearerFormat: Bearer eyJhbGciOiJIUzI1NiIsInR5cCIf36POk6yJV_adQssw5c
-x-refined-from:
-- entur-shared-mobility-openapi.json
-- entur-shared-mobility-openapi.yml

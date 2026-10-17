@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Companies API
-  version: 2026.08.0
+  title: Personnel tickets Companies API
+  description: Personnel tickets are a Norwegian railway discount scheme providing reduced fares for employees, pensioners, and eligible family members in participating companies.
+  termsOfService: http://entur.org
   contact:
     name: Entur Team Personalisering
     email: team.personalisering@entur.org
-  termsOfService: http://entur.org
-  description: 'Operations tagged Companies across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io
 security:
@@ -82,146 +82,8 @@ paths:
           any:
           - Personalbillett-Administrasjon:les
           - Personalbillett-Administrasjon-Selskap:les
-    servers:
-    - url: https://api.entur.io
 components:
-  responses:
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error500:
-      description: Internal server error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error401:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error403:
-      description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
-    ET-Client-Name:
-      name: ET-Client-Name
-      in: header
-      description: 'Entur Client Header.
-
-        It is required that all consumers identify themselves by using this header.
-
-        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
-
-        The structure of ET-Client-Name should be: `<company>-<application>`.'
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
-    CompanyResponse:
-      required:
-      - addressLine
-      - allowETickets
-      - allowLocalEmployees
-      - companyId
-      - employeeNoPrefix
-      - isDeleted
-      - name
-      - postalCode
-      - reportSeparator
-      type: object
-      properties:
-        companyId:
-          type: integer
-          description: The company ID
-          format: int64
-        name:
-          type: string
-          description: The company name
-        addressLine:
-          type: string
-          description: The company postal address
-        postalCode:
-          type: string
-          description: The company postal code
-        employeeNoPrefix:
-          type: string
-          description: A prefix to be prepended to all employee numbers connected to this company
-        allowLocalEmployees:
-          type: boolean
-          description: Whether local employees are allowed
-        allowETickets:
-          type: boolean
-          description: Whether the company allows the usage of e-tickets for its personnel tickets
-        isDeleted:
-          type: boolean
-          description: Whether the company is deleted
-        reportSeparator:
-          type: string
-          description: 'Which character to separate elements within tax report: '',''(default) or '';'''
-        deleted:
-          type: boolean
-          writeOnly: true
-      description: Companies are where employees are hired
-    ErrorSpecification:
-      required:
-      - defaultMessage
-      - field
-      type: object
-      properties:
-        field:
-          type: string
-          description: The field of the associated object in the request related to the error.
-        defaultMessage:
-          type: string
-          description: The message explaining why the error occurred.
-        rejectedValues:
-          type: object
-          description: A list of rejected values.
-      description: Optional list of error specifications.
-    PageCompanyResponse:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: All items for this page
-          items:
-            $ref: '#/components/schemas/CompanyResponse'
-        totalItems:
-          type: integer
-          description: Total items which could be returned
-          format: int64
-          examples:
-          - 1
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int64
-          examples:
-          - 1
-      description: Paged content
     ErrorResponse:
       required:
       - correlationId
@@ -275,11 +137,144 @@ components:
           items:
             $ref: '#/components/schemas/ErrorSpecification'
       description: Response object for errors occurring in the customers API
+    PageCompanyResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          items:
+            $ref: '#/components/schemas/CompanyResponse'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int64
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int64
+          examples:
+          - 1
+      description: Paged content
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    CompanyResponse:
+      required:
+      - addressLine
+      - allowETickets
+      - allowLocalEmployees
+      - companyId
+      - employeeNoPrefix
+      - isDeleted
+      - name
+      - postalCode
+      - reportSeparator
+      type: object
+      properties:
+        companyId:
+          type: integer
+          description: The company ID
+          format: int64
+        name:
+          type: string
+          description: The company name
+        addressLine:
+          type: string
+          description: The company postal address
+        postalCode:
+          type: string
+          description: The company postal code
+        employeeNoPrefix:
+          type: string
+          description: A prefix to be prepended to all employee numbers connected to this company
+        allowLocalEmployees:
+          type: boolean
+          description: Whether local employees are allowed
+        allowETickets:
+          type: boolean
+          description: Whether the company allows the usage of e-tickets for its personnel tickets
+        isDeleted:
+          type: boolean
+          description: Whether the company is deleted
+        reportSeparator:
+          type: string
+          description: 'Which character to separate elements within tax report: '',''(default) or '';'''
+        deleted:
+          type: boolean
+          writeOnly: true
+      description: Companies are where employees are hired
+  responses:
+    Error401:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  parameters:
+    ET-Client-Name:
+      name: ET-Client-Name
+      in: header
+      description: 'Entur Client Header.
+
+        It is required that all consumers identify themselves by using this header.
+
+        Entur will deploy strict rate-limiting policies on API-consumers who do not identify with a header and reserves the right to block unidentified consumers.
+
+        The structure of ET-Client-Name should be: `<company>-<application>`.'
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-personnel-tickets-openapi.json
-- entur-personnel-tickets-openapi.yml

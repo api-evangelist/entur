@@ -1,10 +1,10 @@
 openapi: 3.2.0
 info:
-  title: Entur QR Code API
-  version: 2026.09.2
+  title: Entur shared mobility QR Code API
+  description: This is the API for Entur shared mobility. It is used to communicate with the Entur shared mobility platform. The API is based on the TOMP-API standard and is used to manage bookings, payments, and other operations related to shared mobility. The API is designed to be easy to use and understand, with clear documentation and examples. The API is also designed to be secure, with support for OAuth2 authentication and authorization.
   contact:
     name: Team Delingsmobilitet
-  description: 'Operations tagged QR Code across 2 of this provider''s published API definitions: entur-shared-mobility-openapi.json, entur-shared-mobility-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.2
 servers:
 - url: https://api.entur.io/shared-mobility/v1
   description: Generated server url
@@ -86,64 +86,18 @@ paths:
                 $ref: '#/components/schemas/ApiError'
       summary: Get qr code info
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/shared-mobility/v1
-      description: Generated server url
 components:
   schemas:
-    Coordinates:
+    Operator:
       type: object
       properties:
-        longitude:
-          type: number
-          format: float
-        latitude:
-          type: number
-          format: float
-        altitude:
-          type:
-          - number
-          - 'null'
-          format: float
-      required:
-      - latitude
-      - longitude
-    ApiError:
-      type: object
-      properties:
-        type:
+        id:
           type: string
-        status:
-          type: integer
-          format: int32
-        title:
-          type: string
-        detail:
-          type: string
-        instance:
-          type: string
-        timestamp:
-          type: string
-          format: date-time
-        exception:
-          type: string
-        error:
-          type: string
-        message:
-          type: string
-        path:
+        name:
           type: string
       required:
-      - detail
-      - error
-      - exception
-      - instance
-      - message
-      - path
-      - status
-      - timestamp
-      - title
-      - type
+      - id
+      - name
     Asset:
       type: object
       properties:
@@ -224,26 +178,60 @@ components:
           - 'null'
       required:
       - operator
-    Operator:
+    ApiError:
       type: object
       properties:
-        id:
+        type:
           type: string
-        name:
+        status:
+          type: integer
+          format: int32
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        exception:
+          type: string
+        error:
+          type: string
+        message:
+          type: string
+        path:
           type: string
       required:
-      - id
-      - name
+      - detail
+      - error
+      - exception
+      - instance
+      - message
+      - path
+      - status
+      - timestamp
+      - title
+      - type
+    Coordinates:
+      type: object
+      properties:
+        longitude:
+          type: number
+          format: float
+        latitude:
+          type: number
+          format: float
+        altitude:
+          type:
+          - number
+          - 'null'
+          format: float
+      required:
+      - latitude
+      - longitude
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -259,12 +247,18 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     Authorization:
       type: http
       description: Authorization header
       scheme: bearer
       bearerFormat: Bearer eyJhbGciOiJIUzI1NiIsInR5cCIf36POk6yJV_adQssw5c
-x-refined-from:
-- entur-shared-mobility-openapi.json
-- entur-shared-mobility-openapi.yml

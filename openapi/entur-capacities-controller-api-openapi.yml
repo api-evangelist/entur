@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Capacities Controller API
+  title: Seating manager Capacities Controller API
+  description: Seating manager generates seating offers and keeps track of what seats are reserved and/or blocked
   version: 2026.09.0
-  description: 'Operations tagged capacities-controller across 2 of this provider''s published API definitions: entur-seating-manager-openapi.json, entur-seating-manager-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seating-manager
 security:
@@ -61,8 +61,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatsReservationsResponseV1'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seats/{datedServiceJourneyId}/occupancies:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -114,8 +112,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatsOccupancyResponseV1'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seats/{datedServiceJourneyId}/available:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -162,8 +158,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AvailableElementWithCompartmentsResponse'
-    servers:
-    - url: https://api.entur.io/seating-manager
   /v1-beta/seats/{datedServiceJourneyId}/availabilities:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -215,291 +209,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatsAvailabilitiesResponseV1'
-    servers:
-    - url: https://api.entur.io/seating-manager
 components:
   schemas:
-    SeatsReservationsSeatResponseV1:
+    SeatsAvailabilitiesElementResponseV1:
       required:
       - elementCarriageNumber
-      - properties
-      - reservations
-      - seatNumber
+      - elementNetexId
+      - elementParts
       - series
       - seriesVersion
       type: object
       properties:
-        seatNumber:
+        elementNetexId:
           type: string
-          description: Seat number.
+          description: Netex id of the element.
           examples:
-          - '23'
-        elementCarriageNumber:
-          type: integer
-          description: Number of the corresponding element.
-          format: int32
-          examples:
-          - 3
-        properties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+          - GOA:TrainElement:73-2-A
         series:
           type: string
-          description: Rolling stock series of the corresponding element.
+          description: Rolling stock series of the element.
           examples:
           - GOA-BM73A-KOMFORT
         seriesVersion:
           type: integer
-          description: Rolling stock version of the corresponding element.
+          description: Rolling stock version of the element.
           format: int32
           examples:
           - 2
-        compartmentName:
-          type:
-          - string
-          - 'null'
-          description: A unique identifier of each compartment. If set then every seat with the same compartmentName belongs to the same physical compartment.
-          examples:
-          - '1'
-        reservations:
-          type: array
-          items:
-            $ref: '#/components/schemas/SeatsReservationsReservationResponseV1'
-      description: Information about one seat in the seat offer. Only seats with reservations are listed.
-    AvailableSeatResponse:
-      required:
-      - properties
-      - seatNumber
-      type: object
-      properties:
-        seatNumber:
-          type: string
-          description: Seat number of seat.
-          examples:
-          - '21'
-        properties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-      description: Seat with seatNumber and properties.
-    SeatsReservationsResponseV1:
-      required:
-      - elements
-      - seats
-      - status
-      type: object
-      properties:
-        status:
-          type: string
-          description: Status of the seat offer.
-          examples:
-          - ACTIVE
-        elements:
-          type: array
-          items:
-            $ref: '#/components/schemas/SeatsAvailabilitiesElementResponseV1'
-        seats:
-          type: array
-          items:
-            $ref: '#/components/schemas/SeatsReservationsSeatResponseV1'
-      description: 'Seat reservations for a seat offer. '
-    SeatsReservationsReservationResponseV1:
-      required:
-      - nsrCodeDestination
-      - nsrCodeOrigin
-      - reference
-      - sequenceNrDestination
-      - sequenceNrOrigin
-      - status
-      type: object
-      properties:
-        status:
-          type: string
-          description: Status of the reservation.
-          enum:
-          - DRAFT
-          - CONFIRMED
-          - CANCELLED
-          - DEPRECATED
-          examples:
-          - DRAFT or CONFIRMED
-        sequenceNrOrigin:
-          type: integer
-          description: Index of the origin station of the reservation.
-          format: int32
-          examples:
-          - 0
-        sequenceNrDestination:
-          type: integer
-          description: Index of the destination station of the reservation.
-          format: int32
-          examples:
-          - 0
-        nsrCodeOrigin:
-          type: string
-          description: Nsr code of the origin station of the reservation.
-          examples:
-          - NSR:StopPlace:269
-        nsrCodeDestination:
-          type: string
-          description: Nsr code of the destination station of the reservation.
-          examples:
-          - NSR:StopPlace:337
-        reference:
-          type: string
-          description: Reference of the reservation holding this seat.
-          format: uuid
-          examples:
-          - c129cc9c-76e4-4f28-a4e2-5af96550627a
-        orderId:
-          type:
-          - string
-          - 'null'
-          description: Optional orderId connected to this reservation
-          examples:
-          - ABCD1234
-      description: One reservation for the corresponding seat.
-    AvailableElementWithCompartmentsResponse:
-      required:
-      - availableCompartments
-      - availableSingleSeats
-      - carriageIdentifier
-      type: object
-      properties:
-        carriageIdentifier:
-          type: string
-          description: Carriage number of the element.
-          examples:
-          - '1'
-        availableCompartments:
-          type: array
-          description: Available compartments in element.
-          items:
-            $ref: '#/components/schemas/AvailableCompartmentResponse'
-        availableSingleSeats:
-          type: array
-          description: Available single seats in element. These are seats that are not part of a compartment.
-          items:
-            $ref: '#/components/schemas/AvailableSeatResponse'
-      description: Element (e.g. train carriage) with available seats and/or compartments.
-    StopPlaceWithTimesResponseV1:
-      required:
-      - arrivalDateTime
-      - departureDateTime
-      - nsrCode
-      - sequenceNr
-      type: object
-      properties:
-        nsrCode:
-          type: string
-          description: Stop Place id defined by National StopPlace registry.
-          examples:
-          - NSR:StopPlace:337
-        departureDateTime:
-          type: string
-          description: Time of departure from this stop. Set to time of arrival on last stop.
-          format: date-time
-          examples:
-          - '2025-02-12T12:08:45.539473+01:00'
-        arrivalDateTime:
-          type: string
-          description: Time of arrival on this stop. Set to time of departure on first stop.
-          format: date-time
-          examples:
-          - '2025-02-12T12:08:45.539473+01:00'
-        sequenceNr:
-          type: integer
-          description: The ordering of the station in the journey.
-          format: int32
-          examples:
-          - 0
-      description: Destination stop place for this element in this material composition.
-    AvailableCompartmentResponse:
-      required:
-      - compartmentName
-      - seats
-      type: object
-      properties:
-        compartmentName:
-          type: string
-          description: Unique name identifying compartment in an element.
-          examples:
-          - COMPARTMENT_1
-        compartmentLabel:
-          type:
-          - string
-          - 'null'
-          description: Human-readable label identifying compartment in an element.
-          examples:
-          - Kupé 21, 25
-        seats:
-          type: array
-          description: Seats in compartment.
-          items:
-            $ref: '#/components/schemas/AvailableSeatResponse'
-      description: Compartment (e.g. Sleeper, Couchette etc.) with available seats.
-    SeatsAvailabilitiesSeatResponseV1:
-      required:
-      - availability
-      - closed
-      - elementCarriageNumber
-      - properties
-      - seatNumber
-      - series
-      - seriesVersion
-      type: object
-      properties:
-        seatNumber:
-          type: string
-          description: Seat number.
-          examples:
-          - '23'
         elementCarriageNumber:
           type: integer
-          description: Number of the corresponding element.
+          description: Number of the element.
           format: int32
           examples:
-          - 3
-        properties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-        series:
-          type: string
-          description: Rolling stock series of the corresponding element.
-          examples:
-          - GOA-BM73A-KOMFORT
-        seriesVersion:
-          type: integer
-          description: Rolling stock version of the corresponding element.
-          format: int32
-          examples:
-          - 2
-        availability:
-          type: string
-          description: Availability of the seat.
-          enum:
-          - AVAILABLE
-          - OCCUPIED
-          - CLOSED
-          - LAST_STOP
-          examples:
-          - OCCUPIED
-        closed:
-          type: boolean
-          description: Is the seat closed for this stopPlace. Always true if departure is inactive.
-          examples:
-          - true
-        compartmentLabel:
+          - 15
+        seatmapKey:
           type:
           - string
           - 'null'
-          description: For internal use only!! If set then every seat with the same label belongs to the same physical compartment.
+          description: Nøkkel til seatmap som tilhører elementet.
           examples:
-          - '1'
-        compartmentName:
-          type:
-          - string
-          - 'null'
-          description: A unique identifier of each compartment. If set then every seat with the same compartmentName belongs to the same physical compartment.
-          examples:
-          - '1'
-      description: Availability information for one seat in the seat offer.
+          - BM73
+        elementParts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ElementPartResponseV1'
+      description: Information about one element in the material of this seat offer.
     SeatingPropertiesResponseV1:
       type: object
       properties:
@@ -757,59 +511,33 @@ components:
           examples:
           - BACKWARDS
       description: Information about one element in one material composition.
-    SeatsOccupancyResponseV1:
+    SeatsOccupancySeatResponseV1:
       required:
-      - elements
+      - properties
+      - seatNumber
+      - seatUsages
       type: object
       properties:
-        elements:
-          type: array
-          items:
-            $ref: '#/components/schemas/CapacitiesOccupancyElementResponseV1'
-      description: Occupancy status for seats in seat offer separated by elements.
-    SeatsAvailabilitiesElementResponseV1:
-      required:
-      - elementCarriageNumber
-      - elementNetexId
-      - elementParts
-      - series
-      - seriesVersion
-      type: object
-      properties:
-        elementNetexId:
+        seatNumber:
           type: string
-          description: Netex id of the element.
+          description: Seat number.
           examples:
-          - GOA:TrainElement:73-2-A
-        series:
-          type: string
-          description: Rolling stock series of the element.
-          examples:
-          - GOA-BM73A-KOMFORT
-        seriesVersion:
-          type: integer
-          description: Rolling stock version of the element.
-          format: int32
-          examples:
-          - 2
-        elementCarriageNumber:
-          type: integer
-          description: Number of the element.
-          format: int32
-          examples:
-          - 15
-        seatmapKey:
+          - '23'
+        properties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        compartmentName:
           type:
           - string
           - 'null'
-          description: Nøkkel til seatmap som tilhører elementet.
+          description: A unique identifier of each compartment. If set then every seat with the same compartmentName belongs to the same physical compartment.
           examples:
-          - BM73
-        elementParts:
+          - '1'
+        seatUsages:
           type: array
+          description: List of seat usages between two neighboring stopPlaces.
           items:
-            $ref: '#/components/schemas/ElementPartResponseV1'
-      description: Information about one element in the material of this seat offer.
+            $ref: '#/components/schemas/CapacitiesOccupancySeatUsageResponseV1'
+      description: Occupancy status for one seat.
     CapacitiesOccupancySeatUsageResponseV1:
       required:
       - alighting
@@ -850,6 +578,318 @@ components:
           examples:
           - true
       description: List of seat usages between two neighboring stopPlaces.
+    SeatsReservationsResponseV1:
+      required:
+      - elements
+      - seats
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the seat offer.
+          examples:
+          - ACTIVE
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatsAvailabilitiesElementResponseV1'
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatsReservationsSeatResponseV1'
+      description: 'Seat reservations for a seat offer. '
+    SeatsOccupancyResponseV1:
+      required:
+      - elements
+      type: object
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/CapacitiesOccupancyElementResponseV1'
+      description: Occupancy status for seats in seat offer separated by elements.
+    SeatsAvailabilitiesResponseV1:
+      required:
+      - elements
+      - seats
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the seat offer.
+          examples:
+          - ACTIVE
+        elements:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatsAvailabilitiesElementResponseV1'
+        seats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatsAvailabilitiesSeatResponseV1'
+      description: 'Seat availabilities for a seat offer. '
+    StopPlaceWithTimesResponseV1:
+      required:
+      - arrivalDateTime
+      - departureDateTime
+      - nsrCode
+      - sequenceNr
+      type: object
+      properties:
+        nsrCode:
+          type: string
+          description: Stop Place id defined by National StopPlace registry.
+          examples:
+          - NSR:StopPlace:337
+        departureDateTime:
+          type: string
+          description: Time of departure from this stop. Set to time of arrival on last stop.
+          format: date-time
+          examples:
+          - '2025-02-12T12:08:45.539473+01:00'
+        arrivalDateTime:
+          type: string
+          description: Time of arrival on this stop. Set to time of departure on first stop.
+          format: date-time
+          examples:
+          - '2025-02-12T12:08:45.539473+01:00'
+        sequenceNr:
+          type: integer
+          description: The ordering of the station in the journey.
+          format: int32
+          examples:
+          - 0
+      description: Destination stop place for this element in this material composition.
+    SeatsAvailabilitiesSeatResponseV1:
+      required:
+      - availability
+      - closed
+      - elementCarriageNumber
+      - properties
+      - seatNumber
+      - series
+      - seriesVersion
+      type: object
+      properties:
+        seatNumber:
+          type: string
+          description: Seat number.
+          examples:
+          - '23'
+        elementCarriageNumber:
+          type: integer
+          description: Number of the corresponding element.
+          format: int32
+          examples:
+          - 3
+        properties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        series:
+          type: string
+          description: Rolling stock series of the corresponding element.
+          examples:
+          - GOA-BM73A-KOMFORT
+        seriesVersion:
+          type: integer
+          description: Rolling stock version of the corresponding element.
+          format: int32
+          examples:
+          - 2
+        availability:
+          type: string
+          description: Availability of the seat.
+          enum:
+          - AVAILABLE
+          - OCCUPIED
+          - CLOSED
+          - LAST_STOP
+          examples:
+          - OCCUPIED
+        closed:
+          type: boolean
+          description: Is the seat closed for this stopPlace. Always true if departure is inactive.
+          examples:
+          - true
+        compartmentLabel:
+          type:
+          - string
+          - 'null'
+          description: For internal use only!! If set then every seat with the same label belongs to the same physical compartment.
+          examples:
+          - '1'
+        compartmentName:
+          type:
+          - string
+          - 'null'
+          description: A unique identifier of each compartment. If set then every seat with the same compartmentName belongs to the same physical compartment.
+          examples:
+          - '1'
+      description: Availability information for one seat in the seat offer.
+    AvailableSeatResponse:
+      required:
+      - properties
+      - seatNumber
+      type: object
+      properties:
+        seatNumber:
+          type: string
+          description: Seat number of seat.
+          examples:
+          - '21'
+        properties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+      description: Seat with seatNumber and properties.
+    SeatsReservationsReservationResponseV1:
+      required:
+      - nsrCodeDestination
+      - nsrCodeOrigin
+      - reference
+      - sequenceNrDestination
+      - sequenceNrOrigin
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the reservation.
+          enum:
+          - DRAFT
+          - CONFIRMED
+          - CANCELLED
+          - DEPRECATED
+          examples:
+          - DRAFT or CONFIRMED
+        sequenceNrOrigin:
+          type: integer
+          description: Index of the origin station of the reservation.
+          format: int32
+          examples:
+          - 0
+        sequenceNrDestination:
+          type: integer
+          description: Index of the destination station of the reservation.
+          format: int32
+          examples:
+          - 0
+        nsrCodeOrigin:
+          type: string
+          description: Nsr code of the origin station of the reservation.
+          examples:
+          - NSR:StopPlace:269
+        nsrCodeDestination:
+          type: string
+          description: Nsr code of the destination station of the reservation.
+          examples:
+          - NSR:StopPlace:337
+        reference:
+          type: string
+          description: Reference of the reservation holding this seat.
+          format: uuid
+          examples:
+          - c129cc9c-76e4-4f28-a4e2-5af96550627a
+        orderId:
+          type:
+          - string
+          - 'null'
+          description: Optional orderId connected to this reservation
+          examples:
+          - ABCD1234
+      description: One reservation for the corresponding seat.
+    AvailableCompartmentResponse:
+      required:
+      - compartmentName
+      - seats
+      type: object
+      properties:
+        compartmentName:
+          type: string
+          description: Unique name identifying compartment in an element.
+          examples:
+          - COMPARTMENT_1
+        compartmentLabel:
+          type:
+          - string
+          - 'null'
+          description: Human-readable label identifying compartment in an element.
+          examples:
+          - Kupé 21, 25
+        seats:
+          type: array
+          description: Seats in compartment.
+          items:
+            $ref: '#/components/schemas/AvailableSeatResponse'
+      description: Compartment (e.g. Sleeper, Couchette etc.) with available seats.
+    AvailableElementWithCompartmentsResponse:
+      required:
+      - availableCompartments
+      - availableSingleSeats
+      - carriageIdentifier
+      type: object
+      properties:
+        carriageIdentifier:
+          type: string
+          description: Carriage number of the element.
+          examples:
+          - '1'
+        availableCompartments:
+          type: array
+          description: Available compartments in element.
+          items:
+            $ref: '#/components/schemas/AvailableCompartmentResponse'
+        availableSingleSeats:
+          type: array
+          description: Available single seats in element. These are seats that are not part of a compartment.
+          items:
+            $ref: '#/components/schemas/AvailableSeatResponse'
+      description: Element (e.g. train carriage) with available seats and/or compartments.
+    SeatsReservationsSeatResponseV1:
+      required:
+      - elementCarriageNumber
+      - properties
+      - reservations
+      - seatNumber
+      - series
+      - seriesVersion
+      type: object
+      properties:
+        seatNumber:
+          type: string
+          description: Seat number.
+          examples:
+          - '23'
+        elementCarriageNumber:
+          type: integer
+          description: Number of the corresponding element.
+          format: int32
+          examples:
+          - 3
+        properties:
+          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
+        series:
+          type: string
+          description: Rolling stock series of the corresponding element.
+          examples:
+          - GOA-BM73A-KOMFORT
+        seriesVersion:
+          type: integer
+          description: Rolling stock version of the corresponding element.
+          format: int32
+          examples:
+          - 2
+        compartmentName:
+          type:
+          - string
+          - 'null'
+          description: A unique identifier of each compartment. If set then every seat with the same compartmentName belongs to the same physical compartment.
+          examples:
+          - '1'
+        reservations:
+          type: array
+          items:
+            $ref: '#/components/schemas/SeatsReservationsReservationResponseV1'
+      description: Information about one seat in the seat offer. Only seats with reservations are listed.
     CapacitiesOccupancyElementResponseV1:
       required:
       - elementCarriageNumber
@@ -885,64 +925,7 @@ components:
           items:
             $ref: '#/components/schemas/ElementPartResponseV1'
       description: Element containing a set of seats, and their occupancy status.
-    SeatsAvailabilitiesResponseV1:
-      required:
-      - elements
-      - seats
-      - status
-      type: object
-      properties:
-        status:
-          type: string
-          description: Status of the seat offer.
-          examples:
-          - ACTIVE
-        elements:
-          type: array
-          items:
-            $ref: '#/components/schemas/SeatsAvailabilitiesElementResponseV1'
-        seats:
-          type: array
-          items:
-            $ref: '#/components/schemas/SeatsAvailabilitiesSeatResponseV1'
-      description: 'Seat availabilities for a seat offer. '
-    SeatsOccupancySeatResponseV1:
-      required:
-      - properties
-      - seatNumber
-      - seatUsages
-      type: object
-      properties:
-        seatNumber:
-          type: string
-          description: Seat number.
-          examples:
-          - '23'
-        properties:
-          $ref: '#/components/schemas/SeatingPropertiesResponseV1'
-        compartmentName:
-          type:
-          - string
-          - 'null'
-          description: A unique identifier of each compartment. If set then every seat with the same compartmentName belongs to the same physical compartment.
-          examples:
-          - '1'
-        seatUsages:
-          type: array
-          description: List of seat usages between two neighboring stopPlaces.
-          items:
-            $ref: '#/components/schemas/CapacitiesOccupancySeatUsageResponseV1'
-      description: Occupancy status for one seat.
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -958,11 +941,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seating-manager-openapi.json
-- entur-seating-manager-openapi.yml

@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Reports API
-  version: 2026.08.0
+  title: Personnel tickets Reports API
+  description: Personnel tickets are a Norwegian railway discount scheme providing reduced fares for employees, pensioners, and eligible family members in participating companies.
+  termsOfService: http://entur.org
   contact:
     name: Entur Team Personalisering
     email: team.personalisering@entur.org
-  termsOfService: http://entur.org
-  description: 'Operations tagged Reports across 2 of this provider''s published API definitions: entur-personnel-tickets-openapi.json, entur-personnel-tickets-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.08.0
 servers:
 - url: https://api.entur.io
 security:
@@ -154,8 +154,6 @@ paths:
           - Personalbillett-Rapporter.companyId:opprett
       summary: Create tax savings report
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io
   /personnelticket/v2/reports/tax-savings-reconciliation:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -216,8 +214,6 @@ paths:
           any:
           - Personalbillett-Rapporter-Selskap.companyId:les
           - Personalbillett-Rapporter.companyId:les
-    servers:
-    - url: https://api.entur.io
   /personnelticket/v2/reports/stop-place-ticket-rights:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -256,8 +252,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: Personalbillett-Rapporter:les
-    servers:
-    - url: https://api.entur.io
   /personnelticket/v2/reports/fip/coupons:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -308,8 +302,6 @@ paths:
           any:
           - Personalbillett-Rapporter-Selskap.companyId:les
           - Personalbillett-Rapporter.companyId:les
-    servers:
-    - url: https://api.entur.io
   /personnelticket/v2/reports/fip-monthly:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -378,8 +370,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: Personalbillett-Rapporter:les
-    servers:
-    - url: https://api.entur.io
   /personnelticket/v2/reports/apprentice-ticket-rights:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -418,8 +408,6 @@ paths:
           $ref: '#/components/responses/Error500'
       x-entur-permissions:
         value: Personalbillett-Rapporter:les
-    servers:
-    - url: https://api.entur.io
   /personnelticket/v2/reports/active-ticket-rights-holders:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -504,94 +492,8 @@ paths:
           any:
           - Personalbillett-Rapporter-Selskap.companyId:les
           - Personalbillett-Rapporter.companyId:les
-    servers:
-    - url: https://api.entur.io
 components:
   schemas:
-    FipTicketTypeSimple:
-      required:
-      - code
-      - description
-      - id
-      type: object
-      properties:
-        id:
-          type: integer
-          description: The FIP ticket type id
-          format: int64
-        code:
-          type: string
-          description: The FIP ticket type code
-        description:
-          type: string
-          description: Description of the ticket type
-      description: FIP ticket type
-    TaxSavingReportGenerationResponse:
-      required:
-      - progress
-      - started
-      type: object
-      properties:
-        progress:
-          type: integer
-          description: How far the generation has progressed in percent from 0 to 100
-          format: int32
-          readOnly: true
-        started:
-          type: string
-          description: When the report generation started
-          format: date-time
-          readOnly: true
-        finished:
-          type: string
-          description: When the report generation finished
-          format: date-time
-          readOnly: true
-        error:
-          type: string
-          description: Error if the report generation fails
-          readOnly: true
-    ErrorSpecification:
-      required:
-      - defaultMessage
-      - field
-      type: object
-      properties:
-        field:
-          type: string
-          description: The field of the associated object in the request related to the error.
-        defaultMessage:
-          type: string
-          description: The message explaining why the error occurred.
-        rejectedValues:
-          type: object
-          description: A list of rejected values.
-      description: Optional list of error specifications.
-    PageActiveTicketRightsHolderResponse:
-      required:
-      - items
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          description: All items for this page
-          items:
-            $ref: '#/components/schemas/ActiveTicketRightsHolderResponse'
-        totalItems:
-          type: integer
-          description: Total items which could be returned
-          format: int64
-          examples:
-          - 1
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int64
-          examples:
-          - 1
-      description: Paged content
     ActiveTicketRightsHolderResponse:
       required:
       - companyId
@@ -666,44 +568,22 @@ components:
           examples:
           - Ansatt
       description: All items for this page
-    FipMonthlyTicketReport:
+    TravelType:
       required:
-      - employeeNo
+      - code
+      - id
       type: object
       properties:
-        fipTicketTypeSimple:
-          $ref: '#/components/schemas/FipTicketTypeSimple'
-        issueDate:
+        id:
           type: string
-          description: Issued date
-          format: date
-          examples:
-          - '2023-01-01'
-        ticketNo:
-          type: integer
-          description: Ticket number
-          format: int64
-        validFrom:
+          description: The travel type id
+        code:
           type: string
-          description: The date the ticket is valid from
-          format: date
-          examples:
-          - '2023-01-01'
-        validUntil:
+          description: The travel type code
+        description:
           type: string
-          description: The date the ticket is valid to
-          format: date
-          examples:
-          - '2023-01-01'
-        travelType:
-          $ref: '#/components/schemas/TravelType'
-        company:
-          type: integer
-          description: Company id
-          format: int64
-        employeeNo:
-          type: string
-          description: Employee number
+          description: The travel type description
+      description: Travel type
     ErrorResponse:
       required:
       - correlationId
@@ -757,37 +637,131 @@ components:
           items:
             $ref: '#/components/schemas/ErrorSpecification'
       description: Response object for errors occurring in the customers API
-    TravelType:
+    FipMonthlyTicketReport:
+      required:
+      - employeeNo
+      type: object
+      properties:
+        fipTicketTypeSimple:
+          $ref: '#/components/schemas/FipTicketTypeSimple'
+        issueDate:
+          type: string
+          description: Issued date
+          format: date
+          examples:
+          - '2023-01-01'
+        ticketNo:
+          type: integer
+          description: Ticket number
+          format: int64
+        validFrom:
+          type: string
+          description: The date the ticket is valid from
+          format: date
+          examples:
+          - '2023-01-01'
+        validUntil:
+          type: string
+          description: The date the ticket is valid to
+          format: date
+          examples:
+          - '2023-01-01'
+        travelType:
+          $ref: '#/components/schemas/TravelType'
+        company:
+          type: integer
+          description: Company id
+          format: int64
+        employeeNo:
+          type: string
+          description: Employee number
+    ErrorSpecification:
+      required:
+      - defaultMessage
+      - field
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field of the associated object in the request related to the error.
+        defaultMessage:
+          type: string
+          description: The message explaining why the error occurred.
+        rejectedValues:
+          type: object
+          description: A list of rejected values.
+      description: Optional list of error specifications.
+    PageActiveTicketRightsHolderResponse:
+      required:
+      - items
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          description: All items for this page
+          items:
+            $ref: '#/components/schemas/ActiveTicketRightsHolderResponse'
+        totalItems:
+          type: integer
+          description: Total items which could be returned
+          format: int64
+          examples:
+          - 1
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int64
+          examples:
+          - 1
+      description: Paged content
+    TaxSavingReportGenerationResponse:
+      required:
+      - progress
+      - started
+      type: object
+      properties:
+        progress:
+          type: integer
+          description: How far the generation has progressed in percent from 0 to 100
+          format: int32
+          readOnly: true
+        started:
+          type: string
+          description: When the report generation started
+          format: date-time
+          readOnly: true
+        finished:
+          type: string
+          description: When the report generation finished
+          format: date-time
+          readOnly: true
+        error:
+          type: string
+          description: Error if the report generation fails
+          readOnly: true
+    FipTicketTypeSimple:
       required:
       - code
+      - description
       - id
       type: object
       properties:
         id:
-          type: string
-          description: The travel type id
+          type: integer
+          description: The FIP ticket type id
+          format: int64
         code:
           type: string
-          description: The travel type code
+          description: The FIP ticket type code
         description:
           type: string
-          description: The travel type description
-      description: Travel type
+          description: Description of the ticket type
+      description: FIP ticket type
   responses:
-    Error404:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
     Error400:
       description: Bad request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-    Error500:
-      description: Internal server error
       content:
         application/json:
           schema:
@@ -798,22 +772,25 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    Error404:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
     Error403:
       description: Forbidden
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    Error500:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -829,11 +806,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-personnel-tickets-openapi.json
-- entur-personnel-tickets-openapi.yml

@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Reservation Controller Beta API
+  title: Seating Services Reservation Controller Beta API
+  description: API exposing services to handle seat reservations
   version: 2026.09.0
-  description: 'Operations tagged reservation-controller-beta across 2 of this provider''s published API definitions: entur-seatingservices-openapi.json, entur-seatingservices-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/seatingservices
 tags:
@@ -62,8 +62,6 @@ paths:
       deprecated: true
       summary: Update seats reservation 1
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /beta/reservations:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -119,8 +117,6 @@ paths:
       deprecated: true
       summary: Seats reservation
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /beta/reservations/specific-seats:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -145,8 +141,6 @@ paths:
       deprecated: true
       summary: Reserve specific seats 1
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /beta/reservations/by-seat-types:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -171,8 +165,6 @@ paths:
       deprecated: true
       summary: Reserve seats by type 1
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /beta/reservations/by-products:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -197,8 +189,6 @@ paths:
       deprecated: true
       summary: Reserve seats by product
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /beta/reservations/seats/{seatId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -231,8 +221,6 @@ paths:
       deprecated: true
       summary: Update seat
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
   /beta/reservations/seats:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -253,16 +241,16 @@ paths:
       deprecated: true
       summary: Cancel seats 1
       x-summary-source: derived
-    servers:
-    - url: https://api.entur.io/seatingservices
 components:
   schemas:
+    SeatReservationRequestBeta: {}
+    SeatResponseBeta: {}
+    ReserveSeatTypeRequest: {}
     ReserveSpecificSeatsRequest:
       type: object
       properties:
         hasSeatBehaviors:
           $ref: '#/components/schemas/SeqHasSeatBehavior'
-    ReserveSeatTypeRequest: {}
     MapStringString:
       type: object
       properties:
@@ -270,14 +258,7 @@ components:
           type: boolean
         empty:
           type: boolean
-    SeatResponseBeta: {}
-    SeqReservationResponseBeta:
-      type: object
-      properties:
-        traversableAgain:
-          type: boolean
-        empty:
-          type: boolean
+    ReserveSeatsByProductRequest: {}
     SeqCancelSeatRequest:
       type: object
       properties:
@@ -286,7 +267,7 @@ components:
         empty:
           type: boolean
     UpdateReservationRequestBeta: {}
-    SeqHasSeatBehavior:
+    SeqReservationResponseBeta:
       type: object
       properties:
         traversableAgain:
@@ -294,18 +275,14 @@ components:
         empty:
           type: boolean
     ReservationResponseBeta: {}
-    ReserveSeatsByProductRequest: {}
-    SeatReservationRequestBeta: {}
+    SeqHasSeatBehavior:
+      type: object
+      properties:
+        traversableAgain:
+          type: boolean
+        empty:
+          type: boolean
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -321,11 +298,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     bearer-key:
       type: http
       scheme: Bearer
       bearerFormat: jwt
-x-refined-from:
-- entur-seatingservices-openapi.json
-- entur-seatingservices-openapi.yml

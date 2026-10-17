@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Stop Places API
-  version: 2026.05.0
+  title: Stop Place Register Stop Places API
+  description: The Stop Place Register provides access to public transportation infrastructure data across Norway, including stop places, quays, parkings, and related NeTEx entities. This API enables developers to query stop place information with details on location, accessibility features, transport modes, fare zones, and hierarchical relationships. Ideal for journey planning applications, transportation analysis, mobility services, and public transit integrations.
   contact:
     name: Entur API Support
     url: https://developer.entur.org
-  description: 'Operations tagged Stop Places across 2 of this provider''s published API definitions: entur-stop-place-v1-read-openapi.json, entur-stop-place-v1-read-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.05.0
 servers:
 - url: https://api.entur.io/stop-places/v1/read
 tags:
@@ -278,8 +278,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /stop-places/{id}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -350,8 +348,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StopPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /stop-places/{id}/children:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -426,8 +422,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StopPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /stop-places/{id}/parkings:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -504,8 +498,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Parking'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /stop-places/{id}/scheduled-stop-points:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -566,8 +558,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ScheduledStopPoint'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /stop-places/{id}/versions:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -638,8 +628,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/StopPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
   /stop-places/{id}/versions/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -712,42 +700,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StopPlace'
-    servers:
-    - url: https://api.entur.io/stop-places/v1/read
 components:
   schemas:
-    LocationStructure:
+    VehicleStoppingPlaces_RelStructure:
       type: object
       properties:
-        altitude:
-          type: number
-          xml:
-            name: Altitude
         id:
           type: string
           xml:
             attribute: true
-        latitude:
-          type: number
-          xml:
-            name: Latitude
-        longitude:
-          type: number
-          xml:
-            name: Longitude
-        pos:
-          $ref: '#/components/schemas/DirectPositionType'
-          xml:
-            namespace: http://www.opengis.net/gml/3.2
-        precision:
-          type: number
-          xml:
-            name: Precision
-        srsName:
+        modificationSet:
           type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
           xml:
             attribute: true
-    TypeOfPointRefStructure:
+        vehicleStoppingPlaceRefOrVehicleStoppingPlace:
+          type: array
+          items: {}
+    ParkingRefStructure:
       type: object
       properties:
         changed:
@@ -768,6 +740,10 @@ components:
           - DELETE
           - UNCHANGED
           - DELTA
+          xml:
+            attribute: true
+        nameOfMemberClass:
+          type: string
           xml:
             attribute: true
         nameOfRefClass:
@@ -788,7 +764,7 @@ components:
           type: string
           xml:
             attribute: true
-    TypeOfZoneRefStructure:
+    TopographicPlaceRefStructure:
       type: object
       properties:
         changed:
@@ -809,6 +785,10 @@ components:
           - DELETE
           - UNCHANGED
           - DELTA
+          xml:
+            attribute: true
+        nameOfMemberClass:
+          type: string
           xml:
             attribute: true
         nameOfRefClass:
@@ -829,290 +809,26 @@ components:
           type: string
           xml:
             attribute: true
-    AccessibilityAssessment:
+    TypeOfPlaceRefs_RelStructure:
       type: object
       properties:
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        comment:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Comment
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
         id:
           type: string
           xml:
             attribute: true
-        limitations:
-          $ref: '#/components/schemas/AccessibilityLimitations_RelStructure'
-        mobilityImpairedAccess:
+        modificationSet:
           type: string
           enum:
-          - 'TRUE'
-          - 'FALSE'
-          - UNKNOWN
-          - PARTIAL
-          xml:
-            name: MobilityImpairedAccess
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
+          - ALL
+          - CHANGES_ONLY
           xml:
             attribute: true
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        suitabilities:
-          $ref: '#/components/schemas/Suitabilities_RelStructure'
-        validBetween:
+        typeOfPlaceRef:
           type: array
           items:
-            $ref: '#/components/schemas/ValidBetween'
+            $ref: '#/components/schemas/TypeOfPlaceRefStructure'
           xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
-      required:
-      - mobilityImpairedAccess
-    JAXBElementSiteRefStructure:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/SiteRefStructure'
-    PointRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    SimplePoint_VersionStructure:
-      type: object
-      properties:
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        id:
-          type: string
-          xml:
-            attribute: true
-        location:
-          $ref: '#/components/schemas/LocationStructure'
-          xml:
-            name: Location
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        name:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Name
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
-    Languages:
-      type: object
-      properties:
-        languageUsage:
-          type: array
-          items:
-            $ref: '#/components/schemas/LanguageUsageStructure'
-          xml:
-            name: LanguageUsage
-    AbstractRingType: {}
-    KeyValueStructure:
-      type: object
-      properties:
-        key:
-          type: string
-          xml:
-            name: Key
-        typeOfKey:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-          xml:
-            name: Value
-      required:
-      - key
-      - value
+            name: TypeOfPlaceRef
     TypeOfZoneRefs_RelStructure:
       type: object
       properties:
@@ -1133,7 +849,25 @@ components:
             $ref: '#/components/schemas/TypeOfZoneRefStructure'
           xml:
             name: TypeOfZoneRef
-    JAXBElementTransportTypeRefStructure:
+    GroupMembershipRefs_RelStructure:
+      type: object
+      properties:
+        groupOfPointsRef_:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementGroupOfEntitiesRefStructure'
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+    JAXBElementAbstractRingType:
       type: object
       properties:
         globalScope:
@@ -1152,128 +886,105 @@ components:
         typeSubstituted:
           type: boolean
         value:
-          $ref: '#/components/schemas/TransportTypeRefStructure'
-    SiteFacilitySets_RelStructure:
+          $ref: '#/components/schemas/AbstractRingType'
+    InfoLinks:
       type: object
       properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        siteFacilitySetRefOrSiteFacilitySet:
-          type: array
-          items: {}
-    Quays_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        quayRefOrQuay:
-          type: array
-          items: {}
-    ContactStructure:
-      type: object
-      properties:
-        contactPerson:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: ContactPerson
-        contactRef:
-          $ref: '#/components/schemas/ContactRefStructure'
-          xml:
-            name: ContactRef
-        email:
-          type: string
-          xml:
-            name: Email
-        fax:
-          type: string
-          xml:
-            name: Fax
-        furtherDetails:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: FurtherDetails
-        phone:
-          type: string
-          xml:
-            name: Phone
-        url:
-          type: string
-          xml:
-            name: Url
-    LanguageUsageStructure:
-      type: object
-      properties:
-        language:
-          type: string
-          xml:
-            name: Language
-        languageUse:
+        infoLink:
           type: array
           items:
-            type: string
-            enum:
-            - NORMALLY_USED
-            - UNDERSTOOD
-            - NATIVE
-            - SPOKEN
-            - WRITTEN
-            - READ
-            - OTHER
-            - ALL_USES
-            xml:
-              name: LanguageUse
+            $ref: '#/components/schemas/InfoLinkStructure'
           xml:
-            name: LanguageUse
+            name: InfoLink
       required:
-      - language
-      - languageUse
-    InfoLinkStructure:
+      - infoLink
+    TariffZoneRefs_RelStructure:
       type: object
       properties:
-        targetPlatform:
+        id:
           type: string
           xml:
             attribute: true
-        typeOfInfoLink:
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        tariffZoneRef:
           type: array
           items:
-            type: string
-            enum:
-            - CONTACT
-            - RESOURCE
-            - INFO
-            - IMAGE
-            - DOCUMENT
-            - TIMETABLE_DOCUMENT
-            - FARE_SHEET
-            - DATA_LICENCE
-            - MOBILE_APP_DOWNLOAD
-            - MOBILE_APP_INSTALL_CHECK
-            - MAP
-            - ICON
-            - OTHER
+            $ref: '#/components/schemas/TariffZoneRef'
+          xml:
+            name: TariffZoneRef
+      required:
+      - tariffZoneRef
+    JAXBElementSiteRefStructure:
+      type: object
+      properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value:
+          $ref: '#/components/schemas/SiteRefStructure'
+    ZoneRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfMemberClass:
+          type: string
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
           xml:
             attribute: true
         value:
           type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
     ValidBetween:
       type: object
       properties:
@@ -1392,351 +1103,24 @@ components:
       xml:
         name: ValidBetween
         namespace: http://www.netex.org.uk/netex
-    JAXBElementOrganisationRefStructure:
+    ParkingProperties:
       type: object
       properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/OrganisationRefStructure'
-    Suitabilities_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        suitability:
-          type: array
-          items:
-            $ref: '#/components/schemas/Suitability'
-          xml:
-            name: Suitability
-      required:
-      - suitability
-    InfoLinks:
-      type: object
-      properties:
-        infoLink:
-          type: array
-          items:
-            $ref: '#/components/schemas/InfoLinkStructure'
-          xml:
-            name: InfoLink
-      required:
-      - infoLink
-    ParkingProperties_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        parkingProperties:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParkingProperties'
-          xml:
-            name: ParkingProperties
-      required:
-      - parkingProperties
-    ExternalObjectRefStructure:
-      type: object
-      properties:
-        ref:
-          type: string
-          xml:
-            attribute: true
-        type:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-    JAXBElementAbstractRingType:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/AbstractRingType'
-    ValidityConditionRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    ValidityConditions_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        validityConditionRefOrValidBetweenOrValidityCondition_:
-          type: array
-          items: {}
-    AlternativeText:
-      type: object
-      properties:
-        alternativeTexts: {}
-        attributeName:
-          type: string
-          xml:
-            attribute: true
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataManagedObjectRef:
-          $ref: '#/components/schemas/VersionOfObjectRefStructure'
-          xml:
-            name: DataManagedObjectRef
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
-        id:
-          type: string
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        order:
-          type: integer
-          xml:
-            attribute: true
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        text:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Text
-        useForLanguage:
-          type: string
-          xml:
-            attribute: true
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
-      required:
-      - text
-    TypeOfParkingRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    Projections_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        projectionRefOrProjection:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementObject'
-    ErrorResponse:
-      type: object
-      description: Error response returned when a request fails
-      properties:
-        details:
-          type: object
-          additionalProperties: {}
-          description: Additional error context
-        errorCode:
-          type: string
-          description: Machine-readable error code
-          example: RESOURCE_NOT_FOUND
-        message:
-          type: string
-          description: Human-readable error message
-          example: Resource not found
-      xml:
-        name: error
-    AlternativeName:
-      type: object
-      properties:
-        abbreviation:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Abbreviation
         alternativeTexts:
           $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        areas:
+          $ref: '#/components/schemas/ParkingAreaRefs_RelStructure'
+        bayGeometry:
+          type: string
+          enum:
+          - UNSPECIFIED
+          - ORTHOGONAL
+          - ANGLED
+          - PARALLEL
+          - FREE_FORMAT
+          - OTHER
+          xml:
+            name: BayGeometry
         changed:
           type: string
           format: date-time
@@ -1772,10 +1156,10 @@ components:
           type: string
           xml:
             attribute: true
-        lang:
+        maximumStay:
           type: string
           xml:
-            name: Lang
+            name: MaximumStay
         modification:
           type: string
           enum:
@@ -1794,25 +1178,113 @@ components:
           type: string
           xml:
             attribute: true
-        nameType:
+        parkingRef:
+          $ref: '#/components/schemas/ParkingRefStructure'
+          xml:
+            name: ParkingRef
+        parkingStayList:
+          type: array
+          items:
+            type: string
+            enum:
+            - SHORT_STAY
+            - MID_TERM
+            - LONG_TERM
+            - DROPOFF
+            - UNLIMITED
+            - OTHER
+            - ALL
+            xml:
+              name: ParkingStayList
+          xml:
+            name: ParkingStayList
+        parkingUserTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - ALL_USERS
+            - STAFF
+            - VISITORS
+            - CUSTOMERS
+            - GUESTS
+            - REGISTERED_DISABLED
+            - IMPAIRED_MOBILITY
+            - REGISTERED
+            - RENTAL
+            - DOCTORS
+            - RESIDENTS_WITH_PERMITS
+            - RESERVATION_HOLDERS
+            - EMERGENCY_SERVICES
+            - TAXI
+            - VEHICLE_SHARING
+            - OTHER
+            - ALL
+            xml:
+              name: ParkingUserTypes
+          xml:
+            name: ParkingUserTypes
+        parkingVehicleTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - CYCLE
+            - PEDAL_CYCLE
+            - E_CYCLE
+            - MOPED
+            - MOTORCYCLE
+            - MOTORCYCLE_WITH_SIDECAR
+            - MOTOR_SCOOTER
+            - TWO_WHEELED_VEHICLE
+            - THREE_WHEELED_VEHICLE
+            - CAR
+            - MICRO_CAR
+            - MINI_CAR
+            - SMALL_CAR
+            - PASSENGER_CAR
+            - LARGE_CAR
+            - FOUR_WHEEL_DRIVE
+            - TAXI
+            - CAMPER_CAR
+            - CAR_WITH_TRAILER
+            - CAR_WITH_CARAVAN
+            - MINIBUS
+            - MINIVAN
+            - BUS
+            - VAN
+            - TRANSPORTER
+            - LARGE_VAN
+            - HIGH_SIDED_VEHICLE
+            - LIGHT_GOODS_VEHICLE
+            - HEAVY_GOODS_VEHICLE
+            - AGRICULTURAL_VEHICLE
+            - TANKER
+            - TRUCK
+            - TRAM
+            - ARTICULATED_VEHICLE
+            - VEHICLE_WITH_TRAILER
+            - LIGHT_GOODS_VEHICLE_WITH_TRAILER
+            - HEAVY_GOODS_VEHICLE_WITH_TRAILER
+            - SNOWMOBILE
+            - UNDEFINED
+            - OTHER
+            - ALL_PASSENGER_VEHICLES
+            - ALL
+            xml:
+              name: ParkingVehicleTypes
+          xml:
+            name: ParkingVehicleTypes
+        parkingVisibility:
           type: string
-          default: alias
           enum:
-          - ALIAS
-          - TRANSLATION
-          - COPY
-          - LABEL
+          - UNMARKED
+          - SIGNAGE_ONLY
+          - DEMARCATED
+          - DOCKS
           - OTHER
           xml:
-            name: NameType
-        namedObjectRef:
-          $ref: '#/components/schemas/VersionOfObjectRefStructure'
-          xml:
-            name: NamedObjectRef
-        order:
-          type: integer
-          xml:
-            attribute: true
+            name: ParkingVisibility
         publication:
           type: string
           enum:
@@ -1824,14 +1296,12 @@ components:
           - TEST
           xml:
             attribute: true
-        qualifierName:
-          $ref: '#/components/schemas/MultilingualString'
+        secureParking:
+          type: boolean
           xml:
-            name: QualifierName
-        shortName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: ShortName
+            name: SecureParking
+        spaces:
+          $ref: '#/components/schemas/ParkingCapacities_RelStructure'
         status_BasicModificationDetailsGroup:
           type: string
           enum:
@@ -1841,10 +1311,6 @@ components:
           xml:
             name: status
             attribute: true
-        typeOfName:
-          type: string
-          xml:
-            name: TypeOfName
         validBetween:
           type: array
           items:
@@ -1853,35 +1319,13 @@ components:
             name: ValidBetween
         validityConditions:
           $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        vehicleTypes:
+          $ref: '#/components/schemas/TransportTypeRefs_RelStructure'
         version:
           type: string
           xml:
             attribute: true
-      required:
-      - name
-    TopographicPlaceRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        topographicPlaceRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/TopographicPlaceRefStructure'
-          xml:
-            name: TopographicPlaceRef
-      required:
-      - topographicPlaceRef
-    ParkingAreaRefStructure:
+    GroupOfEntitiesRefStructure:
       type: object
       properties:
         changed:
@@ -1926,28 +1370,12 @@ components:
           type: string
           xml:
             attribute: true
-    AccessibilityLimitation:
+    TypeOfZoneRefStructure:
       type: object
       properties:
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        audibleSignalsAvailable:
-          type: string
-          default: 'false'
-          enum:
-          - 'TRUE'
-          - 'FALSE'
-          - UNKNOWN
-          - PARTIAL
-          xml:
-            name: AudibleSignalsAvailable
         changed:
           type: string
           format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
           xml:
             attribute: true
         created:
@@ -1955,47 +1383,6 @@ components:
           format: date-time
           xml:
             attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        escalatorFreeAccess:
-          type: string
-          default: unknown
-          enum:
-          - 'TRUE'
-          - 'FALSE'
-          - UNKNOWN
-          - PARTIAL
-          xml:
-            name: EscalatorFreeAccess
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
-        id:
-          type: string
-          xml:
-            attribute: true
-        liftFreeAccess:
-          type: string
-          default: unknown
-          enum:
-          - 'TRUE'
-          - 'FALSE'
-          - UNKNOWN
-          - PARTIAL
-          xml:
-            name: LiftFreeAccess
         modification:
           type: string
           enum:
@@ -2006,150 +1393,22 @@ components:
           - DELTA
           xml:
             attribute: true
-        nameOfClass:
+        nameOfRefClass:
           type: string
           xml:
             attribute: true
-        publication:
+        ref:
           type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
           xml:
             attribute: true
-        status_BasicModificationDetailsGroup:
+        value:
           type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        stepFreeAccess:
-          type: string
-          default: unknown
-          enum:
-          - 'TRUE'
-          - 'FALSE'
-          - UNKNOWN
-          - PARTIAL
-          xml:
-            name: StepFreeAccess
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
         version:
           type: string
           xml:
             attribute: true
-        visualSignsAvailable:
+        versionRef:
           type: string
-          default: unknown
-          enum:
-          - 'TRUE'
-          - 'FALSE'
-          - UNKNOWN
-          - PARTIAL
-          xml:
-            name: VisualSignsAvailable
-        wheelchairAccess:
-          type: string
-          default: 'false'
-          enum:
-          - 'TRUE'
-          - 'FALSE'
-          - UNKNOWN
-          - PARTIAL
-          xml:
-            name: WheelchairAccess
-      required:
-      - wheelchairAccess
-      xml:
-        name: AccessibilityLimitation
-        namespace: http://www.netex.org.uk/netex
-    StopAreaRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        stopAreaRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/StopAreaRefStructure'
-          xml:
-            name: StopAreaRef
-      required:
-      - stopAreaRef
-    AbstractRingPropertyType:
-      type: object
-      properties:
-        abstractRing:
-          $ref: '#/components/schemas/JAXBElementAbstractRingType'
-    PolygonType:
-      type: object
-      properties:
-        descriptionReference:
-          $ref: '#/components/schemas/ReferenceType'
-        exterior:
-          $ref: '#/components/schemas/AbstractRingPropertyType'
-        id:
-          type: string
-          xml:
-            namespace: http://www.opengis.net/gml/3.2
-            attribute: true
-        identifier:
-          $ref: '#/components/schemas/CodeWithAuthorityType'
-        interior:
-          type: array
-          items:
-            $ref: '#/components/schemas/AbstractRingPropertyType'
-        name:
-          type: array
-          items:
-            $ref: '#/components/schemas/CodeType'
-        srsDimension:
-          type: integer
-          xml:
-            attribute: true
-        srsName:
-          type: string
-          xml:
-            attribute: true
-    ExplicitEquipments_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        installedEquipmentRefOrInstalledEquipmentOrLocalServiceRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementObject'
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
           xml:
             attribute: true
     RoadNumberRangeStructure:
@@ -2163,12 +1422,9 @@ components:
           type: integer
           xml:
             name: ToNumber
-    Accesses_RelStructure:
+    StopPlacesInFrame_RelStructure:
       type: object
       properties:
-        accessRefOrAccess:
-          type: array
-          items: {}
         id:
           type: string
           xml:
@@ -2180,20 +1436,21 @@ components:
           - CHANGES_ONLY
           xml:
             attribute: true
-    AccessibilityLimitations_RelStructure:
+        stopPlace:
+          type: array
+          items:
+            $ref: '#/components/schemas/StopPlace'
+          xml:
+            name: StopPlace
+      required:
+      - stopPlace
+    ExtensionsStructure:
       type: object
       properties:
-        accessibilityLimitation:
-          $ref: '#/components/schemas/AccessibilityLimitation'
-          xml:
-            name: AccessibilityLimitation
-        id:
-          type: string
-          xml:
-            attribute: true
-      required:
-      - accessibilityLimitation
-    TopographicPlaceRefStructure:
+        any:
+          type: array
+          items: {}
+    StopAreaRefStructure:
       type: object
       properties:
         changed:
@@ -2238,58 +1495,46 @@ components:
           type: string
           xml:
             attribute: true
-    BrandingRefStructure:
+    CodeWithAuthorityType:
       type: object
       properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
+        codeSpace:
           type: string
           xml:
             attribute: true
         value:
           type: string
-        version:
+    AbstractRingPropertyType:
+      type: object
+      properties:
+        abstractRing:
+          $ref: '#/components/schemas/JAXBElementAbstractRingType'
+    PaymentByMobileStructure:
+      type: object
+      properties:
+        paymentAppDownloadUrl:
           type: string
           xml:
-            attribute: true
-        versionRef:
+            name: PaymentAppDownloadUrl
+        paymentUrl:
           type: string
           xml:
-            attribute: true
-    LocalServices_RelStructure:
+            name: PaymentUrl
+        phoneNumberToPay:
+          type: string
+          xml:
+            name: PhoneNumberToPay
+        supportPhoneNumber:
+          type: string
+          xml:
+            name: SupportPhoneNumber
+    TypeOfPaymentMethodRefs_RelStructure:
       type: object
       properties:
         id:
           type: string
           xml:
             attribute: true
-        localServiceRefOrLocalService:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementObject'
         modificationSet:
           type: string
           enum:
@@ -2297,170 +1542,46 @@ components:
           - CHANGES_ONLY
           xml:
             attribute: true
-    TariffZoneRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        tariffZoneRef:
+        typeOfPaymentMethodRef:
           type: array
           items:
-            $ref: '#/components/schemas/TariffZoneRef'
+            $ref: '#/components/schemas/TypeOfPaymentMethodRef'
           xml:
-            name: TariffZoneRef
+            name: TypeOfPaymentMethodRef
       required:
-      - tariffZoneRef
-    NavigationPaths_RelStructure:
+      - typeOfPaymentMethodRef
+    ScheduledStopPoint:
       type: object
       properties:
-        id:
+        allowedForWaitTime:
           type: string
           xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        navigationPathRefOrNavigationPath:
-          type: array
-          items: {}
-    GroupMembershipRefs_RelStructure:
-      type: object
-      properties:
-        groupOfPointsRef_:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementGroupOfEntitiesRefStructure'
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-    ParkingRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfMemberClass:
-          type: string
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    JAXBElementObject:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value: {}
-    RoadAddress:
-      type: object
-      properties:
+            name: AllowedForWaitTime
         alternativeTexts:
           $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        bearingCompass:
-          type: string
-          enum:
-          - SW
-          - SE
-          - NW
-          - NE
-          - W
-          - E
-          - S
-          - N
+        atCentre:
+          type: boolean
+          default: false
           xml:
-            name: BearingCompass
-        bearingDegrees:
-          type: integer
-          xml:
-            name: BearingDegrees
+            name: AtCentre
         brandingRef:
           $ref: '#/components/schemas/BrandingRefStructure'
           xml:
             name: BrandingRef
-        centroid:
-          $ref: '#/components/schemas/SimplePoint_VersionStructure'
-          xml:
-            name: Centroid
         changed:
           type: string
           format: date-time
           xml:
             attribute: true
+        compassBearing:
+          type: number
+          format: float
+          xml:
+            name: CompassBearing
         compatibleWithVersionFrameVersionRef:
           type: string
           xml:
             attribute: true
-        countryName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: CountryName
         countryRef:
           $ref: '#/components/schemas/CountryRef'
           xml:
@@ -2487,28 +1608,38 @@ components:
           $ref: '#/components/schemas/MultilingualString'
           xml:
             name: Description
-        evenNumberRange:
-          $ref: '#/components/schemas/RoadNumberRangeStructure'
-          xml:
-            name: EvenNumberRange
         extensions:
           $ref: '#/components/schemas/ExtensionsStructure'
           xml:
             name: Extensions
-        gisFeatureRef:
-          type: string
+        externalStopPointRef:
+          $ref: '#/components/schemas/ExternalObjectRefStructure'
           xml:
-            name: GisFeatureRef
+            name: ExternalStopPointRef
+        forAlighting:
+          type: boolean
+          xml:
+            name: ForAlighting
+        forBoarding:
+          type: boolean
+          xml:
+            name: ForBoarding
+        groupMemberships:
+          $ref: '#/components/schemas/GroupMembershipRefs_RelStructure'
         id:
           type: string
           xml:
             attribute: true
-        infoLinks:
-          $ref: '#/components/schemas/InfoLinks'
         keyList:
           $ref: '#/components/schemas/KeyListStructure'
-        members:
-          $ref: '#/components/schemas/PointRefs_RelStructure'
+        label:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Label
+        location:
+          $ref: '#/components/schemas/LocationStructure'
+          xml:
+            name: Location
         modification:
           type: string
           enum:
@@ -2519,11 +1650,6 @@ components:
           - DELTA
           xml:
             attribute: true
-        multiSurface:
-          $ref: '#/components/schemas/MultiSurfaceType'
-          xml:
-            name: MultiSurface
-            namespace: http://www.opengis.net/gml/3.2
         name:
           $ref: '#/components/schemas/MultilingualString'
           xml:
@@ -2532,27 +1658,28 @@ components:
           type: string
           xml:
             attribute: true
-        oddNumberRange:
-          $ref: '#/components/schemas/RoadNumberRangeStructure'
+        nameSuffix:
+          $ref: '#/components/schemas/MultilingualString'
           xml:
-            name: OddNumberRange
-        parentZoneRef:
-          $ref: '#/components/schemas/ZoneRefStructure'
+            name: NameSuffix
+        pointNumber:
+          type: string
           xml:
-            name: ParentZoneRef
-        placeTypes:
-          $ref: '#/components/schemas/TypeOfPlaceRefs_RelStructure'
-        polygon:
-          $ref: '#/components/schemas/PolygonType'
+            name: PointNumber
+        presentation:
+          $ref: '#/components/schemas/PresentationStructure'
           xml:
-            name: Polygon
-            namespace: http://www.opengis.net/gml/3.2
+            name: Presentation
         privateCode:
           $ref: '#/components/schemas/PrivateCodeStructure'
           xml:
             name: PrivateCode
         projections:
           $ref: '#/components/schemas/Projections_RelStructure'
+        publicCode:
+          $ref: '#/components/schemas/PrivateCodeStructure'
+          xml:
+            name: PublicCode
         publication:
           type: string
           enum:
@@ -2564,26 +1691,38 @@ components:
           - TEST
           xml:
             attribute: true
-        purposeOfGroupingRef:
-          $ref: '#/components/schemas/PurposeOfGroupingRefStructure'
+        requestMethodType:
+          type: string
+          default: noneRequired
+          enum:
+          - NONE_REQUIRED
+          - HAND_SIGNAL
+          - TURN_ON_LIGHT
+          - STOP_BUTTON
+          - PHONE_CALL
+          - MOBILE_APP
+          - SMS
+          - SPEAK_TO_DRIVER_ONBOARD
+          - OTHER
           xml:
-            name: PurposeOfGroupingRef
+            name: RequestMethodType
+        requestStop:
+          type: boolean
+          default: false
+          xml:
+            name: RequestStop
         responsibilitySetRef:
           type: string
           xml:
             attribute: true
-        roadName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: RoadName
-        roadNumber:
-          type: string
-          xml:
-            name: RoadNumber
         shortName:
           $ref: '#/components/schemas/MultilingualString'
           xml:
             name: ShortName
+        shortStopCode:
+          $ref: '#/components/schemas/PrivateCodeStructure'
+          xml:
+            name: ShortStopCode
         status_BasicModificationDetailsGroup:
           type: string
           enum:
@@ -2593,8 +1732,196 @@ components:
           xml:
             name: status
             attribute: true
+        stopAreas:
+          $ref: '#/components/schemas/StopAreaRefs_RelStructure'
+        stopType:
+          type: string
+          enum:
+          - ONSTREET_BUS
+          - ONSTREET_TRAM
+          - AIRPORT
+          - RAIL_STATION
+          - METRO_STATION
+          - BUS_STATION
+          - COACH_STATION
+          - TRAM_STATION
+          - HARBOUR_PORT
+          - FERRY_PORT
+          - FERRY_STOP
+          - LIFT_STATION
+          - VEHICLE_RAIL_INTERCHANGE
+          - TAXI_RANK
+          - OTHER
+          xml:
+            name: StopType
+        tariffZones:
+          $ref: '#/components/schemas/TariffZoneRefs_RelStructure'
+        timingPointStatus:
+          type: string
+          enum:
+          - TIMING_POINT
+          - SECONDARY_TIMING_POINT
+          - NOT_TIMING_POINT
+          xml:
+            name: TimingPointStatus
+        topographicPlaceRef:
+          $ref: '#/components/schemas/TopographicPlaceRefStructure'
+          xml:
+            name: TopographicPlaceRef
+        topographicPlaceView:
+          $ref: '#/components/schemas/TopographicPlaceView'
+          xml:
+            name: TopographicPlaceView
         types:
-          $ref: '#/components/schemas/TypeOfZoneRefs_RelStructure'
+          $ref: '#/components/schemas/TypeOfPointRefs_RelStructure'
+        url:
+          type: string
+          xml:
+            name: Url
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        vehicleModes:
+          type: array
+          items:
+            type: string
+            enum:
+            - AIR
+            - BUS
+            - COACH
+            - FERRY
+            - METRO
+            - RAIL
+            - TROLLEY_BUS
+            - TRAM
+            - WATER
+            - CABLEWAY
+            - FUNICULAR
+            - LIFT
+            - SNOW_AND_ICE
+            - OTHER
+            xml:
+              name: VehicleModes
+          xml:
+            name: VehicleModes
+        version:
+          type: string
+          xml:
+            attribute: true
+    LocationStructure:
+      type: object
+      properties:
+        altitude:
+          type: number
+          xml:
+            name: Altitude
+        id:
+          type: string
+          xml:
+            attribute: true
+        latitude:
+          type: number
+          xml:
+            name: Latitude
+        longitude:
+          type: number
+          xml:
+            name: Longitude
+        pos:
+          $ref: '#/components/schemas/DirectPositionType'
+          xml:
+            namespace: http://www.opengis.net/gml/3.2
+        precision:
+          type: number
+          xml:
+            name: Precision
+        srsName:
+          type: string
+          xml:
+            attribute: true
+    SimplePoint_VersionStructure:
+      type: object
+      properties:
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        id:
+          type: string
+          xml:
+            attribute: true
+        location:
+          $ref: '#/components/schemas/LocationStructure'
+          xml:
+            name: Location
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        name:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Name
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
         validBetween:
           type: array
           items:
@@ -2607,7 +1934,7 @@ components:
           type: string
           xml:
             attribute: true
-    TariffZoneRef:
+    TypeOfPointRefStructure:
       type: object
       properties:
         changed:
@@ -2630,10 +1957,6 @@ components:
           - DELTA
           xml:
             attribute: true
-        nameOfMemberClass:
-          type: string
-          xml:
-            attribute: true
         nameOfRefClass:
           type: string
           xml:
@@ -2652,55 +1975,7 @@ components:
           type: string
           xml:
             attribute: true
-    PresentationStructure:
-      type: object
-      properties:
-        backgroundColour:
-          type: string
-          format: byte
-          xml:
-            name: BackgroundColour
-        backgroundColourName:
-          type: string
-          xml:
-            name: BackgroundColourName
-        colour:
-          type: string
-          format: byte
-          xml:
-            name: Colour
-        colourName:
-          type: string
-          xml:
-            name: ColourName
-        colourSystem:
-          type: string
-          xml:
-            name: ColourSystem
-        infoLinks:
-          $ref: '#/components/schemas/InfoLinks'
-        textColour:
-          type: string
-          format: byte
-          xml:
-            name: TextColour
-        textColourName:
-          type: string
-          xml:
-            name: TextColourName
-        textFont:
-          type: string
-          xml:
-            name: TextFont
-        textFontName:
-          type: string
-          xml:
-            name: TextFontName
-        textLanguage:
-          type: string
-          xml:
-            name: TextLanguage
-    ParkingEntrancesForVehicles_RelStructure:
+    ParkingsInFrame_RelStructure:
       type: object
       properties:
         id:
@@ -2714,9 +1989,137 @@ components:
           - CHANGES_ONLY
           xml:
             attribute: true
-        parkingEntranceForVehiclesRefOrParkingEntranceForVehicles:
+        parking:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parking'
+          xml:
+            name: Parking
+      required:
+      - parking
+    InfoLinkStructure:
+      type: object
+      properties:
+        targetPlatform:
+          type: string
+          xml:
+            attribute: true
+        typeOfInfoLink:
+          type: array
+          items:
+            type: string
+            enum:
+            - CONTACT
+            - RESOURCE
+            - INFO
+            - IMAGE
+            - DOCUMENT
+            - TIMETABLE_DOCUMENT
+            - FARE_SHEET
+            - DATA_LICENCE
+            - MOBILE_APP_DOWNLOAD
+            - MOBILE_APP_INSTALL_CHECK
+            - MAP
+            - ICON
+            - OTHER
+          xml:
+            attribute: true
+        value:
+          type: string
+    MultilingualString:
+      type: object
+      properties:
+        lang:
+          type: string
+          xml:
+            attribute: true
+        textIdType:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+    ParkingCapacities_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        parkingCapacityRefOrParkingCapacity:
           type: array
           items: {}
+    ExternalObjectRefStructure:
+      type: object
+      properties:
+        ref:
+          type: string
+          xml:
+            attribute: true
+        type:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+    CodeType:
+      type: object
+      properties:
+        codeSpace:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+    ReferenceType:
+      type: object
+      properties:
+        nilReason:
+          type: array
+          items:
+            type: string
+          xml:
+            attribute: true
+        owns:
+          type: boolean
+          xml:
+            attribute: true
+    KeyListStructure:
+      type: object
+      properties:
+        keyValue:
+          type: array
+          items:
+            $ref: '#/components/schemas/KeyValueStructure'
+          xml:
+            name: KeyValue
+      required:
+      - keyValue
+    PlaceEquipments_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        installedEquipmentRefOrInstalledEquipment:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementObject'
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
     MultiSurfaceType:
       type: object
       properties:
@@ -2758,62 +2161,7 @@ components:
             $ref: '#/components/schemas/SurfacePropertyType'
         surfaceMembers:
           $ref: '#/components/schemas/SurfaceArrayPropertyType'
-    SurfacePropertyType:
-      type: object
-      properties:
-        abstractSurface:
-          $ref: '#/components/schemas/JAXBElementAbstractSurfaceType'
-        nilReason:
-          type: array
-          items:
-            type: string
-          xml:
-            attribute: true
-        owns:
-          type: boolean
-          xml:
-            attribute: true
-    OrganisationRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
+    AbstractRingType: {}
     Parking:
       type: object
       properties:
@@ -3373,7 +2721,7 @@ components:
           type: string
           xml:
             attribute: true
-    PathJunctions_RelStructure:
+    ParkingEntrancesForVehicles_RelStructure:
       type: object
       properties:
         id:
@@ -3387,9 +2735,27 @@ components:
           - CHANGES_ONLY
           xml:
             attribute: true
-        pathJunctionRefOrPathJunction:
+        parkingEntranceForVehiclesRefOrParkingEntranceForVehicles:
           type: array
           items: {}
+    LocalServices_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        localServiceRefOrLocalService:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementObject'
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
     ScheduledStopPointsInFrame_RelStructure:
       type: object
       properties:
@@ -3412,1340 +2778,6 @@ components:
             name: ScheduledStopPoint
       required:
       - scheduledStopPoint
-    JAXBElementAbstractSurfaceType:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/AbstractSurfaceType'
-    PurposeOfGroupingRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    TypeOfPaymentMethodRef:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    JAXBElementGroupOfEntitiesRefStructure:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/GroupOfEntitiesRefStructure'
-    ParkingAreas_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        parkingAreaRefOrParkingArea:
-          type: array
-          items: {}
-    AddressRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfMemberClass:
-          type: string
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    StopAreaRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfMemberClass:
-          type: string
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    SiteEntrances_RelStructure:
-      type: object
-      properties:
-        entranceRefOrEntrance:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementObject'
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-    TypeOfPointRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        typeOfPointRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/TypeOfPointRefStructure'
-          xml:
-            name: TypeOfPointRef
-    ExtensionsStructure:
-      type: object
-      properties:
-        any:
-          type: array
-          items: {}
-    ParkingsInFrame_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        parking:
-          type: array
-          items:
-            $ref: '#/components/schemas/Parking'
-          xml:
-            name: Parking
-      required:
-      - parking
-    AccessSpaces_RelStructure:
-      type: object
-      properties:
-        accessSpaceRefOrAccessSpace:
-          type: array
-          items: {}
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-    ParkingAreaRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        parkingAreaRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParkingAreaRefStructure'
-          xml:
-            name: ParkingAreaRef
-      required:
-      - parkingAreaRef
-    KeyListStructure:
-      type: object
-      properties:
-        keyValue:
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyValueStructure'
-          xml:
-            name: KeyValue
-      required:
-      - keyValue
-    PointRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        pointRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementPointRefStructure'
-    Levels_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        levelRefOrLevel:
-          type: array
-          items: {}
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-    Organisation_DerivedViewStructure:
-      type: object
-      properties:
-        alternativeNames:
-          $ref: '#/components/schemas/AlternativeNames_RelStructure'
-        brandingRef:
-          $ref: '#/components/schemas/BrandingRefStructure'
-          xml:
-            name: BrandingRef
-        contactDetails:
-          $ref: '#/components/schemas/ContactStructure'
-          xml:
-            name: ContactDetails
-        id:
-          type: string
-          xml:
-            attribute: true
-        legalName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: LegalName
-        name:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Name
-        organisationRef:
-          $ref: '#/components/schemas/JAXBElementOrganisationRefStructure'
-        shortName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: ShortName
-        tradingName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: TradingName
-    LocaleStructure:
-      type: object
-      properties:
-        defaultLanguage:
-          type: string
-          xml:
-            name: DefaultLanguage
-        languages:
-          $ref: '#/components/schemas/Languages'
-        summerTimeZone:
-          type: string
-          xml:
-            name: SummerTimeZone
-        summerTimeZoneOffset:
-          type: number
-          xml:
-            name: SummerTimeZoneOffset
-        timeZone:
-          type: string
-          xml:
-            name: TimeZone
-        timeZoneOffset:
-          type: number
-          xml:
-            name: TimeZoneOffset
-    PrivateCodeStructure:
-      type: object
-      properties:
-        type:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-    CountryRef:
-      type: object
-      properties:
-        ref:
-          type: string
-          enum:
-          - AC
-          - AD
-          - AE
-          - AF
-          - AG
-          - AI
-          - AL
-          - AM
-          - AN
-          - AO
-          - AQ
-          - AR
-          - AS
-          - AT
-          - AU
-          - AW
-          - AZ
-          - AX
-          - BA
-          - BB
-          - BD
-          - BE
-          - BF
-          - BG
-          - BH
-          - BI
-          - BJ
-          - BM
-          - BN
-          - BO
-          - BR
-          - BS
-          - BT
-          - BV
-          - BW
-          - BY
-          - BZ
-          - CA
-          - CC
-          - CD
-          - CF
-          - CG
-          - CH
-          - CI
-          - CK
-          - CL
-          - CM
-          - CN
-          - CO
-          - CR
-          - CS
-          - CU
-          - CV
-          - CX
-          - CY
-          - CZ
-          - DE
-          - DJ
-          - DK
-          - DM
-          - DO
-          - DZ
-          - EC
-          - EE
-          - EG
-          - EH
-          - ER
-          - ES
-          - ET
-          - EU
-          - FI
-          - FJ
-          - FK
-          - FM
-          - FO
-          - FR
-          - GA
-          - GB
-          - GD
-          - GE
-          - GF
-          - GG
-          - GH
-          - GI
-          - GL
-          - GM
-          - GN
-          - GP
-          - GQ
-          - GR
-          - GS
-          - GT
-          - GU
-          - GW
-          - GY
-          - HK
-          - HM
-          - HN
-          - HR
-          - HT
-          - HU
-          - ID
-          - IE
-          - IL
-          - IM
-          - IN
-          - IO
-          - IQ
-          - IR
-          - IS
-          - IT
-          - JE
-          - JM
-          - JO
-          - JP
-          - KE
-          - KG
-          - KH
-          - KI
-          - KM
-          - KN
-          - KP
-          - KR
-          - KW
-          - KY
-          - KZ
-          - LA
-          - LB
-          - LC
-          - LI
-          - LK
-          - LR
-          - LS
-          - LT
-          - LU
-          - LV
-          - LY
-          - MA
-          - ME
-          - MC
-          - MD
-          - MG
-          - MH
-          - MK
-          - ML
-          - MM
-          - MN
-          - MO
-          - MP
-          - MQ
-          - MR
-          - MS
-          - MT
-          - MU
-          - MV
-          - MW
-          - MX
-          - MY
-          - MZ
-          - NA
-          - NC
-          - NE
-          - NF
-          - NG
-          - NI
-          - NL
-          - 'NO'
-          - NP
-          - NR
-          - NU
-          - NZ
-          - OM
-          - PA
-          - PE
-          - PF
-          - PG
-          - PH
-          - PK
-          - PL
-          - PM
-          - PN
-          - PR
-          - PS
-          - PT
-          - PW
-          - PY
-          - QA
-          - RE
-          - RO
-          - RS
-          - RU
-          - RW
-          - SA
-          - SB
-          - SC
-          - SD
-          - SE
-          - SG
-          - SH
-          - SI
-          - SJ
-          - SK
-          - SL
-          - SM
-          - SN
-          - SO
-          - SR
-          - ST
-          - SV
-          - SY
-          - SZ
-          - TC
-          - TD
-          - TF
-          - TG
-          - TH
-          - TJ
-          - TK
-          - TL
-          - TM
-          - TN
-          - TO
-          - TP
-          - TR
-          - TT
-          - TV
-          - TW
-          - TZ
-          - UA
-          - UG
-          - UK
-          - UM
-          - US
-          - UY
-          - UZ
-          - VA
-          - VC
-          - VE
-          - VG
-          - VI
-          - VN
-          - VU
-          - WF
-          - WS
-          - YE
-          - YT
-          - YU
-          - ZA
-          - ZM
-          - ZW
-          xml:
-            attribute: true
-        refPrincipality:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-      xml:
-        name: CountryRef
-        namespace: http://www.netex.org.uk/netex
-    PostalAddress:
-      type: object
-      properties:
-        addressLine1:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: AddressLine1
-        addressLine2:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: AddressLine2
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        brandingRef:
-          $ref: '#/components/schemas/BrandingRefStructure'
-          xml:
-            name: BrandingRef
-        buildingName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: BuildingName
-        centroid:
-          $ref: '#/components/schemas/SimplePoint_VersionStructure'
-          xml:
-            name: Centroid
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        countryName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: CountryName
-        countryRef:
-          $ref: '#/components/schemas/CountryRef'
-          xml:
-            name: CountryRef
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        description:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Description
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
-        houseNumber:
-          type: string
-          xml:
-            name: HouseNumber
-        id:
-          type: string
-          xml:
-            attribute: true
-        infoLinks:
-          $ref: '#/components/schemas/InfoLinks'
-        keyList:
-          $ref: '#/components/schemas/KeyListStructure'
-        members:
-          $ref: '#/components/schemas/PointRefs_RelStructure'
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        multiSurface:
-          $ref: '#/components/schemas/MultiSurfaceType'
-          xml:
-            name: MultiSurface
-            namespace: http://www.opengis.net/gml/3.2
-        name:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Name
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        parentZoneRef:
-          $ref: '#/components/schemas/ZoneRefStructure'
-          xml:
-            name: ParentZoneRef
-        placeTypes:
-          $ref: '#/components/schemas/TypeOfPlaceRefs_RelStructure'
-        polygon:
-          $ref: '#/components/schemas/PolygonType'
-          xml:
-            name: Polygon
-            namespace: http://www.opengis.net/gml/3.2
-        postCode:
-          type: string
-          xml:
-            name: PostCode
-        postCodeExtension:
-          type: string
-          xml:
-            name: PostCodeExtension
-        postalRegion:
-          type: string
-          xml:
-            name: PostalRegion
-        privateCode:
-          $ref: '#/components/schemas/PrivateCodeStructure'
-          xml:
-            name: PrivateCode
-        projections:
-          $ref: '#/components/schemas/Projections_RelStructure'
-        province:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Province
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        purposeOfGroupingRef:
-          $ref: '#/components/schemas/PurposeOfGroupingRefStructure'
-          xml:
-            name: PurposeOfGroupingRef
-        responsibilitySetRef:
-          type: string
-          xml:
-            attribute: true
-        roadAddressRef:
-          $ref: '#/components/schemas/AddressRefStructure'
-          xml:
-            name: RoadAddressRef
-        shortName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: ShortName
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        street:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Street
-        suburb:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Suburb
-        town:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Town
-        types:
-          $ref: '#/components/schemas/TypeOfZoneRefs_RelStructure'
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
-    ScheduledStopPoint:
-      type: object
-      properties:
-        allowedForWaitTime:
-          type: string
-          xml:
-            name: AllowedForWaitTime
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        atCentre:
-          type: boolean
-          default: false
-          xml:
-            name: AtCentre
-        brandingRef:
-          $ref: '#/components/schemas/BrandingRefStructure'
-          xml:
-            name: BrandingRef
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        compassBearing:
-          type: number
-          format: float
-          xml:
-            name: CompassBearing
-        compatibleWithVersionFrameVersionRef:
-          type: string
-          xml:
-            attribute: true
-        countryRef:
-          $ref: '#/components/schemas/CountryRef'
-          xml:
-            name: CountryRef
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        description:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Description
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
-        externalStopPointRef:
-          $ref: '#/components/schemas/ExternalObjectRefStructure'
-          xml:
-            name: ExternalStopPointRef
-        forAlighting:
-          type: boolean
-          xml:
-            name: ForAlighting
-        forBoarding:
-          type: boolean
-          xml:
-            name: ForBoarding
-        groupMemberships:
-          $ref: '#/components/schemas/GroupMembershipRefs_RelStructure'
-        id:
-          type: string
-          xml:
-            attribute: true
-        keyList:
-          $ref: '#/components/schemas/KeyListStructure'
-        label:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Label
-        location:
-          $ref: '#/components/schemas/LocationStructure'
-          xml:
-            name: Location
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        name:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Name
-        nameOfClass:
-          type: string
-          xml:
-            attribute: true
-        nameSuffix:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: NameSuffix
-        pointNumber:
-          type: string
-          xml:
-            name: PointNumber
-        presentation:
-          $ref: '#/components/schemas/PresentationStructure'
-          xml:
-            name: Presentation
-        privateCode:
-          $ref: '#/components/schemas/PrivateCodeStructure'
-          xml:
-            name: PrivateCode
-        projections:
-          $ref: '#/components/schemas/Projections_RelStructure'
-        publicCode:
-          $ref: '#/components/schemas/PrivateCodeStructure'
-          xml:
-            name: PublicCode
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        requestMethodType:
-          type: string
-          default: noneRequired
-          enum:
-          - NONE_REQUIRED
-          - HAND_SIGNAL
-          - TURN_ON_LIGHT
-          - STOP_BUTTON
-          - PHONE_CALL
-          - MOBILE_APP
-          - SMS
-          - SPEAK_TO_DRIVER_ONBOARD
-          - OTHER
-          xml:
-            name: RequestMethodType
-        requestStop:
-          type: boolean
-          default: false
-          xml:
-            name: RequestStop
-        responsibilitySetRef:
-          type: string
-          xml:
-            attribute: true
-        shortName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: ShortName
-        shortStopCode:
-          $ref: '#/components/schemas/PrivateCodeStructure'
-          xml:
-            name: ShortStopCode
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        stopAreas:
-          $ref: '#/components/schemas/StopAreaRefs_RelStructure'
-        stopType:
-          type: string
-          enum:
-          - ONSTREET_BUS
-          - ONSTREET_TRAM
-          - AIRPORT
-          - RAIL_STATION
-          - METRO_STATION
-          - BUS_STATION
-          - COACH_STATION
-          - TRAM_STATION
-          - HARBOUR_PORT
-          - FERRY_PORT
-          - FERRY_STOP
-          - LIFT_STATION
-          - VEHICLE_RAIL_INTERCHANGE
-          - TAXI_RANK
-          - OTHER
-          xml:
-            name: StopType
-        tariffZones:
-          $ref: '#/components/schemas/TariffZoneRefs_RelStructure'
-        timingPointStatus:
-          type: string
-          enum:
-          - TIMING_POINT
-          - SECONDARY_TIMING_POINT
-          - NOT_TIMING_POINT
-          xml:
-            name: TimingPointStatus
-        topographicPlaceRef:
-          $ref: '#/components/schemas/TopographicPlaceRefStructure'
-          xml:
-            name: TopographicPlaceRef
-        topographicPlaceView:
-          $ref: '#/components/schemas/TopographicPlaceView'
-          xml:
-            name: TopographicPlaceView
-        types:
-          $ref: '#/components/schemas/TypeOfPointRefs_RelStructure'
-        url:
-          type: string
-          xml:
-            name: Url
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        vehicleModes:
-          type: array
-          items:
-            type: string
-            enum:
-            - AIR
-            - BUS
-            - COACH
-            - FERRY
-            - METRO
-            - RAIL
-            - TROLLEY_BUS
-            - TRAM
-            - WATER
-            - CABLEWAY
-            - FUNICULAR
-            - LIFT
-            - SNOW_AND_ICE
-            - OTHER
-            xml:
-              name: VehicleModes
-          xml:
-            name: VehicleModes
-        version:
-          type: string
-          xml:
-            attribute: true
-    MultilingualString:
-      type: object
-      properties:
-        lang:
-          type: string
-          xml:
-            attribute: true
-        textIdType:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-    TypeOfPlaceRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        typeOfPlaceRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/TypeOfPlaceRefStructure'
-          xml:
-            name: TypeOfPlaceRef
-    SiteRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        siteRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementSiteRefStructure'
-    AbstractSurfaceType:
-      type: object
-      properties:
-        descriptionReference:
-          $ref: '#/components/schemas/ReferenceType'
-        id:
-          type: string
-          xml:
-            namespace: http://www.opengis.net/gml/3.2
-            attribute: true
-        identifier:
-          $ref: '#/components/schemas/CodeWithAuthorityType'
-        name:
-          type: array
-          items:
-            $ref: '#/components/schemas/CodeType'
-        srsDimension:
-          type: integer
-          xml:
-            attribute: true
-        srsName:
-          type: string
-          xml:
-            attribute: true
-    EquipmentPlaces_RelStructure:
-      type: object
-      properties:
-        equipmentPlaceRefOrEquipmentPlace:
-          type: array
-          items: {}
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-    TypeOfPaymentMethodRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        typeOfPaymentMethodRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/TypeOfPaymentMethodRef'
-          xml:
-            name: TypeOfPaymentMethodRef
-      required:
-      - typeOfPaymentMethodRef
-    ModeOfOperationRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
     StopPlace:
       type: object
       properties:
@@ -5370,31 +3402,21 @@ components:
           - PREFERRED_INTERCHANGE
           xml:
             name: Weighting
-    ParkingProperties:
+    PrivateCodeStructure:
       type: object
       properties:
-        alternativeTexts:
-          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
-        areas:
-          $ref: '#/components/schemas/ParkingAreaRefs_RelStructure'
-        bayGeometry:
+        type:
           type: string
-          enum:
-          - UNSPECIFIED
-          - ORTHOGONAL
-          - ANGLED
-          - PARALLEL
-          - FREE_FORMAT
-          - OTHER
           xml:
-            name: BayGeometry
+            attribute: true
+        value:
+          type: string
+    ModeOfOperationRefStructure:
+      type: object
+      properties:
         changed:
           type: string
           format: date-time
-          xml:
-            attribute: true
-        compatibleWithVersionFrameVersionRef:
-          type: string
           xml:
             attribute: true
         created:
@@ -5402,31 +3424,6 @@ components:
           format: date-time
           xml:
             attribute: true
-        dataSourceRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromObjectRef:
-          type: string
-          xml:
-            attribute: true
-        derivedFromVersionRef_BasicModificationDetailsGroup:
-          type: string
-          xml:
-            name: derivedFromVersionRef
-            attribute: true
-        extensions:
-          $ref: '#/components/schemas/ExtensionsStructure'
-          xml:
-            name: Extensions
-        id:
-          type: string
-          xml:
-            attribute: true
-        maximumStay:
-          type: string
-          xml:
-            name: MaximumStay
         modification:
           type: string
           enum:
@@ -5437,178 +3434,25 @@ components:
           - DELTA
           xml:
             attribute: true
-        name:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: Name
-        nameOfClass:
+        nameOfRefClass:
           type: string
           xml:
             attribute: true
-        parkingRef:
-          $ref: '#/components/schemas/ParkingRefStructure'
-          xml:
-            name: ParkingRef
-        parkingStayList:
-          type: array
-          items:
-            type: string
-            enum:
-            - SHORT_STAY
-            - MID_TERM
-            - LONG_TERM
-            - DROPOFF
-            - UNLIMITED
-            - OTHER
-            - ALL
-            xml:
-              name: ParkingStayList
-          xml:
-            name: ParkingStayList
-        parkingUserTypes:
-          type: array
-          items:
-            type: string
-            enum:
-            - ALL_USERS
-            - STAFF
-            - VISITORS
-            - CUSTOMERS
-            - GUESTS
-            - REGISTERED_DISABLED
-            - IMPAIRED_MOBILITY
-            - REGISTERED
-            - RENTAL
-            - DOCTORS
-            - RESIDENTS_WITH_PERMITS
-            - RESERVATION_HOLDERS
-            - EMERGENCY_SERVICES
-            - TAXI
-            - VEHICLE_SHARING
-            - OTHER
-            - ALL
-            xml:
-              name: ParkingUserTypes
-          xml:
-            name: ParkingUserTypes
-        parkingVehicleTypes:
-          type: array
-          items:
-            type: string
-            enum:
-            - CYCLE
-            - PEDAL_CYCLE
-            - E_CYCLE
-            - MOPED
-            - MOTORCYCLE
-            - MOTORCYCLE_WITH_SIDECAR
-            - MOTOR_SCOOTER
-            - TWO_WHEELED_VEHICLE
-            - THREE_WHEELED_VEHICLE
-            - CAR
-            - MICRO_CAR
-            - MINI_CAR
-            - SMALL_CAR
-            - PASSENGER_CAR
-            - LARGE_CAR
-            - FOUR_WHEEL_DRIVE
-            - TAXI
-            - CAMPER_CAR
-            - CAR_WITH_TRAILER
-            - CAR_WITH_CARAVAN
-            - MINIBUS
-            - MINIVAN
-            - BUS
-            - VAN
-            - TRANSPORTER
-            - LARGE_VAN
-            - HIGH_SIDED_VEHICLE
-            - LIGHT_GOODS_VEHICLE
-            - HEAVY_GOODS_VEHICLE
-            - AGRICULTURAL_VEHICLE
-            - TANKER
-            - TRUCK
-            - TRAM
-            - ARTICULATED_VEHICLE
-            - VEHICLE_WITH_TRAILER
-            - LIGHT_GOODS_VEHICLE_WITH_TRAILER
-            - HEAVY_GOODS_VEHICLE_WITH_TRAILER
-            - SNOWMOBILE
-            - UNDEFINED
-            - OTHER
-            - ALL_PASSENGER_VEHICLES
-            - ALL
-            xml:
-              name: ParkingVehicleTypes
-          xml:
-            name: ParkingVehicleTypes
-        parkingVisibility:
-          type: string
-          enum:
-          - UNMARKED
-          - SIGNAGE_ONLY
-          - DEMARCATED
-          - DOCKS
-          - OTHER
-          xml:
-            name: ParkingVisibility
-        publication:
-          type: string
-          enum:
-          - PUBLIC
-          - RESTRICTED
-          - PRIVATE
-          - CONFIDENTIAL
-          - AUTHORISED
-          - TEST
-          xml:
-            attribute: true
-        secureParking:
-          type: boolean
-          xml:
-            name: SecureParking
-        spaces:
-          $ref: '#/components/schemas/ParkingCapacities_RelStructure'
-        status_BasicModificationDetailsGroup:
-          type: string
-          enum:
-          - ACTIVE
-          - INACTIVE
-          - OTHER
-          xml:
-            name: status
-            attribute: true
-        validBetween:
-          type: array
-          items:
-            $ref: '#/components/schemas/ValidBetween'
-          xml:
-            name: ValidBetween
-        validityConditions:
-          $ref: '#/components/schemas/ValidityConditions_RelStructure'
-        vehicleTypes:
-          $ref: '#/components/schemas/TransportTypeRefs_RelStructure'
-        version:
-          type: string
-          xml:
-            attribute: true
-    DirectPositionType:
-      type: object
-      properties:
-        srsDimension:
-          type: integer
-          xml:
-            attribute: true
-        srsName:
+        ref:
           type: string
           xml:
             attribute: true
         value:
-          type: array
-          items:
-            type: number
-            format: double
-    JAXBElementModeOfOperationRefStructure:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    JAXBElementOrganisationRefStructure:
       type: object
       properties:
         globalScope:
@@ -5627,91 +3471,79 @@ components:
         typeSubstituted:
           type: boolean
         value:
-          $ref: '#/components/schemas/ModeOfOperationRefStructure'
-    TopographicPlaceView:
+          $ref: '#/components/schemas/OrganisationRefStructure'
+    JAXBElementTransportTypeRefStructure:
       type: object
       properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value:
+          $ref: '#/components/schemas/TransportTypeRefStructure'
+    SurfaceArrayPropertyType:
+      type: object
+      properties:
+        abstractSurface:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementAbstractSurfaceType'
+        owns:
+          type: boolean
+          xml:
+            attribute: true
+    Organisation_DerivedViewStructure:
+      type: object
+      properties:
+        alternativeNames:
+          $ref: '#/components/schemas/AlternativeNames_RelStructure'
         brandingRef:
           $ref: '#/components/schemas/BrandingRefStructure'
           xml:
             name: BrandingRef
-        countryRef:
-          $ref: '#/components/schemas/CountryRef'
+        contactDetails:
+          $ref: '#/components/schemas/ContactStructure'
           xml:
-            name: CountryRef
+            name: ContactDetails
         id:
           type: string
           xml:
             attribute: true
+        legalName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: LegalName
         name:
           $ref: '#/components/schemas/MultilingualString'
           xml:
             name: Name
-        qualifierName:
-          $ref: '#/components/schemas/MultilingualString'
-          xml:
-            name: QualifierName
+        organisationRef:
+          $ref: '#/components/schemas/JAXBElementOrganisationRefStructure'
         shortName:
           $ref: '#/components/schemas/MultilingualString'
           xml:
             name: ShortName
-        topographicPlaceRef:
-          $ref: '#/components/schemas/TopographicPlaceRefStructure'
+        tradingName:
+          $ref: '#/components/schemas/MultilingualString'
           xml:
-            name: TopographicPlaceRef
-    ContactRefStructure:
+            name: TradingName
+    Accesses_RelStructure:
       type: object
       properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    CodeType:
-      type: object
-      properties:
-        codeSpace:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-    SitePathLinks_RelStructure:
-      type: object
-      properties:
+        accessRefOrAccess:
+          type: array
+          items: {}
         id:
           type: string
           xml:
@@ -5721,71 +3553,6 @@ components:
           enum:
           - ALL
           - CHANGES_ONLY
-          xml:
-            attribute: true
-        pathLinkRefOrSitePathLink:
-          type: array
-          items: {}
-    VehicleStoppingPlaces_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        vehicleStoppingPlaceRefOrVehicleStoppingPlace:
-          type: array
-          items: {}
-    ZoneRefStructure:
-      type: object
-      properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfMemberClass:
-          type: string
-          xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
           xml:
             attribute: true
     Suitability:
@@ -5941,88 +3708,6 @@ components:
       xml:
         name: Suitability
         namespace: http://www.netex.org.uk/netex
-    PlaceEquipments_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        installedEquipmentRefOrInstalledEquipment:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementObject'
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-    TransportTypeRefs_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        transportTypeRef:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementTransportTypeRefStructure'
-    CodeWithAuthorityType:
-      type: object
-      properties:
-        codeSpace:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-    ParkingCapacities_RelStructure:
-      type: object
-      properties:
-        id:
-          type: string
-          xml:
-            attribute: true
-        modificationSet:
-          type: string
-          enum:
-          - ALL
-          - CHANGES_ONLY
-          xml:
-            attribute: true
-        parkingCapacityRefOrParkingCapacity:
-          type: array
-          items: {}
-    JAXBElementPointRefStructure:
-      type: object
-      properties:
-        globalScope:
-          type: boolean
-        name:
-          type: object
-          properties:
-            localPart:
-              type: string
-            namespaceURI:
-              type: string
-            prefix:
-              type: string
-        nil:
-          type: boolean
-        typeSubstituted:
-          type: boolean
-        value:
-          $ref: '#/components/schemas/PointRefStructure'
     TypeOfPlaceRefStructure:
       type: object
       properties:
@@ -6064,52 +3749,463 @@ components:
           type: string
           xml:
             attribute: true
-    PaymentByMobileStructure:
+    TypeOfPaymentMethodRef:
       type: object
       properties:
-        paymentAppDownloadUrl:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
           type: string
           xml:
-            name: PaymentAppDownloadUrl
-        paymentUrl:
+            attribute: true
+        ref:
           type: string
           xml:
-            name: PaymentUrl
-        phoneNumberToPay:
+            attribute: true
+        value:
+          type: string
+        version:
           type: string
           xml:
-            name: PhoneNumberToPay
-        supportPhoneNumber:
+            attribute: true
+        versionRef:
           type: string
           xml:
-            name: SupportPhoneNumber
-    AlternativeTexts_RelStructure:
+            attribute: true
+    ContactRefStructure:
       type: object
       properties:
-        alternativeText:
-          type: array
-          items:
-            $ref: '#/components/schemas/AlternativeText'
+        changed:
+          type: string
+          format: date-time
           xml:
-            name: AlternativeText
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    CountryRef:
+      type: object
+      properties:
+        ref:
+          type: string
+          enum:
+          - AC
+          - AD
+          - AE
+          - AF
+          - AG
+          - AI
+          - AL
+          - AM
+          - AN
+          - AO
+          - AQ
+          - AR
+          - AS
+          - AT
+          - AU
+          - AW
+          - AZ
+          - AX
+          - BA
+          - BB
+          - BD
+          - BE
+          - BF
+          - BG
+          - BH
+          - BI
+          - BJ
+          - BM
+          - BN
+          - BO
+          - BR
+          - BS
+          - BT
+          - BV
+          - BW
+          - BY
+          - BZ
+          - CA
+          - CC
+          - CD
+          - CF
+          - CG
+          - CH
+          - CI
+          - CK
+          - CL
+          - CM
+          - CN
+          - CO
+          - CR
+          - CS
+          - CU
+          - CV
+          - CX
+          - CY
+          - CZ
+          - DE
+          - DJ
+          - DK
+          - DM
+          - DO
+          - DZ
+          - EC
+          - EE
+          - EG
+          - EH
+          - ER
+          - ES
+          - ET
+          - EU
+          - FI
+          - FJ
+          - FK
+          - FM
+          - FO
+          - FR
+          - GA
+          - GB
+          - GD
+          - GE
+          - GF
+          - GG
+          - GH
+          - GI
+          - GL
+          - GM
+          - GN
+          - GP
+          - GQ
+          - GR
+          - GS
+          - GT
+          - GU
+          - GW
+          - GY
+          - HK
+          - HM
+          - HN
+          - HR
+          - HT
+          - HU
+          - ID
+          - IE
+          - IL
+          - IM
+          - IN
+          - IO
+          - IQ
+          - IR
+          - IS
+          - IT
+          - JE
+          - JM
+          - JO
+          - JP
+          - KE
+          - KG
+          - KH
+          - KI
+          - KM
+          - KN
+          - KP
+          - KR
+          - KW
+          - KY
+          - KZ
+          - LA
+          - LB
+          - LC
+          - LI
+          - LK
+          - LR
+          - LS
+          - LT
+          - LU
+          - LV
+          - LY
+          - MA
+          - ME
+          - MC
+          - MD
+          - MG
+          - MH
+          - MK
+          - ML
+          - MM
+          - MN
+          - MO
+          - MP
+          - MQ
+          - MR
+          - MS
+          - MT
+          - MU
+          - MV
+          - MW
+          - MX
+          - MY
+          - MZ
+          - NA
+          - NC
+          - NE
+          - NF
+          - NG
+          - NI
+          - NL
+          - 'NO'
+          - NP
+          - NR
+          - NU
+          - NZ
+          - OM
+          - PA
+          - PE
+          - PF
+          - PG
+          - PH
+          - PK
+          - PL
+          - PM
+          - PN
+          - PR
+          - PS
+          - PT
+          - PW
+          - PY
+          - QA
+          - RE
+          - RO
+          - RS
+          - RU
+          - RW
+          - SA
+          - SB
+          - SC
+          - SD
+          - SE
+          - SG
+          - SH
+          - SI
+          - SJ
+          - SK
+          - SL
+          - SM
+          - SN
+          - SO
+          - SR
+          - ST
+          - SV
+          - SY
+          - SZ
+          - TC
+          - TD
+          - TF
+          - TG
+          - TH
+          - TJ
+          - TK
+          - TL
+          - TM
+          - TN
+          - TO
+          - TP
+          - TR
+          - TT
+          - TV
+          - TW
+          - TZ
+          - UA
+          - UG
+          - UK
+          - UM
+          - US
+          - UY
+          - UZ
+          - VA
+          - VC
+          - VE
+          - VG
+          - VI
+          - VN
+          - VU
+          - WF
+          - WS
+          - YE
+          - YT
+          - YU
+          - ZA
+          - ZM
+          - ZW
+          xml:
+            attribute: true
+        refPrincipality:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+      xml:
+        name: CountryRef
+        namespace: http://www.netex.org.uk/netex
+    JAXBElementModeOfOperationRefStructure:
+      type: object
+      properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value:
+          $ref: '#/components/schemas/ModeOfOperationRefStructure'
+    TopographicPlaceView:
+      type: object
+      properties:
+        brandingRef:
+          $ref: '#/components/schemas/BrandingRefStructure'
+          xml:
+            name: BrandingRef
+        countryRef:
+          $ref: '#/components/schemas/CountryRef'
+          xml:
+            name: CountryRef
         id:
           type: string
           xml:
             attribute: true
-      required:
-      - alternativeText
-    SurfaceArrayPropertyType:
+        name:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Name
+        qualifierName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: QualifierName
+        shortName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: ShortName
+        topographicPlaceRef:
+          $ref: '#/components/schemas/TopographicPlaceRefStructure'
+          xml:
+            name: TopographicPlaceRef
+    ParkingProperties_RelStructure:
       type: object
       properties:
-        abstractSurface:
-          type: array
-          items:
-            $ref: '#/components/schemas/JAXBElementAbstractSurfaceType'
-        owns:
-          type: boolean
+        id:
+          type: string
           xml:
             attribute: true
-    StopPlacesInFrame_RelStructure:
+        parkingProperties:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParkingProperties'
+          xml:
+            name: ParkingProperties
+      required:
+      - parkingProperties
+    ValidityConditionRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    SitePathLinks_RelStructure:
       type: object
       properties:
         id:
@@ -6123,100 +4219,136 @@ components:
           - CHANGES_ONLY
           xml:
             attribute: true
-        stopPlace:
+        pathLinkRefOrSitePathLink:
+          type: array
+          items: {}
+    PathJunctions_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        pathJunctionRefOrPathJunction:
+          type: array
+          items: {}
+    PolygonType:
+      type: object
+      properties:
+        descriptionReference:
+          $ref: '#/components/schemas/ReferenceType'
+        exterior:
+          $ref: '#/components/schemas/AbstractRingPropertyType'
+        id:
+          type: string
+          xml:
+            namespace: http://www.opengis.net/gml/3.2
+            attribute: true
+        identifier:
+          $ref: '#/components/schemas/CodeWithAuthorityType'
+        interior:
           type: array
           items:
-            $ref: '#/components/schemas/StopPlace'
+            $ref: '#/components/schemas/AbstractRingPropertyType'
+        name:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeType'
+        srsDimension:
+          type: integer
           xml:
-            name: StopPlace
+            attribute: true
+        srsName:
+          type: string
+          xml:
+            attribute: true
+    KeyValueStructure:
+      type: object
+      properties:
+        key:
+          type: string
+          xml:
+            name: Key
+        typeOfKey:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+          xml:
+            name: Value
       required:
-      - stopPlace
-    TransportTypeRefStructure:
+      - key
+      - value
+    Suitabilities_RelStructure:
       type: object
       properties:
-        changed:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
-          type: string
-          enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
-          xml:
-            attribute: true
-        nameOfRefClass:
+        id:
           type: string
           xml:
             attribute: true
-        ref:
-          type: string
+        suitability:
+          type: array
+          items:
+            $ref: '#/components/schemas/Suitability'
           xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
-    GroupOfEntitiesRefStructure:
+            name: Suitability
+      required:
+      - suitability
+    LanguageUsageStructure:
       type: object
       properties:
-        changed:
+        language:
           type: string
-          format: date-time
+          xml:
+            name: Language
+        languageUse:
+          type: array
+          items:
+            type: string
+            enum:
+            - NORMALLY_USED
+            - UNDERSTOOD
+            - NATIVE
+            - SPOKEN
+            - WRITTEN
+            - READ
+            - OTHER
+            - ALL_USES
+            xml:
+              name: LanguageUse
+          xml:
+            name: LanguageUse
+      required:
+      - language
+      - languageUse
+    TypeOfPointRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
           xml:
             attribute: true
-        created:
-          type: string
-          format: date-time
-          xml:
-            attribute: true
-        modification:
+        modificationSet:
           type: string
           enum:
-          - NEW
-          - REVISE
-          - DELETE
-          - UNCHANGED
-          - DELTA
+          - ALL
+          - CHANGES_ONLY
           xml:
             attribute: true
-        nameOfMemberClass:
-          type: string
+        typeOfPointRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/TypeOfPointRefStructure'
           xml:
-            attribute: true
-        nameOfRefClass:
-          type: string
-          xml:
-            attribute: true
-        ref:
-          type: string
-          xml:
-            attribute: true
-        value:
-          type: string
-        version:
-          type: string
-          xml:
-            attribute: true
-        versionRef:
-          type: string
-          xml:
-            attribute: true
+            name: TypeOfPointRef
     SiteRefStructure:
       type: object
       properties:
@@ -6262,20 +4394,383 @@ components:
           type: string
           xml:
             attribute: true
-    ReferenceType:
+    VersionOfObjectRefStructure:
       type: object
       properties:
-        nilReason:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    DirectPositionType:
+      type: object
+      properties:
+        srsDimension:
+          type: integer
+          xml:
+            attribute: true
+        srsName:
+          type: string
+          xml:
+            attribute: true
+        value:
           type: array
           items:
-            type: string
+            type: number
+            format: double
+    Levels_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
           xml:
             attribute: true
-        owns:
+        levelRefOrLevel:
+          type: array
+          items: {}
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+    ValidityConditions_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        validityConditionRefOrValidBetweenOrValidityCondition_:
+          type: array
+          items: {}
+    SiteFacilitySets_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        siteFacilitySetRefOrSiteFacilitySet:
+          type: array
+          items: {}
+    ParkingAreas_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        parkingAreaRefOrParkingArea:
+          type: array
+          items: {}
+    PointRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        pointRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementPointRefStructure'
+    AccessibilityAssessment:
+      type: object
+      properties:
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        comment:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Comment
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
+        id:
+          type: string
+          xml:
+            attribute: true
+        limitations:
+          $ref: '#/components/schemas/AccessibilityLimitations_RelStructure'
+        mobilityImpairedAccess:
+          type: string
+          enum:
+          - 'TRUE'
+          - 'FALSE'
+          - UNKNOWN
+          - PARTIAL
+          xml:
+            name: MobilityImpairedAccess
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        suitabilities:
+          $ref: '#/components/schemas/Suitabilities_RelStructure'
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+      required:
+      - mobilityImpairedAccess
+    JAXBElementObject:
+      type: object
+      properties:
+        globalScope:
           type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value: {}
+    TransportTypeRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
           xml:
             attribute: true
-    VersionOfObjectRefStructure:
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        transportTypeRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementTransportTypeRefStructure'
+    AccessSpaces_RelStructure:
+      type: object
+      properties:
+        accessSpaceRefOrAccessSpace:
+          type: array
+          items: {}
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+    AlternativeTexts_RelStructure:
+      type: object
+      properties:
+        alternativeText:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlternativeText'
+          xml:
+            name: AlternativeText
+        id:
+          type: string
+          xml:
+            attribute: true
+      required:
+      - alternativeText
+    TypeOfParkingRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    Projections_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        projectionRefOrProjection:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementObject'
+    PurposeOfGroupingRefStructure:
       type: object
       properties:
         changed:
@@ -6331,6 +4826,1497 @@ components:
             attribute: true
       required:
       - alternativeName
+    AccessibilityLimitation:
+      type: object
+      properties:
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        audibleSignalsAvailable:
+          type: string
+          default: 'false'
+          enum:
+          - 'TRUE'
+          - 'FALSE'
+          - UNKNOWN
+          - PARTIAL
+          xml:
+            name: AudibleSignalsAvailable
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        escalatorFreeAccess:
+          type: string
+          default: unknown
+          enum:
+          - 'TRUE'
+          - 'FALSE'
+          - UNKNOWN
+          - PARTIAL
+          xml:
+            name: EscalatorFreeAccess
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
+        id:
+          type: string
+          xml:
+            attribute: true
+        liftFreeAccess:
+          type: string
+          default: unknown
+          enum:
+          - 'TRUE'
+          - 'FALSE'
+          - UNKNOWN
+          - PARTIAL
+          xml:
+            name: LiftFreeAccess
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        stepFreeAccess:
+          type: string
+          default: unknown
+          enum:
+          - 'TRUE'
+          - 'FALSE'
+          - UNKNOWN
+          - PARTIAL
+          xml:
+            name: StepFreeAccess
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+        visualSignsAvailable:
+          type: string
+          default: unknown
+          enum:
+          - 'TRUE'
+          - 'FALSE'
+          - UNKNOWN
+          - PARTIAL
+          xml:
+            name: VisualSignsAvailable
+        wheelchairAccess:
+          type: string
+          default: 'false'
+          enum:
+          - 'TRUE'
+          - 'FALSE'
+          - UNKNOWN
+          - PARTIAL
+          xml:
+            name: WheelchairAccess
+      required:
+      - wheelchairAccess
+      xml:
+        name: AccessibilityLimitation
+        namespace: http://www.netex.org.uk/netex
+    EquipmentPlaces_RelStructure:
+      type: object
+      properties:
+        equipmentPlaceRefOrEquipmentPlace:
+          type: array
+          items: {}
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+    ParkingAreaRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        parkingAreaRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/ParkingAreaRefStructure'
+          xml:
+            name: ParkingAreaRef
+      required:
+      - parkingAreaRef
+    SiteRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        siteRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementSiteRefStructure'
+    OrganisationRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    TransportTypeRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    AbstractSurfaceType:
+      type: object
+      properties:
+        descriptionReference:
+          $ref: '#/components/schemas/ReferenceType'
+        id:
+          type: string
+          xml:
+            namespace: http://www.opengis.net/gml/3.2
+            attribute: true
+        identifier:
+          $ref: '#/components/schemas/CodeWithAuthorityType'
+        name:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeType'
+        srsDimension:
+          type: integer
+          xml:
+            attribute: true
+        srsName:
+          type: string
+          xml:
+            attribute: true
+    JAXBElementPointRefStructure:
+      type: object
+      properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value:
+          $ref: '#/components/schemas/PointRefStructure'
+    AccessibilityLimitations_RelStructure:
+      type: object
+      properties:
+        accessibilityLimitation:
+          $ref: '#/components/schemas/AccessibilityLimitation'
+          xml:
+            name: AccessibilityLimitation
+        id:
+          type: string
+          xml:
+            attribute: true
+      required:
+      - accessibilityLimitation
+    AlternativeName:
+      type: object
+      properties:
+        abbreviation:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Abbreviation
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
+        id:
+          type: string
+          xml:
+            attribute: true
+        lang:
+          type: string
+          xml:
+            name: Lang
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        name:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Name
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        nameType:
+          type: string
+          default: alias
+          enum:
+          - ALIAS
+          - TRANSLATION
+          - COPY
+          - LABEL
+          - OTHER
+          xml:
+            name: NameType
+        namedObjectRef:
+          $ref: '#/components/schemas/VersionOfObjectRefStructure'
+          xml:
+            name: NamedObjectRef
+        order:
+          type: integer
+          xml:
+            attribute: true
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        qualifierName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: QualifierName
+        shortName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: ShortName
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        typeOfName:
+          type: string
+          xml:
+            name: TypeOfName
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+      required:
+      - name
+    StopAreaRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        stopAreaRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/StopAreaRefStructure'
+          xml:
+            name: StopAreaRef
+      required:
+      - stopAreaRef
+    LocaleStructure:
+      type: object
+      properties:
+        defaultLanguage:
+          type: string
+          xml:
+            name: DefaultLanguage
+        languages:
+          $ref: '#/components/schemas/Languages'
+        summerTimeZone:
+          type: string
+          xml:
+            name: SummerTimeZone
+        summerTimeZoneOffset:
+          type: number
+          xml:
+            name: SummerTimeZoneOffset
+        timeZone:
+          type: string
+          xml:
+            name: TimeZone
+        timeZoneOffset:
+          type: number
+          xml:
+            name: TimeZoneOffset
+    PostalAddress:
+      type: object
+      properties:
+        addressLine1:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: AddressLine1
+        addressLine2:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: AddressLine2
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        brandingRef:
+          $ref: '#/components/schemas/BrandingRefStructure'
+          xml:
+            name: BrandingRef
+        buildingName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: BuildingName
+        centroid:
+          $ref: '#/components/schemas/SimplePoint_VersionStructure'
+          xml:
+            name: Centroid
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        countryName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: CountryName
+        countryRef:
+          $ref: '#/components/schemas/CountryRef'
+          xml:
+            name: CountryRef
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        description:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Description
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
+        houseNumber:
+          type: string
+          xml:
+            name: HouseNumber
+        id:
+          type: string
+          xml:
+            attribute: true
+        infoLinks:
+          $ref: '#/components/schemas/InfoLinks'
+        keyList:
+          $ref: '#/components/schemas/KeyListStructure'
+        members:
+          $ref: '#/components/schemas/PointRefs_RelStructure'
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        multiSurface:
+          $ref: '#/components/schemas/MultiSurfaceType'
+          xml:
+            name: MultiSurface
+            namespace: http://www.opengis.net/gml/3.2
+        name:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Name
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        parentZoneRef:
+          $ref: '#/components/schemas/ZoneRefStructure'
+          xml:
+            name: ParentZoneRef
+        placeTypes:
+          $ref: '#/components/schemas/TypeOfPlaceRefs_RelStructure'
+        polygon:
+          $ref: '#/components/schemas/PolygonType'
+          xml:
+            name: Polygon
+            namespace: http://www.opengis.net/gml/3.2
+        postCode:
+          type: string
+          xml:
+            name: PostCode
+        postCodeExtension:
+          type: string
+          xml:
+            name: PostCodeExtension
+        postalRegion:
+          type: string
+          xml:
+            name: PostalRegion
+        privateCode:
+          $ref: '#/components/schemas/PrivateCodeStructure'
+          xml:
+            name: PrivateCode
+        projections:
+          $ref: '#/components/schemas/Projections_RelStructure'
+        province:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Province
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        purposeOfGroupingRef:
+          $ref: '#/components/schemas/PurposeOfGroupingRefStructure'
+          xml:
+            name: PurposeOfGroupingRef
+        responsibilitySetRef:
+          type: string
+          xml:
+            attribute: true
+        roadAddressRef:
+          $ref: '#/components/schemas/AddressRefStructure'
+          xml:
+            name: RoadAddressRef
+        shortName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: ShortName
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        street:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Street
+        suburb:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Suburb
+        town:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Town
+        types:
+          $ref: '#/components/schemas/TypeOfZoneRefs_RelStructure'
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+    AlternativeText:
+      type: object
+      properties:
+        alternativeTexts: {}
+        attributeName:
+          type: string
+          xml:
+            attribute: true
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataManagedObjectRef:
+          $ref: '#/components/schemas/VersionOfObjectRefStructure'
+          xml:
+            name: DataManagedObjectRef
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
+        id:
+          type: string
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        order:
+          type: integer
+          xml:
+            attribute: true
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        text:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Text
+        useForLanguage:
+          type: string
+          xml:
+            attribute: true
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+      required:
+      - text
+    AddressRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfMemberClass:
+          type: string
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    SurfacePropertyType:
+      type: object
+      properties:
+        abstractSurface:
+          $ref: '#/components/schemas/JAXBElementAbstractSurfaceType'
+        nilReason:
+          type: array
+          items:
+            type: string
+          xml:
+            attribute: true
+        owns:
+          type: boolean
+          xml:
+            attribute: true
+    TariffZoneRef:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfMemberClass:
+          type: string
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    ErrorResponse:
+      type: object
+      description: Error response returned when a request fails
+      properties:
+        details:
+          type: object
+          additionalProperties: {}
+          description: Additional error context
+        errorCode:
+          type: string
+          description: Machine-readable error code
+          example: RESOURCE_NOT_FOUND
+        message:
+          type: string
+          description: Human-readable error message
+          example: Resource not found
+      xml:
+        name: error
+    PresentationStructure:
+      type: object
+      properties:
+        backgroundColour:
+          type: string
+          format: byte
+          xml:
+            name: BackgroundColour
+        backgroundColourName:
+          type: string
+          xml:
+            name: BackgroundColourName
+        colour:
+          type: string
+          format: byte
+          xml:
+            name: Colour
+        colourName:
+          type: string
+          xml:
+            name: ColourName
+        colourSystem:
+          type: string
+          xml:
+            name: ColourSystem
+        infoLinks:
+          $ref: '#/components/schemas/InfoLinks'
+        textColour:
+          type: string
+          format: byte
+          xml:
+            name: TextColour
+        textColourName:
+          type: string
+          xml:
+            name: TextColourName
+        textFont:
+          type: string
+          xml:
+            name: TextFont
+        textFontName:
+          type: string
+          xml:
+            name: TextFontName
+        textLanguage:
+          type: string
+          xml:
+            name: TextLanguage
+    ParkingAreaRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfMemberClass:
+          type: string
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    TopographicPlaceRefs_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        topographicPlaceRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/TopographicPlaceRefStructure'
+          xml:
+            name: TopographicPlaceRef
+      required:
+      - topographicPlaceRef
+    BrandingRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    RoadAddress:
+      type: object
+      properties:
+        alternativeTexts:
+          $ref: '#/components/schemas/AlternativeTexts_RelStructure'
+        bearingCompass:
+          type: string
+          enum:
+          - SW
+          - SE
+          - NW
+          - NE
+          - W
+          - E
+          - S
+          - N
+          xml:
+            name: BearingCompass
+        bearingDegrees:
+          type: integer
+          xml:
+            name: BearingDegrees
+        brandingRef:
+          $ref: '#/components/schemas/BrandingRefStructure'
+          xml:
+            name: BrandingRef
+        centroid:
+          $ref: '#/components/schemas/SimplePoint_VersionStructure'
+          xml:
+            name: Centroid
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        compatibleWithVersionFrameVersionRef:
+          type: string
+          xml:
+            attribute: true
+        countryName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: CountryName
+        countryRef:
+          $ref: '#/components/schemas/CountryRef'
+          xml:
+            name: CountryRef
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        dataSourceRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromObjectRef:
+          type: string
+          xml:
+            attribute: true
+        derivedFromVersionRef_BasicModificationDetailsGroup:
+          type: string
+          xml:
+            name: derivedFromVersionRef
+            attribute: true
+        description:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Description
+        evenNumberRange:
+          $ref: '#/components/schemas/RoadNumberRangeStructure'
+          xml:
+            name: EvenNumberRange
+        extensions:
+          $ref: '#/components/schemas/ExtensionsStructure'
+          xml:
+            name: Extensions
+        gisFeatureRef:
+          type: string
+          xml:
+            name: GisFeatureRef
+        id:
+          type: string
+          xml:
+            attribute: true
+        infoLinks:
+          $ref: '#/components/schemas/InfoLinks'
+        keyList:
+          $ref: '#/components/schemas/KeyListStructure'
+        members:
+          $ref: '#/components/schemas/PointRefs_RelStructure'
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        multiSurface:
+          $ref: '#/components/schemas/MultiSurfaceType'
+          xml:
+            name: MultiSurface
+            namespace: http://www.opengis.net/gml/3.2
+        name:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: Name
+        nameOfClass:
+          type: string
+          xml:
+            attribute: true
+        oddNumberRange:
+          $ref: '#/components/schemas/RoadNumberRangeStructure'
+          xml:
+            name: OddNumberRange
+        parentZoneRef:
+          $ref: '#/components/schemas/ZoneRefStructure'
+          xml:
+            name: ParentZoneRef
+        placeTypes:
+          $ref: '#/components/schemas/TypeOfPlaceRefs_RelStructure'
+        polygon:
+          $ref: '#/components/schemas/PolygonType'
+          xml:
+            name: Polygon
+            namespace: http://www.opengis.net/gml/3.2
+        privateCode:
+          $ref: '#/components/schemas/PrivateCodeStructure'
+          xml:
+            name: PrivateCode
+        projections:
+          $ref: '#/components/schemas/Projections_RelStructure'
+        publication:
+          type: string
+          enum:
+          - PUBLIC
+          - RESTRICTED
+          - PRIVATE
+          - CONFIDENTIAL
+          - AUTHORISED
+          - TEST
+          xml:
+            attribute: true
+        purposeOfGroupingRef:
+          $ref: '#/components/schemas/PurposeOfGroupingRefStructure'
+          xml:
+            name: PurposeOfGroupingRef
+        responsibilitySetRef:
+          type: string
+          xml:
+            attribute: true
+        roadName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: RoadName
+        roadNumber:
+          type: string
+          xml:
+            name: RoadNumber
+        shortName:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: ShortName
+        status_BasicModificationDetailsGroup:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - OTHER
+          xml:
+            name: status
+            attribute: true
+        types:
+          $ref: '#/components/schemas/TypeOfZoneRefs_RelStructure'
+        validBetween:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidBetween'
+          xml:
+            name: ValidBetween
+        validityConditions:
+          $ref: '#/components/schemas/ValidityConditions_RelStructure'
+        version:
+          type: string
+          xml:
+            attribute: true
+    ContactStructure:
+      type: object
+      properties:
+        contactPerson:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: ContactPerson
+        contactRef:
+          $ref: '#/components/schemas/ContactRefStructure'
+          xml:
+            name: ContactRef
+        email:
+          type: string
+          xml:
+            name: Email
+        fax:
+          type: string
+          xml:
+            name: Fax
+        furtherDetails:
+          $ref: '#/components/schemas/MultilingualString'
+          xml:
+            name: FurtherDetails
+        phone:
+          type: string
+          xml:
+            name: Phone
+        url:
+          type: string
+          xml:
+            name: Url
+    JAXBElementGroupOfEntitiesRefStructure:
+      type: object
+      properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value:
+          $ref: '#/components/schemas/GroupOfEntitiesRefStructure'
+    ExplicitEquipments_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        installedEquipmentRefOrInstalledEquipmentOrLocalServiceRef:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementObject'
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+    PointRefStructure:
+      type: object
+      properties:
+        changed:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        created:
+          type: string
+          format: date-time
+          xml:
+            attribute: true
+        modification:
+          type: string
+          enum:
+          - NEW
+          - REVISE
+          - DELETE
+          - UNCHANGED
+          - DELTA
+          xml:
+            attribute: true
+        nameOfRefClass:
+          type: string
+          xml:
+            attribute: true
+        ref:
+          type: string
+          xml:
+            attribute: true
+        value:
+          type: string
+        version:
+          type: string
+          xml:
+            attribute: true
+        versionRef:
+          type: string
+          xml:
+            attribute: true
+    NavigationPaths_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        navigationPathRefOrNavigationPath:
+          type: array
+          items: {}
+    JAXBElementAbstractSurfaceType:
+      type: object
+      properties:
+        globalScope:
+          type: boolean
+        name:
+          type: object
+          properties:
+            localPart:
+              type: string
+            namespaceURI:
+              type: string
+            prefix:
+              type: string
+        nil:
+          type: boolean
+        typeSubstituted:
+          type: boolean
+        value:
+          $ref: '#/components/schemas/AbstractSurfaceType'
+    Quays_RelStructure:
+      type: object
+      properties:
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+        quayRefOrQuay:
+          type: array
+          items: {}
+    SiteEntrances_RelStructure:
+      type: object
+      properties:
+        entranceRefOrEntrance:
+          type: array
+          items:
+            $ref: '#/components/schemas/JAXBElementObject'
+        id:
+          type: string
+          xml:
+            attribute: true
+        modificationSet:
+          type: string
+          enum:
+          - ALL
+          - CHANGES_ONLY
+          xml:
+            attribute: true
+    Languages:
+      type: object
+      properties:
+        languageUsage:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageUsageStructure'
+          xml:
+            name: LanguageUsage
   parameters:
     ET-Client-Name:
       name: ET-Client-Name
@@ -6356,6 +6342,3 @@ components:
       explode: false
       schema:
         type: string
-x-refined-from:
-- entur-stop-place-v1-read-openapi.json
-- entur-stop-place-v1-read-openapi.yml

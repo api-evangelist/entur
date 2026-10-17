@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Group Of Distance Matrix Elements API
+  title: Products Group Of Distance Matrix Elements API
+  description: This API provides services to read and maintain products and fare data for public transport in Norway.
   version: 2026.10.0
-  description: 'Operations tagged group-of-distance-matrix-elements across 2 of this provider''s published API definitions: entur-products-openapi.json, entur-products-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/products
   description: Production environment
@@ -155,13 +155,6 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:endre
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
   /group-of-distance-matrix-elements/{id}/{version}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -249,35 +242,61 @@ paths:
       - basic_auth: []
       x-entur-permissions:
         value: product-api-access:les
-    servers:
-    - url: https://api.entur.io/products
-      description: Production environment
-    - url: https://api.staging.entur.io/products
-      description: Staging environment
-    - url: https://api.dev.entur.io/products
-      description: Development environment
 components:
   schemas:
-    VersionOfObjectRef:
+    GroupOfDistanceMatrixElementsInsert:
       required:
-      - nameOfClass
-      - ref
+      - fareFrameRef
+      - id
+      - members
       - version
       type: object
       properties:
-        nameOfClass:
-          minLength: 1
-          type: string
-          description: Name of class.
-        ref:
+        description:
+          type: array
+          description: Description represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        fareFrameId:
+          type: integer
+          description: Fare frame id.
+          format: int64
+        fareFrameRef:
+          $ref: '#/components/schemas/VersionOfObjectRef'
+        id:
           minLength: 1
           pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: The netex id reference to the object.
+          description: Id.
+          examples:
+          - NSB:GroupOfDistanceMatrixElements:TENDistances
+        members:
+          type: array
+          description: DistanceMatrixElements within the group.
+          items:
+            type: string
+        name:
+          type: array
+          description: GroupOfDistanceMatrixElements  name represented in different languages. Language codes are ISO-639.
+          items:
+            $ref: '#/components/schemas/TextInLanguage'
+        tariffId:
+          type: integer
+          description: Tariff id.
+          format: int64
+        validityConditions:
+          type: array
+          description: Validity conditions for the user profile.
+          items:
+            $ref: '#/components/schemas/ValidityCondition'
         version:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
           type: string
-          description: Version.
-      description: Fare frame ref.
+          description: GroupOfDistanceMatrixElements version.
+          examples:
+          - NSB:Version:V1
+      description: A GroupDistanceMatrixElement create request
     ValidityCondition:
       required:
       - changed
@@ -345,6 +364,26 @@ components:
           examples:
           - NSB:Version:V1
       description: A condition of the validity of the priceable object
+    VersionOfObjectRef:
+      required:
+      - nameOfClass
+      - ref
+      - version
+      type: object
+      properties:
+        nameOfClass:
+          minLength: 1
+          type: string
+          description: Name of class.
+        ref:
+          minLength: 1
+          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
+          type: string
+          description: The netex id reference to the object.
+        version:
+          type: string
+          description: Version.
+      description: Fare frame ref.
     GroupOfDistanceMatrixElements:
       required:
       - changed
@@ -429,69 +468,7 @@ components:
           type: string
           description: The text.
       description: Text in a specific language.
-    GroupOfDistanceMatrixElementsInsert:
-      required:
-      - fareFrameRef
-      - id
-      - members
-      - version
-      type: object
-      properties:
-        description:
-          type: array
-          description: Description represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        fareFrameId:
-          type: integer
-          description: Fare frame id.
-          format: int64
-        fareFrameRef:
-          $ref: '#/components/schemas/VersionOfObjectRef'
-        id:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: Id.
-          examples:
-          - NSB:GroupOfDistanceMatrixElements:TENDistances
-        members:
-          type: array
-          description: DistanceMatrixElements within the group.
-          items:
-            type: string
-        name:
-          type: array
-          description: GroupOfDistanceMatrixElements  name represented in different languages. Language codes are ISO-639.
-          items:
-            $ref: '#/components/schemas/TextInLanguage'
-        tariffId:
-          type: integer
-          description: Tariff id.
-          format: int64
-        validityConditions:
-          type: array
-          description: Validity conditions for the user profile.
-          items:
-            $ref: '#/components/schemas/ValidityCondition'
-        version:
-          minLength: 1
-          pattern: ^([A-Z]{3}):([A-Za-z]*):([0-9A-Za-z_\-]*)$
-          type: string
-          description: GroupOfDistanceMatrixElements version.
-          examples:
-          - NSB:Version:V1
-      description: A GroupDistanceMatrixElement create request
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -507,11 +484,17 @@ components:
       explode: false
       schema:
         type: string
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   securitySchemes:
     jwt:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-products-openapi.json
-- entur-products-openapi.yml

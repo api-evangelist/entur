@@ -1,8 +1,8 @@
 openapi: 3.2.0
 info:
-  title: Entur Datasets API
+  title: Timetable Management Datasets API
+  description: Entur provides an API for uploading and downloading NeTEx timetable datasets.
   version: 2026.09.0
-  description: 'Operations tagged Datasets across 2 of this provider''s published API definitions: entur-timetable-management-openapi.json, entur-timetable-management-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/timetable/v1/timetable-management
   description: Production
@@ -92,13 +92,6 @@ paths:
               examples:
                 default:
                   value: Internal server error
-    servers:
-    - url: https://api.entur.io/timetable/v1/timetable-management
-      description: Production
-    - url: https://api.staging.entur.io/timetable/v1/timetable-management
-      description: Staging
-    - url: https://api.dev.entur.io/timetable/v1/timetable-management
-      description: Development
   /datasets/{codespace}/filtered:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -197,13 +190,6 @@ paths:
               examples:
                 default:
                   value: Internal server error
-    servers:
-    - url: https://api.entur.io/timetable/v1/timetable-management
-      description: Production
-    - url: https://api.staging.entur.io/timetable/v1/timetable-management
-      description: Staging
-    - url: https://api.dev.entur.io/timetable/v1/timetable-management
-      description: Development
 components:
   schemas:
     UploadResult:
@@ -241,6 +227,3 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-x-refined-from:
-- entur-timetable-management-openapi.json
-- entur-timetable-management-openapi.yml

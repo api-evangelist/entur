@@ -1,12 +1,12 @@
 openapi: 3.2.0
 info:
-  title: Entur Discovery API
-  version: 2026.10.0
+  title: Sales v2 Discovery API
+  description: Entur's sales API, based on the Open Mobility Sales API (OMSA) standard, for searching, selecting, and purchasing public transport tickets.
   contact:
     name: Team Selgerintegrasjoner
     url: https://github.com/entur/omsa
+  version: 2026.10.0
   x-stability-level: draft
-  description: 'Operations tagged discovery across 2 of this provider''s published API definitions: entur-omsa-openapi.json, entur-omsa-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://api.entur.io/omsa/v1
   description: Production environment
@@ -40,13 +40,6 @@ paths:
           $ref: '#/components/responses/errorResponse'
       security:
       - OpenData: []
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
   /api:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -91,13 +84,6 @@ paths:
           $ref: '#/components/responses/errorResponse'
       security:
       - OpenData: []
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
   /conformance:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -118,13 +104,6 @@ paths:
           $ref: '#/components/responses/errorResponse'
       security:
       - OpenData: []
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
   /collections:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -151,13 +130,6 @@ paths:
           $ref: '#/components/responses/errorResponse'
       security:
       - OpenData: []
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
   /collections/{collectionId}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -197,13 +169,6 @@ paths:
           $ref: '#/components/responses/errorResponse'
       security:
       - OpenData: []
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
   /processes:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -235,13 +200,6 @@ paths:
           $ref: '#/components/responses/errorResponse'
       security:
       - OpenData: []
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
   /processes/{processID}:
     parameters:
     - $ref: '#/components/parameters/ET-Client-Name'
@@ -296,31 +254,217 @@ paths:
           $ref: '#/components/responses/errorResponse'
       security:
       - OpenData: []
-    servers:
-    - url: https://api.entur.io/omsa/v1
-      description: Production environment
-    - url: https://api.dev.entur.io/omsa/v1
-      description: Development environment
-    - url: https://api.staging.entur.io/omsa/v1
-      description: Staging environment
 components:
-  headers:
-    contentLanguage:
-      description: The language/localization of user-facing content, One IETF BCP 47 (RFC 5646) language tag (nl-NL)
-      required: true
-      style: simple
-      explode: false
-      schema:
-        pattern: ^[a-zA-Z]+-[a-zA-Z]+$
-        type: string
-    version:
-      description: the version used to format the response
-      required: true
-      style: simple
-      explode: false
-      schema:
-        type: string
   schemas:
+    httpStatus:
+      maximum: 599
+      minimum: 100
+      type: integer
+      description: HTTP status code (100–599)
+    confClasses:
+      required:
+      - conformsTo
+      type: object
+      properties:
+        conformsTo:
+          type: array
+          items:
+            type: string
+            examples:
+            - http://www.opengis.net/spec/ogcapi-processes-1/1.0/conf/core
+    link:
+      required:
+      - href
+      - rel
+      type: object
+      properties:
+        rel:
+          type: string
+          description: the action that can be performed OR part of the URI allowed values include the 'processId's, prefixes for the referenced data sources, prefixes for deeplinks ('apple' and 'android'), OGC compliant ones (alternative, next, etc)
+        href:
+          $ref: '#/components/schemas/url'
+        type:
+          $ref: '#/components/schemas/shortString'
+        method:
+          type: string
+          description: to indicate the http method.
+          enum:
+          - POST
+          - GET
+          - PUT
+          - DELETE
+          - PATCH
+        description:
+          type: string
+          description: the description of the external data source
+        body:
+          type: object
+          description: the (prefilled) body for the request
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        isMandatory:
+          type: boolean
+          description: is this link informative, or must it be used?
+        hash:
+          type: string
+          description: to validate that the content of the link hasn't been changed.
+        validity:
+          $ref: '#/components/schemas/temporalParameter'
+      additionalProperties: false
+      x-externalDocs:
+        url: https://github.com/opengeospatial/ogcapi-processes/raw/refs/heads/master/openapi/schemas/common-core/link.yaml
+    error:
+      required:
+      - category
+      - code
+      - detail
+      - hint
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/url'
+        title:
+          $ref: '#/components/schemas/shortString'
+        status:
+          $ref: '#/components/schemas/httpStatus'
+        detail:
+          $ref: '#/components/schemas/longString'
+        instance:
+          $ref: '#/components/schemas/url'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        code:
+          type: string
+          description: Stable machine-readable problem code.
+        category:
+          type: string
+          description: Public problem category used by curated problems.
+          enum:
+          - authorization
+          - validation
+          - downstream
+          - state
+          - resource
+          - availability
+          - server
+        hint:
+          type: string
+          description: Short client-facing remediation hint.
+        context:
+          type: object
+          additionalProperties: true
+          description: Safe structured context fields for the problem.
+      additionalProperties: true
+      description: JSON schema for exceptions based on RFC 7807
+    processSummary:
+      allOf:
+      - $ref: '#/components/schemas/descriptionType'
+      - required:
+        - id
+        - version
+        type: object
+        properties:
+          id:
+            type: string
+          version:
+            type: string
+          jobControlOptions:
+            type: array
+            items:
+              $ref: '#/components/schemas/jobControlOptions'
+          links:
+            type: array
+            items:
+              $ref: '#/components/schemas/link'
+    day:
+      type: string
+      enum:
+      - MON
+      - TUE
+      - WED
+      - THU
+      - FRI
+      - SAT
+      - SUN
+      x-tm: DAY OF WEEK
+    normalInt:
+      maximum: 1000
+      minimum: 0
+      type: integer
+      description: default length for an integer (0-1000)
+      default: 0
+    processList:
+      required:
+      - links
+      - processes
+      type: object
+      properties:
+        processes:
+          type: array
+          items:
+            $ref: '#/components/schemas/processSummary'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+    url:
+      type: string
+      description: valid URL
+      format: uri
+    collections:
+      required:
+      - collections
+      - links
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/link'
+        timeStamp:
+          type: string
+          format: date-time
+        numberMatched:
+          minimum: 0
+          type: integer
+          examples:
+          - 1
+        numberReturned:
+          minimum: 0
+          type: integer
+          examples:
+          - 1
+        collections:
+          type: array
+          items:
+            $ref: '#/components/schemas/collectionInfo'
+    metadata:
+      oneOf:
+      - allOf:
+        - $ref: '#/components/schemas/link'
+        - type: object
+          properties:
+            role:
+              type: string
+      - type: object
+        properties:
+          role:
+            type: string
+          title:
+            type: string
+          lang:
+            type: string
+          value:
+            oneOf:
+            - type: string
+            - type: object
     collectionInfo:
       required:
       - id
@@ -383,100 +527,6 @@ components:
         maxCellSize:
           type: number
           description: Maximum cell size for usage of the collection
-    processSummary:
-      allOf:
-      - $ref: '#/components/schemas/descriptionType'
-      - required:
-        - id
-        - version
-        type: object
-        properties:
-          id:
-            type: string
-          version:
-            type: string
-          jobControlOptions:
-            type: array
-            items:
-              $ref: '#/components/schemas/jobControlOptions'
-          links:
-            type: array
-            items:
-              $ref: '#/components/schemas/link'
-    processList:
-      required:
-      - links
-      - processes
-      type: object
-      properties:
-        processes:
-          type: array
-          items:
-            $ref: '#/components/schemas/processSummary'
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/link'
-    day:
-      type: string
-      enum:
-      - MON
-      - TUE
-      - WED
-      - THU
-      - FRI
-      - SAT
-      - SUN
-      x-tm: DAY OF WEEK
-    metadata:
-      oneOf:
-      - allOf:
-        - $ref: '#/components/schemas/link'
-        - type: object
-          properties:
-            role:
-              type: string
-      - type: object
-        properties:
-          role:
-            type: string
-          title:
-            type: string
-          lang:
-            type: string
-          value:
-            oneOf:
-            - type: string
-            - type: object
-    longString:
-      maxLength: 10000
-      type: string
-      description: long string, memos etc (length 0-10.000)
-    shortString:
-      maxLength: 75
-      type: string
-      description: short string, display names (length 0-75)
-    normalInt:
-      maximum: 1000
-      minimum: 0
-      type: integer
-      description: default length for an integer (0-1000)
-      default: 0
-    descriptionType:
-      type: object
-      properties:
-        title:
-          type: string
-        description:
-          type: string
-        keywords:
-          type: array
-          items:
-            type: string
-        metadata:
-          type: array
-          items:
-            $ref: '#/components/schemas/metadata'
     dateTime:
       type: string
       description: https://www.rfc-editor.org/rfc/rfc3339#section-5.6, date-time (2019-10-12T07:20:50.52Z)
@@ -488,165 +538,6 @@ components:
       - sync-execute
       - async-execute
       - dismiss
-    confClasses:
-      required:
-      - conformsTo
-      type: object
-      properties:
-        conformsTo:
-          type: array
-          items:
-            type: string
-            examples:
-            - http://www.opengis.net/spec/ogcapi-processes-1/1.0/conf/core
-    collections:
-      required:
-      - collections
-      - links
-      type: object
-      properties:
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/link'
-        timeStamp:
-          type: string
-          format: date-time
-        numberMatched:
-          minimum: 0
-          type: integer
-          examples:
-          - 1
-        numberReturned:
-          minimum: 0
-          type: integer
-          examples:
-          - 1
-        collections:
-          type: array
-          items:
-            $ref: '#/components/schemas/collectionInfo'
-    httpStatus:
-      maximum: 599
-      minimum: 100
-      type: integer
-      description: HTTP status code (100–599)
-    link:
-      required:
-      - href
-      - rel
-      type: object
-      properties:
-        rel:
-          type: string
-          description: the action that can be performed OR part of the URI allowed values include the 'processId's, prefixes for the referenced data sources, prefixes for deeplinks ('apple' and 'android'), OGC compliant ones (alternative, next, etc)
-        href:
-          $ref: '#/components/schemas/url'
-        type:
-          $ref: '#/components/schemas/shortString'
-        method:
-          type: string
-          description: to indicate the http method.
-          enum:
-          - POST
-          - GET
-          - PUT
-          - DELETE
-          - PATCH
-        description:
-          type: string
-          description: the description of the external data source
-        body:
-          type: object
-          description: the (prefilled) body for the request
-        headers:
-          type: object
-          additionalProperties:
-            type: string
-        isMandatory:
-          type: boolean
-          description: is this link informative, or must it be used?
-        hash:
-          type: string
-          description: to validate that the content of the link hasn't been changed.
-        validity:
-          $ref: '#/components/schemas/temporalParameter'
-      additionalProperties: false
-      x-externalDocs:
-        url: https://github.com/opengeospatial/ogcapi-processes/raw/refs/heads/master/openapi/schemas/common-core/link.yaml
-    temporalParameter:
-      required:
-      - type
-      type: object
-      properties:
-        type:
-          pattern: ^(temporal)$
-          type: string
-        startTime:
-          $ref: '#/components/schemas/dateTime'
-        endTime:
-          $ref: '#/components/schemas/dateTime'
-        duration:
-          $ref: '#/components/schemas/normalInt'
-        dayType:
-          $ref: '#/components/schemas/day'
-      x-tm: TEMPORAL VALIDITY PARAMETERS
-    dataType:
-      oneOf:
-      - type: string
-      - type: string
-        enum:
-        - map
-        - vector
-        - coverage
-    error:
-      required:
-      - category
-      - code
-      - detail
-      - hint
-      - status
-      - title
-      - type
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/url'
-        title:
-          $ref: '#/components/schemas/shortString'
-        status:
-          $ref: '#/components/schemas/httpStatus'
-        detail:
-          $ref: '#/components/schemas/longString'
-        instance:
-          $ref: '#/components/schemas/url'
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/link'
-        code:
-          type: string
-          description: Stable machine-readable problem code.
-        category:
-          type: string
-          description: Public problem category used by curated problems.
-          enum:
-          - authorization
-          - validation
-          - downstream
-          - state
-          - resource
-          - availability
-          - server
-        hint:
-          type: string
-          description: Short client-facing remediation hint.
-        context:
-          type: object
-          additionalProperties: true
-          description: Safe structured context fields for the problem.
-      additionalProperties: true
-      description: JSON schema for exceptions based on RFC 7807
     landingPage:
       required:
       - links
@@ -668,10 +559,54 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/link'
-    url:
+    temporalParameter:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          pattern: ^(temporal)$
+          type: string
+        startTime:
+          $ref: '#/components/schemas/dateTime'
+        endTime:
+          $ref: '#/components/schemas/dateTime'
+        duration:
+          $ref: '#/components/schemas/normalInt'
+        dayType:
+          $ref: '#/components/schemas/day'
+      x-tm: TEMPORAL VALIDITY PARAMETERS
+    longString:
+      maxLength: 10000
       type: string
-      description: valid URL
-      format: uri
+      description: long string, memos etc (length 0-10.000)
+    descriptionType:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        keywords:
+          type: array
+          items:
+            type: string
+        metadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/metadata'
+    dataType:
+      oneOf:
+      - type: string
+      - type: string
+        enum:
+        - map
+        - vector
+        - coverage
+    shortString:
+      maxLength: 75
+      type: string
+      description: short string, display names (length 0-75)
   responses:
     conformanceDeclarationResponse:
       description: 'The URIs of all conformance classes supported by the server.
@@ -696,6 +631,17 @@ components:
         text/html:
           schema:
             type: string
+    errorResponse:
+      description: Bad request.
+      headers:
+        Version:
+          $ref: '#/components/headers/version'
+        Content-Language:
+          $ref: '#/components/headers/contentLanguage'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
     landingPageResponse:
       description: The reponse containing a landing page
       headers:
@@ -710,27 +656,33 @@ components:
         text/html:
           schema:
             type: string
-    errorResponse:
-      description: Bad request.
-      headers:
-        Version:
-          $ref: '#/components/headers/version'
-        Content-Language:
-          $ref: '#/components/headers/contentLanguage'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/error'
-  parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
+  headers:
+    version:
+      description: the version used to format the response
+      required: true
       style: simple
       explode: false
       schema:
         type: string
+    contentLanguage:
+      description: The language/localization of user-facing content, One IETF BCP 47 (RFC 5646) language tag (nl-NL)
+      required: true
+      style: simple
+      explode: false
+      schema:
+        pattern: ^[a-zA-Z]+-[a-zA-Z]+$
+        type: string
+  parameters:
+    acceptLanguage:
+      name: Accept-Language
+      in: header
+      required: true
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/shortString'
+      x-externalDocs:
+        description: A comma-separated list of BCP 47 (RFC 5646) language tags and optional weights as described in IETF RFC7231 section 5.3.5. A list of the languages/localizations the user would like to see the results in. For user privacy and ease of use on the TO side, this list should be kept as short as possible
     ET-Client-Name:
       name: ET-Client-Name
       in: header
@@ -759,16 +711,15 @@ components:
         enum:
         - json
         - html
-    acceptLanguage:
-      name: Accept-Language
+    X-Correlation-Id:
+      name: X-Correlation-Id
       in: header
-      required: true
+      description: Correlation id
+      required: false
       style: simple
       explode: false
       schema:
-        $ref: '#/components/schemas/shortString'
-      x-externalDocs:
-        description: A comma-separated list of BCP 47 (RFC 5646) language tags and optional weights as described in IETF RFC7231 section 5.3.5. A list of the languages/localizations the user would like to see the results in. For user privacy and ease of use on the TO side, this list should be kept as short as possible
+        type: string
   securitySchemes:
     OpenData:
       type: http
@@ -796,6 +747,3 @@ components:
           tokenUrl: /oauth/token
           scopes:
             processes: Access to /processes/
-x-refined-from:
-- entur-omsa-openapi.json
-- entur-omsa-openapi.yml

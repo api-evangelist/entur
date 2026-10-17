@@ -410,177 +410,6 @@ components:
       - FlatPrice
       examples:
       - FlatPrice
-    VersionStatus:
-      type: string
-      enum:
-      - DRAFT
-      - PROPOSED
-      - VERSIONED
-      - DEPRECATED
-    FareTableRequest:
-      required:
-      - prices
-      - startDate
-      - status
-      type: object
-      properties:
-        ownerOrganisationId:
-          minimum: 1
-          type: integer
-          description: Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.
-          format: int64
-          examples:
-          - 1
-        names:
-          $ref: '#/components/schemas/LocalizedString'
-        descriptions:
-          $ref: '#/components/schemas/LocalizedString'
-        startDate:
-          type: string
-          description: First day this price version is valid.
-          format: date
-          examples:
-          - '2026-08-01'
-        endDate:
-          type: string
-          description: Last day this price version is valid (optional). Omit for an open-ended version.
-          format: date
-          examples:
-          - '2026-12-31'
-        status:
-          allOf:
-          - $ref: '#/components/schemas/VersionStatus'
-          - description: 'Status of the fare table version. Required; on create only DRAFT or
-
-              PROPOSED is accepted — a new version cannot be published directly.
-
-
-              - **DRAFT** - Under construction and not ready for operational use.
-
-              - **PROPOSED** - Complete but pending review and approval.
-
-              - **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.
-
-              - **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.
-
-              '
-            examples:
-            - DRAFT
-        prices:
-          minItems: 1
-          type: array
-          description: 'The prices in this table. Each entry must be uniquely identified by its selector
-
-            combination, so a flat price with no passenger-type differentiation is a single
-
-            selector-less entry. Each entry carries its own optional `currency`, per NeTEx.
-
-            '
-          items:
-            $ref: '#/components/schemas/FarePriceEntry'
-    FarePriceEntry:
-      required:
-      - amount
-      - currency
-      - type
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/FarePriceType'
-        amount:
-          pattern: ^[0-9]+(\.[0-9]+)?$
-          type: string
-          description: 'The price in the major unit of this entry''s `currency`, as a decimal string (for example
-
-            "49.00"). The number of decimals must not exceed what that currency allows — 2 for NOK and
-
-            EUR, 0 for JPY, 3 for KWD.
-
-            '
-          examples:
-          - '49.00'
-        currency:
-          pattern: ^[A-Z]{3}$
-          type: string
-          description: 'ISO 4217 currency code for this individual price, per NeTEx `FarePrice.Currency`. Required:
-
-            the flat `amount` cannot be interpreted without knowing its currency (the number of decimals
-
-            depends on it). Different entries in the same fare table may declare different currencies.
-
-            '
-          examples:
-          - NOK
-      description: 'A single NeTEx-typed price, held as a cell of the fare table.
-
-
-        Each price is an explicit NeTEx price object identified by its `type` (the NeTEx class). Only
-
-        the flat `FlatPrice` is implemented today: a fixed amount with no origin/destination, interval
-
-        or passenger-type selectors. The richer NeTEx price types — `DistanceMatrixElementPrice` for an
-
-        origin/destination pair, `GeographicalIntervalPrice` for a counted interval, each optionally
-
-        carrying a `LimitingRule` for discounts and caps — will be added as sibling `type`s when the
-
-        model is extended, so clients can already branch on `type`.
-
-        '
-    LocalizedString:
-      type: array
-      items:
-        required:
-        - lang
-        - value
-        type: object
-        properties:
-          lang:
-            pattern: ^[a-z]{2}-[A-Z]{2}$
-            type: string
-            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
-            examples:
-            - nb-NO
-          value:
-            type: string
-            description: The localized string value for the specified lang.
-    ProblemDetails:
-      required:
-      - detail
-      - status
-      - title
-      - type
-      type: object
-      properties:
-        type:
-          type: string
-          description: A URI reference that identifies the problem type.
-          format: uri
-          examples:
-          - https://developer.entur.org/errors/bad-request
-        title:
-          type: string
-          description: Short, human-readable summary of the problem type.
-          examples:
-          - Bad Request
-        status:
-          type: integer
-          description: The HTTP status code.
-          format: int32
-          examples:
-          - 400
-        detail:
-          type: string
-          description: Human-readable explanation specific to this occurrence.
-          examples:
-          - The supplied ruleId is not a valid UUID.
-        instance:
-          type: string
-          description: A URI reference that identifies the specific occurrence.
-          format: uri
-          examples:
-          - https://api.example.com/requests/12345
-      description: RFC 9457 Problem Details
     FareTableResponse:
       required:
       - id
@@ -673,21 +502,178 @@ components:
             examples:
             - ENT:SupplementProduct:bike
           default: []
-  responses:
-    ForbiddenError:
-      description: Forbidden - Insufficient permissions
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ProblemDetails'
+    FarePriceEntry:
+      required:
+      - amount
+      - currency
+      - type
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/FarePriceType'
+        amount:
+          pattern: ^[0-9]+(\.[0-9]+)?$
+          type: string
+          description: 'The price in the major unit of this entry''s `currency`, as a decimal string (for example
+
+            "49.00"). The number of decimals must not exceed what that currency allows — 2 for NOK and
+
+            EUR, 0 for JPY, 3 for KWD.
+
+            '
           examples:
-            forbidden:
-              summary: Access forbidden
-              value:
-                type: https://example.com/probs/forbidden
-                title: Forbidden
-                status: 403
-                detail: You do not have permission to access this resource.
+          - '49.00'
+        currency:
+          pattern: ^[A-Z]{3}$
+          type: string
+          description: 'ISO 4217 currency code for this individual price, per NeTEx `FarePrice.Currency`. Required:
+
+            the flat `amount` cannot be interpreted without knowing its currency (the number of decimals
+
+            depends on it). Different entries in the same fare table may declare different currencies.
+
+            '
+          examples:
+          - NOK
+      description: 'A single NeTEx-typed price, held as a cell of the fare table.
+
+
+        Each price is an explicit NeTEx price object identified by its `type` (the NeTEx class). Only
+
+        the flat `FlatPrice` is implemented today: a fixed amount with no origin/destination, interval
+
+        or passenger-type selectors. The richer NeTEx price types — `DistanceMatrixElementPrice` for an
+
+        origin/destination pair, `GeographicalIntervalPrice` for a counted interval, each optionally
+
+        carrying a `LimitingRule` for discounts and caps — will be added as sibling `type`s when the
+
+        model is extended, so clients can already branch on `type`.
+
+        '
+    FareTableRequest:
+      required:
+      - prices
+      - startDate
+      - status
+      type: object
+      properties:
+        ownerOrganisationId:
+          minimum: 1
+          type: integer
+          description: Internal id of the organisation that owns this element. Omit it to use the organisation in the access token, which is what a caller acting for itself should do. Supplying a different organisation requires permission to act on behalf of that organisation.
+          format: int64
+          examples:
+          - 1
+        names:
+          $ref: '#/components/schemas/LocalizedString'
+        descriptions:
+          $ref: '#/components/schemas/LocalizedString'
+        startDate:
+          type: string
+          description: First day this price version is valid.
+          format: date
+          examples:
+          - '2026-08-01'
+        endDate:
+          type: string
+          description: Last day this price version is valid (optional). Omit for an open-ended version.
+          format: date
+          examples:
+          - '2026-12-31'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/VersionStatus'
+          - description: 'Status of the fare table version. Required; on create only DRAFT or
+
+              PROPOSED is accepted — a new version cannot be published directly.
+
+
+              - **DRAFT** - Under construction and not ready for operational use.
+
+              - **PROPOSED** - Complete but pending review and approval.
+
+              - **VERSIONED** - Finalized and frozen; a new version must be created for further modifications. Remains authoritative for its validity period even after expiry.
+
+              - **DEPRECATED** - Explicitly withdrawn and should not be used; indicates an active decision to retract, not a natural expiry.
+
+              '
+            examples:
+            - DRAFT
+        prices:
+          minItems: 1
+          type: array
+          description: 'The prices in this table. Each entry must be uniquely identified by its selector
+
+            combination, so a flat price with no passenger-type differentiation is a single
+
+            selector-less entry. Each entry carries its own optional `currency`, per NeTEx.
+
+            '
+          items:
+            $ref: '#/components/schemas/FarePriceEntry'
+    VersionStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PROPOSED
+      - VERSIONED
+      - DEPRECATED
+    LocalizedString:
+      type: array
+      items:
+        required:
+        - lang
+        - value
+        type: object
+        properties:
+          lang:
+            pattern: ^[a-z]{2}-[A-Z]{2}$
+            type: string
+            description: BCP-47 language tag (e.g., 'nb-NO', 'en-GB').
+            examples:
+            - nb-NO
+          value:
+            type: string
+            description: The localized string value for the specified lang.
+    ProblemDetails:
+      required:
+      - detail
+      - status
+      - title
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: A URI reference that identifies the problem type.
+          format: uri
+          examples:
+          - https://developer.entur.org/errors/bad-request
+        title:
+          type: string
+          description: Short, human-readable summary of the problem type.
+          examples:
+          - Bad Request
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+          examples:
+          - 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          examples:
+          - The supplied ruleId is not a valid UUID.
+        instance:
+          type: string
+          description: A URI reference that identifies the specific occurrence.
+          format: uri
+          examples:
+          - https://api.example.com/requests/12345
+      description: RFC 9457 Problem Details
+  responses:
     BadRequestError:
       description: Bad request - Invalid data or schema violation
       content:
@@ -709,6 +695,20 @@ components:
                 title: Bad Request
                 status: 400
                 detail: PurchaseWindow with id 'ENT:PurchaseWindow:120days' not found.
+    ForbiddenError:
+      description: Forbidden - Insufficient permissions
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          examples:
+            forbidden:
+              summary: Access forbidden
+              value:
+                type: https://example.com/probs/forbidden
+                title: Forbidden
+                status: 403
+                detail: You do not have permission to access this resource.
     UnauthorizedError:
       description: Unauthorized - Authentication required
       content:
@@ -724,15 +724,6 @@ components:
                 status: 401
                 detail: Authentication credentials were missing or invalid.
   parameters:
-    X-Correlation-Id:
-      name: X-Correlation-Id
-      in: header
-      description: Correlation id
-      required: false
-      style: simple
-      explode: false
-      schema:
-        type: string
     version:
       name: version
       in: path
@@ -746,23 +737,6 @@ components:
       examples:
         default:
           value: ENT:Version:001
-    validOnDate:
-      name: validOnDate
-      in: query
-      description: 'The date that the element should be valid for, e.g. the travel date.
-
-        Defaults to the current date.
-
-        '
-      required: false
-      style: form
-      explode: true
-      schema:
-        type: string
-        format: date
-      examples:
-        default:
-          value: '2026-12-01'
     id:
       name: id
       in: path
@@ -791,7 +765,46 @@ components:
       explode: false
       schema:
         type: string
+    validOnDate:
+      name: validOnDate
+      in: query
+      description: 'The date that the element should be valid for, e.g. the travel date.
+
+        Defaults to the current date.
+
+        '
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: string
+        format: date
+      examples:
+        default:
+          value: '2026-12-01'
+    X-Correlation-Id:
+      name: X-Correlation-Id
+      in: header
+      description: Correlation id
+      required: false
+      style: simple
+      explode: false
+      schema:
+        type: string
   examples:
+    flat:
+      summary: Flat price
+      value:
+        ownerOrganisationId: 1
+        names:
+        - lang: nb-NO
+          value: Sykkeltillegg
+        startDate: '2026-08-01'
+        status: DRAFT
+        prices:
+        - type: FlatPrice
+          amount: '49.00'
+          currency: NOK
     flat-2:
       summary: Flat price
       value:
@@ -803,19 +816,6 @@ components:
           value: Sykkeltillegg
         startDate: '2026-08-01'
         status: VERSIONED
-        prices:
-        - type: FlatPrice
-          amount: '49.00'
-          currency: NOK
-    flat:
-      summary: Flat price
-      value:
-        ownerOrganisationId: 1
-        names:
-        - lang: nb-NO
-          value: Sykkeltillegg
-        startDate: '2026-08-01'
-        status: DRAFT
         prices:
         - type: FlatPrice
           amount: '49.00'

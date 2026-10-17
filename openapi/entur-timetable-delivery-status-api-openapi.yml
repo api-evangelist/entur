@@ -1,11 +1,11 @@
 openapi: 3.2.0
 info:
-  title: Entur Timetable Delivery Status API
-  version: 2026.09.0
+  title: Timetable Delivery Status API
+  description: Status of a timetable data delivery
   contact:
     name: Entur
     url: https://developer.entur.org
-  description: 'Operations tagged timetable-delivery-status across 2 of this provider''s published API definitions: entur-timetable-delivery-status-openapi.json, entur-timetable-delivery-status-openapi.yml. Each path carries the servers of the definition it was published in.'
+  version: 2026.09.0
 servers:
 - url: https://api.dev.entur.io/timetable/v1/timetable-events
   description: Development
@@ -57,13 +57,6 @@ paths:
                     state: OK
                     date: '2026-04-17T10:30:00Z'
                     fileName: rut-netex_202604171030.zip
-    servers:
-    - url: https://api.dev.entur.io/timetable/v1/timetable-events
-      description: Development
-    - url: https://api.staging.entur.io/timetable/v1/timetable-events
-      description: Staging
-    - url: https://api.entur.io/timetable/v1/timetable-events
-      description: Production
 components:
   parameters:
     X-Correlation-Id:
@@ -105,6 +98,3 @@ components:
           format: date-time
         fileName:
           type: string
-x-refined-from:
-- entur-timetable-delivery-status-openapi.json
-- entur-timetable-delivery-status-openapi.yml
