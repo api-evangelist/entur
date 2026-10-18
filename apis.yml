@@ -132,6 +132,9 @@ apis:
   humanURL: https://developer.entur.no/docs/open-services/journey-planner
   baseURL: https://api.entur.io/journey-planner/v3/graphql
   tags:
+  - OpenAPI
+  - GraphQL
+  tags_raw:
   - Open API
   - GraphQL
   properties:
@@ -148,6 +151,9 @@ apis:
   humanURL: https://developer.entur.no/docs/open-services/vehicle-positions
   baseURL: https://api.entur.io/realtime/v2/vehicles/graphql
   tags:
+  - OpenAPI
+  - GraphQL
+  tags_raw:
   - Open API
   - GraphQL
   properties:
@@ -164,6 +170,9 @@ apis:
   humanURL: https://developer.entur.no/docs/open-services/mobility
   baseURL: https://api.entur.io/mobility/v2/graphql
   tags:
+  - OpenAPI
+  - GraphQL
+  tags_raw:
   - Open API
   - GraphQL
   properties:
@@ -1429,6 +1438,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Authentication
+  tags_raw:
   - authentication
   properties:
   - type: OpenAPI
@@ -1682,7 +1693,8 @@ apis:
     target="_blank">Chapter 6&#58; API Authentication and Authorization</a> of the BoB Manual.
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - authtokenPublicKey
   properties:
   - type: OpenAPI
@@ -4684,6 +4696,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Collection
+  tags_raw:
   - collections
   properties:
   - type: OpenAPI
@@ -7187,6 +7201,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Credit
+  tags_raw:
   - Credits
   properties:
   - type: OpenAPI
@@ -9189,6 +9205,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Discovery
+  tags_raw:
   - discovery
   properties:
   - type: OpenAPI
@@ -10194,7 +10212,8 @@ apis:
     target="_blank">MTS1</a> section 2.4).
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - domainName
   properties:
   - type: OpenAPI
@@ -12200,6 +12219,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Example
+  tags_raw:
   - example
   properties:
   - type: OpenAPI
@@ -12951,6 +12972,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Export
+  tags_raw:
   - export
   properties:
   - type: OpenAPI
@@ -20221,7 +20244,8 @@ apis:
     target="_blank">BoB documentation&#58; How does it work &rarr; BoB-API and API endpoints</a>.
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - interfaceEndpoint
   properties:
   - type: OpenAPI
@@ -20974,7 +20998,8 @@ apis:
     which participants that are allowed to sign tickets issued by other participants.
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - issuerSignatureConstraint
   properties:
   - type: OpenAPI
@@ -21225,6 +21250,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Item
+  tags_raw:
   - Items
   properties:
   - type: OpenAPI
@@ -22225,6 +22252,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Metadata
+  tags_raw:
   - meta-data
   properties:
   - type: OpenAPI
@@ -22479,7 +22508,8 @@ apis:
     target="_blank">BoB Manual&#58; Key Management &rarr; 5.3. Ticketing keys</a>.
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - mtbPublicKey
   properties:
   - type: OpenAPI
@@ -23230,6 +23260,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Order Lines
+  tags_raw:
   - Order lines
   properties:
   - type: OpenAPI
@@ -23730,6 +23762,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Order
+  tags_raw:
   - Orders
   properties:
   - type: OpenAPI
@@ -24731,7 +24765,8 @@ apis:
   description: Manage participant info for a participant
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - participantInfo
   properties:
   - type: OpenAPI
@@ -24981,7 +25016,8 @@ apis:
   description: Get all metadata for a certain participant.
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - participantMetadata
   properties:
   - type: OpenAPI
@@ -25231,7 +25267,8 @@ apis:
   description: Get all metadata for all registered participants.
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
-  tags:
+  tags: []
+  tags_raw:
   - participantMetadataFile
   properties:
   - type: OpenAPI
@@ -28735,6 +28772,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Processes
+  tags_raw:
   - processes
   properties:
   - type: OpenAPI
@@ -30999,6 +31038,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - QR Codes
+  tags_raw:
   - QR Code
   properties:
   - type: OpenAPI
@@ -41775,6 +41816,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Tariffs
+  tags_raw:
   - tariffs
   properties:
   - type: OpenAPI
@@ -47284,6 +47327,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - User Profiles
+  tags_raw:
   - user-profiles
   properties:
   - type: OpenAPI
@@ -49035,6 +49080,8 @@ apis:
   humanURL: https://developer.entur.no/apis/clearing-reports
   baseURL: https://api.entur.io/cleos-reporting
   tags:
+  - Versions
+  tags_raw:
   - versions
   properties:
   - type: OpenAPI
